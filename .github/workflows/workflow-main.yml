@@ -1,0 +1,141 @@
+# Workflow 이름
+name: CD workflow
+
+# Event Trigger 환경
+on:
+  pull_request:
+    branches: [ "main" ]  # push가 main 브랜치에 생성되면 트리거
+
+permissions: # 워크플로우 권한
+  id-token: write
+  contents: read # 읽기
+
+jobs:
+  build:
+    # 실행환경 설정
+    runs-on: ubuntu-24.04
+
+    # Action을 사용하여 Step을 구성
+    steps:
+      # GitHub repository 코드 체크아웃
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      # JDK 17 설치
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # resources 폴더 생성
+      - name: Create resources folder if not exist
+        run: |
+          if [ ! -d "./src/main/resources" ]; then
+            mkdir -p ./src/main/resources
+          fi
+
+      # application.yml 파일 생성
+      - name: make application.yml
+        run: |
+          touch ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
+        shell: bash
+
+      # cloud 폴더 생성
+      - name: Create cloud folder if not exist
+        run: |
+          if [ ! -d "./src/main/resources/cloud" ]; then
+            mkdir -p ./src/main/resources/cloud
+          fi
+
+      # application-cloud.yml 파일 생성
+      - name: make application-cloud.yml
+        run: |
+          touch ./src/main/resources/cloud/application-cloud.yml
+          echo "${{ secrets.APPLICATION_CLOUD_YML }}" > ./src/main/resources/cloud/application-cloud.yml
+        shell: bash
+
+      # 빌드 속도 향상을 위한 Gradle 캐싱
+      - name: Gradle Caching
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      # 빌드를 위한 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew  # Gradle wrapper에 실행 권한 부여
+
+      # Gradle을 사용하여 빌드 실행
+      - name: Build with Gradle Wrapper
+        run: ./gradlew clean build -x test
+
+      # Docker 로그인
+      - name: login docker hub
+        uses: docker/login-action@v2.2.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Docker 빌드 및 푸시
+      - name: install docker buildx
+        uses: docker/setup-buildx-action@v2.9.1
+
+      - name: docker image build & push
+        run: |
+          docker build --platform linux/amd64 -t confetiserver/deploy .
+          docker push confetiserver/deploy
+
+  deploy:
+    needs: build
+    # 실행환경 설정
+    runs-on: ubuntu-24.04
+    environment: production
+
+    # Action을 사용하여 Step을 구성
+    steps:
+      # Github Action 환경의 Public IP 가져오기
+      - name: Get Github action IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
+      # AWS 인증
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_NAME }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      # AWS ECR 로그인
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: true
+
+      # 보안 규칙에 ssh IP 추가
+      - name: Add Github Actions IP to Security group
+        run: |
+          aws ec2 authorize-security-group-ingress --group-name ${{ secrets.AWS_SG_NAME }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+      # 원격 서버에 배포
+      - name: docker container deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            cd ~
+            docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
+            ./deploy.sh
+
+      # 보안 규칙에 ssh IP 삭제
+      - name: Remove Github Actions IP from security group
+        run: |
+          aws ec2 revoke-security-group-ingress --group-name ${{ secrets.AWS_SG_NAME }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
