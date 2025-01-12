@@ -25,18 +25,18 @@ jobs:
           DESCRIPTION_MESSAGE="temp"
 
           if [[ "$ACTION" == "opened" ]]; then
-            DESCRIPTION_MESSAGE="[ OPENED ] 오이오이 리뷰하라구"
+            DESCRIPTION_MESSAGE="[ OPENED ] 리뷰 달아주셔요"
           elif [[ "$ACTION" == "closed" && "$MERGED" == "true" ]]; then
             DESCRIPTION_MESSAGE="[ MERGED ] 💯💯💯"
           else
-            DESCRIPTION_MESSAGE="[ CLOSED ] 기행종이었다니,,"
+            DESCRIPTION_MESSAGE="[ CLOSED ] 머함요?"
           fi
           
           curl -X POST -H "Content-Type: application/json" \
           -d '{
               "embeds": [
                 {
-                  "title": "😵 신죠오 사사게오 😵",
+                  "title": "😵 서버는 열일 중... 😵",
                   "description": "**🔥 '"$DESCRIPTION_MESSAGE"' 🔥**\n👤 '"$USERNAME"'\n🔊 '"$TITLE"'\n🔗 '"$URL"'",
                   "color": 6847432
                 }
