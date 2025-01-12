@@ -1,0 +1,44 @@
+name: 'PR Discord Notification'
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+    types:
+      - opened
+      - closed
+
+jobs:
+  notification:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Discord Notification
+        env:
+          ACTION: ${{ github.event.action }}
+          MERGED: ${{ github.event.pull_request.merged }}
+          USERNAME: ${{ github.event.pull_request.user.login }}
+          TITLE: ${{ github.event.pull_request.title }}
+          URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          DESCRIPTION_MESSAGE="temp"
+
+          if [[ "$ACTION" == "opened" ]]; then
+            DESCRIPTION_MESSAGE="[ OPENED ] 오이오이 리뷰하라구"
+          elif [[ "$ACTION" == "closed" && "$MERGED" == "true" ]]; then
+            DESCRIPTION_MESSAGE="[ MERGED ] 💯💯💯"
+          else
+            DESCRIPTION_MESSAGE="[ CLOSED ] 기행종이었다니,,"
+          fi
+          
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{
+              "embeds": [
+                {
+                  "title": "😵 신죠오 사사게오 😵",
+                  "description": "**🔥 '"$DESCRIPTION_MESSAGE"' 🔥**\n👤 '"$USERNAME"'\n🔊 '"$TITLE"'\n🔗 '"$URL"'",
+                  "color": 6847432
+                }
+              ]
+            }' ${{ secrets.DISCORD_WEBHOOK_URL }};
