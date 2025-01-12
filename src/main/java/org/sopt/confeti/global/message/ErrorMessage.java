@@ -1,12 +1,7 @@
 package org.sopt.confeti.global.message;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 public enum ErrorMessage {
     /* 400 Bad Request */
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "요청 형식이 올바르지 않습니다"),
@@ -27,9 +22,22 @@ public enum ErrorMessage {
     CONFLICT(HttpStatus.CONFLICT, "이미 존재하는 리소스입니다."),
 
     /* 500 Internal Server Error*/
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.");;
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),;
 
     private final HttpStatus httpStatus;
     private final String message;
+
+    private ErrorMessage(HttpStatus httpStatus, String message) {
+        this.httpStatus = httpStatus;
+        this.message = message;
+    }
+
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 
 }
