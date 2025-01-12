@@ -21,11 +21,11 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
 
-      # JDK 17 설치
-      - name: Set up JDK 17
+      # JDK 21 설치
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
       # resources 폴더 생성
