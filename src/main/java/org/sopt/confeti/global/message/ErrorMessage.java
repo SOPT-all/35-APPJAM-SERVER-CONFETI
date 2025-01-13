@@ -4,7 +4,8 @@ import org.springframework.http.HttpStatus;
 
 public enum ErrorMessage {
     /* 400 Bad Request */
-    BAD_REQUEST(HttpStatus.BAD_REQUEST, "요청 형식이 올바르지 않습니다"),
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "요청 형식이 올바르지 않습니다."),
+    TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "올바르지 않은 쿼리 파라미터 형식입니다."),
 
     /* 401 Unauthorized */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "사용자의 로그인 검증을 실패했습니다."),
