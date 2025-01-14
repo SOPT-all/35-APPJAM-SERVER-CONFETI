@@ -1,38 +1,53 @@
 package org.sopt.confeti.domain.festivaldate;
 
 import jakarta.persistence.*;
+import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.festivalstage.FestivalStage;
+import org.springframework.cglib.core.Local;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="festival_dates")
 public class FestivalDate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long festival_date_id;
+    private Long id;
 
-    @Column
-    private Long festival_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "festival_id", nullable = false)
+    private Festival festival;
 
-    @Column
-    private Timestamp festival_at;
+    @Column(nullable = false)
+    private LocalDate festivalAt;
 
-    @Column
-    private Timestamp open_at;
+    @Column(nullable = false)
+    private LocalTime openAt;
 
-    public Long getFestival_date_id() {
-        return festival_date_id;
+    @OneToMany(mappedBy = "festival_date", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<FestivalStage> stages = new ArrayList<>();
+
+    public Long getId() {
+        return id;
     }
 
-    public Long getFestival_id() {
-        return festival_id;
+    public Festival getFestival() {
+        return festival;
     }
 
-    public Timestamp getFestival_at() {
-        return festival_at;
+    public LocalDate getFestivalAt() {
+        return festivalAt;
     }
 
-    public Timestamp getOpen_at() {
-        return open_at;
+    public LocalTime getOpenAt() {
+        return openAt;
+    }
+
+    public List<FestivalStage> getStages() {
+        return stages;
     }
 }
