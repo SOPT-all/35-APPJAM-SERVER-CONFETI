@@ -7,6 +7,7 @@ import org.sopt.confeti.domain.festivaldate.FestivalDate;
 import org.sopt.confeti.domain.festivalfavorite.FestivalFavorite;
 import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +24,29 @@ public class Festival {
     @Column(length = 50, nullable = false)
     private String festivalTitle;
 
-    @Column(nullable = false)
-    private LocalDateTime festivalStartAt;
+    @Column(length = 50, nullable = false)
+    private String festivalSubtitle;
 
     @Column(nullable = false)
-    private LocalDateTime festivalEndAt;
+    private LocalDate festivalStartAt;
+
+    @Column(nullable = false)
+    private LocalDate festivalEndAt;
 
     @Column(length = 30, nullable = false)
     private String festivalArea;
 
     @Column(length = 250, nullable = false)
     private String festivalPosterPath;
+
+    @Column(length = 250, nullable = false)
+    private String festivalPosterBgPath;
+
+    @Column(length = 250, nullable = false)
+    private String festivalInfoImgPath;
+
+    @Column(length = 250)
+    private String festivalReservationBgPath;
 
     @Column(nullable = false)
     private LocalDateTime reserveAt;
@@ -53,14 +66,12 @@ public class Festival {
     @Column(length = 100, nullable = false)
     private String price;
 
-    @Column(length = 250, nullable = false)
-    private String infoImgUrl;
-
     @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FestivalDate> dates= new ArrayList<>();
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
     private List<FestivalFavorite> festivalFavorites = new ArrayList<>();
+
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
     private List<TimetableFestival> timetableFestivals = new ArrayList<>();
@@ -85,11 +96,11 @@ public class Festival {
         return festivalTitle;
     }
 
-    public LocalDateTime getFestivalStartAt() {
+    public LocalDate getFestivalStartAt() {
         return festivalStartAt;
     }
 
-    public LocalDateTime getFestivalEndAt() {
+    public LocalDate getFestivalEndAt() {
         return festivalEndAt;
     }
 
@@ -125,8 +136,20 @@ public class Festival {
         return price;
     }
 
-    public String getInfoImgUrl() {
-        return infoImgUrl;
+    public String getFestivalSubtitle() {
+        return festivalSubtitle;
+    }
+
+    public String getFestivalPosterBgPath() {
+        return festivalPosterBgPath;
+    }
+
+    public String getFestivalInfoImgPath() {
+        return festivalInfoImgPath;
+    }
+
+    public String getFestivalReservationBgPath() {
+        return festivalReservationBgPath;
     }
 }
 
