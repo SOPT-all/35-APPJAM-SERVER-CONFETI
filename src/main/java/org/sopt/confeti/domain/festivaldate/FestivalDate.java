@@ -1,11 +1,11 @@
 package org.sopt.confeti.domain.festivaldate;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festivalstage.FestivalStage;
-import org.springframework.cglib.core.Local;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -13,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name="festival_dates")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FestivalDate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

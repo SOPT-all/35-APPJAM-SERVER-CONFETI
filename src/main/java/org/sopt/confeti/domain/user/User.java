@@ -2,6 +2,8 @@ package org.sopt.confeti.domain.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.concertfavorite.ConcertFavorite;
 import org.sopt.confeti.domain.festivalfavorite.FestivalFavorite;
@@ -13,6 +15,7 @@ import java.util.List;
 
 @Entity
 @Table(name="users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

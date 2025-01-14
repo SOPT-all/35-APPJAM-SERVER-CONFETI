@@ -1,6 +1,8 @@
 package org.sopt.confeti.domain.festivalstage;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festivalartist.FestivalArtist;
 import org.sopt.confeti.domain.festivaldate.FestivalDate;
 
@@ -9,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name="festival_stages")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FestivalStage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

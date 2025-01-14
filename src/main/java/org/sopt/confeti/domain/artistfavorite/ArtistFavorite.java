@@ -1,10 +1,14 @@
 package org.sopt.confeti.domain.artistfavorite;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.user.User;
 
 @Entity
 @Table(name="artist_favorites")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArtistFavorite {
 
     @Id
@@ -29,5 +33,18 @@ public class ArtistFavorite {
 
     public String getArtistId() {
         return artistId;
+    }
+
+    @Builder
+    private ArtistFavorite(User user, String artistId) {
+        this.user = user;
+        this.artistId = artistId;
+    }
+
+    public static ArtistFavorite create(User user, String artistId) {
+        return ArtistFavorite.builder()
+                .user(user)
+                .artistId(artistId)
+                .build();
     }
 }
