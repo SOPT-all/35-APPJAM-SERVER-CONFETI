@@ -8,6 +8,7 @@ import org.sopt.confeti.domain.user.User;
 public class ArtistFavorite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="artist_favorite_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

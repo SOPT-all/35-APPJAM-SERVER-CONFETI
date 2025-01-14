@@ -9,6 +9,7 @@ import org.sopt.confeti.domain.user.User;
 public class FestivalFavorite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="festival_favorite_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

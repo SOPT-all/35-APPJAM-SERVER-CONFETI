@@ -8,6 +8,7 @@ import org.sopt.confeti.domain.concert.Concert;
 public class ConcertArtist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="concert_artist_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

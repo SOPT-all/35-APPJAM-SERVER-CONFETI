@@ -16,6 +16,7 @@ import java.util.List;
 public class FestivalDate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="festival_date_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,7 +30,7 @@ public class FestivalDate {
     private LocalTime openAt;
 
     @OneToMany(mappedBy = "festival_date", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<FestivalStage> stages = new ArrayList<>();
+    private List<FestivalStage> stages = new ArrayList<>();
 
     public Long getId() {
         return id;

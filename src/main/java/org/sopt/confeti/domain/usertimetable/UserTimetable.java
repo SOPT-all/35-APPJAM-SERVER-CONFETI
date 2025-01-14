@@ -9,6 +9,7 @@ import org.sopt.confeti.domain.user.User;
 public class UserTimetable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="user_timetable_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -25,7 +26,7 @@ public class UserTimetable {
     public Long getId() {
         return id;
     }
-    
+
     public User getUser() {
         return user;
     }

@@ -12,6 +12,7 @@ import java.util.List;
 public class Concert {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="concert_id")
     private Long id;
 
     @Column(length = 50, nullable = false)
@@ -51,7 +52,7 @@ public class Concert {
     private String infoImgUrl;
 
     @OneToMany(mappedBy = "concert", cascade = CascadeType.REMOVE)
-    List<ConcertArtist> artists = new ArrayList<>();
+    private List<ConcertArtist> artists = new ArrayList<>();
 
     public Long getId() {
         return id;
