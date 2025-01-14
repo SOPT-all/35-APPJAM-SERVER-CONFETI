@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.concertartist.ConcertArtist;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,17 +22,29 @@ public class Concert {
     @Column(length = 50, nullable = false)
     private String concertTitle;
 
-    @Column(nullable = false)
-    private LocalDateTime concertStartAt;
+    @Column(length = 50, nullable = false)
+    private String concertSubtitle;
 
     @Column(nullable = false)
-    private LocalDateTime concertEndAt;
+    private LocalDate concertStartAt;
+
+    @Column(nullable = false)
+    private LocalDate concertEndAt;
 
     @Column(length = 30, nullable = false)
     private String concertArea;
 
     @Column(length = 250, nullable = false)
     private String concertPosterPath;
+
+    @Column(length = 250, nullable = false)
+    private String concertPosterBgPath;
+
+    @Column(length = 250, nullable = false)
+    private String concertInfoImgPath;
+
+    @Column(length = 250, nullable = false)
+    private String concertReservationBgPath;
 
     @Column(nullable = false)
     private LocalDateTime reserveAt;
@@ -51,9 +64,6 @@ public class Concert {
     @Column(length = 100, nullable = false)
     private String price;
 
-    @Column(length = 250, nullable = false)
-    private String infoImgUrl;
-
     @OneToMany(mappedBy = "concert", cascade = CascadeType.REMOVE)
     private List<ConcertArtist> artists = new ArrayList<>();
 
@@ -65,11 +75,11 @@ public class Concert {
         return concertTitle;
     }
 
-    public LocalDateTime getConcertStartAt() {
+    public LocalDate getConcertStartAt() {
         return concertStartAt;
     }
 
-    public LocalDateTime getConcertEndAt() {
+    public LocalDate getConcertEndAt() {
         return concertEndAt;
     }
 
@@ -105,8 +115,20 @@ public class Concert {
         return price;
     }
 
-    public String getInfoImgUrl() {
-        return infoImgUrl;
+    public String getConcertSubtitle() {
+        return concertSubtitle;
+    }
+
+    public String getConcertPosterBgPath() {
+        return concertPosterBgPath;
+    }
+
+    public String getConcertInfoImgPath() {
+        return concertInfoImgPath;
+    }
+
+    public String getConcertReservationBgPath() {
+        return concertReservationBgPath;
     }
 
     public List<ConcertArtist> getArtists() {
