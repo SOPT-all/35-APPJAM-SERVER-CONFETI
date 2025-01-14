@@ -1,90 +1,116 @@
 package org.sopt.confeti.domain.festival;
 
 import jakarta.persistence.*;
+import org.sopt.confeti.domain.festivaldate.FestivalDate;
+import org.sopt.confeti.domain.festivalfavorite.FestivalFavorite;
+import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 
-import java.security.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="festivals")
 public class Festival {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long festival_id;
+    private Long id;
 
-    @Column(length = 50)
-    private String festival_title;
+    @Column(length = 50, nullable = false)
+    private String festivalTitle;
 
-    @Column
-    private Timestamp festival_start_at;
+    @Column(nullable = false)
+    private LocalDateTime festivalStartAt;
 
-    @Column
-    private Timestamp festival_end_at;
+    @Column(nullable = false)
+    private LocalDateTime festivalEndAt;
 
-    @Column(length = 30)
-    private String festival_area;
+    @Column(length = 30, nullable = false)
+    private String festivalArea;
 
-    @Column(length = 250)
-    private String festival_poster_path;
+    @Column(length = 250, nullable = false)
+    private String festivalPosterPath;
 
-    @Column
-    private Timestamp reserve_at;
+    @Column(nullable = false)
+    private LocalDateTime reserveAt;
 
-    @Column(length = 250)
-    private String reservation_url;
+    @Column(length = 250, nullable = false)
+    private String reservationUrl;
 
-    @Column(length = 30)
-    private String reservation_office;
+    @Column(length = 30, nullable = false)
+    private String reservationOffice;
 
-    @Column(length = 30)
-    private String age_rating;
+    @Column(length = 30, nullable = false)
+    private String ageRating;
 
-    @Column(length = 30)
+    @Column(length = 30, nullable = false)
     private String time;
 
-    @Column(length = 100)
+    @Column(length = 100, nullable = false)
     private String price;
 
-    @Column(length = 250)
-    private String info_img_url;
+    @Column(length = 250, nullable = false)
+    private String infoImgUrl;
 
-    public Long getConcert_id() {
-        return festival_id;
+    @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<FestivalDate> dates= new ArrayList<>();
+
+    @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
+    List<FestivalFavorite> festivalFavorites = new ArrayList<>();
+
+    @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
+    List<TimetableFestival> timetableFestivals = new ArrayList<>();
+
+    public Long getId() {
+        return id;
     }
 
-    public String getFestival_title() {
-        return festival_title;
+    public List<FestivalDate> getDates() {
+        return dates;
     }
 
-    public Timestamp getFestival_start_at() {
-        return festival_start_at;
+    public List<FestivalFavorite> getFestivalFavorites() {
+        return festivalFavorites;
     }
 
-    public Timestamp getFestival_end_at() {
-        return festival_end_at;
+    public List<TimetableFestival> getTimetableFestivals() {
+        return timetableFestivals;
     }
 
-    public String getFestival_area() {
-        return festival_area;
+    public String getFestivalTitle() {
+        return festivalTitle;
     }
 
-    public String getFestival_poster_path() {
-        return festival_poster_path;
+    public LocalDateTime getFestivalStartAt() {
+        return festivalStartAt;
     }
 
-    public Timestamp getReserve_at() {
-        return reserve_at;
+    public LocalDateTime getFestivalEndAt() {
+        return festivalEndAt;
     }
 
-    public String getReservation_url() {
-        return reservation_url;
+    public String getFestivalArea() {
+        return festivalArea;
     }
 
-    public String getReservation_office() {
-        return reservation_office;
+    public String getFestivalPosterPath() {
+        return festivalPosterPath;
     }
 
-    public String getAge_rating() {
-        return age_rating;
+    public LocalDateTime getReserveAt() {
+        return reserveAt;
+    }
+
+    public String getReservationUrl() {
+        return reservationUrl;
+    }
+
+    public String getReservationOffice() {
+        return reservationOffice;
+    }
+
+    public String getAgeRating() {
+        return ageRating;
     }
 
     public String getTime() {
@@ -95,8 +121,8 @@ public class Festival {
         return price;
     }
 
-    public String getInfo_img_url() {
-        return info_img_url;
+    public String getInfoImgUrl() {
+        return infoImgUrl;
     }
 }
 

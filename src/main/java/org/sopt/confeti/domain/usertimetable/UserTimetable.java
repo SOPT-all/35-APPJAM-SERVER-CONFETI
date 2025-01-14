@@ -1,35 +1,40 @@
 package org.sopt.confeti.domain.usertimetable;
 
 import jakarta.persistence.*;
+import org.sopt.confeti.domain.festivalartist.FestivalArtist;
+import org.sopt.confeti.domain.user.User;
 
 @Entity
 @Table(name="user_timetables")
 public class UserTimetable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long user_timetable_id;
+    private Long id;
 
-    @Column
-    private Long user_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    private User user;
 
-    @Column
-    private Long festival_artist_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="festival_artist_id")
+    private FestivalArtist festivalArtist;
 
-    @Column Boolean is_selected;
+    @Column(nullable = false)
+    private boolean isSelected;
 
-    public Long getUser_timetable_id() {
-        return user_timetable_id;
+    public Long getId() {
+        return id;
+    }
+    
+    public User getUser() {
+        return user;
     }
 
-    public Long getUser_id() {
-        return user_id;
+    public FestivalArtist getFestivalArtist() {
+        return festivalArtist;
     }
 
-    public Long getFestival_artist_id() {
-        return festival_artist_id;
-    }
-
-    public Boolean getIs_selected() {
-        return is_selected;
+    public boolean isSelected() {
+        return isSelected;
     }
 }

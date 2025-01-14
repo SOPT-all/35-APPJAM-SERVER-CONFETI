@@ -1,45 +1,56 @@
 package org.sopt.confeti.domain.festivalartist;
 
 import jakarta.persistence.*;
+import org.sopt.confeti.domain.festivalstage.FestivalStage;
+import org.sopt.confeti.domain.usertimetable.UserTimetable;
 
-import java.security.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Entity
 @Table(name="festival_artist")
 public class FestivalArtist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long festival_artist_id;
+    private Long id;
 
-    @Column
-    private Long festival_stage_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="festival_stage_id", nullable=false)
+    private FestivalStage festivalStage;
 
-    @Column(length = 100)
-    private String artist_id;
+    @Column(length = 100, nullable = false)
+    private String artistId;
 
-    @Column
-    private Timestamp start_at;
+    @Column(nullable = false)
+    private LocalDateTime startAt;
 
-    @Column
-    private Timestamp end_at;
+    @Column(nullable = false)
+    private LocalDateTime endAt;
 
-    public Long getFestival_artist_id() {
-        return festival_artist_id;
+    @OneToMany(mappedBy = "festivalArtist", cascade = CascadeType.REMOVE)
+    ArrayList<UserTimetable> timetables = new ArrayList<>();
+
+    public FestivalStage getFestivalStage() {
+        return festivalStage;
     }
 
-    public Long getFestival_stage_id() {
-        return festival_stage_id;
+    public Long getId() {
+        return id;
     }
 
-    public String getArtist_id() {
-        return artist_id;
+    public String getArtistId() {
+        return artistId;
     }
 
-    public Timestamp getStart_at() {
-        return start_at;
+    public LocalDateTime getStartAt() {
+        return startAt;
     }
 
-    public Timestamp getEnd_at() {
-        return end_at;
+    public LocalDateTime getEndAt() {
+        return endAt;
+    }
+
+    public ArrayList<UserTimetable> getTimetables() {
+        return timetables;
     }
 }

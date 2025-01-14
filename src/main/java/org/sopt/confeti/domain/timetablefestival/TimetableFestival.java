@@ -1,29 +1,33 @@
 package org.sopt.confeti.domain.timetablefestival;
 
 import jakarta.persistence.*;
+import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.user.User;
 
 @Entity
 @Table(name="timetable_festivals")
 public class TimetableFestival {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long timetable_festival_id;
+    private Long id;
 
-    @Column
-    private Long user_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column
-    private Long festival_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "festival_id")
+    private Festival festival;
 
-    public Long getTimetable_festival_id() {
-        return timetable_festival_id;
+    public Long getId() {
+        return id;
     }
 
-    public Long getUser_id() {
-        return user_id;
+    public User getUser() {
+        return user;
     }
 
-    public Long getFestival_id() {
-        return festival_id;
+    public Festival getFestival() {
+        return festival;
     }
 }

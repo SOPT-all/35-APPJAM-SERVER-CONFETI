@@ -1,101 +1,111 @@
 package org.sopt.confeti.domain.concert;
 
 import jakarta.persistence.*;
+import org.sopt.confeti.domain.concertartist.ConcertArtist;
 
-import java.security.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="concerts")
 public class Concert {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long concert_id;
+    private Long id;
 
-    @Column
-    private String concert_title;
+    @Column(length = 50, nullable = false)
+    private String concertTitle;
 
-    @Column
-    private Timestamp concert_start_at;
+    @Column(nullable = false)
+    private LocalDateTime concertStartAt;
 
-    @Column
-    private Timestamp concert_end_at;
+    @Column(nullable = false)
+    private LocalDateTime concertEndAt;
 
-    @Column
-    private String concert_area;
+    @Column(length = 30, nullable = false)
+    private String concertArea;
 
-    @Column
-    private String concert_poster_path;
+    @Column(length = 250, nullable = false)
+    private String concertPosterPath;
 
-    @Column
-    private Timestamp reserve_at;
+    @Column(nullable = false)
+    private LocalDateTime reserveAt;
 
-    @Column
-    private String reservation_url;
+    @Column(length = 250, nullable = false)
+    private String reservationUrl;
 
-    @Column
-    private String reservation_office;
+    @Column(length = 30, nullable = false)
+    private String reservationOffice;
 
-    @Column
-    private String age_rating;
+    @Column(length = 30, nullable = false)
+    private String ageRating;
 
-    @Column
+    @Column(length = 30, nullable = false)
     private String time;
 
-    @Column
+    @Column(length = 100, nullable = false)
     private String price;
 
-    @Column
-    private String info_img_url;
+    @Column(length = 250, nullable = false)
+    private String infoImgUrl;
 
-    public Long getConcert_id() {
-        return concert_id;
+    @OneToMany(mappedBy = "concert", cascade = CascadeType.REMOVE)
+    List<ConcertArtist> artists = new ArrayList<>();
+
+    public Long getId() {
+        return id;
     }
 
-    public String getConcert_title() {
-        return concert_title;
+    public String getConcertTitle() {
+        return concertTitle;
     }
 
-    public String getAge_rating() {
-        return age_rating;
+    public LocalDateTime getConcertStartAt() {
+        return concertStartAt;
     }
 
-    public String getConcert_area() {
-        return concert_area;
+    public LocalDateTime getConcertEndAt() {
+        return concertEndAt;
     }
 
-    public String getConcert_poster_path() {
-        return concert_poster_path;
+    public String getConcertArea() {
+        return concertArea;
     }
 
-    public String getInfo_img_url() {
-        return info_img_url;
+    public String getConcertPosterPath() {
+        return concertPosterPath;
     }
 
-    public String getPrice() {
-        return price;
+    public LocalDateTime getReserveAt() {
+        return reserveAt;
     }
 
-    public String getReservation_office() {
-        return reservation_office;
+    public String getReservationUrl() {
+        return reservationUrl;
     }
 
-    public String getReservation_url() {
-        return reservation_url;
+    public String getReservationOffice() {
+        return reservationOffice;
+    }
+
+    public String getAgeRating() {
+        return ageRating;
     }
 
     public String getTime() {
         return time;
     }
 
-    public Timestamp getConcert_end_at() {
-        return concert_end_at;
+    public String getPrice() {
+        return price;
     }
 
-    public Timestamp getConcert_start_at() {
-        return concert_start_at;
+    public String getInfoImgUrl() {
+        return infoImgUrl;
     }
 
-    public Timestamp getReserve_at() {
-        return reserve_at;
+    public List<ConcertArtist> getArtists() {
+        return artists;
     }
 }

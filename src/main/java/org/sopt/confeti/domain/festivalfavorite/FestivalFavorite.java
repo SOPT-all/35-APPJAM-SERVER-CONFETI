@@ -1,29 +1,33 @@
 package org.sopt.confeti.domain.festivalfavorite;
 
 import jakarta.persistence.*;
+import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.user.User;
 
 @Entity
 @Table(name="festival_favorites")
 public class FestivalFavorite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long festival_favorite_id;
+    private Long id;
 
-    @Column
-    private Long user_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    private User user;
 
-    @Column
-    private Long festival_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="festival_id")
+    private Festival festival;
 
-    public Long getFestival_favorite_id() {
-        return festival_favorite_id;
+    public Long getId() {
+        return id;
     }
 
-    public void setFestival_favorite_id(Long festival_favorite_id) {
-        this.festival_favorite_id = festival_favorite_id;
+    public User getUser() {
+        return user;
     }
 
-    public Long getUser_id() {
-        return user_id;
+    public Festival getFestival() {
+        return festival;
     }
 }
