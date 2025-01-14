@@ -1,11 +1,15 @@
 package org.sopt.confeti.domain.timetablefestival;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.user.User;
 
 @Entity
 @Table(name="timetable_festivals")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TimetableFestival {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,5 +34,18 @@ public class TimetableFestival {
 
     public Festival getFestival() {
         return festival;
+    }
+
+    @Builder
+    public TimetableFestival(User user, Festival festival) {
+        this.user = user;
+        this.festival = festival;
+    }
+
+    public static TimetableFestival create(User user, Festival festival) {
+        return TimetableFestival.builder()
+                .user(user)
+                .festival(festival)
+                .build();
     }
 }
