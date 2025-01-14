@@ -9,12 +9,14 @@ import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 import org.sopt.confeti.domain.usertimetable.UserTimetable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="user_id")
     private Long id;
 
     @Column(length=20, nullable = false)
@@ -24,19 +26,19 @@ public class User {
     private String profilePath;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true )
-    ArrayList<UserTimetable> timetables = new ArrayList<>();
+    private List<UserTimetable> timetables = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    ArrayList<ArtistFavorite> artistFavorites = new ArrayList<>();
+    private List<ArtistFavorite> artistFavorites = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    ArrayList<ConcertFavorite> concertFavorites = new ArrayList<>();
+    private List<ConcertFavorite> concertFavorites = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
-    ArrayList<FestivalFavorite> festivalFavorites = new ArrayList<>();
+    private List<FestivalFavorite> festivalFavorites = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true )
-    ArrayList<TimetableFestival> timetableFestivals = new ArrayList<>();
+    private List<TimetableFestival> timetableFestivals = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -50,23 +52,23 @@ public class User {
         return profilePath;
     }
 
-    public ArrayList<UserTimetable> getTimetables() {
+    public List<UserTimetable> getTimetables() {
         return timetables;
     }
 
-    public ArrayList<ArtistFavorite> getArtistFavorites() {
+    public List<ArtistFavorite> getArtistFavorites() {
         return artistFavorites;
     }
 
-    public ArrayList<ConcertFavorite> getConcertFavorites() {
+    public List<ConcertFavorite> getConcertFavorites() {
         return concertFavorites;
     }
 
-    public ArrayList<FestivalFavorite> getFestivalFavorites() {
+    public List<FestivalFavorite> getFestivalFavorites() {
         return festivalFavorites;
     }
 
-    public ArrayList<TimetableFestival> getTimetableFestivals() {
+    public List<TimetableFestival> getTimetableFestivals() {
         return timetableFestivals;
     }
 }

@@ -12,6 +12,7 @@ import java.util.List;
 public class FestivalStage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="festival_stage_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,11 +22,11 @@ public class FestivalStage {
     @Column(length = 30, nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false)
     private int order;
 
     @OneToMany(mappedBy = "festival_stage", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<FestivalArtist> artists = new ArrayList<>();
+    private List<FestivalArtist> artists = new ArrayList<>();
 
     public Long getId() {
         return id;

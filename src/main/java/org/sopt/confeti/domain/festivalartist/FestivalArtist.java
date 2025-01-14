@@ -6,12 +6,14 @@ import org.sopt.confeti.domain.usertimetable.UserTimetable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="festival_artist")
 public class FestivalArtist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "festival_artist_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,7 +30,7 @@ public class FestivalArtist {
     private LocalDateTime endAt;
 
     @OneToMany(mappedBy = "festivalArtist", cascade = CascadeType.REMOVE)
-    ArrayList<UserTimetable> timetables = new ArrayList<>();
+    private List<UserTimetable> timetables = new ArrayList<>();
 
     public FestivalStage getFestivalStage() {
         return festivalStage;
@@ -50,7 +52,7 @@ public class FestivalArtist {
         return endAt;
     }
 
-    public ArrayList<UserTimetable> getTimetables() {
+    public List<UserTimetable> getTimetables() {
         return timetables;
     }
 }

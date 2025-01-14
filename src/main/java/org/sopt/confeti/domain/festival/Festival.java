@@ -14,6 +14,7 @@ import java.util.List;
 public class Festival {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "festival_id")
     private Long id;
 
     @Column(length = 50, nullable = false)
@@ -53,13 +54,13 @@ public class Festival {
     private String infoImgUrl;
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<FestivalDate> dates= new ArrayList<>();
+    private List<FestivalDate> dates= new ArrayList<>();
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
-    List<FestivalFavorite> festivalFavorites = new ArrayList<>();
+    private List<FestivalFavorite> festivalFavorites = new ArrayList<>();
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
-    List<TimetableFestival> timetableFestivals = new ArrayList<>();
+    private List<TimetableFestival> timetableFestivals = new ArrayList<>();
 
     public Long getId() {
         return id;
