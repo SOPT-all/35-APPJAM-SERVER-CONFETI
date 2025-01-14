@@ -22,10 +22,10 @@ public class FestivalStage {
     @Column(length = 30, nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "orders", nullable = false)
     private int order;
 
-    @OneToMany(mappedBy = "festival_stage", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "festivalStage", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FestivalArtist> artists = new ArrayList<>();
 
     public Long getId() {

@@ -6,6 +6,7 @@ import org.sopt.confeti.domain.user.User;
 @Entity
 @Table(name="artist_favorites")
 public class ArtistFavorite {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="artist_favorite_id")
