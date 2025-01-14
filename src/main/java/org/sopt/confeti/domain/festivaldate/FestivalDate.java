@@ -29,7 +29,7 @@ public class FestivalDate {
     @Column(nullable = false)
     private LocalTime openAt;
 
-    @OneToMany(mappedBy = "festival_date", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "festivalDate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FestivalStage> stages = new ArrayList<>();
 
     public Long getId() {

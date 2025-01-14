@@ -44,7 +44,7 @@ public class Festival {
     @Column(length = 30, nullable = false)
     private String ageRating;
 
-    @Column(length = 30, nullable = false)
+    @Column(name = "times", length = 30, nullable = false)
     private String time;
 
     @Column(length = 100, nullable = false)
