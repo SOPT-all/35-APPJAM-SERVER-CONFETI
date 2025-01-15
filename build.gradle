@@ -28,6 +28,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // spotify api
+    implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.4.1'
+
     // actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
