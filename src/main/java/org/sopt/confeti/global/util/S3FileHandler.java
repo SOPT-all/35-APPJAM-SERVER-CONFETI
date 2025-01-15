@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class S3FileHandler {
 
-    private S3FileHandler() {}
+    protected S3FileHandler() {}
 
     @Value("${cloud.aws.s3.url-prefix}")
     private String urlPrefix;
