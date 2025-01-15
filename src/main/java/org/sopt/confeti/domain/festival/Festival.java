@@ -48,6 +48,9 @@ public class Festival {
     @Column(length = 250)
     private String festivalReservationBgPath;
 
+    @Column(length = 250)
+    private String festivalLogoPath;
+
     @Column(nullable = false)
     private LocalDateTime reserveAt;
 
@@ -71,7 +74,6 @@ public class Festival {
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
     private List<FestivalFavorite> festivalFavorites = new ArrayList<>();
-
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
     private List<TimetableFestival> timetableFestivals = new ArrayList<>();
@@ -110,6 +112,10 @@ public class Festival {
 
     public String getFestivalPosterPath() {
         return festivalPosterPath;
+    }
+
+    public String getFestivalLogoPath() {
+        return festivalLogoPath;
     }
 
     public LocalDateTime getReserveAt() {
