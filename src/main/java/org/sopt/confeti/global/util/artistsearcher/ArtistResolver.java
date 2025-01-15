@@ -136,8 +136,6 @@ public class ArtistResolver {
         return field.getType().isAssignableFrom(ConfetiArtist.class);
     }
 
-
-
     private ConfetiArtist extractConfetiArtist(final Object target, final Field field)
             throws RuntimeException {
         try {
