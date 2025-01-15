@@ -15,14 +15,16 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.util.IntegrateFunction;
 import org.springframework.stereotype.Component;
 
 @Component
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Slf4j
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArtistResolver {
 
-    private static final String GET_ID_FUNC_NAME = "getId";
     private static final boolean ACCESS_ALLOW = true;
 
     private final Set<Class<?>> noCustomReferenceTypes = new LinkedHashSet<Class<?>>(
@@ -46,11 +48,7 @@ public class ArtistResolver {
         });
     }};
 
-    private SpotifyAPIHandler spotifyAPIHandler;
-
-    public ArtistResolver(SpotifyAPIHandler spotifyAPIHandler) {
-        this.spotifyAPIHandler = spotifyAPIHandler;
-    }
+    private final SpotifyAPIHandler spotifyAPIHandler;
 
     // Spotify API를 사용해 아티스트를 로드하는 엔트리 포인트
     public void load(final Object target) {
@@ -80,10 +78,11 @@ public class ArtistResolver {
         Class<?> targetClass = target.getClass();
         Arrays.stream(targetClass.getDeclaredFields()).forEach((Field field) -> {
             if (isReferenceType(field) && isNoCustomReferenceType(field)) {
-                if (isArtistClass(field)) {
-                    String artistId = extractArtistId(target);
-                    artistIds.add(artistId);
-                    artistMapper.put(artistId, (ConfetiArtist) target);
+                if (isConfetiArtistClass(field)) {
+                    ConfetiArtist artist = extractConfetiArtist(target, field);
+
+                    artistIds.add(artist.getArtistId());
+                    artistMapper.put(artist.getArtistId(), artist);
                     return;
                 }
 
@@ -126,24 +125,25 @@ public class ArtistResolver {
     }
 
     private boolean isNoCustomReferenceType(final Field field) {
-        return !noCustomReferenceTypes.contains(field.getClass());
+        return !noCustomReferenceTypes.contains(field.getType());
     }
 
     private boolean isReferenceType(final Field field) {
-        return !field.getClass().isPrimitive();
+        return !field.getType().isPrimitive();
     }
 
-    private boolean isArtistClass(final Field field) {
+    private boolean isConfetiArtistClass(final Field field) {
         return field.getType().isAssignableFrom(ConfetiArtist.class);
     }
 
 
 
-    private String extractArtistId(final Object target)
+    private ConfetiArtist extractConfetiArtist(final Object target, final Field field)
             throws RuntimeException {
         try {
-            return (String) target.getClass().getMethod(GET_ID_FUNC_NAME).invoke(target);
-        } catch (NoSuchMethodException  | InvocationTargetException | IllegalAccessException e) {
+            setAccessibleIfPrivate(field);
+            return (ConfetiArtist) field.get(target);
+        } catch (IllegalAccessException e) {
             throw new RuntimeException();
         }
 
