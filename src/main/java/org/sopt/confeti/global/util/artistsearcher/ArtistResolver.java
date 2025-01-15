@@ -1,7 +1,6 @@
 package org.sopt.confeti.global.util.artistsearcher;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.util.IntegrateFunction;
@@ -75,6 +73,16 @@ public class ArtistResolver {
 
     // 리플렉션을 사용해 타겟 오브젝트를 재귀적으로 순회하며 아티스트 아이디를 수집하는 함수
     private void collect(final Object target, final List<String> artistIds, final HashMap<String, ConfetiArtist> artistMapper) {
+        // 현재 오브젝트가 ConfetiArtist 타입인 경우
+        if (isConfetiArtistClass(target)) {
+            ConfetiArtist artist = (ConfetiArtist) target;
+
+            artistIds.add(artist.getArtistId());
+            artistMapper.put(artist.getArtistId(), artist);
+            return;
+        }
+
+        // 필드에 있는 객체 목록 확인
         Class<?> targetClass = target.getClass();
         Arrays.stream(targetClass.getDeclaredFields()).forEach((Field field) -> {
             if (isReferenceType(field) && isNoCustomReferenceType(field)) {
@@ -134,6 +142,10 @@ public class ArtistResolver {
 
     private boolean isConfetiArtistClass(final Field field) {
         return field.getType().isAssignableFrom(ConfetiArtist.class);
+    }
+
+    private boolean isConfetiArtistClass(final Object object) {
+        return object.getClass().isAssignableFrom(ConfetiArtist.class);
     }
 
     private ConfetiArtist extractConfetiArtist(final Object target, final Field field)
