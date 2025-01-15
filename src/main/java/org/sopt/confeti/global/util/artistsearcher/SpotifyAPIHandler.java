@@ -10,8 +10,8 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
+import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
-import se.michaelthelin.spotify.requests.data.artists.GetArtistRequest;
 
 @Component
 public class SpotifyAPIHandler {
@@ -27,6 +27,20 @@ public class SpotifyAPIHandler {
     public SpotifyAPIHandler() {
         createSpotifyApi();
         generateAccessToken();
+    }
+
+    public List<ConfetiArtist> findArtistsByKeyword(final String keyword) {
+        try {
+            Paging<Artist> artists = spotifyApi.searchArtists(keyword)
+                    .build()
+                    .execute();
+
+            return Arrays.stream(artists.getItems())
+                    .map(ConfetiArtist::toConfetiArtist)
+                    .toList();
+        } catch (IOException | ParseException | SpotifyWebApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<ConfetiArtist> findArtistsByArtistIds(final List<String> artistIds) {
