@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festivalartist.FestivalArtist;
 import org.sopt.confeti.domain.festivaldate.FestivalDate;
+import org.sopt.confeti.domain.festivaltime.FestivalTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class FestivalStage {
     private int order;
 
     @OneToMany(mappedBy = "festivalStage", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FestivalArtist> artists = new ArrayList<>();
+    private List<FestivalTime> times = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -47,7 +48,7 @@ public class FestivalStage {
         return order;
     }
 
-    public List<FestivalArtist> getArtists() {
-        return artists;
+    public List<FestivalTime> getTimes() {
+        return times;
     }
 }

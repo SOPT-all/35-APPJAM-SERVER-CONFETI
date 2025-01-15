@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import org.sopt.confeti.domain.festivalartist.FestivalArtist;
+import org.sopt.confeti.domain.festivaltime.FestivalTime;
 import org.sopt.confeti.domain.user.User;
 
 @Entity
@@ -21,8 +21,8 @@ public class UserTimetable {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="festival_artist_id")
-    private FestivalArtist festivalArtist;
+    @JoinColumn(name="festival_time_id")
+    private FestivalTime festivalTime;
 
     @Column(nullable = false)
     private boolean isSelected;
@@ -35,8 +35,8 @@ public class UserTimetable {
         return user;
     }
 
-    public FestivalArtist getFestivalArtist() {
-        return festivalArtist;
+    public FestivalTime getFestivalTime() {
+        return festivalTime;
     }
 
     public boolean isSelected() {
@@ -44,16 +44,16 @@ public class UserTimetable {
     }
 
     @Builder
-    public UserTimetable(User user, FestivalArtist festivalArtist, boolean isSelected) {
+    public UserTimetable(User user, FestivalTime festivalTime, boolean isSelected) {
         this.user = user;
-        this.festivalArtist = festivalArtist;
+        this.festivalTime = festivalTime;
         this.isSelected = isSelected;
     }
 
-    public static UserTimetable create(User user, FestivalArtist festivalArtist, boolean isSelected) {
+    public static UserTimetable create(User user, FestivalTime festivalTime, boolean isSelected) {
         return UserTimetable.builder()
                 .user(user)
-                .festivalArtist(festivalArtist)
+                .festivalTime(festivalTime)
                 .isSelected(isSelected)
                 .build();
     }
