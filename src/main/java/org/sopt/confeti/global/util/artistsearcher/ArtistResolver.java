@@ -1,6 +1,7 @@
 package org.sopt.confeti.global.util.artistsearcher;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,15 +13,18 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.annotation.Resolver;
+import lombok.NoArgsConstructor;
 import org.sopt.confeti.global.util.IntegrateFunction;
+import org.springframework.stereotype.Component;
 
-@Resolver
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@Component
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArtistResolver {
 
+    private static final String GET_ID_FUNC_NAME = "getId";
+    private static final String COMMA = ",";
     private static final boolean ACCESS_ALLOW = true;
 
     private final Set<Class<?>> noCustomReferenceTypes = new LinkedHashSet<Class<?>>(
@@ -39,56 +43,34 @@ public class ArtistResolver {
                 throw new RuntimeException();
             }
 
-            collectByListType((List<?>) args[0], (List<String>) args[1], (HashMap<String, ConfetiArtist>) args[2]);
+            collectByListType((List<?>) args[0], (List<String>) args[1], (HashMap<String, Artist>) args[2]);
             return null;
         });
     }};
 
-    private final SpotifyAPIHandler spotifyAPIHandler;
-
     // Spotify API를 사용해 아티스트를 로드하는 엔트리 포인트
     public void load(final Object target) {
         List<String> artistIds = new ArrayList<>();
-        HashMap<String, ConfetiArtist> artistMapper = new HashMap<>();
+        HashMap<String, Artist> artistMapper = new HashMap<>();
         collect(target, artistIds, artistMapper);
 
-        List<ConfetiArtist> confetiArtists =  searchByArtistIds(artistIds);
-
-        injection(artistMapper, confetiArtists);
+        List<Artist> artists =  searchByArtistIds(artistIds);
     }
 
-    private void injection(final HashMap<String, ConfetiArtist> artistMapper, final List<ConfetiArtist> confetiArtists) {
-        confetiArtists.forEach((confetiArtist -> {
-            ConfetiArtist mappedConfetiArtist = artistMapper.get(confetiArtist.getArtistId());
-            mappedConfetiArtist.setName(confetiArtist.getName());
-            mappedConfetiArtist.setProfileUrl(confetiArtist.getProfileUrl());
-        }));
-    }
+    private List<Artist> searchByArtistIds(final List<String> artistIds) {
+        String collectedArtistIds = String.join(COMMA, artistIds);
 
-    private List<ConfetiArtist> searchByArtistIds(final List<String> artistIds) {
-        return spotifyAPIHandler.findArtistsByArtistIds(artistIds);
     }
 
     // 리플렉션을 사용해 타겟 오브젝트를 재귀적으로 순회하며 아티스트 아이디를 수집하는 함수
-    private void collect(final Object target, final List<String> artistIds, final HashMap<String, ConfetiArtist> artistMapper) {
-        // 현재 오브젝트가 ConfetiArtist 타입인 경우
-        if (isConfetiArtistClass(target)) {
-            ConfetiArtist artist = (ConfetiArtist) target;
-
-            artistIds.add(artist.getArtistId());
-            artistMapper.put(artist.getArtistId(), artist);
-            return;
-        }
-
-        // 필드에 있는 객체 목록 확인
+    private void collect(final Object target, final List<String> artistIds, final HashMap<String, Artist> artistMapper) {
         Class<?> targetClass = target.getClass();
         Arrays.stream(targetClass.getDeclaredFields()).forEach((Field field) -> {
             if (isReferenceType(field) && isNoCustomReferenceType(field)) {
-                if (isConfetiArtistClass(field)) {
-                    ConfetiArtist artist = extractConfetiArtist(target, field);
-
-                    artistIds.add(artist.getArtistId());
-                    artistMapper.put(artist.getArtistId(), artist);
+                if (isArtistClass(field)) {
+                    String artistId = extractArtistId(target);
+                    artistIds.add(artistId);
+                    artistMapper.put(artistId, (Artist) target);
                     return;
                 }
 
@@ -101,7 +83,7 @@ public class ArtistResolver {
         });
     }
 
-    private void collectByType(final Object target, final Field field, final List<String> artistIds, final HashMap<String, ConfetiArtist> artistMapper) throws IllegalAccessException {
+    private void collectByType(final Object target, final Field field, final List<String> artistIds, final HashMap<String, Artist> artistMapper) throws IllegalAccessException {
         Class<?> fieldType = field.getType();
         setAccessibleIfPrivate(field);
 
@@ -120,7 +102,7 @@ public class ArtistResolver {
         }
     }
 
-    private void collectByListType(final List<?> objects, final List<String> artistIds, final HashMap<String, ConfetiArtist> artistMapper) {
+    private void collectByListType(final List<?> objects, final List<String> artistIds, final HashMap<String, Artist> artistMapper) {
         objects.forEach((obj) -> collect(obj, artistIds, artistMapper));
     }
 
@@ -131,27 +113,24 @@ public class ArtistResolver {
     }
 
     private boolean isNoCustomReferenceType(final Field field) {
-        return !noCustomReferenceTypes.contains(field.getType());
+        return !noCustomReferenceTypes.contains(field.getClass());
     }
 
     private boolean isReferenceType(final Field field) {
-        return !field.getType().isPrimitive();
+        return !field.getClass().isPrimitive();
     }
 
-    private boolean isConfetiArtistClass(final Field field) {
-        return field.getType().isAssignableFrom(ConfetiArtist.class);
+    private boolean isArtistClass(final Field field) {
+        return field.getType().isAssignableFrom(Artist.class);
     }
 
-    private boolean isConfetiArtistClass(final Object object) {
-        return object.getClass().isAssignableFrom(ConfetiArtist.class);
-    }
 
-    private ConfetiArtist extractConfetiArtist(final Object target, final Field field)
+
+    private String extractArtistId(final Object target)
             throws RuntimeException {
         try {
-            setAccessibleIfPrivate(field);
-            return (ConfetiArtist) field.get(target);
-        } catch (IllegalAccessException e) {
+            return (String) target.getClass().getMethod(GET_ID_FUNC_NAME).invoke(target);
+        } catch (NoSuchMethodException  | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException();
         }
 
