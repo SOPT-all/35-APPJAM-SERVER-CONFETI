@@ -30,10 +30,10 @@ public class FestivalTime {
     @Column(nullable = false)
     private LocalDateTime endAt;
 
-    @OneToMany(mappedBy = "userTimetable", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "userTimetable", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserTimetable> timetables = new ArrayList<>();
 
-    @OneToMany(mappedBy = "festivalArtist", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "festivalArtist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FestivalArtist> artists = new ArrayList<>();
 
     public Long getId() {
