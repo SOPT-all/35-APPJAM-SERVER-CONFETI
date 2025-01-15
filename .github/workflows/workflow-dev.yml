@@ -54,6 +54,20 @@ jobs:
           echo "${{ secrets.APPLICATION_CLOUD_YML }}" > ./src/main/resources/cloud/application-cloud.yml
         shell: bash
 
+      # openapi 폴더 생성
+      - name: Create cloud folder if not exist
+        run: |
+          if [ ! -d "./src/main/resources/openapi" ]; then
+            mkdir -p ./src/main/resources/openapi
+          fi
+
+      # application-spotify.yml 파일 생성
+      - name: make application-spotify.yml
+        run: |
+          touch ./src/main/resources/openapi/application-spotify.yml
+          echo "${{ secrets.APPLICATION_SPOTIFY_YML }}" > ./src/main/resources/openapi/application-spotify.yml
+        shell: bash
+
       # 빌드 속도 향상을 위한 Gradle 캐싱
       - name: Gradle Caching
         uses: actions/cache@v4
