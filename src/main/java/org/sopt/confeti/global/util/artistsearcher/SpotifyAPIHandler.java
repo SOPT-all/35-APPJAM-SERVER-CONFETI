@@ -24,24 +24,25 @@ public class SpotifyAPIHandler {
 
     private SpotifyApi spotifyApi;
 
-    private GetArtistRequest getArtistRequest;
-
     public SpotifyAPIHandler() {
         createSpotifyApi();
         generateAccessToken();
     }
 
-    public List<ConfetiArtist> findArtistsByArtistIds(final List<String> artistIds)
-            throws IOException, ParseException, SpotifyWebApiException {
-        Artist[] artists = spotifyApi.getSeveralArtists(
-                artistIds.toArray(new String[0])
-        )
-                .build()
-                .execute();
+    public List<ConfetiArtist> findArtistsByArtistIds(final List<String> artistIds) {
+        try {
+            Artist[] artists = spotifyApi.getSeveralArtists(
+                            artistIds.toArray(new String[0])
+                    )
+                    .build()
+                    .execute();
 
-        return Arrays.stream(artists)
-                .map(ConfetiArtist::toConfetiArtist)
-                .toList();
+            return Arrays.stream(artists)
+                    .map(ConfetiArtist::toConfetiArtist)
+                    .toList();
+        } catch (IOException | ParseException | SpotifyWebApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void createSpotifyApi() {
