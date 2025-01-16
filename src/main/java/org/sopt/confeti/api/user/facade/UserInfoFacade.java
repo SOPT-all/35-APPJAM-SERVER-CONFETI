@@ -13,12 +13,8 @@ public class UserInfoFacade {
     private final UserService userService;
 
     @Transactional
-        public UserInfoDTO getUserInfo(Long userId) {
+    public UserInfoDTO getUserInfo(Long userId) {
         User user = userService.getUserInfo(userId);
-        return new UserInfoDTO(
-                user.getId(),
-                user.getProfilePath(),
-                user.getUsername()
-        );
+        return UserInfoDTO.from(user);
     }
 }
