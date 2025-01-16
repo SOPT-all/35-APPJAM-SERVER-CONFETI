@@ -7,7 +7,7 @@ public record ConcertDetailArtistResponse(
         String name,
         String profileUrl
 ) {
-    public static ConcertDetailArtistResponse of(final ConcertArtistDTO concertArtistDTO) {
+    public static ConcertDetailArtistResponse from(final ConcertArtistDTO concertArtistDTO) {
         return new ConcertDetailArtistResponse(
                 concertArtistDTO.artistId(),
                 concertArtistDTO.name(),

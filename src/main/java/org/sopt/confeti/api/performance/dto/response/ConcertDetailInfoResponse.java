@@ -21,7 +21,7 @@ public record ConcertDetailInfoResponse(
         String price,
         String infoImgUrl
 ) {
-    public static ConcertDetailInfoResponse of(final ConcertDetailDTO concertDetailDTO) {
+    public static ConcertDetailInfoResponse from(final ConcertDetailDTO concertDetailDTO) {
         return new ConcertDetailInfoResponse(
                 concertDetailDTO.concertId(),
                 concertDetailDTO.posterUrl(),

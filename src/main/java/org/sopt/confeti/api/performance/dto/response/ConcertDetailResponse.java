@@ -9,9 +9,9 @@ public record ConcertDetailResponse(
 ) {
     public static ConcertDetailResponse from(final ConcertDetailDTO concertDetailDTO) {
         return new ConcertDetailResponse(
-                ConcertDetailInfoResponse.of(concertDetailDTO),
+                ConcertDetailInfoResponse.from(concertDetailDTO),
                 concertDetailDTO.artists().stream()
-                        .map(ConcertDetailArtistResponse::of)
+                        .map(ConcertDetailArtistResponse::from)
                         .toList()
         );
     }
