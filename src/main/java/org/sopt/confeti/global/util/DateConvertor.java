@@ -9,6 +9,7 @@ import org.sopt.confeti.annotation.Convertor;
 @Convertor
 public class DateConvertor {
 
+    private final DateTimeFormatter spotifyLocalDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final DateTimeFormatter localDateFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd");
     private final DateTimeFormatter localTimeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
     private final DateTimeFormatter localDateTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
@@ -35,5 +36,9 @@ public class DateConvertor {
 
     public LocalDateTime convertToLocalDateTime(final String localDateTime) {
         return LocalDateTime.parse(localDateTime, localDateTimeFormat);
+    }
+
+    public LocalDate convertToSpotifyLocalDate(final String spotifyLocalDate) {
+        return LocalDate.parse(spotifyLocalDate, spotifyLocalDateFormat);
     }
 }
