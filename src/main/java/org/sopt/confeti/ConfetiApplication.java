@@ -13,7 +13,7 @@ import org.springframework.context.event.EventListener;
 public class ConfetiApplication {
 
     private final ApplicationContext ac;
-
+  
     public static void main(String[] args) {
         SpringApplication.run(ConfetiApplication.class, args);
     }
