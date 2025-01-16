@@ -11,6 +11,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.sopt.confeti.annotation.Handler;
+import org.sopt.confeti.global.exception.NotFoundException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.DateConvertor;
 import org.springframework.beans.factory.annotation.Value;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -71,7 +73,7 @@ public class SpotifyAPIHandler {
                     .map(ConfetiArtist::toConfetiArtist)
                     .toList();
         } catch (IOException | ParseException | SpotifyWebApiException e) {
-            throw new RuntimeException(e);
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
@@ -87,7 +89,7 @@ public class SpotifyAPIHandler {
             return Arrays.stream(artists.getItems())
                     .findFirst();
         } catch (IOException | ParseException | SpotifyWebApiException e) {
-            throw new RuntimeException(e);
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
