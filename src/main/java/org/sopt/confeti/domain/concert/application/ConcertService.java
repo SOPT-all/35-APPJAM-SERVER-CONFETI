@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
 import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.artistsearcher.ArtistResolver;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class ConcertService {
     public Concert getConcertDetailByConcertId(final long concertId) {
         Concert concert = concertRepository.findById(concertId)
                 .orElseThrow(
-                        () -> new ConfetiException(ErrorMessage.NOT_FOUND)
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
 
         artistResolver.load(concert);
