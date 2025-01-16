@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
 
 @Entity
 @Table(name="concerts")
