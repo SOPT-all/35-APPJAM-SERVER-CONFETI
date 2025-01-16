@@ -14,12 +14,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.annotation.Resolver;
 import org.sopt.confeti.global.util.IntegrateFunction;
-import org.springframework.stereotype.Component;
 
-@Component
-@Slf4j
+@Resolver
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArtistResolver {
 
