@@ -20,14 +20,14 @@ public class UserFavoriteFacade {
     @Transactional
     public void save(long userId, long festivalId) {
         User user = userService.findById(userId);
-        Festival festival = festivalService.findByid(festivalId);
+        Festival festival = festivalService.findById(festivalId);
         festivalFavoriteService.save(user, festival);
     }
 
     @Transactional
     public void delete(long userId, long festivalId) {
         User user = userService.findById(userId);
-        Festival festival = festivalService.findByid(festivalId);
+        Festival festival = festivalService.findById(festivalId);
         festivalFavoriteService.delete(user, festival);
     }
 }
