@@ -3,12 +3,14 @@ package org.sopt.confeti.domain.festivalfavorite;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.user.User;
 
 @Entity
 @Table(name="festival_favorites")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FestivalFavorite {
     @Id
@@ -23,18 +25,6 @@ public class FestivalFavorite {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="festival_id")
     private Festival festival;
-
-    public Long getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public Festival getFestival() {
-        return festival;
-    }
 
     @Builder
     public FestivalFavorite(User user, Festival festival) {

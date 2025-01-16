@@ -2,6 +2,7 @@ package org.sopt.confeti.domain.festival;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festivaldate.FestivalDate;
 import org.sopt.confeti.domain.festivalfavorite.FestivalFavorite;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Entity
 @Table(name="festivals")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Festival {
     @Id
@@ -77,85 +79,5 @@ public class Festival {
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
     private List<TimetableFestival> timetableFestivals = new ArrayList<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public List<FestivalDate> getDates() {
-        return dates;
-    }
-
-    public List<FestivalFavorite> getFestivalFavorites() {
-        return festivalFavorites;
-    }
-
-    public List<TimetableFestival> getTimetableFestivals() {
-        return timetableFestivals;
-    }
-
-    public String getFestivalTitle() {
-        return festivalTitle;
-    }
-
-    public LocalDate getFestivalStartAt() {
-        return festivalStartAt;
-    }
-
-    public LocalDate getFestivalEndAt() {
-        return festivalEndAt;
-    }
-
-    public String getFestivalArea() {
-        return festivalArea;
-    }
-
-    public String getFestivalPosterPath() {
-        return festivalPosterPath;
-    }
-
-    public String getFestivalLogoPath() {
-        return festivalLogoPath;
-    }
-
-    public LocalDateTime getReserveAt() {
-        return reserveAt;
-    }
-
-    public String getReservationUrl() {
-        return reservationUrl;
-    }
-
-    public String getReservationOffice() {
-        return reservationOffice;
-    }
-
-    public String getAgeRating() {
-        return ageRating;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public String getPrice() {
-        return price;
-    }
-
-    public String getFestivalSubtitle() {
-        return festivalSubtitle;
-    }
-
-    public String getFestivalPosterBgPath() {
-        return festivalPosterBgPath;
-    }
-
-    public String getFestivalInfoImgPath() {
-        return festivalInfoImgPath;
-    }
-
-    public String getFestivalReservationBgPath() {
-        return festivalReservationBgPath;
-    }
 }
 

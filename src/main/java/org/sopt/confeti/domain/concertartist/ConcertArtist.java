@@ -3,11 +3,14 @@ package org.sopt.confeti.domain.concertartist;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.concert.Concert;
+import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
 
 @Entity
 @Table(name="concert_artists")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConcertArtist {
     @Id
@@ -19,31 +22,6 @@ public class ConcertArtist {
     @JoinColumn(name = "concert_id")
     private Concert concert;
 
-    @Column(length=100, nullable = false)
-    private String artistId;
-
-    @Builder
-    private ConcertArtist(Concert concert, String artistId) {
-        this.concert = concert;
-        this.artistId = artistId;
-    }
-
-    public static ConcertArtist create(Concert concert, String artistId) {
-        return ConcertArtist.builder()
-                .concert(concert)
-                .artistId(artistId)
-                .build();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Concert getConcert() {
-        return concert;
-    }
-
-    public String getArtistId() {
-        return artistId;
-    }
+    @Embedded
+    private ConfetiArtist artist;
 }

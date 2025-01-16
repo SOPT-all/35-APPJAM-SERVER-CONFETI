@@ -3,6 +3,7 @@ package org.sopt.confeti.domain.user;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.concertfavorite.ConcertFavorite;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Entity
 @Table(name="users")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
     @Id
@@ -42,36 +44,4 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true )
     private List<TimetableFestival> timetableFestivals = new ArrayList<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getProfilePath() {
-        return profilePath;
-    }
-
-    public List<UserTimetable> getTimetables() {
-        return timetables;
-    }
-
-    public List<ArtistFavorite> getArtistFavorites() {
-        return artistFavorites;
-    }
-
-    public List<ConcertFavorite> getConcertFavorites() {
-        return concertFavorites;
-    }
-
-    public List<FestivalFavorite> getFestivalFavorites() {
-        return festivalFavorites;
-    }
-
-    public List<TimetableFestival> getTimetableFestivals() {
-        return timetableFestivals;
-    }
 }

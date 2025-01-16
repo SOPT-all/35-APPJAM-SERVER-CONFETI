@@ -3,12 +3,14 @@ package org.sopt.confeti.domain.usertimetable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festivaltime.FestivalTime;
 import org.sopt.confeti.domain.user.User;
 
 @Entity
 @Table(name="user_timetables")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserTimetable {
     @Id
@@ -26,22 +28,6 @@ public class UserTimetable {
 
     @Column(nullable = false)
     private boolean isSelected;
-
-    public Long getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public FestivalTime getFestivalTime() {
-        return festivalTime;
-    }
-
-    public boolean isSelected() {
-        return isSelected;
-    }
 
     @Builder
     public UserTimetable(User user, FestivalTime festivalTime, boolean isSelected) {

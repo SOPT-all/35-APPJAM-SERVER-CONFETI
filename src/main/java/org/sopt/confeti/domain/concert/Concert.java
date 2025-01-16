@@ -2,6 +2,7 @@ package org.sopt.confeti.domain.concert;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.concertartist.ConcertArtist;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name="concerts")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Concert {
     @Id
@@ -66,72 +68,4 @@ public class Concert {
 
     @OneToMany(mappedBy = "concert", cascade = CascadeType.REMOVE)
     private List<ConcertArtist> artists = new ArrayList<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getConcertTitle() {
-        return concertTitle;
-    }
-
-    public LocalDate getConcertStartAt() {
-        return concertStartAt;
-    }
-
-    public LocalDate getConcertEndAt() {
-        return concertEndAt;
-    }
-
-    public String getConcertArea() {
-        return concertArea;
-    }
-
-    public String getConcertPosterPath() {
-        return concertPosterPath;
-    }
-
-    public LocalDateTime getReserveAt() {
-        return reserveAt;
-    }
-
-    public String getReservationUrl() {
-        return reservationUrl;
-    }
-
-    public String getReservationOffice() {
-        return reservationOffice;
-    }
-
-    public String getAgeRating() {
-        return ageRating;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public String getPrice() {
-        return price;
-    }
-
-    public String getConcertSubtitle() {
-        return concertSubtitle;
-    }
-
-    public String getConcertPosterBgPath() {
-        return concertPosterBgPath;
-    }
-
-    public String getConcertInfoImgPath() {
-        return concertInfoImgPath;
-    }
-
-    public String getConcertReservationBgPath() {
-        return concertReservationBgPath;
-    }
-
-    public List<ConcertArtist> getArtists() {
-        return artists;
-    }
 }
