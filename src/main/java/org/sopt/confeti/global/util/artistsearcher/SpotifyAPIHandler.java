@@ -1,8 +1,10 @@
 package org.sopt.confeti.global.util.artistsearcher;
 
+import com.neovisionaries.i18n.CountryCode;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
@@ -19,6 +21,9 @@ import se.michaelthelin.spotify.requests.authorization.client_credentials.Client
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SpotifyAPIHandler {
 
+    private static final int LIMIT = 1;
+    private static final int OFFSET = 0;
+
     @Value("${spotify.credentials.client-id}")
     private String clientId;
 
@@ -32,15 +37,20 @@ public class SpotifyAPIHandler {
         generateAccessToken();
     }
 
-    public List<ConfetiArtist> findArtistsByKeyword(final String keyword) {
+    public Optional<ConfetiArtist> findArtistsByKeyword(final String keyword) {
         try {
             Paging<Artist> artists = spotifyApi.searchArtists(keyword)
+                    .market(CountryCode.KR)
+                    .limit(LIMIT)
+                    .offset(OFFSET)
                     .build()
                     .execute();
 
-            return Arrays.stream(artists.getItems())
-                    .map(ConfetiArtist::toConfetiArtist)
-                    .toList();
+            Optional<Artist> artist = Arrays.stream(artists.getItems())
+                    .findFirst();
+
+            return artist.map(ConfetiArtist::toConfetiArtist);
+
         } catch (IOException | ParseException | SpotifyWebApiException e) {
             throw new RuntimeException(e);
         }
