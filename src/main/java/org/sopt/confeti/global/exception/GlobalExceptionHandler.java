@@ -34,4 +34,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<?>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         return ApiResponseUtil.failure(ErrorMessage.METHOD_NOT_ALLOWED);
     }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<BaseResponse<?>> handleConflictException(ConflictException e) {
+        return ApiResponseUtil.failure(ErrorMessage.CONFLICT);
+    }
 }
