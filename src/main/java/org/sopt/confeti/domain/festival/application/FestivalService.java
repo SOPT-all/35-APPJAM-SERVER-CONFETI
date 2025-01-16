@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.festival.application;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -7,17 +8,13 @@ import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class FestivalService {
     private final FestivalRepository festivalRepository;
 
-    public FestivalService(FestivalRepository festivalRepository) {
-        this.festivalRepository = festivalRepository;
-    }
-
-    public Festival findByid(Long festivalId) {
+    public Festival findById(Long festivalId) {
         Festival festival = festivalRepository.findById(festivalId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-                return festival;
-
+        return festival;
     }
 }
