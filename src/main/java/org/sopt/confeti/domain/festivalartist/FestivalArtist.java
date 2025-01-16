@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festivalstage.FestivalStage;
+import org.sopt.confeti.domain.festivaltime.FestivalTime;
 import org.sopt.confeti.domain.usertimetable.UserTimetable;
 
 import java.time.LocalDateTime;
@@ -19,25 +20,12 @@ public class FestivalArtist {
     @Column(name = "festival_artist_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="festival_stage_id", nullable=false)
-    private FestivalStage festivalStage;
-
     @Column(length = 100, nullable = false)
     private String artistId;
 
-    @Column(nullable = false)
-    private LocalDateTime startAt;
-
-    @Column(nullable = false)
-    private LocalDateTime endAt;
-
-    @OneToMany(mappedBy = "festivalArtist", cascade = CascadeType.REMOVE)
-    private List<UserTimetable> timetables = new ArrayList<>();
-
-    public FestivalStage getFestivalStage() {
-        return festivalStage;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="festival_time_id", nullable=false)
+    private FestivalTime festivalTime;
 
     public Long getId() {
         return id;
@@ -47,15 +35,7 @@ public class FestivalArtist {
         return artistId;
     }
 
-    public LocalDateTime getStartAt() {
-        return startAt;
-    }
-
-    public LocalDateTime getEndAt() {
-        return endAt;
-    }
-
-    public List<UserTimetable> getTimetables() {
-        return timetables;
+    public FestivalTime getFestivalTime() {
+        return festivalTime;
     }
 }
