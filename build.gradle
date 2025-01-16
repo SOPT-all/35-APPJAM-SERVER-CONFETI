@@ -29,7 +29,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     // actuator
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'\
+
+    // validation
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.0'
+    implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final'
 
     // lombok
     compileOnly 'org.projectlombok:lombok'
@@ -37,6 +41,7 @@ dependencies {
 
     // DB
     runtimeOnly 'com.mysql:mysql-connector-j'
+
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
