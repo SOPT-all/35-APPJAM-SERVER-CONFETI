@@ -37,16 +37,10 @@ public class ConfetiArtist {
         Optional<Image> image = Arrays.stream(artist.getImages())
                 .min(Comparator.comparingInt(Image::getHeight));
 
-        String profileUrl = null;
-
-        if (image.isPresent()) {
-            profileUrl = image.get().getUrl();
-        }
-
         return new ConfetiArtist(
                 artist.getId(),
                 artist.getName(),
-                profileUrl,
+                image.map(Image::getUrl).orElse(null),
                 null
         );
     }
@@ -55,16 +49,10 @@ public class ConfetiArtist {
         Optional<Image> image = Arrays.stream(artist.getImages())
                 .min(Comparator.comparingInt(Image::getHeight));
 
-        String profileUrl = null;
-
-        if (image.isPresent()) {
-            profileUrl = image.get().getUrl();
-        }
-
         return new ConfetiArtist(
                 artist.getId(),
                 artist.getName(),
-                profileUrl,
+                image.map(Image::getUrl).orElse(null),
                 latestReleaseAt
         );
     }
