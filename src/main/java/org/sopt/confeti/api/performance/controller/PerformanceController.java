@@ -26,7 +26,7 @@ public class PerformanceController {
 
     @GetMapping("/concerts/{concertId}")
     public ResponseEntity<BaseResponse<?>> getConcertInfo(@RequestHeader("Authorization") Long userId,
-                                                          @PathVariable @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long concertId) {
+                                                          @PathVariable("concertId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long concertId) {
         ConcertDetailDTO concertDetailDTO = performanceFacade.getConcertDetailInfo(concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, ConcertDetailResponse.from(concertDetailDTO));
     }
