@@ -8,8 +8,8 @@ import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
+import org.sopt.confeti.annotation.Handler;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
@@ -17,7 +17,7 @@ import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 
-@Component
+@Handler
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SpotifyAPIHandler {
 
