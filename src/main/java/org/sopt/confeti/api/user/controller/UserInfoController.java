@@ -23,13 +23,7 @@ public class UserInfoController {
     @GetMapping
     public ResponseEntity<BaseResponse<?>> getUserInfo(@RequestHeader("Authorization") Long userId) {
         UserInfoDTO userInfo = userInfoFacade.getUserInfo(userId);
-
-        UserInfoResponse user = new UserInfoResponse(
-                userInfo.userId(),
-                userInfo.profileUrl(),
-                userInfo.username()
-        );
-
+        UserInfoResponse user = UserInfoResponse.from(userInfo);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, user);
     }
 }
