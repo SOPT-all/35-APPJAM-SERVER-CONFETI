@@ -30,4 +30,5 @@ public class UserFavoriteController {
                                                                   @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
         userFavoriteFacade.delete(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
-    }}
+    }
+}
