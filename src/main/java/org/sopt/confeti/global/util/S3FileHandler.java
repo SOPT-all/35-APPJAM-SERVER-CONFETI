@@ -1,9 +1,9 @@
 package org.sopt.confeti.global.util;
 
+import org.sopt.confeti.annotation.Handler;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
-@Service
+@Handler
 public class S3FileHandler {
 
     protected S3FileHandler() {}
