@@ -3,6 +3,7 @@ package org.sopt.confeti.global.util.artistsearcher;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Transient;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
@@ -29,6 +30,9 @@ public class ConfetiArtist {
     @Transient
     private String profileUrl;
 
+    @Transient
+    private LocalDate latestReleaseAt;
+
     public static ConfetiArtist toConfetiArtist(final Artist artist) {
         Optional<Image> image = Arrays.stream(artist.getImages())
                 .min(Comparator.comparingInt(Image::getHeight));
@@ -42,7 +46,26 @@ public class ConfetiArtist {
         return new ConfetiArtist(
                 artist.getId(),
                 artist.getName(),
-                profileUrl
+                profileUrl,
+                null
+        );
+    }
+
+    public static ConfetiArtist toConfetiArtist(final Artist artist, final LocalDate latestReleaseAt) {
+        Optional<Image> image = Arrays.stream(artist.getImages())
+                .min(Comparator.comparingInt(Image::getHeight));
+
+        String profileUrl = null;
+
+        if (image.isPresent()) {
+            profileUrl = image.get().getUrl();
+        }
+
+        return new ConfetiArtist(
+                artist.getId(),
+                artist.getName(),
+                profileUrl,
+                latestReleaseAt
         );
     }
 
