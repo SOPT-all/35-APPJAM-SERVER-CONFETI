@@ -69,7 +69,7 @@ jobs:
           touch ./src/main/resources/openapi/application-spotify.yml
           echo "${{ secrets.APPLICATION_SPOTIFY_YML }}" > ./src/main/resources/openapi/application-spotify.yml
         shell: bash
-
+        
       # 빌드 속도 향상을 위한 Gradle 캐싱
       - name: Gradle Caching
         uses: actions/cache@v4
