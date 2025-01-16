@@ -33,31 +33,47 @@ public class ArtistResolver {
 
     private final ConcurrentHashMap<Class<?>, IntegrateFunction> collectByTypeMapper = new ConcurrentHashMap<Class<?>, IntegrateFunction>() {{
         put(List.class, args -> {
-            if (!(args[0] instanceof List) || !(args[1] instanceof List) || !(args[2] instanceof HashMap)) {
+            if (!(args[0] instanceof List)) {
                 // TODO:
                 // 예외 처리 추가
                 throw new RuntimeException();
             }
 
-            collectByListType((List<?>) args[0], (List<String>) args[1], (HashMap<String, ConfetiArtist>) args[2]);
+            collectByListType((List<?>) args[0]);
             return null;
         });
     }};
 
+    private List<String> artistIds;
+    private HashMap<String, ConfetiArtist> artistMapper;
+    private HashMap<Object, Boolean> objectTrack;
+
     private final SpotifyAPIHandler spotifyAPIHandler;
+
+    private void prologue() {
+        artistIds = new ArrayList<>();
+        artistMapper = new HashMap<>();
+        objectTrack = new HashMap<>();
+    }
+
+    private void epilogue() {
+        artistIds.clear();
+        artistMapper.clear();
+        objectTrack.clear();
+    }
 
     // Spotify API를 사용해 아티스트를 로드하는 엔트리 포인트
     public void load(final Object target) {
-        List<String> artistIds = new ArrayList<>();
-        HashMap<String, ConfetiArtist> artistMapper = new HashMap<>();
-        collect(target, artistIds, artistMapper);
+        prologue();
+        collect(target);
 
         List<ConfetiArtist> confetiArtists =  searchByArtistIds(artistIds);
 
-        injection(artistMapper, confetiArtists);
+        injection(confetiArtists);
+        epilogue();
     }
 
-    private void injection(final HashMap<String, ConfetiArtist> artistMapper, final List<ConfetiArtist> confetiArtists) {
+    private void injection(final List<ConfetiArtist> confetiArtists) {
         confetiArtists.forEach((confetiArtist -> {
             ConfetiArtist mappedConfetiArtist = artistMapper.get(confetiArtist.getArtistId());
             mappedConfetiArtist.setName(confetiArtist.getName());
@@ -70,7 +86,15 @@ public class ArtistResolver {
     }
 
     // 리플렉션을 사용해 타겟 오브젝트를 재귀적으로 순회하며 아티스트 아이디를 수집하는 함수
-    private void collect(final Object target, final List<String> artistIds, final HashMap<String, ConfetiArtist> artistMapper) {
+    private void collect(final Object target) {
+        // 이미 탐색한 객체인 경우
+        if (objectTrack.containsKey(target)) {
+            return;
+        }
+
+        // 오브젝트 트랙에 현재 탐색 대상 객체를 추가
+        objectTrack.put(target, true);
+
         // 현재 오브젝트가 ConfetiArtist 타입인 경우
         if (isConfetiArtistClass(target)) {
             ConfetiArtist artist = (ConfetiArtist) target;
@@ -93,7 +117,7 @@ public class ArtistResolver {
                 }
 
                 try {
-                    collectByType(target, field, artistIds, artistMapper);
+                    collectByType(target, field);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -101,27 +125,23 @@ public class ArtistResolver {
         });
     }
 
-    private void collectByType(final Object target, final Field field, final List<String> artistIds, final HashMap<String, ConfetiArtist> artistMapper) throws IllegalAccessException {
+    private void collectByType(final Object target, final Field field) throws IllegalAccessException {
         Class<?> fieldType = field.getType();
         setAccessibleIfPrivate(field);
 
         try {
             collectByTypeMapper.get(fieldType).apply(
-                    field.get(target),
-                    artistIds,
-                    artistMapper
+                    field.get(target)
             );
         } catch (NullPointerException e) {
             collect(
-                    field.get(target),
-                    artistIds,
-                    artistMapper
+                    field.get(target)
             );
         }
     }
 
-    private void collectByListType(final List<?> objects, final List<String> artistIds, final HashMap<String, ConfetiArtist> artistMapper) {
-        objects.forEach((obj) -> collect(obj, artistIds, artistMapper));
+    private void collectByListType(final List<?> objects) {
+        objects.forEach(this::collect);
     }
 
     private void setAccessibleIfPrivate(final Field field) {
