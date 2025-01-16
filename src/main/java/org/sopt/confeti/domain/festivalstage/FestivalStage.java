@@ -2,6 +2,7 @@ package org.sopt.confeti.domain.festivalstage;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festivalartist.FestivalArtist;
 import org.sopt.confeti.domain.festivaldate.FestivalDate;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name="festival_stages")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FestivalStage {
     @Id
@@ -31,24 +33,4 @@ public class FestivalStage {
 
     @OneToMany(mappedBy = "festivalStage", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FestivalTime> times = new ArrayList<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public FestivalDate getFestivalDate() {
-        return festivalDate;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public List<FestivalTime> getTimes() {
-        return times;
-    }
 }

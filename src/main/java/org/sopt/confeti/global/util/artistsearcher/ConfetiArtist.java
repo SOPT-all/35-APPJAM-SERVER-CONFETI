@@ -21,7 +21,7 @@ import se.michaelthelin.spotify.model_objects.specification.Image;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConfetiArtist {
 
-    @Column(length = 100)
+    @Column(length = 100, nullable = false)
     private String artistId;
 
     @Transient
