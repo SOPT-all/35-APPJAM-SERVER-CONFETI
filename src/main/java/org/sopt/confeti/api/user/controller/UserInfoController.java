@@ -1,7 +1,9 @@
 package org.sopt.confeti.api.user.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.user.dto.response.UserInfoResponse;
 import org.sopt.confeti.api.user.facade.UserInfoFacade;
+import org.sopt.confeti.api.user.facade.dto.response.UserInfoDTO;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -20,7 +22,14 @@ public class UserInfoController {
 
     @GetMapping
     public ResponseEntity<BaseResponse<?>> getUserInfo(@RequestHeader("Authorization") Long userId) {
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, userInfoFacade.getUserInfo(userId));
-    }
+        UserInfoDTO userInfo = userInfoFacade.getUserInfo(userId);
 
+        UserInfoResponse user = new UserInfoResponse(
+                userInfo.userId(),
+                userInfo.profileUrl(),
+                userInfo.username()
+        );
+
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, user);
+    }
 }
