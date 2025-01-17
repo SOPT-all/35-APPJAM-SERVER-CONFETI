@@ -5,7 +5,7 @@ import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import java.util.List;
 
 public record UserFavoriteArtistDTO (List<UserFavoriteArtistListDTO> artists) {
-    public static UserFavoriteArtistDTO of(final List<ArtistFavorite> artists) {
+    public static UserFavoriteArtistDTO from(final List<ArtistFavorite> artists) {
         return new UserFavoriteArtistDTO(
                 artists.stream()
                         .map(UserFavoriteArtistListDTO::from)
