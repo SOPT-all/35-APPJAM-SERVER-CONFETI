@@ -3,6 +3,7 @@ package org.sopt.confeti.global.util.artistsearcher;
 import com.neovisionaries.i18n.CountryCode;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -62,6 +63,10 @@ public class SpotifyAPIHandler {
     }
 
     public List<ConfetiArtist> findArtistsByArtistIds(final List<String> artistIds) {
+        if (artistIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         try {
             Artist[] artists = spotifyApi.getSeveralArtists(
                             artistIds.toArray(new String[0])

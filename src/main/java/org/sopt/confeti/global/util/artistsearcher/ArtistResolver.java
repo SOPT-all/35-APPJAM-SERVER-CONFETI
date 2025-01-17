@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Resolver;
 import org.sopt.confeti.global.util.IntegrateFunction;
+import org.springframework.aop.support.AopUtils;
 
 @Resolver
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,6 +33,16 @@ public class ArtistResolver {
     );
 
     private final ConcurrentHashMap<Class<?>, IntegrateFunction> collectByTypeMapper = new ConcurrentHashMap<Class<?>, IntegrateFunction>() {{
+        put(ArrayList.class, args -> {
+            if (!(args[0] instanceof List)) {
+                // TODO:
+                // 예외 처리 추가
+                throw new RuntimeException();
+            }
+
+            collectByListType((List<?>) args[0]);
+            return null;
+        });
         put(List.class, args -> {
             if (!(args[0] instanceof List)) {
                 // TODO:
@@ -86,9 +97,13 @@ public class ArtistResolver {
     }
 
     // 리플렉션을 사용해 타겟 오브젝트를 재귀적으로 순회하며 아티스트 아이디를 수집하는 함수
+    // TODO: 추후에 메소드 분리 리펙토링 예정
     private void collect(final Object target) {
+        if (target !=null) {
+            System.out.println(target);
+        }
         // 이미 탐색한 객체인 경우
-        if (objectTrack.containsKey(target)) {
+        if (target == null || objectTrack.containsKey(target)) {
             return;
         }
 
@@ -101,6 +116,12 @@ public class ArtistResolver {
 
             artistIds.add(artist.getArtistId());
             artistMapper.put(artist.getArtistId(), artist);
+            return;
+        } else if (collectByTypeMapper.containsKey(target.getClass())) {
+            // 현재 오브젝트가 정해진 처리 방법이 필요한 타입인 경우 (현재는 List)
+            collectByTypeMapper.get(target.getClass()).apply(
+                    target
+            );
             return;
         }
 
@@ -116,8 +137,18 @@ public class ArtistResolver {
                     return;
                 }
 
+                setAccessibleIfPrivateOrProtected(field);
+
                 try {
-                    collectByType(target, field);
+                    if (collectByTypeMapper.containsKey(field.getType())) {
+                        collectByTypeMapper.get(field.getType()).apply(
+                                field.get(target)
+                        );
+
+                        return;
+                    }
+
+                    collect(field.get(target));
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -125,27 +156,14 @@ public class ArtistResolver {
         });
     }
 
-    private void collectByType(final Object target, final Field field) throws IllegalAccessException {
-        Class<?> fieldType = field.getType();
-        setAccessibleIfPrivate(field);
-
-        try {
-            collectByTypeMapper.get(fieldType).apply(
-                    field.get(target)
-            );
-        } catch (NullPointerException e) {
-            collect(
-                    field.get(target)
-            );
-        }
-    }
-
     private void collectByListType(final List<?> objects) {
         objects.forEach(this::collect);
     }
 
-    private void setAccessibleIfPrivate(final Field field) {
-        if (Modifier.isPrivate(field.getModifiers())) {
+    private void setAccessibleIfPrivateOrProtected(final Field field) {
+        if (
+                Modifier.isPrivate(field.getModifiers()) || Modifier.isProtected(field.getModifiers())
+        ) {
             field.setAccessible(ACCESS_ALLOW);
         }
     }
@@ -169,7 +187,7 @@ public class ArtistResolver {
     private ConfetiArtist extractConfetiArtist(final Object target, final Field field)
             throws RuntimeException {
         try {
-            setAccessibleIfPrivate(field);
+            setAccessibleIfPrivateOrProtected(field);
             return (ConfetiArtist) field.get(target);
         } catch (IllegalAccessException e) {
             throw new RuntimeException();
