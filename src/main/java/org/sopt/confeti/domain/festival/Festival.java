@@ -72,7 +72,7 @@ public class Festival {
     private String price;
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FestivalDate> dates= new ArrayList<>();
+    private List<FestivalDate> dates = new ArrayList<>();
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
     private List<FestivalFavorite> festivalFavorites = new ArrayList<>();
