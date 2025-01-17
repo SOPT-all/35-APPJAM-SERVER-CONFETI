@@ -99,9 +99,6 @@ public class ArtistResolver {
     // 리플렉션을 사용해 타겟 오브젝트를 재귀적으로 순회하며 아티스트 아이디를 수집하는 함수
     // TODO: 추후에 메소드 분리 리펙토링 예정
     private void collect(final Object target) {
-        if (target !=null) {
-            System.out.println(target);
-        }
         // 이미 탐색한 객체인 경우
         if (target == null || objectTrack.containsKey(target)) {
             return;
