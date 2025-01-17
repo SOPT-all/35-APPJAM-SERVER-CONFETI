@@ -29,7 +29,7 @@ public class ArtistFavorite {
     @Builder
     private ArtistFavorite(User user, String artistId) {
         this.user = user;
-        this.artist = new ConfetiArtist(artistId);
+        this.artist = ConfetiArtist.from(artistId);
     }
 
     public static ArtistFavorite create(User user, String artistId) {

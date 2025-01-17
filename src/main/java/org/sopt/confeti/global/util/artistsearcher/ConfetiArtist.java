@@ -33,6 +33,10 @@ public class ConfetiArtist {
     @Transient
     private LocalDate latestReleaseAt;
 
+    private ConfetiArtist(String artistId) {
+        this.artistId = artistId;
+    }
+
     public static ConfetiArtist toConfetiArtist(final Artist artist) {
         Optional<Image> image = Arrays.stream(artist.getImages())
                 .min(Comparator.comparingInt(Image::getHeight));
@@ -57,7 +61,7 @@ public class ConfetiArtist {
         );
     }
 
-    public ConfetiArtist(String artistId) {
-        this.artistId = artistId;
+    public static ConfetiArtist from(final String artistId) {
+        return new ConfetiArtist(artistId);
     }
 }
