@@ -1,6 +1,7 @@
 package org.sopt.confeti.domain.festival.application;
 
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -16,5 +17,11 @@ public class FestivalService {
         Festival festival = festivalRepository.findById(festivalId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         return festival;
+    }
+
+    public void create(final CreateFestivalDTO createFestivalDTO) {
+        festivalRepository.save(
+                Festival.create(createFestivalDTO)
+        );
     }
 }
