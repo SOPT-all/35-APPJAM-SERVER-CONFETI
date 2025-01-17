@@ -17,6 +17,7 @@ import org.sopt.confeti.global.util.IntegrateFunction;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArtistResolver {
 
+    // 기존에 조회할 클래스를 매핑
     private final ConcurrentHashMap<Class<?>, IntegrateFunction> collectByTypeMapper = new ConcurrentHashMap<Class<?>, IntegrateFunction>() {{
         put(ArtistFavorite.class, args -> {
             collectArtistFavorite(args[0]);
@@ -67,10 +68,12 @@ public class ArtistResolver {
             return;
         }
 
+        // 주어진 타겟이 리스트일 경우
         if (isListType(target)) {
             List<Object> objects = (List<Object>) target;
 
             objects.forEach(object -> {
+                // Mapper에 등록된 클래스 타입인 경우
                 if (collectByTypeMapper.containsKey(object.getClass())) {
                     collectByTypeMapper.get(object.getClass())
                             .apply(object);
@@ -80,6 +83,7 @@ public class ArtistResolver {
             return;
         }
 
+        // Mapper에 등록된 클래스 타입인 경우
         if (collectByTypeMapper.containsKey(target.getClass())) {
             collectByTypeMapper.get(target.getClass()).apply(target);
         }
