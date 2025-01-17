@@ -31,4 +31,8 @@ public class FestivalFavoriteService {
 
         festivalFavoriteRepository.delete(festivalFavorite);
     }
+
+    public boolean isFavorite(final long userId, final long festivalId) {
+        return festivalFavoriteRepository.existsByUserIdAndFestivalId(userId, festivalId);
+    }
 }
