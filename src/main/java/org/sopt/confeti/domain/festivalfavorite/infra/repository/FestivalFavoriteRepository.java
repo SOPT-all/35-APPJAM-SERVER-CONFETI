@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface FestivalFavoriteRepository extends JpaRepository<FestivalFavorite, Long> {
     Optional<FestivalFavorite> findByUserIdAndFestivalId(long userId, long festivalId);
+
+    boolean existsByUserIdAndFestivalId(long userId, long festivalId);
 }
