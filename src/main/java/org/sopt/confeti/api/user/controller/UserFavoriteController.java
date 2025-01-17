@@ -37,6 +37,6 @@ public class UserFavoriteController {
     @GetMapping("/artists")
     public ResponseEntity<BaseResponse<?>> getFavoriteArtists(@RequestHeader("Authorization") Long userId) {
         UserFavoriteArtistDTO userFavoriteArtistDTO = userFavoriteFacade.getArtistList(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserFavoriteResponse.of(userFavoriteArtistDTO.artists()));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserFavoriteResponse.from(userFavoriteArtistDTO.artists()));
     }
 }
