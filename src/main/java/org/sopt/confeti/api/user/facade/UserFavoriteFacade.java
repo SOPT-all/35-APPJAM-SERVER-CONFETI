@@ -40,7 +40,8 @@ public class UserFavoriteFacade {
     @Transactional
     public UserFavoriteArtistDTO getArtistList(long userId) {
         User user = userService.findById(userId);
-        List<ArtistFavorite> artists = artistFavoriteService.getArtistList(user);
-        return UserFavoriteArtistDTO.of(artists);
+        userService.existsById(userId);
+        List<ArtistFavorite> artists = artistFavoriteService.getArtistList(userId);
+        return UserFavoriteArtistDTO.from(artists);
     }
 }
