@@ -3,8 +3,10 @@ package org.sopt.confeti.api.performance.controller;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
+import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -29,5 +31,12 @@ public class PerformanceController {
                                                           @PathVariable("concertId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long concertId) {
         ConcertDetailDTO concertDetailDTO = performanceFacade.getConcertDetailInfo(concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, ConcertDetailResponse.from(concertDetailDTO));
+    }
+
+    @GetMapping("/festivals/{festivalId}")
+    public ResponseEntity<BaseResponse<?>> getFestivalInfo(@RequestHeader(name = "Authorization", required = false) Long userId,
+                                                           @PathVariable("festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
+        FestivalDetailDTO festivalDetailDTO = performanceFacade.getFestivalDetailInfo(userId, festivalId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, FestivalDetailResponse.from(festivalDetailDTO));
     }
 }
