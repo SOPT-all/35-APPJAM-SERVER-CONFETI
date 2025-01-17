@@ -23,4 +23,11 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         return user;
     }
+
+    public void existsById(Long userId) {
+        final boolean isExistUser = userRepository.existsById(userId);
+        if(!isExistUser) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+    }
 }
