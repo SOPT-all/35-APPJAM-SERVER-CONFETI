@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.sopt.confeti.domain.concert.Concert;
-import org.sopt.confeti.global.util.S3FileHandler;
 
 public record ConcertDetailDTO(
         long concertId,
@@ -13,10 +12,10 @@ public record ConcertDetailDTO(
         LocalDate startAt,
         LocalDate endAt,
         String area,
-        String posterUrl,
-        String posterBgUrl,
-        String infoImgUrl,
-        String concertReservationBgUrl,
+        String posterPath,
+        String posterBgPath,
+        String infoImgPath,
+        String concertReservationBgPath,
         LocalDateTime reserveAt,
         String reservationUrl,
         String reservationOffice,
@@ -25,7 +24,7 @@ public record ConcertDetailDTO(
         String price,
         List<ConcertArtistDTO> artists
 ) {
-    public static ConcertDetailDTO of(final Concert concert, final S3FileHandler s3FileHandler) {
+    public static ConcertDetailDTO from(final Concert concert) {
         return new ConcertDetailDTO(
                 concert.getId(),
                 concert.getConcertTitle(),
@@ -33,10 +32,10 @@ public record ConcertDetailDTO(
                 concert.getConcertStartAt(),
                 concert.getConcertEndAt(),
                 concert.getConcertArea(),
-                s3FileHandler.getFileUrl(concert.getConcertPosterPath()),
-                s3FileHandler.getFileUrl(concert.getConcertPosterBgPath()),
-                s3FileHandler.getFileUrl(concert.getConcertInfoImgPath()),
-                s3FileHandler.getFileUrl(concert.getConcertReservationBgPath()),
+                concert.getConcertPosterPath(),
+                concert.getConcertPosterBgPath(),
+                concert.getConcertInfoImgPath(),
+                concert.getConcertReservationBgPath(),
                 concert.getReserveAt(),
                 concert.getReservationUrl(),
                 concert.getReservationOffice(),
