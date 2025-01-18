@@ -27,4 +27,10 @@ public class ConcertService {
 
         return concert;
     }
+
+    public void existsById(long concertId) {
+        if (!concertRepository.existsById(concertId)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+    }
 }

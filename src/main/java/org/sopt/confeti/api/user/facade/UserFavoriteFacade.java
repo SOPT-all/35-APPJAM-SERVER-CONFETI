@@ -5,12 +5,15 @@ import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.artistfavorite.application.ArtistFavoriteService;
+import org.sopt.confeti.domain.concert.application.ConcertService;
+import org.sopt.confeti.domain.concertfavorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivalfavorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.global.exception.ConflictException;
+import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,8 @@ public class UserFavoriteFacade {
     private final FestivalService festivalService;
     private final FestivalFavoriteService festivalFavoriteService;
     private final ArtistFavoriteService artistFavoriteService;
+    private final ConcertService concertService;
+    private final ConcertFavoriteService concertFavoriteService;
 
     @Transactional
     public void addFestivalFavorite(long userId, long festivalId) {
@@ -55,5 +60,17 @@ public class UserFavoriteFacade {
         }
 
         artistFavoriteService.addFavorite(user, artistId);
+    }
+
+    @Transactional
+    public void removeConcertFavorite(final long userId, final long concertId) {
+        userService.existsById(userId);
+        concertService.existsById(concertId);
+
+        if (!concertFavoriteService.isFavorite(userId, concertId)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+
+        concertFavoriteService.removeFavorite(userId, concertId);
     }
 }

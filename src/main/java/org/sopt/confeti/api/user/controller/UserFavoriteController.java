@@ -48,4 +48,13 @@ public class UserFavoriteController {
         userFavoriteFacade.addArtistFavorite(userId, artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
+
+    @DeleteMapping("/concerts/{concertId}")
+    public ResponseEntity<BaseResponse<?>> removeConcertFavorite(
+            @RequestHeader("Authorization") Long userId,
+            @PathVariable(name = "concertId") Long concertId
+    ) {
+        userFavoriteFacade.removeConcertFavorite(userId, concertId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
 }
