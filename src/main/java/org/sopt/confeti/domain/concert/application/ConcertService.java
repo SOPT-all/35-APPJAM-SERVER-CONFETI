@@ -1,10 +1,8 @@
 package org.sopt.confeti.domain.concert.application;
 
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
-import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.artistsearcher.ArtistResolver;
@@ -26,6 +24,12 @@ public class ConcertService {
         artistResolver.load(concert);
 
         return concert;
+    }
+
+    public void existsById(long concertId) {
+        if (!concertRepository.existsById(concertId)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
     }
 
     public Concert findById(final long concertId) {
