@@ -12,6 +12,7 @@ import org.sopt.confeti.domain.festivalfavorite.application.FestivalFavoriteServ
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.global.exception.ConflictException;
+import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,7 +64,7 @@ public class UserFavoriteFacade {
         userService.existsById(userId);
 
         if (!artistFavoriteService.isFavorite(userId, artistId)) {
-            throw new ConflictException(ErrorMessage.CONFLICT);
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
 
         artistFavoriteService.removeFavorite(userId, artistId);
