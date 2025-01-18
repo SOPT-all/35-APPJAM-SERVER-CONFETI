@@ -5,6 +5,7 @@ import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.artistfavorite.infra.repository.ArtistFavoriteRepository;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.global.util.artistsearcher.ArtistResolver;
+import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,5 +28,12 @@ public class ArtistFavoriteService {
     @Transactional(readOnly = true)
     public boolean isFavorite(final long userId, final String artistId) {
         return artistFavoriteRepository.existsByUserIdAndArtist_ArtistId(userId, artistId);
+    }
+
+    @Transactional
+    public void addFavorite(final User user, final String artistId) {
+        artistFavoriteRepository.save(
+                ArtistFavorite.create(user, artistId)
+        );
     }
 }

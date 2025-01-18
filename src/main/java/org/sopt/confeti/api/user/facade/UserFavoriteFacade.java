@@ -10,6 +10,8 @@ import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivalfavorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
+import org.sopt.confeti.global.exception.ConflictException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -42,5 +44,16 @@ public class UserFavoriteFacade {
         userService.existsById(userId);
         List<ArtistFavorite> artists = artistFavoriteService.getArtistList(userId);
         return UserFavoriteArtistDTO.from(artists);
+    }
+
+    @Transactional
+    public void addArtistFavorite(final long userId, final String artistId) {
+        User user = userService.findById(userId);
+
+        if (artistFavoriteService.isFavorite(userId, artistId)) {
+            throw new ConflictException(ErrorMessage.CONFLICT);
+        }
+
+        artistFavoriteService.addFavorite(user, artistId);
     }
 }
