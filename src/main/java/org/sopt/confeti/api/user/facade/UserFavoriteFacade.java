@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.user.facade;
 
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
@@ -46,9 +47,18 @@ public class UserFavoriteFacade {
     public void removeFestivalFavorite(long userId, long festivalId) {
         User user = userService.findById(userId);
         Festival festival = festivalService.findById(festivalId);
+        validateExistUser(userId);
+        validateExistFestival(festivalId);
         validateExistFestivalFavorite(userId, festivalId);
 
         festivalFavoriteService.delete(user, festival);
+    }
+
+    @Transactional(readOnly = true)
+    protected void validateExistFestival(final long festivalId) {
+        if (!festivalService.existsById(festivalId)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -139,13 +149,6 @@ public class UserFavoriteFacade {
     @Transactional(readOnly = true)
     protected void validateExistConcert(final long concertId) {
         if (!concertService.existsById(concertId)) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
-    }
-
-    @Transactional(readOnly = true)
-    protected void validateExistFestival(final long festivalId) {
-        if (!festivalService.existsById(festivalId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
