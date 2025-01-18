@@ -17,7 +17,7 @@ import java.util.List;
 import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
 
 @Entity
-@Table(name="festival_artist")
+@Table(name="festival_artists")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FestivalArtist {
