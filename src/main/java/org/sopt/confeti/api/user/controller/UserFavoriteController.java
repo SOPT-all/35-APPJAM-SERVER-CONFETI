@@ -57,4 +57,13 @@ public class UserFavoriteController {
         userFavoriteFacade.removeArtistFavorite(userId, artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
+
+    @PostMapping("/concerts/{concertId}")
+    public ResponseEntity<BaseResponse<?>> addConcertFavorite(
+            @RequestHeader("Authorization") Long userId,
+            @PathVariable(name = "concertId") Long concertId
+    ) {
+        userFavoriteFacade.addConcertFavorite(userId, concertId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
 }
