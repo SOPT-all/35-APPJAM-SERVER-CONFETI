@@ -5,5 +5,5 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ArtistConstant {
-    private static final int ARTIST_BOX_OPEN_CRITERIA = 4;
+    public static final int ARTIST_BOX_OPEN_CRITERIA = 4;
 }
