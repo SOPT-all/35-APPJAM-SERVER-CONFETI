@@ -49,21 +49,21 @@ public class UserFavoriteController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
-    @DeleteMapping("/artists/{artistId}")
-    public ResponseEntity<BaseResponse<?>> removeArtistFavorite(
-            @RequestHeader("Authorization") Long userId,
-            @PathVariable(name = "artistId") String artistId
-    ) {
-        userFavoriteFacade.removeArtistFavorite(userId, artistId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
-    }
-
     @PostMapping("/concerts/{concertId}")
     public ResponseEntity<BaseResponse<?>> addConcertFavorite(
             @RequestHeader("Authorization") Long userId,
             @PathVariable(name = "concertId") Long concertId
     ) {
         userFavoriteFacade.addConcertFavorite(userId, concertId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @DeleteMapping("/artists/{artistId}")
+    public ResponseEntity<BaseResponse<?>> removeArtistFavorite(
+            @RequestHeader("Authorization") Long userId,
+            @PathVariable(name = "artistId") String artistId
+    ) {
+        userFavoriteFacade.removeArtistFavorite(userId, artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }
