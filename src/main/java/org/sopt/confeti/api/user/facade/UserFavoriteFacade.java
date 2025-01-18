@@ -24,20 +24,20 @@ public class UserFavoriteFacade {
     private final ArtistFavoriteService artistFavoriteService;
 
     @Transactional
-    public void save(long userId, long festivalId) {
+    public void addFestivalFavorite(long userId, long festivalId) {
         User user = userService.findById(userId);
         Festival festival = festivalService.findById(festivalId);
         festivalFavoriteService.save(user, festival);
     }
 
     @Transactional
-    public void delete(long userId, long festivalId) {
+    public void removeFestivalFavorite(long userId, long festivalId) {
         User user = userService.findById(userId);
         Festival festival = festivalService.findById(festivalId);
         festivalFavoriteService.delete(user, festival);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public UserFavoriteArtistDTO getArtistList(long userId) {
         userService.existsById(userId);
         List<ArtistFavorite> artists = artistFavoriteService.getArtistList(userId);
