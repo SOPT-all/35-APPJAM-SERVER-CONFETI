@@ -1,14 +1,14 @@
 package org.sopt.confeti.api.performance.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import org.springframework.format.annotation.DateTimeFormat;
 
 public record CreateFestivalDateRequest(
-        @DateTimeFormat(pattern = "yyyy.MM.dd")
+        @JsonFormat(pattern = "yyyy.MM.dd")
         LocalDate festivalAt,
-        @DateTimeFormat(pattern = "HH:mm:ss")
+        @JsonFormat(pattern = "HH:mm:ss")
         LocalTime ticketOpenAt,
         List<CreateFestivalStageRequest> festivalStages
 ) {
