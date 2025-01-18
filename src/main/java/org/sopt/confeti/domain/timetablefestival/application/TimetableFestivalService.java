@@ -15,7 +15,7 @@ public class TimetableFestivalService {
 
     @Transactional(readOnly = true)
     public List<TimetableFestival> getFetivalList(long userId){
-        return timetableFestivalRepository.findByUserId(userId);
+        return timetableFestivalRepository.findByUserIdWhereEndAtLENow(userId);
     }
 
     @Transactional(readOnly = true)
