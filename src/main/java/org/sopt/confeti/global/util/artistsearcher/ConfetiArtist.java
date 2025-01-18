@@ -64,4 +64,8 @@ public class ConfetiArtist {
     public static ConfetiArtist from(final String artistId) {
         return new ConfetiArtist(artistId);
     }
+
+    public static ConfetiArtist empty() {
+        return new ConfetiArtist();
+    }
 }

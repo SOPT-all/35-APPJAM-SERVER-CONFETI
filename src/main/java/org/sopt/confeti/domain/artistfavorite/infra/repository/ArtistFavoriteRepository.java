@@ -10,4 +10,6 @@ import java.util.List;
 public interface ArtistFavoriteRepository extends JpaRepository<ArtistFavorite, Long> {
     @Query(value = "select * from artist_favorites where user_id = :userId order by rand() limit 3", nativeQuery = true)
     List<ArtistFavorite> findTop3ByUserIdOrderByRand(@Param("userId") Long userId);
+
+    boolean existsByUserIdAndArtist_ArtistId(long userId, String artistId);
 }
