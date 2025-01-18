@@ -82,7 +82,6 @@ public class ArtistResolver {
 
             return;
         }
-
         // Mapper에 등록된 클래스 타입인 경우
         if (collectByTypeMapper.containsKey(target.getClass())) {
             collectByTypeMapper.get(target.getClass()).apply(target);
@@ -118,7 +117,7 @@ public class ArtistResolver {
                 .flatMap(stage -> stage.getTimes().stream())
                 .flatMap(time -> time.getArtists().stream())
                 .forEach(artist -> {
-                    artistIds.add(artist.getArtist().getName());
+                    artistIds.add(artist.getArtist().getArtistId());
                     artistMapper.put(artist.getArtist().getArtistId(), artist.getArtist());
                 });
     }
@@ -129,7 +128,7 @@ public class ArtistResolver {
                 .flatMap(stage -> stage.getTimes().stream())
                 .flatMap(time -> time.getArtists().stream())
                 .forEach(artist -> {
-                    artistIds.add(artist.getArtist().getName());
+                    artistIds.add(artist.getArtist().getArtistId());
                     artistMapper.put(artist.getArtist().getArtistId(), artist.getArtist());
                 });
     }
