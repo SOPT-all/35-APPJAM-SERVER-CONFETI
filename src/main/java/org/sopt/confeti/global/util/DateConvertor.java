@@ -13,14 +13,26 @@ public class DateConvertor {
     private static final DateTimeFormatter localDateTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     public static String convert(final LocalDate localDate) {
+        if (localDate == null) {
+            return null;
+        }
+
         return localDate.format(localDateFormat);
     }
 
     public static String convert(final LocalTime localTime) {
+        if (localTime == null) {
+            return null;
+        }
+
         return localTime.format(localTimeFormat);
     }
 
     public static String convert(final LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
+        }
+
         return localDateTime.format(localDateTimeFormat);
     }
 

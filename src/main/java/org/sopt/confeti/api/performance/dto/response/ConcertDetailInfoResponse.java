@@ -3,6 +3,7 @@ package org.sopt.confeti.api.performance.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
+import org.sopt.confeti.global.util.DateConvertor;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record ConcertDetailInfoResponse(
@@ -11,10 +12,10 @@ public record ConcertDetailInfoResponse(
         String posterBgUrl,
         String title,
         String subtitle,
-        LocalDate startAt,
-        LocalDate endAt,
+        String startAt,
+        String endAt,
         String area,
-        LocalDateTime reserveAt,
+        String reserveAt,
         String reservationUrl,
         String time,
         String ageRating,
@@ -29,10 +30,10 @@ public record ConcertDetailInfoResponse(
                 s3FileHandler.getFileUrl(concertDetailDTO.posterBgPath()),
                 concertDetailDTO.title(),
                 concertDetailDTO.subtitle(),
-                concertDetailDTO.startAt(),
-                concertDetailDTO.endAt(),
+                DateConvertor.convert(concertDetailDTO.startAt()),
+                DateConvertor.convert(concertDetailDTO.endAt()),
                 concertDetailDTO.area(),
-                concertDetailDTO.reserveAt(),
+                DateConvertor.convert(concertDetailDTO.reserveAt()),
                 concertDetailDTO.reservationUrl(),
                 concertDetailDTO.time(),
                 concertDetailDTO.ageRating(),
