@@ -16,8 +16,10 @@ public class CorsConfig {
 
         //리소스를 허용할 URL 지정
         ArrayList<String> allowedOriginPatterns = new ArrayList<>();
-        allowedOriginPatterns.add("http://localhost:3000");
-        allowedOriginPatterns.add("http://127.0.0.1:3000");
+        allowedOriginPatterns.add("http://localhost:5173");
+        allowedOriginPatterns.add("http://localhost:5174");
+        allowedOriginPatterns.add("https://35-appjam-web-confeti.vercel.app/");
+        allowedOriginPatterns.add("https://confeti.co.kr");
         allowedOriginPatterns.add("https://confeti.xyz");
         allowedOriginPatterns.add("https://api.confeti.xyz");
         configuration.setAllowedOrigins(allowedOriginPatterns);
