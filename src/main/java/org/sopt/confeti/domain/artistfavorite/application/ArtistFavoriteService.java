@@ -23,4 +23,9 @@ public class ArtistFavoriteService {
 
         return artistList;
     }
+
+    @Transactional(readOnly = true)
+    public boolean isFavorite(final long userId, final String artistId) {
+        return artistFavoriteRepository.existsByUserIdAndArtist_ArtistId(userId, artistId);
+    }
 }
