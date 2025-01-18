@@ -1,14 +1,13 @@
 package org.sopt.confeti.domain.concert.application;
 
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
-import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.artistsearcher.ArtistResolver;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +16,7 @@ public class ConcertService {
     private final ConcertRepository concertRepository;
     private final ArtistResolver artistResolver;
 
+    @Transactional(readOnly = true)
     public Concert getConcertDetailByConcertId(final long concertId) {
         Concert concert = concertRepository.findById(concertId)
                 .orElseThrow(
@@ -28,6 +28,14 @@ public class ConcertService {
         return concert;
     }
 
+    @Transactional(readOnly = true)
+    public void existsById(long concertId) {
+        if (!concertRepository.existsById(concertId)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+    }
+
+    @Transactional(readOnly = true)
     public Concert findById(final long concertId) {
         return concertRepository.findById(concertId)
                 .orElseThrow(

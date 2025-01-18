@@ -1,11 +1,12 @@
 package org.sopt.confeti.api.user.facade;
 
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.artistfavorite.application.ArtistFavoriteService;
+import org.sopt.confeti.domain.concert.application.ConcertService;
+import org.sopt.confeti.domain.concertfavorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concertfavorite.application.ConcertFavoriteService;
@@ -85,5 +86,17 @@ public class UserFavoriteFacade {
         }
 
         concertFavoriteService.addFavorite(user, concert);
+    }
+
+    @Transactional
+    public void removeConcertFavorite(final long userId, final long concertId) {
+        userService.existsById(userId);
+        concertService.existsById(concertId);
+
+        if (!concertFavoriteService.isFavorite(userId, concertId)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+
+        concertFavoriteService.removeFavorite(userId, concertId);
     }
 }
