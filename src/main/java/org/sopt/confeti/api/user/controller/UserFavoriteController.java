@@ -43,7 +43,7 @@ public class UserFavoriteController {
     @PostMapping("/artists/{artistId}")
     public ResponseEntity<BaseResponse<?>> addArtistFavorite(
             @RequestHeader("Authorization") Long userId,
-            @PathVariable(name = "artistId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") String artistId
+            @PathVariable(name = "artistId") String artistId
     ) {
         userFavoriteFacade.addArtistFavorite(userId, artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
