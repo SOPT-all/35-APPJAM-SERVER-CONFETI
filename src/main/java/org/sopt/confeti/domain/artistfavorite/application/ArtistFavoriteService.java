@@ -36,4 +36,9 @@ public class ArtistFavoriteService {
                 ArtistFavorite.create(user, artistId)
         );
     }
+
+    @Transactional
+    public void removeFavorite(final long userId, final String artistId) {
+        artistFavoriteRepository.deleteByUserIdAndArtist_ArtistId(userId, artistId);
+    }
 }
