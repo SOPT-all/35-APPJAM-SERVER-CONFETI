@@ -2,12 +2,13 @@ package org.sopt.confeti.api.artist.dto.response;
 
 import java.time.LocalDate;
 import org.sopt.confeti.api.artist.facade.dto.response.SearchArtistDTO;
+import org.sopt.confeti.global.util.DateConvertor;
 
 public record SearchArtistSingleResponse(
         String artistId,
         String name,
         String profileUrl,
-        LocalDate latestReleaseAt,
+        String latestReleaseAt,
         boolean isFavorite,
         boolean isMultipleArtists
 ) {
@@ -16,7 +17,7 @@ public record SearchArtistSingleResponse(
                 searchArtistDTO.artistId(),
                 searchArtistDTO.name(),
                 searchArtistDTO.profileUrl(),
-                searchArtistDTO.latestReleaseAt(),
+                DateConvertor.convert(searchArtistDTO.latestReleaseAt()),
                 searchArtistDTO.isFavorite(),
                 searchArtistDTO.isMultipleArtists()
         );

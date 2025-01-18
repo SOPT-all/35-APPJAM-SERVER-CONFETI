@@ -3,6 +3,7 @@ package org.sopt.confeti.api.performance.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
+import org.sopt.confeti.global.util.DateConvertor;
 
 public record FestivalDetailInfoResponse(
         long festivalId,
@@ -10,10 +11,10 @@ public record FestivalDetailInfoResponse(
         String posterBgUrl,
         String title,
         String subtitle,
-        LocalDate startAt,
-        LocalDate endAt,
+        String startAt,
+        String endAt,
         String area,
-        LocalDate reserveAt,
+        String reserveAt,
         String reservationUrl,
         String time,
         String ageRating,
@@ -29,10 +30,10 @@ public record FestivalDetailInfoResponse(
                 festival.festivalPosterBgUrl(),
                 festival.festivalTitle(),
                 festival.festivalSubtitle(),
-                festival.festivalStartAt(),
-                festival.festivalEndAt(),
+                DateConvertor.convert(festival.festivalStartAt()),
+                DateConvertor.convert(festival.festivalEndAt()),
                 festival.festivalArea(),
-                festival.reserveAt(),
+                DateConvertor.convert(festival.reserveAt()),
                 festival.reservationUrl(),
                 festival.time(),
                 festival.ageRating(),
