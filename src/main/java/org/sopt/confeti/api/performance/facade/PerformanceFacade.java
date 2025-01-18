@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.performance.facade;
 
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
@@ -10,6 +11,8 @@ import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivalfavorite.application.FestivalFavoriteService;
+import org.sopt.confeti.global.exception.NotFoundException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +28,16 @@ public class PerformanceFacade {
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final long concertId) {
         Concert concert = concertService.getConcertDetailByConcertId(concertId);
+        validateConcertNotPassed(concert);
+
         return ConcertDetailDTO.from(concert);
+    }
+
+    @Transactional(readOnly = true)
+    protected void validateConcertNotPassed(final Concert concert) {
+        if (LocalDate.now().isAfter(concert.getConcertEndAt())) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
     }
 
     @Transactional
@@ -42,6 +54,15 @@ public class PerformanceFacade {
         }
 
         Festival festival = festivalService.getFestivalDetailByFestivalId(festivalId);
+        validateFestivalNotPassed(festival);
+
         return FestivalDetailDTO.of(festival, isFavorite, s3FileHandler);
+    }
+
+    @Transactional(readOnly = true)
+    protected void validateFestivalNotPassed(final Festival festival) {
+        if (LocalDate.now().isAfter(festival.getFestivalEndAt())) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
     }
 }
