@@ -45,10 +45,9 @@ public class UserFavoriteFacade {
 
     @Transactional
     public void removeFestivalFavorite(long userId, long festivalId) {
+        // TODO: 페스티벌 좋아요 삭제 시 엔티티 값을 사용하지 않으므로 아이디 값으로 삭제하도록 리펙토링 예정
         User user = userService.findById(userId);
         Festival festival = festivalService.findById(festivalId);
-        validateExistUser(userId);
-        validateExistFestival(festivalId);
         validateExistFestivalFavorite(userId, festivalId);
 
         festivalFavoriteService.delete(user, festival);
