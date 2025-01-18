@@ -3,6 +3,7 @@ package org.sopt.confeti.api.user.facade;
 import lombok.AllArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDTO;
+import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 import org.sopt.confeti.domain.timetablefestival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.application.UserService;
