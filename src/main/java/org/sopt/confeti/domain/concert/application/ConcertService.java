@@ -27,4 +27,11 @@ public class ConcertService {
 
         return concert;
     }
+
+    public Concert findById(final long concertId) {
+        return concertRepository.findById(concertId)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
+    }
 }

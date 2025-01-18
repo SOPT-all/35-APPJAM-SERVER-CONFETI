@@ -6,6 +6,9 @@ import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.artistfavorite.application.ArtistFavoriteService;
+import org.sopt.confeti.domain.concert.Concert;
+import org.sopt.confeti.domain.concert.application.ConcertService;
+import org.sopt.confeti.domain.concertfavorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivalfavorite.application.FestivalFavoriteService;
@@ -26,6 +29,8 @@ public class UserFavoriteFacade {
     private final FestivalService festivalService;
     private final FestivalFavoriteService festivalFavoriteService;
     private final ArtistFavoriteService artistFavoriteService;
+    private final ConcertFavoriteService concertFavoriteService;
+    private final ConcertService concertService;
 
     @Transactional
     public void addFestivalFavorite(long userId, long festivalId) {
@@ -68,5 +73,17 @@ public class UserFavoriteFacade {
         }
 
         artistFavoriteService.removeFavorite(userId, artistId);
+    }
+
+    @Transactional
+    public void addConcertFavorite(final long userId, final long concertId) {
+        User user = userService.findById(userId);
+        Concert concert = concertService.findById(concertId);
+
+        if (concertFavoriteService.isFavorite(userId, concertId)) {
+            throw new ConflictException(ErrorMessage.CONFLICT);
+        }
+
+        concertFavoriteService.addFavorite(user, concert);
     }
 }
