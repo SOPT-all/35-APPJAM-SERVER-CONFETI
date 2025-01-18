@@ -10,6 +10,8 @@ import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivalfavorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
+import org.sopt.confeti.global.exception.ConflictException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -24,23 +26,34 @@ public class UserFavoriteFacade {
     private final ArtistFavoriteService artistFavoriteService;
 
     @Transactional
-    public void save(long userId, long festivalId) {
+    public void addFestivalFavorite(long userId, long festivalId) {
         User user = userService.findById(userId);
         Festival festival = festivalService.findById(festivalId);
         festivalFavoriteService.save(user, festival);
     }
 
     @Transactional
-    public void delete(long userId, long festivalId) {
+    public void removeFestivalFavorite(long userId, long festivalId) {
         User user = userService.findById(userId);
         Festival festival = festivalService.findById(festivalId);
         festivalFavoriteService.delete(user, festival);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public UserFavoriteArtistDTO getArtistList(long userId) {
         userService.existsById(userId);
         List<ArtistFavorite> artists = artistFavoriteService.getArtistList(userId);
         return UserFavoriteArtistDTO.from(artists);
+    }
+
+    @Transactional
+    public void addArtistFavorite(final long userId, final String artistId) {
+        User user = userService.findById(userId);
+
+        if (artistFavoriteService.isFavorite(userId, artistId)) {
+            throw new ConflictException(ErrorMessage.CONFLICT);
+        }
+
+        artistFavoriteService.addFavorite(user, artistId);
     }
 }

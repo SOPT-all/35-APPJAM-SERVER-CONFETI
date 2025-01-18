@@ -23,14 +23,14 @@ public class UserFavoriteController {
     @PostMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<?>> postFavoriteFestival(@RequestHeader("Authorization") Long userId, @PathVariable
                                                                 @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
-        userFavoriteFacade.save(userId, festivalId);
+        userFavoriteFacade.addFestivalFavorite(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @DeleteMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<?>> deleteFavoriteFestival(@RequestHeader("Authorization") Long userId, @PathVariable
                                                                   @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
-        userFavoriteFacade.delete(userId, festivalId);
+        userFavoriteFacade.removeFestivalFavorite(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
@@ -38,5 +38,14 @@ public class UserFavoriteController {
     public ResponseEntity<BaseResponse<?>> getFavoriteArtists(@RequestHeader("Authorization") Long userId) {
         UserFavoriteArtistDTO userFavoriteArtistDTO = userFavoriteFacade.getArtistList(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserFavoriteResponse.from(userFavoriteArtistDTO.artists()));
+    }
+
+    @PostMapping("/artists/{artistId}")
+    public ResponseEntity<BaseResponse<?>> addArtistFavorite(
+            @RequestHeader("Authorization") Long userId,
+            @PathVariable(name = "artistId") String artistId
+    ) {
+        userFavoriteFacade.addArtistFavorite(userId, artistId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }
