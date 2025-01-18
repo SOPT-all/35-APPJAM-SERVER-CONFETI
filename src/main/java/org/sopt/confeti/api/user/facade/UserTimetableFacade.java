@@ -23,9 +23,7 @@ public class UserTimetableFacade {
 
     @Transactional(readOnly = true)
     public UserTimetableDTO getTimetablesListAndDate(long userId) {
-        if (!userService.existsById(userId)) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
+        validateExistUser(userId);
 
         List<TimetableFestival> festivalList =  timetableFestivalService.getFetivalList(userId);
         return UserTimetableDTO.from(festivalList);
@@ -33,15 +31,32 @@ public class UserTimetableFacade {
 
     @Transactional
     public void removeTimetableFestival(final long userId, final long festivalId) {
-        if (
-                !userService.existsById(userId) ||
-                        !festivalService.existsById(festivalId) ||
-                        !timetableFestivalService.existsByUserIdAndFestivalId(userId, festivalId)
-        ) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
+        validateExistUser(userId);
+        validateExistFestival(festivalId);
+        validateExistTimetableFestival(userId, festivalId);
 
         timetableFestivalService.removeTimetableFestival(userId, festivalId);
+    }
+
+    @Transactional(readOnly = true)
+    protected void validateExistUser(final long userId) {
+        if (!userService.existsById(userId)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    protected void validateExistFestival(final long festivalId) {
+        if (!festivalService.existsById(festivalId)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    protected void validateExistTimetableFestival(final long userId, final long festivalId) {
+        if (!timetableFestivalService.existsByUserIdAndFestivalId(userId, festivalId)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
     }
 }
 
