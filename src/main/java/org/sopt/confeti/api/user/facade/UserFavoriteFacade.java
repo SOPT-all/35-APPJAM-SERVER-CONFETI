@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.user.facade;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
@@ -55,5 +56,16 @@ public class UserFavoriteFacade {
         }
 
         artistFavoriteService.addFavorite(user, artistId);
+    }
+
+    @Transactional
+    public void removeArtistFavorite(final long userId, final String artistId) {
+        userService.existsById(userId);
+
+        if (!artistFavoriteService.isFavorite(userId, artistId)) {
+            throw new ConflictException(ErrorMessage.CONFLICT);
+        }
+
+        artistFavoriteService.removeFavorite(userId, artistId);
     }
 }
