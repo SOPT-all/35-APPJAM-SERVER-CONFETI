@@ -14,7 +14,7 @@ public class UserInfoFacade {
 
     @Transactional
     public UserInfoDTO getUserInfo(Long userId) {
-        User user = userService.getUserInfo(userId);
+        User user = userService.findById(userId);
         return UserInfoDTO.from(user);
     }
 }
