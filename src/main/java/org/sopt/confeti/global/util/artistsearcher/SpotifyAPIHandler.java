@@ -41,8 +41,6 @@ public class SpotifyAPIHandler {
 
     private SpotifyApi spotifyApi;
 
-    private final DateConvertor dateConvertor;
-
     public void init() {
         createSpotifyApi();
         generateAccessToken();
@@ -110,7 +108,7 @@ public class SpotifyAPIHandler {
                 )
                 .max(Comparator.comparing(AlbumSimplified::getReleaseDate))
                 .map(
-                        albumSimplified -> dateConvertor.convertToSpotifyLocalDate(albumSimplified.getReleaseDate())
+                        albumSimplified -> DateConvertor.convertToSpotifyLocalDate(albumSimplified.getReleaseDate())
                 )
                 .get();
     }
