@@ -47,16 +47,21 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public FestivalDetailDTO getFestivalDetailInfo(final Long userId, final long festivalId) {
-        boolean isFavorite = false;
-
-        if (userId != null) {
-            isFavorite = festivalFavoriteService.isFavorite(userId, festivalId);
-        }
+        boolean isFavorite = getIsFavorite(userId, festivalId);
 
         Festival festival = festivalService.getFestivalDetailByFestivalId(festivalId);
         validateFestivalNotPassed(festival);
 
         return FestivalDetailDTO.of(festival, isFavorite, s3FileHandler);
+    }
+
+    @Transactional(readOnly = true)
+    protected boolean getIsFavorite(final Long userid, final long festivalId) {
+        if (userid != null) {
+            return festivalFavoriteService.isFavorite(userid, festivalId);
+        }
+
+        return false;
     }
 
     @Transactional(readOnly = true)
