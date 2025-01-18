@@ -1,6 +1,5 @@
 package org.sopt.confeti.domain.timetablefestival.infra.repository;
 
-import java.time.LocalDate;
 import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 import org.springframework.data.jpa.repository.JpaRepository;
 
