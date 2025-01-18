@@ -3,6 +3,7 @@ package org.sopt.confeti.api.performance.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
+import org.sopt.confeti.global.util.S3FileHandler;
 
 public record ConcertDetailInfoResponse(
         long concertId,
@@ -21,11 +22,11 @@ public record ConcertDetailInfoResponse(
         String price,
         String infoImgUrl
 ) {
-    public static ConcertDetailInfoResponse from(final ConcertDetailDTO concertDetailDTO) {
+    public static ConcertDetailInfoResponse of(final ConcertDetailDTO concertDetailDTO, final S3FileHandler s3FileHandler) {
         return new ConcertDetailInfoResponse(
                 concertDetailDTO.concertId(),
-                concertDetailDTO.posterUrl(),
-                concertDetailDTO.posterBgUrl(),
+                s3FileHandler.getFileUrl(concertDetailDTO.posterPath()),
+                s3FileHandler.getFileUrl(concertDetailDTO.posterBgPath()),
                 concertDetailDTO.title(),
                 concertDetailDTO.subtitle(),
                 concertDetailDTO.startAt(),
@@ -37,7 +38,7 @@ public record ConcertDetailInfoResponse(
                 concertDetailDTO.ageRating(),
                 concertDetailDTO.reservationOffice(),
                 concertDetailDTO.price(),
-                concertDetailDTO.infoImgUrl()
+                s3FileHandler.getFileUrl(concertDetailDTO.infoImgPath())
         );
     }
 }

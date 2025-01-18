@@ -25,7 +25,7 @@ public class PerformanceFacade {
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final long concertId) {
         Concert concert = concertService.getConcertDetailByConcertId(concertId);
-        return ConcertDetailDTO.of(concert, s3FileHandler);
+        return ConcertDetailDTO.from(concert);
     }
 
     @Transactional
