@@ -49,7 +49,10 @@ public class UserFavoriteFacade {
 
     @Transactional(readOnly = true)
     public UserFavoriteArtistDTO getArtistList(long userId) {
-        userService.existsById(userId);
+        if (!userService.existsById(userId)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+
         List<ArtistFavorite> artists = artistFavoriteService.getArtistList(userId);
         return UserFavoriteArtistDTO.from(artists);
     }
@@ -67,9 +70,9 @@ public class UserFavoriteFacade {
 
     @Transactional
     public void removeArtistFavorite(final long userId, final String artistId) {
-        userService.existsById(userId);
-
-        if (!artistFavoriteService.isFavorite(userId, artistId)) {
+        if (
+                !userService.existsById(userId) || !artistFavoriteService.isFavorite(userId, artistId)
+        ) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
 
@@ -90,10 +93,9 @@ public class UserFavoriteFacade {
 
     @Transactional
     public void removeConcertFavorite(final long userId, final long concertId) {
-        userService.existsById(userId);
-        concertService.existsById(concertId);
-
-        if (!concertFavoriteService.isFavorite(userId, concertId)) {
+        if (
+                !userService.existsById(userId) || !concertService.existsById(concertId) || !concertFavoriteService.isFavorite(userId, concertId)
+        ) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
 

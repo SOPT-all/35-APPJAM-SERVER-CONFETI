@@ -24,10 +24,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public void existsById(Long userId) {
-        final boolean isExistUser = userRepository.existsById(userId);
-        if(!isExistUser) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
+    public boolean existsById(Long userId) {
+        return userRepository.existsById(userId);
     }
 }

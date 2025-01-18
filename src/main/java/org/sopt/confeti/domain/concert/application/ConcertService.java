@@ -29,10 +29,8 @@ public class ConcertService {
     }
 
     @Transactional(readOnly = true)
-    public void existsById(long concertId) {
-        if (!concertRepository.existsById(concertId)) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
+    public boolean existsById(long concertId) {
+        return concertRepository.existsById(concertId);
     }
 
     @Transactional(readOnly = true)

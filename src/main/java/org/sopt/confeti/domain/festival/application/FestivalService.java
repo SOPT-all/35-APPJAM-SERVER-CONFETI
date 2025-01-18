@@ -35,4 +35,8 @@ public class FestivalService {
                 Festival.create(createFestivalDTO)
         );
     }
+
+    public boolean existsById(final long festivalId) {
+        return festivalRepository.existsById(festivalId);
+    }
 }
