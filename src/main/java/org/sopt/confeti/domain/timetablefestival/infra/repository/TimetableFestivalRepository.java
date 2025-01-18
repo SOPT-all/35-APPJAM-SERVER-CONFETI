@@ -7,4 +7,8 @@ import java.util.List;
 
 public interface TimetableFestivalRepository extends JpaRepository<TimetableFestival, Long> {
     List<TimetableFestival> findByUserId(Long userId);
+
+    boolean existsByUserIdAndFestivalId(final long userId, final long festivalId);
+
+    void deleteByUserIdAndFestivalId(final long userId, final long festivalId);
 }
