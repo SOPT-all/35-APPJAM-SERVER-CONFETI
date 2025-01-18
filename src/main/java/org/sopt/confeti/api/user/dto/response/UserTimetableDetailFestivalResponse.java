@@ -1,7 +1,6 @@
 package org.sopt.confeti.api.user.dto.response;
 
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalDTO;
-import org.sopt.confeti.domain.usertimetable.UserTimetable;
 
 import java.util.List;
 
