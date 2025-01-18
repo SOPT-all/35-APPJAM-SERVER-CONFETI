@@ -48,13 +48,6 @@ public class PerformanceController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, FestivalDetailResponse.from(festivalDetailDTO));
     }
 
-    @GetMapping("/festivals/{festivalId}")
-    public ResponseEntity<BaseResponse<?>> getFestivalInfo(@RequestHeader(name = "Authorization", required = false) Long userId,
-                                                           @PathVariable("festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
-        FestivalDetailDTO festivalDetailDTO = performanceFacade.getFestivalDetailInfo(userId, festivalId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, FestivalDetailResponse.from(festivalDetailDTO));
-    }
-
     @PostMapping("/festivals")
     public ResponseEntity<BaseResponse<?>> createConcert(@RequestBody CreateFestivalRequest createFestivalRequest) {
         performanceFacade.createFestival(CreateFestivalDTO.from(createFestivalRequest));
