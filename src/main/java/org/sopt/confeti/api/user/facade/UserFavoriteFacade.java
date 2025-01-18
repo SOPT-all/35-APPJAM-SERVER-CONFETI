@@ -5,6 +5,8 @@ import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.artistfavorite.application.ArtistFavoriteService;
+import org.sopt.confeti.domain.concert.application.ConcertService;
+import org.sopt.confeti.domain.concertfavorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concertfavorite.application.ConcertFavoriteService;
