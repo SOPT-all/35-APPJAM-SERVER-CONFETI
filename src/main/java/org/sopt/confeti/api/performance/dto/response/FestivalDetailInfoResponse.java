@@ -13,7 +13,7 @@ public record FestivalDetailInfoResponse(
         LocalDate startAt,
         LocalDate endAt,
         String area,
-        LocalDateTime reserveAt,
+        LocalDate reserveAt,
         String reservationUrl,
         String time,
         String ageRating,

@@ -1,13 +1,14 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import org.sopt.confeti.domain.festivaltime.FestivalTime;
 
 public record FestivalDetailTimeDTO(
         long festivalTimeId,
-        LocalDateTime startAt,
-        LocalDateTime endAt,
+        LocalTime startAt,
+        LocalTime endAt,
         List<FestivalDetailArtistDTO> artists
 ) {
     public static FestivalDetailTimeDTO from(final FestivalTime festivalTime) {

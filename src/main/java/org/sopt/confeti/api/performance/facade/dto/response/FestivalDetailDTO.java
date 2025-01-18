@@ -18,7 +18,7 @@ public record FestivalDetailDTO(
         String festivalInfoImgUrl,
         String festivalReservationBgUrl,
         String festivalLogoUrl,
-        LocalDateTime reserveAt,
+        LocalDate reserveAt,
         String reservationUrl,
         String reservationOffice,
         String ageRating,
