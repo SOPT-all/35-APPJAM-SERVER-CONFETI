@@ -7,7 +7,7 @@ import java.util.List;
 public record UserTimetableFestivalDTO(
         long festivalId,
         String title,
-        String logoUrl,
+        String logoPath,
         List<UserTimetableDatesDTO> festivalDates
 ) {
     public static UserTimetableFestivalDTO from(TimetableFestival timetableFestival) {
