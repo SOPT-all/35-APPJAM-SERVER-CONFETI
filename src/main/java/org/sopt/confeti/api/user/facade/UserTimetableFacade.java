@@ -50,15 +50,15 @@ public class UserTimetableFacade {
     @Transactional
     public void addTimetableFestivals(final long userId, final AddTimetableFestivalDTO from) {
         User user = userService.findById(userId);
-        List<Festival> currentFestivals = timetableFestivalService.findByUserId(userId).stream()
-                .map(TimetableFestival::getFestival)
-                .toList();
         List<Festival> addFestivals = festivalService.findByIdIn(
                 from.festivals().stream()
                         .distinct()
                         .map(AddTimetableFestivalArtiestDTO::festivalId)
                         .toList()
         );
+        List<Festival> currentFestivals = timetableFestivalService.findByUserId(userId).stream()
+                .map(TimetableFestival::getFestival)
+                .toList();
 
         validateDuplicateTimetableFestival(currentFestivals, addFestivals);
         validateCountTimetableFestival(currentFestivals.size(), addFestivals.size());
