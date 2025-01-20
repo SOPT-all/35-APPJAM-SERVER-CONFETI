@@ -47,7 +47,7 @@ public class FestivalService {
     }
 
     @Transactional
-    public List<Festival> findByIdIn(final List<Long> festivalIds) {
-        return festivalRepository.findByIdIn(festivalIds);
+    public List<Festival> findAllByIdIn(final List<Long> festivalIds) {
+        return festivalRepository.findAllByIdIn(festivalIds);
     }
 }
