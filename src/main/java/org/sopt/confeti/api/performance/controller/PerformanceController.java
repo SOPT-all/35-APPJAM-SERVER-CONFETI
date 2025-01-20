@@ -9,6 +9,8 @@ import org.sopt.confeti.api.performance.facade.PerformanceFacade;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
+import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -53,5 +55,12 @@ public class PerformanceController {
         performanceFacade.createFestival(CreateFestivalDTO.from(createFestivalRequest));
 
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @GetMapping("/reservation")
+    public ResponseEntity<BaseResponse<?>> getPerformReservationInfo(@RequestHeader(name = "Authorization", required = false) Long userId
+    ) {
+        PerformanceReservationDTO performanceReservationDTO = performanceFacade.getPerformReservationInfo(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, PerformanceReservationResponse.of(performanceReservationDTO, s3FileHandler));
     }
 }
