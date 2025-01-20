@@ -1,6 +1,5 @@
 package org.sopt.confeti.api.user.facade;
 
-import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
@@ -10,13 +9,13 @@ import org.sopt.confeti.domain.artistfavorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concertfavorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
-import org.sopt.confeti.domain.concert.application.ConcertService;
-import org.sopt.confeti.domain.concertfavorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivalfavorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
+import org.sopt.confeti.domain.view.performance.PerformanceDTO;
+import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -34,6 +33,7 @@ public class UserFavoriteFacade {
     private final ArtistFavoriteService artistFavoriteService;
     private final ConcertFavoriteService concertFavoriteService;
     private final ConcertService concertService;
+    private final PerformanceService performanceService;
 
     @Transactional
     public void addFestivalFavorite(long userId, long festivalId) {
@@ -52,13 +52,6 @@ public class UserFavoriteFacade {
         validateExistFestivalFavorite(userId, festivalId);
 
         festivalFavoriteService.delete(user, festival);
-    }
-
-    @Transactional(readOnly = true)
-    protected void validateExistFestival(final long festivalId) {
-        if (!festivalService.existsById(festivalId)) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
     }
 
     @Transactional(readOnly = true)
@@ -136,7 +129,8 @@ public class UserFavoriteFacade {
     public UserFavoritePerformancesDTO getFavoritePerformances(final long userId) {
         validateExistUser(userId);
 
-        List<>
+        List<PerformanceDTO> performances = performanceService.getFavoritePerformancesPreview(userId);
+        return UserFavoritePerformancesDTO.from(performances);
     }
 
     @Transactional(readOnly = true)

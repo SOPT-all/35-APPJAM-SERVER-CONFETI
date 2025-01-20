@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.view.performance;
 
+import java.time.LocalDate;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record PerformanceDTO(
@@ -8,13 +9,13 @@ public record PerformanceDTO(
         String title,
         String posterPath
 ) {
-    public PerformanceDTO(
+    public static PerformanceDTO of(
             final long performanceId,
             final String type,
             final String title,
             final String posterPath
     ) {
-        this(
+        return new PerformanceDTO(
                 performanceId,
                 PerformanceType.convert(type),
                 title,

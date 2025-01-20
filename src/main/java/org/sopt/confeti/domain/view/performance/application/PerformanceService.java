@@ -14,7 +14,7 @@ public class PerformanceService {
     private final PerformanceRepository performanceRepository;
 
     @Transactional(readOnly = true)
-    public List<PerformanceDTO> getFavoritePerformancesPreview() {
-
+    public List<PerformanceDTO> getFavoritePerformancesPreview(final long userId) {
+        return performanceRepository.findFavoritePerformancesPreview(userId);
     }
 }
