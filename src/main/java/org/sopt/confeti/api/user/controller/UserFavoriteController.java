@@ -46,7 +46,7 @@ public class UserFavoriteController {
 
     @PostMapping("/artists/{artistId}")
     public ResponseEntity<BaseResponse<?>> addArtistFavorite(
-            @RequestHeader("Authorization") Long userId,
+            @RequestHeader("Authorization") long userId,
             @PathVariable(name = "artistId") String artistId
     ) {
         userFavoriteFacade.addArtistFavorite(userId, artistId);

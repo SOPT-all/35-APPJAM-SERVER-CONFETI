@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.user.facade;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
@@ -19,6 +20,8 @@ import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
+import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
+import org.sopt.confeti.global.util.artistsearcher.SpotifyAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -33,6 +36,7 @@ public class UserFavoriteFacade {
     private final ArtistFavoriteService artistFavoriteService;
     private final ConcertFavoriteService concertFavoriteService;
     private final ConcertService concertService;
+    private final SpotifyAPIHandler spotifyAPIHandler;
     private final PerformanceService performanceService;
 
     @Transactional
@@ -79,6 +83,7 @@ public class UserFavoriteFacade {
     @Transactional
     public void addArtistFavorite(final long userId, final String artistId) {
         User user = userService.findById(userId);
+        validateExistArtist(artistId);
         validateNotExistArtistFavorite(userId, artistId);
 
         artistFavoriteService.addFavorite(user, artistId);
@@ -90,6 +95,13 @@ public class UserFavoriteFacade {
         validateExistArtistFavorite(userId, artistId);
 
         artistFavoriteService.removeFavorite(userId, artistId);
+    }
+
+    private void validateExistArtist(final String artistId) {
+        Optional<ConfetiArtist> artist = spotifyAPIHandler.findArtistByArtistId(artistId);
+        if (artist.isEmpty()) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
     }
 
     @Transactional(readOnly = true)
