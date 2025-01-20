@@ -94,7 +94,7 @@ public class UserTimetableFacade {
     @Transactional(readOnly = true)
     protected void validateCountTimetableFestival(final long currentCount, final int addCount) {
         if (currentCount + addCount > TIMETABLE_FESTIVAL_COUNT_MAXIMUM) {
-            throw new ConflictException(ErrorMessage.CONFLICT);
+            throw new ConflictException(ErrorMessage.TIMETABLE_FESTIVAL_IS_FULL);
         }
     }
 
