@@ -2,6 +2,7 @@ package org.sopt.confeti.api.user.controller;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.user.dto.response.UserFavoritePerformancesResponse;
 import org.sopt.confeti.api.user.dto.response.UserFavoriteResponse;
 import org.sopt.confeti.api.user.facade.UserFavoriteFacade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
@@ -9,6 +10,7 @@ import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserFavoriteController {
 
     private final UserFavoriteFacade userFavoriteFacade;
+    private final S3FileHandler s3FileHandler;
 
     @PostMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<?>> postFavoriteFestival(@RequestHeader("Authorization") Long userId, @PathVariable
@@ -82,6 +85,6 @@ public class UserFavoriteController {
             @RequestHeader("Authorization") long userId
     ) {
         UserFavoritePerformancesDTO userFavoritePerformancesDTO = userFavoriteFacade.getFavoritePerformances(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, );
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserFavoritePerformancesResponse.of(userFavoritePerformancesDTO, s3FileHandler));
     }
 }
