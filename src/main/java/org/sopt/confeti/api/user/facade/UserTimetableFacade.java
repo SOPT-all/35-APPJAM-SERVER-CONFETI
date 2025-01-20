@@ -12,7 +12,6 @@ import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 import org.sopt.confeti.domain.timetablefestival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
-import org.sopt.confeti.domain.usertimetable.application.UserTimetableService;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
@@ -29,7 +28,6 @@ public class UserTimetableFacade {
 
     private final UserService userService;
     private final TimetableFestivalService timetableFestivalService;
-    private final UserTimetableService userTimetableService;
     private final FestivalService festivalService;
 
     @Transactional(readOnly = true)
