@@ -77,10 +77,8 @@ public class SpotifyAPIHandler {
             return Optional.of(
                     ConfetiArtist.toConfetiArtist(artist)
             );
-        } catch (NotFoundException e) {
+        } catch (NotFoundException | BadRequestException e) {
             return Optional.empty();
-        } catch (BadRequestException e) {
-            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         } catch (IOException | ParseException | SpotifyWebApiException e) {
             throw new RuntimeException(e);
         }
