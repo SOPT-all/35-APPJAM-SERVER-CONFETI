@@ -39,4 +39,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<?>> handleConflictException(ConflictException e) {
         return ApiResponseUtil.failure(ErrorMessage.CONFLICT);
     }
+
+    @ExceptionHandler(ConfetiException.class)
+    public ResponseEntity<BaseResponse<?>> handleConfetiException(ConfetiException e) {
+        return ApiResponseUtil.failure(e.getErrorMessage());
+    }
 }
