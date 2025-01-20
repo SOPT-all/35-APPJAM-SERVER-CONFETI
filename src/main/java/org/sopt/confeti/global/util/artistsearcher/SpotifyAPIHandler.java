@@ -5,19 +5,23 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.core5.http.ParseException;
 import org.sopt.confeti.annotation.Handler;
-import org.sopt.confeti.global.exception.NotFoundException;
+import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.DateConvertor;
 import org.springframework.beans.factory.annotation.Value;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.exceptions.detailed.BadRequestException;
+import se.michaelthelin.spotify.exceptions.detailed.NotFoundException;
 import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
@@ -60,23 +64,48 @@ public class SpotifyAPIHandler {
         );
     }
 
+    public Optional<ConfetiArtist> findArtistByArtistId(final String artistId) {
+        if (artistId == null || artistId.isBlank()) {
+            return Optional.empty();
+        }
+
+        try {
+            Artist artist = spotifyApi.getArtist(artistId)
+                    .build()
+                    .execute();
+
+            return Optional.of(
+                    ConfetiArtist.toConfetiArtist(artist)
+            );
+        } catch (NotFoundException | BadRequestException e) {
+            return Optional.empty();
+        } catch (IOException | ParseException | SpotifyWebApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<ConfetiArtist> findArtistsByArtistIds(final List<String> artistIds) {
         if (artistIds.isEmpty()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         try {
             Artist[] artists = spotifyApi.getSeveralArtists(
-                            artistIds.toArray(new String[0])
+                        artistIds.stream()
+                                .filter(Objects::nonNull)
+                                .toArray(String[]::new)
                     )
                     .build()
                     .execute();
 
             return Arrays.stream(artists)
+                    .filter(Objects::nonNull)
                     .map(ConfetiArtist::toConfetiArtist)
                     .toList();
+        } catch (BadRequestException e) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         } catch (IOException | ParseException | SpotifyWebApiException e) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+            throw new RuntimeException(e);
         }
     }
 
@@ -92,7 +121,7 @@ public class SpotifyAPIHandler {
             return Arrays.stream(artists.getItems())
                     .findFirst();
         } catch (IOException | ParseException | SpotifyWebApiException e) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
 
