@@ -1,7 +1,9 @@
 package org.sopt.confeti.global.message;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public enum ErrorMessage {
     /* 400 Bad Request */
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "요청 형식이 올바르지 않습니다."),
@@ -32,13 +34,4 @@ public enum ErrorMessage {
         this.httpStatus = httpStatus;
         this.message = message;
     }
-
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
 }

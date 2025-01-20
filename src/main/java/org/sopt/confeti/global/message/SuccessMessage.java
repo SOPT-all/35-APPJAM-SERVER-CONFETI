@@ -10,7 +10,7 @@ public enum SuccessMessage {
     private final HttpStatus httpStatus;
     private final String message;
 
-    private SuccessMessage(HttpStatus httpStatus, String message) {
+    SuccessMessage(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
         this.message = message;
     }
