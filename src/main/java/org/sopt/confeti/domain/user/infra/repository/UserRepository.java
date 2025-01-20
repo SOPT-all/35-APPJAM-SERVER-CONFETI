@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value =
-        "SELECT DISTINCT u" +
+        "SELECT u" +
                 " FROM User u" +
                 " JOIN FETCH u.timetableFestivals tf" +
                 " JOIN FETCH tf.userTimetables ut" +
