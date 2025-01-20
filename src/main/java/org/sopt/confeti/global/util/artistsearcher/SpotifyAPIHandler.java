@@ -3,6 +3,7 @@ package org.sopt.confeti.global.util.artistsearcher;
 import com.neovisionaries.i18n.CountryCode;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
