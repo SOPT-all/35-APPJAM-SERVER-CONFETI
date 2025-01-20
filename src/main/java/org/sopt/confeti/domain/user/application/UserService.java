@@ -27,4 +27,12 @@ public class UserService {
     public boolean existsById(Long userId) {
         return userRepository.existsById(userId);
     }
+
+    @Transactional(readOnly = true)
+    public User findUserTimetablesById(final long userId) {
+        return userRepository.findUserTimetablesById(userId)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
+    }
 }

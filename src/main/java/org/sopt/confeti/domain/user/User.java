@@ -30,9 +30,6 @@ public class User {
     @Column(length=250, nullable = false)
     private String profilePath;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true )
-    private List<UserTimetable> timetables = new ArrayList<>();
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<ArtistFavorite> artistFavorites = new ArrayList<>();
 
