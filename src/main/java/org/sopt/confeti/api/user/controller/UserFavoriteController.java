@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.response.UserFavoriteResponse;
 import org.sopt.confeti.api.user.facade.UserFavoriteFacade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -74,5 +75,13 @@ public class UserFavoriteController {
     ) {
         userFavoriteFacade.removeConcertFavorite(userId, concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @GetMapping("/performances/preview")
+    public ResponseEntity<BaseResponse<?>> getFavoritePerformances(
+            @RequestHeader("Authorization") long userId
+    ) {
+        UserFavoritePerformancesDTO userFavoritePerformancesDTO = userFavoriteFacade.getFavoritePerformances(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, );
     }
 }

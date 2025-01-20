@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.artistfavorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.application.ConcertService;
@@ -129,6 +130,13 @@ public class UserFavoriteFacade {
         validateExistConcertFavorite(userId, concertId);
 
         concertFavoriteService.removeFavorite(userId, concertId);
+    }
+
+    @Transactional(readOnly = true)
+    public UserFavoritePerformancesDTO getFavoritePerformances(final long userId) {
+        validateExistUser(userId);
+
+        List<>
     }
 
     @Transactional(readOnly = true)
