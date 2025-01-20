@@ -1,16 +1,22 @@
 package org.sopt.confeti.api.performance.facade;
 
 import java.time.LocalDate;
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivalfavorite.application.FestivalFavoriteService;
+import org.sopt.confeti.domain.user.application.UserService;
+import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
+import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -22,8 +28,10 @@ public class PerformanceFacade {
 
     private final ConcertService concertService;
     private final FestivalService festivalService;
+    private final UserService userService;
     private final FestivalFavoriteService festivalFavoriteService;
     private final S3FileHandler s3FileHandler;
+    private final PerformanceService performanceService;
 
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final long concertId) {
@@ -69,5 +77,11 @@ public class PerformanceFacade {
         if (LocalDate.now().isAfter(festival.getFestivalEndAt())) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public PerformanceReservationDTO getPerformReservationInfo(final Long userId){
+        List<PerformanceTicketDTO> performanceReserve=performanceService.getFavoritePerformancesReservation(userId);
+        return PerformanceReservationDTO.from(performanceReserve);
     }
 }
