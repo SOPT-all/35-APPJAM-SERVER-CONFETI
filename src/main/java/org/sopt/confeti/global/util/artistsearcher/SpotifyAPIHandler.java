@@ -3,7 +3,6 @@ package org.sopt.confeti.global.util.artistsearcher;
 import com.neovisionaries.i18n.CountryCode;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,10 +21,13 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.exceptions.detailed.BadRequestException;
 import se.michaelthelin.spotify.exceptions.detailed.NotFoundException;
+import se.michaelthelin.spotify.exceptions.detailed.UnauthorizedException;
+import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRefreshRequest;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 
 @Handler
@@ -77,6 +79,9 @@ public class SpotifyAPIHandler {
             return Optional.of(
                     ConfetiArtist.toConfetiArtist(artist)
             );
+        } catch (UnauthorizedException e) {
+            refreshToken();
+            return findArtistByArtistId(artistId);
         } catch (NotFoundException | BadRequestException e) {
             return Optional.empty();
         } catch (IOException | ParseException | SpotifyWebApiException e) {
@@ -102,6 +107,9 @@ public class SpotifyAPIHandler {
                     .filter(Objects::nonNull)
                     .map(ConfetiArtist::toConfetiArtist)
                     .toList();
+        } catch (UnauthorizedException e) {
+            refreshToken();
+            return findArtistsByArtistIds(artistIds);
         } catch (BadRequestException e) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         } catch (IOException | ParseException | SpotifyWebApiException e) {
@@ -120,15 +128,18 @@ public class SpotifyAPIHandler {
 
             return Arrays.stream(artists.getItems())
                     .findFirst();
+        } catch (UnauthorizedException e) {
+            refreshToken();
+            return searchArtistByKeyword(keyword);
         } catch (IOException | ParseException | SpotifyWebApiException e) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
 
     private LocalDate findLatestReleaseAt(final String keyword, final Artist artist) {
-        Paging<AlbumSimplified> albums = searchAlbumByKeyword(keyword);
+        Optional<Paging<AlbumSimplified>> albums = searchAlbumByKeyword(keyword);
 
-        return Arrays.stream(albums.getItems())
+        return albums.map(albumSimplifiedPaging -> Arrays.stream(albumSimplifiedPaging.getItems())
                 .filter((searchedAlbum) ->
                         Arrays.stream(searchedAlbum.getArtists())
                                 .anyMatch((searchedArtist) ->
@@ -139,17 +150,24 @@ public class SpotifyAPIHandler {
                 .map(
                         albumSimplified -> DateConvertor.convertToSpotifyLocalDate(albumSimplified.getReleaseDate())
                 )
-                .get();
+                .get())
+                .orElse(null);
+
     }
 
-    private Paging<AlbumSimplified> searchAlbumByKeyword(final String keyword) {
+    private Optional<Paging<AlbumSimplified>> searchAlbumByKeyword(final String keyword) {
         try {
-            return spotifyApi.searchAlbums(keyword)
+            return Optional.of(spotifyApi.searchAlbums(keyword)
                     .market(CountryCode.KR)
                     .limit(ALBUM_LIMIT)
                     .offset(ALBUM_OFFSET)
                     .build()
-                    .execute();
+                    .execute());
+        } catch (UnauthorizedException e) {
+            refreshToken();
+            return searchAlbumByKeyword(keyword);
+        } catch (NotFoundException | BadRequestException e) {
+            return Optional.empty();
         } catch (IOException | ParseException | SpotifyWebApiException e) {
             throw new RuntimeException(e);
         }
@@ -171,6 +189,18 @@ public class SpotifyAPIHandler {
             spotifyApi.setAccessToken(clientCredentials.getAccessToken());
         } catch (IOException | ParseException | SpotifyWebApiException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void refreshToken() {
+        try {
+            AuthorizationCodeRefreshRequest refreshRequest = spotifyApi.authorizationCodeRefresh().build();
+            AuthorizationCodeCredentials credentials = refreshRequest.execute();
+
+            spotifyApi.setAccessToken(credentials.getAccessToken());
+
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
     }
 
