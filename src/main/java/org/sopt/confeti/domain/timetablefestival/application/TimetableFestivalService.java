@@ -31,11 +31,6 @@ public class TimetableFestivalService {
         timetableFestivalRepository.deleteByUserIdAndFestivalId(userId, festivalId);
     }
 
-    @Transactional(readOnly = true)
-    public int countByUserId(final long userId) {
-        return timetableFestivalRepository.countByUserId(userId);
-    }
-
     @Transactional
     public void addTimetableFestivals(final User user, final List<Festival> festivals) {
         timetableFestivalRepository.saveAll(
