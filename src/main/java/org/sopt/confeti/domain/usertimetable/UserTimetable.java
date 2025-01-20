@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festivaltime.FestivalTime;
+import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 import org.sopt.confeti.domain.user.User;
 
 @Entity
@@ -19,8 +20,8 @@ public class UserTimetable {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id")
-    private User user;
+    @JoinColumn(name="timetable_festival_id")
+    private TimetableFestival timetableFestival;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="festival_time_id")
@@ -30,15 +31,15 @@ public class UserTimetable {
     private boolean isSelected;
 
     @Builder
-    public UserTimetable(User user, FestivalTime festivalTime, boolean isSelected) {
-        this.user = user;
+    public UserTimetable(TimetableFestival timetableFestival, FestivalTime festivalTime, boolean isSelected) {
+        this.timetableFestival = timetableFestival;
         this.festivalTime = festivalTime;
         this.isSelected = isSelected;
     }
 
-    public static UserTimetable create(User user, FestivalTime festivalTime, boolean isSelected) {
+    public static UserTimetable create(TimetableFestival timetableFestival, FestivalTime festivalTime, boolean isSelected) {
         return UserTimetable.builder()
-                .user(user)
+                .timetableFestival(timetableFestival)
                 .festivalTime(festivalTime)
                 .isSelected(isSelected)
                 .build();
