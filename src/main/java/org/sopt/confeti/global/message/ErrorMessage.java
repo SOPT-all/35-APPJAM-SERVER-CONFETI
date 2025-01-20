@@ -1,7 +1,9 @@
 package org.sopt.confeti.global.message;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public enum ErrorMessage {
     /* 400 Bad Request */
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "요청 형식이 올바르지 않습니다."),
@@ -21,6 +23,7 @@ public enum ErrorMessage {
 
     /* 409 Conflict */
     CONFLICT(HttpStatus.CONFLICT, "이미 존재하는 리소스입니다."),
+    TIMETABLE_FESTIVAL_IS_FULL(HttpStatus.CONFLICT, "더 이상 등록할 수 없습니다."),
 
     /* 500 Internal Server Error*/
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),;
@@ -32,13 +35,4 @@ public enum ErrorMessage {
         this.httpStatus = httpStatus;
         this.message = message;
     }
-
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
 }
