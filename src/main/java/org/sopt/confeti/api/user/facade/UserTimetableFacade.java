@@ -50,7 +50,7 @@ public class UserTimetableFacade {
     @Transactional
     public void addTimetableFestivals(final long userId, final AddTimetableFestivalDTO from) {
         User user = userService.findUserTimetablesById(userId);
-        List<Festival> addFestivals = festivalService.findAllByIdIn(
+        List<Festival> addFestivals = festivalService.findFestivalsByIdIn(
                 from.festivals().stream()
                         .distinct()
                         .map(AddTimetableFestivalArtiestDTO::festivalId)
