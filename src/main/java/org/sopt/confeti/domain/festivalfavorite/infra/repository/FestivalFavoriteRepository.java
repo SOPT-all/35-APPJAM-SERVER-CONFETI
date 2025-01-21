@@ -11,4 +11,5 @@ public interface FestivalFavoriteRepository extends JpaRepository<FestivalFavori
     Optional<FestivalFavorite> findByUserIdAndFestivalId(long userId, long festivalId);
 
     boolean existsByUserIdAndFestivalId(long userId, long festivalId);
+    boolean existsByUserId(Long userId);
 }

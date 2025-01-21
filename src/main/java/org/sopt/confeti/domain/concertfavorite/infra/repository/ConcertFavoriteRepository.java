@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ConcertFavoriteRepository extends JpaRepository<ConcertFavorite, Long> {
     boolean existsByUserIdAndConcertId(final long userId, final long concertId);
     void deleteByUserIdAndConcertId(final long userId, final long concertId);
+    boolean existsByUserId(final Long userId);
 }
