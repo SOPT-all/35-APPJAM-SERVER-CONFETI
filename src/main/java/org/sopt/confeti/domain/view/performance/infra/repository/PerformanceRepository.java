@@ -17,8 +17,8 @@ public class PerformanceRepository {
 
     private final EntityManager em;
 
-    int PREVIEW_FAVORITE_PERFORMANCE_COUNT = 3;
-    int RESERVE_FAVORITE_PERFORMANCE_COUNT = 5;
+    private static final int PREVIEW_FAVORITE_PERFORMANCE_COUNT = 3;
+    private static final int  RESERVE_FAVORITE_PERFORMANCE_COUNT = 5;
 
     public List<PerformanceDTO> findFavoritePerformancesPreview(final Long userId) {
         String sql =
@@ -53,84 +53,56 @@ public class PerformanceRepository {
     }
 
     public List<PerformanceTicketDTO> findFavoritePerformancesReservation(final Long userId) {
-        String sql;
-        boolean isUserIdValid = userId != null && userId > 0;
-
-        if (!isUserIdValid) {
-            sql = getAllPerformancesQuery();
-        } else {
-            boolean hasFavorites = checkUserHasFavorites(userId);
-            sql = hasFavorites ? getFavoritePerformancesQuery() : getAllPerformancesQuery();
-        }
-
-        Query query = em.createNativeQuery(sql)
-                .setParameter("concertType", PerformanceType.CONCERT.getType())
-                .setParameter("festivalType", PerformanceType.FESTIVAL.getType())
-                .setParameter("performanceReservationCount", RESERVE_FAVORITE_PERFORMANCE_COUNT);
-
-        if (isUserIdValid && sql.contains(":userId")) {
-            query.setParameter("userId", userId);
-        }
-
-        List<Object[]> results = query.getResultList();
-        return convertToPerformanceTicketDTOs(results);
-    }
-
-    private boolean checkUserHasFavorites(Long userId) {
-        String checkFavoritesQuery = """
-            SELECT COUNT(*) > 0
-            FROM (
-                SELECT 1 FROM concert_favorites cf 
-                JOIN concerts c ON cf.concert_id = c.concert_id 
-                WHERE cf.user_id = ?1 AND c.reserve_at >= CURRENT_DATE
-                UNION ALL
-                SELECT 1 FROM festival_favorites ff 
-                JOIN festivals f ON ff.festival_id = f.festival_id 
-                WHERE ff.user_id = ?1 AND f.reserve_at >= CURRENT_DATE
-                LIMIT 1
-            ) AS favorites
-            """;
-
-        Query checkQuery = em.createNativeQuery(checkFavoritesQuery)
-                .setParameter(1, userId);
-
-        return ((Number) checkQuery.getSingleResult()).intValue() > 0;
-    }
-
-    private String getAllPerformancesQuery() {
-        return """
+        String sql = """
             SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, subtitle, reserve_at, reservation_bg_url
             FROM (
-                SELECT c.concert_id AS performance_id, :concertType AS type, c.concert_subtitle AS subtitle, c.reserve_at, c.concert_reservation_bg_path AS reservation_bg_url
-                FROM concerts c
-                WHERE c.reserve_at >= CURRENT_DATE
-                UNION ALL
-                SELECT f.festival_id, :festivalType, f.festival_subtitle, f.reserve_at, f.festival_reservation_bg_path
-                FROM festivals f
-                WHERE f.reserve_at >= CURRENT_DATE
-            ) AS all_performances
-            ORDER BY reserve_at ASC
-            LIMIT :performanceReservationCount
-            """;
-    }
-
-    private String getFavoritePerformancesQuery() {
-        return """
-            SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, subtitle, reserve_at, reservation_bg_url
-            FROM (
-                SELECT c.concert_id AS performance_id, :concertType AS type, c.concert_subtitle AS subtitle, c.reserve_at, c.concert_reservation_bg_path AS reservation_bg_url
+                SELECT c.concert_id performance_id, :concertType type, c.concert_subtitle subtitle, c.reserve_at, c.concert_reservation_bg_path reservation_bg_url
                 FROM concert_favorites cf
                 JOIN concerts c ON cf.concert_id = c.concert_id
                 WHERE cf.user_id = :userId AND c.reserve_at >= CURRENT_DATE 
                 UNION ALL
-                SELECT f.festival_id, :festivalType, f.festival_subtitle, f.reserve_at, f.festival_reservation_bg_path
+                SELECT f.festival_id performance_id, :festivalType type, f.festival_subtitle subtitle, f.reserve_at, f.festival_reservation_bg_path reservation_bg_url
                 FROM festival_favorites ff
                 JOIN festivals f ON ff.festival_id = f.festival_id
                 WHERE ff.user_id = :userId AND f.reserve_at >= CURRENT_DATE
             ) AS favorite_performances
             ORDER BY reserve_at ASC
             LIMIT :performanceReservationCount
+            """;;
+
+        Query query = em.createNativeQuery(sql)
+                .setParameter("userId", userId)
+                .setParameter("concertType", PerformanceType.CONCERT.getType())
+                .setParameter("festivalType", PerformanceType.FESTIVAL.getType())
+                .setParameter("performanceReservationCount", RESERVE_FAVORITE_PERFORMANCE_COUNT);
+
+        List<Object[]> results = query.getResultList();
+        return convertToPerformanceTicketDTOs(results);
+    }
+
+    public List<PerformanceTicketDTO> findPerformancesReservation() {
+        String sql =  """
+            SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, subtitle, reserve_at, reservation_bg_url
+            FROM (
+                SELECT c.concert_id performance_id, :concertType type, c.concert_subtitle subtitle, c.reserve_at, c.concert_reservation_bg_path reservation_bg_url
+                FROM concerts c
+                WHERE c.reserve_at >= CURRENT_DATE
+                UNION ALL
+                SELECT f.festival_id performance_id, :festivalType type, f.festival_subtitle subtitle, f.reserve_at, f.festival_reservation_bg_path reservation_bg_url
+                FROM festivals f
+                WHERE f.reserve_at >= CURRENT_DATE
+            ) AS all_performances
+            ORDER BY reserve_at ASC
+            LIMIT :performanceReservationCount
             """;
+
+        Query query = em.createNativeQuery(sql)
+                .setParameter("concertType", PerformanceType.CONCERT.getType())
+                .setParameter("festivalType", PerformanceType.FESTIVAL.getType())
+                .setParameter("performanceReservationCount", RESERVE_FAVORITE_PERFORMANCE_COUNT);
+
+        List<Object[]> results = query.getResultList();
+        return convertToPerformanceTicketDTOs(results);
     }
 
     private List<PerformanceTicketDTO> convertToPerformanceTicketDTOs(List<Object[]> results) {

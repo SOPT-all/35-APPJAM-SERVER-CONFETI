@@ -23,4 +23,9 @@ public class PerformanceService {
     public List<PerformanceTicketDTO> getFavoritePerformancesReservation(final Long userId) {
         return performanceRepository.findFavoritePerformancesReservation(userId);
     }
+
+    @Transactional(readOnly = true)
+    public List<PerformanceTicketDTO> getPerformancesReservation() {
+        return performanceRepository.findPerformancesReservation();
+    }
 }
