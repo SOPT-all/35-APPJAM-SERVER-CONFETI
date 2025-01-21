@@ -25,15 +25,17 @@ public class UserFavoriteController {
     private final S3FileHandler s3FileHandler;
 
     @PostMapping("/festivals/{festivalId}")
-    public ResponseEntity<BaseResponse<?>> postFavoriteFestival(@RequestHeader("Authorization") Long userId, @PathVariable
-                                                                @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
+    public ResponseEntity<BaseResponse<?>> postFavoriteFestival(
+            @RequestHeader("Authorization") Long userId,
+            @PathVariable(name = "festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
         userFavoriteFacade.addFestivalFavorite(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @DeleteMapping("/festivals/{festivalId}")
-    public ResponseEntity<BaseResponse<?>> deleteFavoriteFestival(@RequestHeader("Authorization") Long userId, @PathVariable
-                                                                  @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
+    public ResponseEntity<BaseResponse<?>> deleteFavoriteFestival(
+            @RequestHeader("Authorization") Long userId,
+            @PathVariable(name = "festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
         userFavoriteFacade.removeFestivalFavorite(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
