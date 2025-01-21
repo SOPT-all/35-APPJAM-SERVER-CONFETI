@@ -1,7 +1,6 @@
 package org.sopt.confeti.global.util.artistsearcher;
 
 import com.neovisionaries.i18n.CountryCode;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,9 +9,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.apache.hc.core5.http.ParseException;
 import org.sopt.confeti.annotation.Handler;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -23,13 +22,10 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.exceptions.detailed.BadRequestException;
 import se.michaelthelin.spotify.exceptions.detailed.NotFoundException;
 import se.michaelthelin.spotify.exceptions.detailed.UnauthorizedException;
-import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
-import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRefreshRequest;
-import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 
 @Handler
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,8 +33,10 @@ public class SpotifyAPIHandler {
 
     private static final int ARTIST_LIMIT = 1;
     private static final int ARTIST_OFFSET = 0;
-    private static final int ALBUM_LIMIT = 10;
+    private static final int ALBUM_LIMIT = 1;
     private static final int ALBUM_OFFSET = 0;
+    private static final int REFRESH_TRIAL = 5;
+    private static final int REFRESH_INIT_VALUE = 0;
 
     @Value("${spotify.credentials.client-id}")
     private String clientId;
@@ -48,9 +46,13 @@ public class SpotifyAPIHandler {
 
     private SpotifyApi spotifyApi;
 
+    private int refreshCount;
+
     public void init() {
         createSpotifyApi();
         generateAccessToken();
+
+        refreshCount = REFRESH_INIT_VALUE;
     }
 
     public Optional<ConfetiArtist> findArtistsByKeyword(final String keyword) {
@@ -63,7 +65,7 @@ public class SpotifyAPIHandler {
         Artist artist = searchedArtist.get();
 
         return Optional.of(
-                ConfetiArtist.toConfetiArtist(artist, findLatestReleaseAt(keyword, artist))
+                ConfetiArtist.toConfetiArtist(artist, findLatestReleaseAt(artist.getId()))
         );
     }
 
@@ -73,20 +75,23 @@ public class SpotifyAPIHandler {
         }
 
         try {
-            Artist artist = spotifyApi.getArtist(artistId)
-                    .build()
-                    .execute();
+            generateAccessTokenIfExpired();
 
-            return Optional.of(
-                    ConfetiArtist.toConfetiArtist(artist)
-            );
-        } catch (UnauthorizedException e) {
-            refreshToken();
-            return findArtistByArtistId(artistId);
-        } catch (NotFoundException | BadRequestException e) {
+            return executeWithTokenRefresh(() -> {
+                Artist artist = spotifyApi.getArtist(artistId)
+                        .build()
+                        .execute();
+
+                return Optional.of(
+                        ConfetiArtist.toConfetiArtist(artist)
+                );
+            });
+        } catch (NotFoundException e) {
             return Optional.empty();
-        } catch (IOException | ParseException | SpotifyWebApiException e) {
-            throw new RuntimeException(e);
+        } catch (BadRequestException e) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        } catch (Exception e) {
+            throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -96,81 +101,79 @@ public class SpotifyAPIHandler {
         }
 
         try {
-            Artist[] artists = spotifyApi.getSeveralArtists(
-                        artistIds.stream()
-                                .filter(Objects::nonNull)
-                                .toArray(String[]::new)
-                    )
-                    .build()
-                    .execute();
+            generateAccessTokenIfExpired();
 
-            return Arrays.stream(artists)
-                    .filter(Objects::nonNull)
-                    .map(ConfetiArtist::toConfetiArtist)
-                    .toList();
-        } catch (UnauthorizedException e) {
-            refreshToken();
-            return findArtistsByArtistIds(artistIds);
+            return executeWithTokenRefresh(() -> {
+                Artist[] artists = spotifyApi.getSeveralArtists(
+                                artistIds.stream()
+                                        .filter(Objects::nonNull)
+                                        .toArray(String[]::new)
+                        )
+                        .build()
+                        .execute();
+
+                return Arrays.stream(artists)
+                        .filter(Objects::nonNull)
+                        .map(ConfetiArtist::toConfetiArtist)
+                        .toList();
+            });
         } catch (BadRequestException e) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
-        } catch (IOException | ParseException | SpotifyWebApiException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
     }
 
     private Optional<Artist> searchArtistByKeyword(final String keyword) {
         try {
-            Paging<Artist> artists = spotifyApi.searchArtists(keyword)
-                    .market(CountryCode.KR)
-                    .limit(ARTIST_LIMIT)
-                    .offset(ARTIST_OFFSET)
-                    .build()
-                    .execute();
+            generateAccessTokenIfExpired();
 
-            return Arrays.stream(artists.getItems())
-                    .findFirst();
-        } catch (UnauthorizedException e) {
-            refreshToken();
-            return searchArtistByKeyword(keyword);
-        } catch (IOException | ParseException | SpotifyWebApiException e) {
-            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+            return executeWithTokenRefresh(() -> {
+                Paging<Artist> artists = spotifyApi.searchArtists(keyword)
+                        .market(CountryCode.KR)
+                        .limit(ARTIST_LIMIT)
+                        .offset(ARTIST_OFFSET)
+                        .build()
+                        .execute();
+
+                return Arrays.stream(artists.getItems())
+                        .findFirst();
+            });
+        } catch (Exception e) {
+            throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private LocalDate findLatestReleaseAt(final String keyword, final Artist artist) {
-        Optional<Paging<AlbumSimplified>> albums = searchAlbumByKeyword(keyword);
+    private LocalDate findLatestReleaseAt(final String artistId) {
+        Optional<Paging<AlbumSimplified>> searchedAlbums = searchAlbumByArtistId(artistId);
 
-        return albums.map(albumSimplifiedPaging -> Arrays.stream(albumSimplifiedPaging.getItems())
-                .filter((searchedAlbum) ->
-                        Arrays.stream(searchedAlbum.getArtists())
-                                .anyMatch((searchedArtist) ->
-                                        searchedArtist.getId().equals(artist.getId())
-                                )
-                )
-                .max(Comparator.comparing(AlbumSimplified::getReleaseDate))
-                .map(
-                        albumSimplified -> DateConvertor.convertToSpotifyLocalDate(albumSimplified.getReleaseDate())
-                )
-                .get())
-                .orElse(null);
+        if (searchedAlbums.isEmpty()) {
+            return null;
+        }
 
+        Paging<AlbumSimplified> albums = searchedAlbums.get();
+
+        return Arrays.stream(albums.getItems())
+                .map(albumItem -> DateConvertor.convertToSpotifyLocalDate(albumItem.getReleaseDate()))
+                .findFirst()
+                .orElseGet(null);
     }
 
-    private Optional<Paging<AlbumSimplified>> searchAlbumByKeyword(final String keyword) {
+    private Optional<Paging<AlbumSimplified>> searchAlbumByArtistId(final String artistId) {
         try {
-            return Optional.of(spotifyApi.searchAlbums(keyword)
+            generateAccessTokenIfExpired();
+
+            return executeWithTokenRefresh(() ->
+                    Optional.of(spotifyApi.getArtistsAlbums(artistId)
                     .market(CountryCode.KR)
                     .limit(ALBUM_LIMIT)
                     .offset(ALBUM_OFFSET)
                     .build()
-                    .execute());
-        } catch (UnauthorizedException e) {
-            refreshToken();
-            return searchAlbumByKeyword(keyword);
+                    .execute()));
         } catch (NotFoundException | BadRequestException e) {
             return Optional.empty();
-        } catch (IOException | ParseException | SpotifyWebApiException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -182,27 +185,42 @@ public class SpotifyAPIHandler {
     }
 
     private void generateAccessToken() {
-        ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials().build();
-
         try {
-            final ClientCredentials clientCredentials = clientCredentialsRequest.execute();
+            final ClientCredentials clientCredentials = spotifyApi.clientCredentials()
+                    .build()
+                    .execute();
 
             spotifyApi.setAccessToken(clientCredentials.getAccessToken());
-        } catch (IOException | ParseException | SpotifyWebApiException e) {
-            throw new RuntimeException(e);
-        }
-    }
+            refreshCount = REFRESH_INIT_VALUE;
 
-    public void refreshToken() {
-        try {
-            AuthorizationCodeRefreshRequest refreshRequest = spotifyApi.authorizationCodeRefresh().build();
-            AuthorizationCodeCredentials credentials = refreshRequest.execute();
-
-            spotifyApi.setAccessToken(credentials.getAccessToken());
-
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
+        } catch (Exception e) {
             throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
     }
 
+    private void generateAccessTokenIfExpired() {
+        if (spotifyApi.getAccessToken() == null) {
+            generateAccessToken();
+        }
+    }
+
+    // 토큰 재발급을 위한 실행 메서드
+    private <T> T executeWithTokenRefresh(Callable<T> action) throws Exception {
+        try {
+            T retVal = action.call();
+            refreshCount = REFRESH_INIT_VALUE;
+            return retVal;
+        } catch (UnauthorizedException e) {
+            if (isTokenExpired(e) && refreshCount < REFRESH_TRIAL) {
+                generateAccessToken();
+                return action.call();  // 새 토큰으로 재시도
+            }
+            throw e;
+        }
+    }
+
+    // 토큰 만료 여부 확인
+    private boolean isTokenExpired(SpotifyWebApiException e) {
+        return e instanceof UnauthorizedException;
+    }
 }
