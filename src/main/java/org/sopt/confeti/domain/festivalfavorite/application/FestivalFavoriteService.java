@@ -35,4 +35,8 @@ public class FestivalFavoriteService {
     public boolean isFavorite(final long userId, final long festivalId) {
         return festivalFavoriteRepository.existsByUserIdAndFestivalId(userId, festivalId);
     }
+
+    public boolean existsByUserId(final Long userId) {
+        return festivalFavoriteRepository.existsByUserId(userId);
+    }
 }

@@ -11,6 +11,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
+import org.sopt.confeti.domain.concertfavorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivalfavorite.application.FestivalFavoriteService;
@@ -32,6 +33,7 @@ public class PerformanceFacade {
     private final FestivalFavoriteService festivalFavoriteService;
     private final S3FileHandler s3FileHandler;
     private final PerformanceService performanceService;
+    private final ConcertFavoriteService concertFavoriteService;
 
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final long concertId) {
@@ -81,7 +83,16 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public PerformanceReservationDTO getPerformReservationInfo(final Long userId){
-        List<PerformanceTicketDTO> performanceReserve=performanceService.getFavoritePerformancesReservation(userId);
+        boolean isUserExist = userId != null && userService.existsById(userId);
+        boolean isCFExist = isUserExist && concertFavoriteService.existsByUserId(userId);
+        boolean isFFExist = isUserExist && festivalFavoriteService.existsByUserId(userId);
+
+        if (isCFExist || isFFExist) {
+            List<PerformanceTicketDTO> performanceReserve=performanceService.getFavoritePerformancesReservation(userId);
+            return PerformanceReservationDTO.from(performanceReserve);
+        }
+
+        List<PerformanceTicketDTO> performanceReserve=performanceService.getPerformancesReservation();
         return PerformanceReservationDTO.from(performanceReserve);
     }
 }
