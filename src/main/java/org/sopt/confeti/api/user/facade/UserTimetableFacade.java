@@ -6,8 +6,11 @@ import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalArtiestDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
+import org.sopt.confeti.domain.festivaldate.FestivalDate;
+import org.sopt.confeti.domain.festivaldate.application.FestivalDateService;
 import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 import org.sopt.confeti.domain.timetablefestival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.User;
@@ -16,6 +19,7 @@ import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
+import org.sopt.confeti.global.util.artistsearcher.ArtistResolver;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -29,6 +33,8 @@ public class UserTimetableFacade {
     private final UserService userService;
     private final TimetableFestivalService timetableFestivalService;
     private final FestivalService festivalService;
+    private final FestivalDateService festivalDateService;
+    private final ArtistResolver artistResolver;
 
     @Transactional(readOnly = true)
     public UserTimetableDTO getTimetablesListAndDate(long userId) {
@@ -104,6 +110,23 @@ public class UserTimetableFacade {
     protected void validateExistTimetableFestival(final long userId, final long festivalId) {
         if (!timetableFestivalService.existsByUserIdAndFestivalId(userId, festivalId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public UserTimetableFestivalBasicDTO getTimetableInfo(final long userId, final long festivalDateId) {
+        validateUserExists(userId);
+
+        FestivalDate festivalDate = festivalDateService.findFestivalDateId(userId, festivalDateId);
+        artistResolver.load(festivalDate);
+
+        return UserTimetableFestivalBasicDTO.from(festivalDate);
+    }
+
+    @Transactional(readOnly = true)
+    protected void validateUserExists(final long userId) {
+        if (!userService.existsById(userId)) {
+            throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
         }
     }
 }
