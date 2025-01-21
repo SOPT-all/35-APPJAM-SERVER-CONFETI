@@ -1,25 +1,30 @@
 package org.sopt.confeti.api.user.facade;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalArtiestDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
+import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivaldate.FestivalDate;
 import org.sopt.confeti.domain.festivaldate.application.FestivalDateService;
+import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 import org.sopt.confeti.domain.timetablefestival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
+import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.artistsearcher.ArtistResolver;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -111,6 +116,33 @@ public class UserTimetableFacade {
         if (!timetableFestivalService.existsByUserIdAndFestivalId(userId, festivalId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public CursorPage<TimetableToAddDTO> getTimetablesToAdd(final long userId, final Long cursor, final int size) {
+        if (cursor == null) {
+            List<Festival> festivals = festivalService.findFestivalsUsingInitCursor(userId, size);
+            return CursorPage.of(
+                    festivals.stream()
+                            .map(TimetableToAddDTO::from)
+                            .toList(),
+                    size
+            );
+        }
+
+        // 커서 값 조회
+        FestivalCursorDTO festivalCursorDTO = festivalService.findFestivalCursor(userId, cursor)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
+
+        List<Festival> festivals = festivalService.findFestivalsUsingCursor(userId, festivalCursorDTO.cursorTitle(), festivalCursorDTO.cursorIsFavorite(), size);
+        return CursorPage.of(
+                festivals.stream()
+                        .map(TimetableToAddDTO::from)
+                        .toList(),
+                size
+        );
     }
 
     @Transactional(readOnly = true)
