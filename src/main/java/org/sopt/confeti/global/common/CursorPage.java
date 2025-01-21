@@ -15,7 +15,7 @@ public class CursorPage<T> {
     }
 
     public boolean isLast() {
-        return itemsWithNextCursor.size() <= size;
+        return itemsWithNextCursor.size() < size;
     }
 
     public List<T> getItems() {
@@ -23,7 +23,7 @@ public class CursorPage<T> {
             return itemsWithNextCursor;
         }
 
-        return itemsWithNextCursor.subList(0, size);
+        return itemsWithNextCursor.subList(0, size - 1);
     }
 
     public T getNextCursor() {
