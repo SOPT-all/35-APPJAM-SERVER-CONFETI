@@ -37,8 +37,6 @@ public class SpotifyAPIHandler {
     private static final int REFRESH_TRIAL = 5;
     private static final int REFRESH_INIT_VALUE = 0;
 
-    private static final String TOKEN_EXPIRED_MESSAGE = "The access token expired";
-
     @Value("${spotify.credentials.client-id}")
     private String clientId;
 
