@@ -4,14 +4,14 @@ import org.sopt.confeti.domain.view.performance.PerformanceDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record UserFavoritePerformanceDTO(
-        long performanceId,
+        long typeId,
         PerformanceType type,
         String title,
         String posterPath
 ) {
     public static UserFavoritePerformanceDTO from(final PerformanceDTO performance) {
         return new UserFavoritePerformanceDTO(
-                performance.performanceId(),
+                performance.typeId(),
                 performance.type(),
                 performance.title(),
                 performance.posterPath()

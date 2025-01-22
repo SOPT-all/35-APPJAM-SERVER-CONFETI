@@ -3,6 +3,7 @@ package org.sopt.confeti.api.performance.dto.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record CreateFestivalRequest(
@@ -12,10 +13,10 @@ public record CreateFestivalRequest(
         String festivalSubtitle,
         @JsonFormat(pattern = "yyyy.MM.dd")
         @JsonProperty(value = "festival_start_at")
-        LocalDate festivalStartAt,
+        LocalDateTime festivalStartAt,
         @JsonFormat(pattern = "yyyy.MM.dd")
         @JsonProperty(value = "festival_end_at")
-        LocalDate festivalEndAt,
+        LocalDateTime festivalEndAt,
         @JsonProperty(value = "festival_area")
         String festivalArea,
         @JsonProperty(value = "festival_poster_path")
@@ -30,7 +31,7 @@ public record CreateFestivalRequest(
         String festivalLogoPath,
         @JsonFormat(pattern = "yyyy.MM.dd")
         @JsonProperty(value = "reserve_at")
-        LocalDate reserveAt,
+        LocalDateTime reserveAt,
         @JsonProperty(value = "reservation_url")
         String reservationUrl,
         @JsonProperty(value = "reservation_office")
