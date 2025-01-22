@@ -7,6 +7,8 @@ import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
+import org.sopt.confeti.domain.view.performance.application.dto.request.GetPerformanceIdRequest;
+import org.sopt.confeti.domain.view.performance.application.dto.response.GetPerformanceIdResponse;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceDTORepository;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceRepository;
 import org.springframework.stereotype.Service;
@@ -44,5 +46,17 @@ public class PerformanceService {
                         .map(artist -> Performance.create(festival, artist.getArtist().getArtistId()))
                         .toList()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetPerformanceIdResponse> getPerformanceIds(final List<GetPerformanceIdRequest> getPerformanceIdRequests) {
+        List<Performance> performances = getPerformanceIdRequests.stream()
+                .map(getPerformanceIdRequest -> performanceRepository.findPerformanceByTypeIdAndType(
+                        getPerformanceIdRequest.typeId(), getPerformanceIdRequest.type()
+                )).toList();
+
+        return performances.stream()
+                .map(GetPerformanceIdResponse::from)
+                .toList();
     }
 }
