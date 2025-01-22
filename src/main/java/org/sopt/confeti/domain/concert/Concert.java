@@ -5,8 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.concertartist.ConcertArtist;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +27,12 @@ public class Concert {
     private String concertSubtitle;
 
     @Column(nullable = false)
-    private LocalDate concertStartAt;
+    private LocalDateTime concertStartAt;
 
     @Column(nullable = false)
-    private LocalDate concertEndAt;
+    private LocalDateTime concertEndAt;
 
-    @Column(length = 30, nullable = false)
+    @Column(length = 100, nullable = false)
     private String concertArea;
 
     @Column(length = 250, nullable = false)
@@ -46,7 +44,7 @@ public class Concert {
     @Column(length = 250, nullable = false)
     private String concertInfoImgPath;
 
-    @Column(length = 250, nullable = false)
+    @Column(length = 250) // 나중에 nullable = false로 수정
     private String concertReservationBgPath;
 
     @Column(nullable = false)
@@ -55,7 +53,7 @@ public class Concert {
     @Column(length = 250, nullable = false)
     private String reservationUrl;
 
-    @Column(length = 30, nullable = false)
+    @Column(length = 50, nullable = false)
     private String reservationOffice;
 
     @Column(length = 30, nullable = false)
@@ -64,7 +62,7 @@ public class Concert {
     @Column(name = "times", length = 30, nullable = false)
     private String time;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 200, nullable = false)
     private String price;
 
     @OneToMany(mappedBy = "concert", cascade = CascadeType.REMOVE)

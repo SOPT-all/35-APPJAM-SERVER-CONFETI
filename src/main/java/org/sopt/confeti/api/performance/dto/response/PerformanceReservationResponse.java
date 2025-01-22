@@ -6,7 +6,7 @@ import org.sopt.confeti.global.util.S3FileHandler;
 import java.util.List;
 
 public record PerformanceReservationResponse(
-        Integer performanceCount,
+        int performanceCount,
         List<PerformanceReservationDetailResponse> performances
 ){
     public static PerformanceReservationResponse of(final PerformanceReservationDTO performanceReservation,

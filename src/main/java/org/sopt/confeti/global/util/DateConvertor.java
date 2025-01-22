@@ -36,6 +36,14 @@ public class DateConvertor {
         return localDateTime.format(localDateTimeFormat);
     }
 
+    public static String convertToLocalDate(final LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
+        }
+
+        return localDateTime.format(localDateFormat);
+    }
+
     public static LocalDate convertToLocalDate(final String localDate) {
         return LocalDate.parse(localDate, localDateFormat);
     }
