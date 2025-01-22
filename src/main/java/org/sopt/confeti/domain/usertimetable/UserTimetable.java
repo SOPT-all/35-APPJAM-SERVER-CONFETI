@@ -44,4 +44,9 @@ public class UserTimetable {
                 .isSelected(isSelected)
                 .build();
     }
+
+    public void setIsSelected(boolean isSelected) {
+        this.isSelected = isSelected;
+    }
+
 }
