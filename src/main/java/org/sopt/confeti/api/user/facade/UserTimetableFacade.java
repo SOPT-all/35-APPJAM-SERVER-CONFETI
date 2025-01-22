@@ -171,22 +171,5 @@ public class UserTimetableFacade {
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
     }
-
-    @Transactional(readOnly = true)
-    public UserTimetableFestivalBasicDTO getTimetableInfo(final long userId, final long festivalDateId) {
-        validateUserExists(userId);
-
-        FestivalDate festivalDate = festivalDateService.findFestivalDateId(userId, festivalDateId);
-        artistResolver.load(festivalDate);
-
-        return UserTimetableFestivalBasicDTO.from(festivalDate);
-    }
-
-    @Transactional(readOnly = true)
-    protected void validateUserExists(final long userId) {
-        if (!userService.existsById(userId)) {
-            throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
-        }
-    }
 }
 
