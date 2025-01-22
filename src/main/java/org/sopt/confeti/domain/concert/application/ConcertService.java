@@ -51,7 +51,7 @@ public class ConcertService {
 
     @Transactional(readOnly = true)
     public List<Concert> getRecentConcerts(final int size) {
-        return concertRepository.findAllByConcertEndAtLessThan(
+        return concertRepository.findAllByConcertEndAtGreaterThanEqual(
                 LocalDateTime.now(),
                 getPageRequest(size, getRecentConcertsSort())
         );
