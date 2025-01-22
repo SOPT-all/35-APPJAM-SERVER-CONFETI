@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.festival.infra.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.sopt.confeti.domain.festival.Festival;
@@ -71,4 +72,6 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             final @Param("userId") long userId,
             final @Param("festivalId") long festivalId
     );
+
+    List<Festival> findAllByFestivalEndAtLessThan(final LocalDateTime now, final PageRequest pageRequest);
 }
