@@ -5,12 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.dto.request.CreateFestivalRequest;
 import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
+import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -62,5 +64,13 @@ public class PerformanceController {
     ) {
         PerformanceReservationDTO performanceReservationDTO = performanceFacade.getPerformReservationInfo(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, PerformanceReservationResponse.of(performanceReservationDTO, s3FileHandler));
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<BaseResponse<?>> getRecentPerformances(
+            @RequestHeader(name = "Authorization", required = false) Long userId
+    ) {
+        RecentPerformancesDTO recentPerformances = performanceFacade.getRecentPerformances(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, RecentPerformancesResponse.of(recentPerformances, s3FileHandler));
     }
 }
