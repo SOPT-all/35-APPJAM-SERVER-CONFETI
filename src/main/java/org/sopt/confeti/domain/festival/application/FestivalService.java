@@ -72,10 +72,6 @@ public class FestivalService {
         return PageRequest.of(INIT_PAGE, size, sort);
     }
 
-    private PageRequest getPageRequest(final int size) {
-        return PageRequest.of(INIT_PAGE, size);
-    }
-
     private Sort getFestivalSort() {
         return Sort.by(
                 Order.asc(FESTIVAL_TITLE_COLUMN_NAME)
@@ -97,6 +93,7 @@ public class FestivalService {
         );
     }
 
+    @Transactional(readOnly = true)
     public Optional<FestivalCursorDTO> findFestivalCursor(final long userId, final long festivalId) {
         return festivalRepository.findFestivalCursor(userId, festivalId);
     }
