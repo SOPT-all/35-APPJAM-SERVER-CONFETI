@@ -32,4 +32,5 @@ public enum ErrorMessage {
 
     private final HttpStatus httpStatus;
     private final String message;
+
 }
