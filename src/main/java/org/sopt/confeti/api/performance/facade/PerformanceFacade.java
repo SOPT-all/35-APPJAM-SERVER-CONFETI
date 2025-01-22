@@ -3,9 +3,6 @@ package org.sopt.confeti.api.performance.facade;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
@@ -22,16 +19,11 @@ import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivalfavorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.user.application.UserService;
-import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
-import org.sopt.confeti.domain.view.performance.application.dto.request.GetPerformanceIdRequest;
-import org.sopt.confeti.domain.view.performance.application.dto.response.GetPerformanceIdResponse;
-import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
-import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
