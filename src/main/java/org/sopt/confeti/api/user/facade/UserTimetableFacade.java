@@ -133,10 +133,7 @@ public class UserTimetableFacade {
         }
 
         // 커서 값 조회
-        FestivalCursorDTO festivalCursorDTO = festivalService.findFestivalCursor(userId, cursor)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
+        FestivalCursorDTO festivalCursorDTO = getFestivalCursor(userId, cursor);
 
         List<Festival> festivals = festivalService.findFestivalsUsingCursor(userId, festivalCursorDTO.cursorTitle(), festivalCursorDTO.cursorIsFavorite(), TIMETABLE_FESTIVALS_TO_ADD_SIZE);
         return CursorPage.of(
@@ -162,6 +159,14 @@ public class UserTimetableFacade {
         if (!userService.existsById(userId)) {
             throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public FestivalCursorDTO getFestivalCursor(final long userId, final long cursor) {
+        return festivalService.findFestivalCursor(userId, cursor)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
     }
 }
 
