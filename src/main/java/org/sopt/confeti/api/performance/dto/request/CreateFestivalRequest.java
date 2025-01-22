@@ -11,12 +11,12 @@ public record CreateFestivalRequest(
         String festivalTitle,
         @JsonProperty(value = "festival_subtitle")
         String festivalSubtitle,
-        @JsonFormat(pattern = "yyyy.MM.dd")
+        @JsonFormat(pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
         @JsonProperty(value = "festival_start_at")
-        LocalDateTime festivalStartAt,
-        @JsonFormat(pattern = "yyyy.MM.dd")
+        LocalDate festivalStartAt,
+        @JsonFormat(pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
         @JsonProperty(value = "festival_end_at")
-        LocalDateTime festivalEndAt,
+        LocalDate festivalEndAt,
         @JsonProperty(value = "festival_area")
         String festivalArea,
         @JsonProperty(value = "festival_poster_path")
@@ -29,9 +29,9 @@ public record CreateFestivalRequest(
         String festivalReservationBgPath,
         @JsonProperty(value = "festival_logo_path")
         String festivalLogoPath,
-        @JsonFormat(pattern = "yyyy.MM.dd")
+        @JsonFormat(pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
         @JsonProperty(value = "reserve_at")
-        LocalDateTime reserveAt,
+        LocalDate reserveAt,
         @JsonProperty(value = "reservation_url")
         String reservationUrl,
         @JsonProperty(value = "reservation_office")

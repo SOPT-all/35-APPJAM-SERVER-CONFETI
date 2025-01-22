@@ -54,7 +54,7 @@ public class PerformanceController {
     public ResponseEntity<BaseResponse<?>> createConcert(@RequestBody CreateFestivalRequest createFestivalRequest) {
         performanceFacade.createFestival(CreateFestivalDTO.from(createFestivalRequest));
 
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+        return ApiResponseUtil.success(SuccessMessage.CREATED);
     }
 
     @GetMapping("/reservation")
