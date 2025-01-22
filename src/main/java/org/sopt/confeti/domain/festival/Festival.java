@@ -9,12 +9,9 @@ import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festivaldate.FestivalDate;
 import org.sopt.confeti.domain.festivalfavorite.FestivalFavorite;
 import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.sopt.confeti.domain.user.User;
 
 @Entity
 @Table(name="festivals")
@@ -33,10 +30,10 @@ public class Festival {
     private String festivalSubtitle;
 
     @Column(nullable = false)
-    private LocalDate festivalStartAt;
+    private LocalDateTime festivalStartAt;
 
     @Column(nullable = false)
-    private LocalDate festivalEndAt;
+    private LocalDateTime festivalEndAt;
 
     @Column(length = 100, nullable = false)
     private String festivalArea;
@@ -57,7 +54,7 @@ public class Festival {
     private String festivalLogoPath;
 
     @Column(nullable = false)
-    private LocalDate reserveAt;
+    private LocalDateTime reserveAt;
 
     @Column(length = 250, nullable = false)
     private String reservationUrl;
@@ -84,11 +81,11 @@ public class Festival {
     private List<TimetableFestival> timetableFestivals = new ArrayList<>();
 
     @Builder
-    public Festival(String festivalTitle, String festivalSubtitle, LocalDate festivalStartAt,
-                    LocalDate festivalEndAt, String festivalArea, String festivalPosterPath,
+    public Festival(String festivalTitle, String festivalSubtitle, LocalDateTime festivalStartAt,
+                    LocalDateTime festivalEndAt, String festivalArea, String festivalPosterPath,
                     String festivalPosterBgPath,
                     String festivalInfoImgPath, String festivalReservationBgPath, String festivalLogoPath,
-                    LocalDate reserveAt, String reservationUrl, String reservationOffice, String ageRating,
+                    LocalDateTime reserveAt, String reservationUrl, String reservationOffice, String ageRating,
                     String time,
                     String price, List<FestivalDate> dates) {
         this.festivalTitle = festivalTitle;

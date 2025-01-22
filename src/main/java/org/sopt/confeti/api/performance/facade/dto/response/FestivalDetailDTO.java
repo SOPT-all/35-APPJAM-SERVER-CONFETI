@@ -1,6 +1,5 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.sopt.confeti.domain.festival.Festival;
@@ -10,15 +9,15 @@ public record FestivalDetailDTO(
         long festivalId,
         String festivalTitle,
         String festivalSubtitle,
-        LocalDate festivalStartAt,
-        LocalDate festivalEndAt,
+        LocalDateTime festivalStartAt,
+        LocalDateTime festivalEndAt,
         String festivalArea,
         String festivalPosterUrl,
         String festivalPosterBgUrl,
         String festivalInfoImgUrl,
         String festivalReservationBgUrl,
         String festivalLogoUrl,
-        LocalDate reserveAt,
+        LocalDateTime reserveAt,
         String reservationUrl,
         String reservationOffice,
         String ageRating,

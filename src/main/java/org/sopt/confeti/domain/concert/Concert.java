@@ -5,12 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.concertartist.ConcertArtist;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
 
 @Entity
 @Table(name="concerts")
@@ -29,10 +26,10 @@ public class Concert {
     private String concertSubtitle;
 
     @Column(nullable = false)
-    private LocalDate concertStartAt;
+    private LocalDateTime concertStartAt;
 
     @Column(nullable = false)
-    private LocalDate concertEndAt;
+    private LocalDateTime concertEndAt;
 
     @Column(length = 100, nullable = false)
     private String concertArea;
