@@ -1,6 +1,5 @@
 package org.sopt.confeti.api.performance.facade.dto.request;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.sopt.confeti.api.performance.dto.request.CreateFestivalRequest;
@@ -28,15 +27,15 @@ public record CreateFestivalDTO(
         return new CreateFestivalDTO(
                 createFestivalRequest.festivalTitle(),
                 createFestivalRequest.festivalSubtitle(),
-                createFestivalRequest.festivalStartAt(),
-                createFestivalRequest.festivalEndAt(),
+                createFestivalRequest.festivalStartAt().atStartOfDay(),
+                createFestivalRequest.festivalEndAt().atStartOfDay(),
                 createFestivalRequest.festivalArea(),
                 createFestivalRequest.festivalPosterPath(),
                 createFestivalRequest.festivalPosterBgPath(),
                 createFestivalRequest.festivalInfoImgPath(),
                 createFestivalRequest.festivalReservationBgPath(),
                 createFestivalRequest.festivalLogoPath(),
-                createFestivalRequest.reserveAt(),
+                createFestivalRequest.reserveAt().atStartOfDay(),
                 createFestivalRequest.reservationUrl(),
                 createFestivalRequest.reservationOffice(),
                 createFestivalRequest.ageRating(),

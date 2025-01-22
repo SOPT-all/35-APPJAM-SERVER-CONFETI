@@ -52,7 +52,8 @@ public class PerformanceFacade {
 
     @Transactional
     public void createFestival(final CreateFestivalDTO createFestivalDTO) {
-        festivalService.create(createFestivalDTO);
+        Festival festival = festivalService.create(createFestivalDTO);
+        performanceService.create(festival);
     }
 
     @Transactional(readOnly = true)
