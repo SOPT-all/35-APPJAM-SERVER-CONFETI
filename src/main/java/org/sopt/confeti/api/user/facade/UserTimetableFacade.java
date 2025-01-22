@@ -34,6 +34,8 @@ import java.util.List;
 public class UserTimetableFacade {
 
     private static final int TIMETABLE_FESTIVAL_COUNT_MAXIMUM = 3;
+    private static final int NEXT_CURSOR_SIZE = 1;
+    private static final int TIMETABLE_FESTIVALS_TO_ADD_SIZE = 6 + NEXT_CURSOR_SIZE;
 
     private final UserService userService;
     private final TimetableFestivalService timetableFestivalService;
@@ -119,14 +121,14 @@ public class UserTimetableFacade {
     }
 
     @Transactional(readOnly = true)
-    public CursorPage<TimetableToAddDTO> getTimetablesToAdd(final long userId, final Long cursor, final int size) {
+    public CursorPage<TimetableToAddDTO> getTimetablesToAdd(final long userId, final Long cursor) {
         if (cursor == null) {
-            List<Festival> festivals = festivalService.findFestivalsUsingInitCursor(userId, size);
+            List<Festival> festivals = festivalService.findFestivalsUsingInitCursor(userId, TIMETABLE_FESTIVALS_TO_ADD_SIZE);
             return CursorPage.of(
                     festivals.stream()
                             .map(TimetableToAddDTO::from)
                             .toList(),
-                    size
+                    TIMETABLE_FESTIVALS_TO_ADD_SIZE
             );
         }
 
@@ -136,12 +138,12 @@ public class UserTimetableFacade {
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
 
-        List<Festival> festivals = festivalService.findFestivalsUsingCursor(userId, festivalCursorDTO.cursorTitle(), festivalCursorDTO.cursorIsFavorite(), size);
+        List<Festival> festivals = festivalService.findFestivalsUsingCursor(userId, festivalCursorDTO.cursorTitle(), festivalCursorDTO.cursorIsFavorite(), TIMETABLE_FESTIVALS_TO_ADD_SIZE);
         return CursorPage.of(
                 festivals.stream()
                         .map(TimetableToAddDTO::from)
                         .toList(),
-                size
+                TIMETABLE_FESTIVALS_TO_ADD_SIZE
         );
     }
 

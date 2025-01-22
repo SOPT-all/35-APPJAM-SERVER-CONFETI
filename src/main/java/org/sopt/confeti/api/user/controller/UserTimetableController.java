@@ -33,8 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/user/timetables/festivals")
 public class UserTimetableController {
-    private static final String DEFAULT_PAGING_SIZE = "3";
-    private static final int NEXT_CURSOR_SIZE = 1;
 
     private final UserTimetableFacade userTimetableFacade;
     private final S3FileHandler s3FileHandler;
@@ -48,10 +46,9 @@ public class UserTimetableController {
     @GetMapping("/add")
     public ResponseEntity<BaseResponse<?>> getTimetablesToAdd(
             @RequestHeader("Authorization") long userId,
-            @RequestParam(name = "cursor", required = false) Long cursor,
-            @RequestParam(name = "size", required = false, defaultValue = DEFAULT_PAGING_SIZE) int size
+            @RequestParam(name = "cursor", required = false) Long cursor
     ) {
-        CursorPage<TimetableToAddDTO> timetablesToAdd = userTimetableFacade.getTimetablesToAdd(userId, cursor, size + NEXT_CURSOR_SIZE);
+        CursorPage<TimetableToAddDTO> timetablesToAdd = userTimetableFacade.getTimetablesToAdd(userId, cursor);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, TimetablesToAddResponse.of(timetablesToAdd, s3FileHandler));
     }
 
