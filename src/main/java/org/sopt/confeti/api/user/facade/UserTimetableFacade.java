@@ -1,6 +1,8 @@
 package org.sopt.confeti.api.user.facade;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
@@ -16,10 +18,12 @@ import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivaldate.FestivalDate;
 import org.sopt.confeti.domain.festivaldate.application.FestivalDateService;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
+import org.sopt.confeti.domain.festivaltime.FestivalTime;
 import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 import org.sopt.confeti.domain.timetablefestival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
+import org.sopt.confeti.domain.usertimetable.UserTimetable;
 import org.sopt.confeti.domain.usertimetable.application.UserTimetableService;
 import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.exception.ConflictException;
@@ -30,6 +34,7 @@ import org.sopt.confeti.global.util.artistsearcher.ArtistResolver;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Facade
 @RequiredArgsConstructor
@@ -150,10 +155,20 @@ public class UserTimetableFacade {
     public UserTimetableFestivalBasicDTO getTimetableInfo(final long userId, final long festivalDateId) {
         validateUserExists(userId);
 
-        FestivalDate festivalDate = festivalDateService.findFestivalDateId(userId, festivalDateId);
+        FestivalDate festivalDate = festivalDateService.findFestivalDateId(festivalDateId);
         artistResolver.load(festivalDate);
 
-        return UserTimetableFestivalBasicDTO.from(festivalDate);
+        List<Long> festivalTimeIds = festivalDate.getStages().stream()
+                .flatMap(festivalStage -> festivalStage.getTimes().stream())
+                .map(FestivalTime::getId)
+                .toList();
+
+        List<UserTimetable> userTimetables = userTimetableService.getUserTimetables(userId, festivalTimeIds);
+
+        Map<Long, UserTimetable> userTimetableMapper = userTimetables.stream()
+                .collect(Collectors.toMap(UserTimetable::getId, Function.identity()));
+
+        return UserTimetableFestivalBasicDTO.of(festivalDate, userTimetableMapper);
     }
 
     @Transactional(readOnly = true)

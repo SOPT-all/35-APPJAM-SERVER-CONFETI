@@ -5,23 +5,22 @@ import org.sopt.confeti.domain.usertimetable.UserTimetable;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 
 public record UserTimetableFestivalTimeDTO (
-        long festivalTimeId,
+        long userTimetableId,
         LocalTime startAt,
         LocalTime endAt,
         boolean isSelected,
         List<UserTimetableFestivalArtistDTO> artists
 ){
-    public static UserTimetableFestivalTimeDTO from(FestivalTime festivalTime) {
+    public static UserTimetableFestivalTimeDTO of(FestivalTime festivalTime, Map<Long, UserTimetable> userTimetables) {
         return new UserTimetableFestivalTimeDTO(
-                festivalTime.getId(),
+                userTimetables.get(festivalTime.getId()).getId(),
                 festivalTime.getStartAt(),
                 festivalTime.getEndAt(),
-                festivalTime.getTimetables()
-                        .stream()
-                        .anyMatch(UserTimetable::isSelected),
+                userTimetables.get(festivalTime.getId()).isSelected(),
                 festivalTime.getArtists()
                         .stream()
                         .map(UserTimetableFestivalArtistDTO::from)
