@@ -73,5 +73,5 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             final @Param("festivalId") long festivalId
     );
 
-    List<Festival> findAllByFestivalEndAtLessThan(final LocalDateTime now, final PageRequest pageRequest);
+    List<Festival> findAllByFestivalEndAtGreaterThanEqual(final LocalDateTime now, final PageRequest pageRequest);
 }

@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ConcertRepository extends JpaRepository<Concert, Long> {
 
-    List<Concert> findAllByConcertEndAtLessThan(final LocalDateTime localDateTime, PageRequest pageRequest);
+    List<Concert> findAllByConcertEndAtGreaterThanEqual(final LocalDateTime localDateTime, PageRequest pageRequest);
 }

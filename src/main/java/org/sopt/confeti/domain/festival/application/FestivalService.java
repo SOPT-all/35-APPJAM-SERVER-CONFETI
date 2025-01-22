@@ -105,7 +105,7 @@ public class FestivalService {
 
     @Transactional(readOnly = true)
     public List<Festival> getRecentFestivals(final int size) {
-        return festivalRepository.findAllByFestivalEndAtLessThan(
+        return festivalRepository.findAllByFestivalEndAtGreaterThanEqual(
                 LocalDateTime.now(),
                 getPageRequest(size, getRecentFestivalsSort())
         );
