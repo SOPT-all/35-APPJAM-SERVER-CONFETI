@@ -8,6 +8,8 @@ import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -17,10 +19,9 @@ public class FestivalDateService {
 
     @Transactional(readOnly = true)
     public FestivalDate findFestivalDateId(final long userId, final long festivalDateId) {
-        FestivalDate festivalInfo =  festivalDateRepository.findByFestivalDateId(userId, festivalDateId);
-        if (festivalInfo == null) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
-        return festivalInfo;
+        return festivalDateRepository.findByFestivalDateId(userId, festivalDateId)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
     }
 }

@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface FestivalDateRepository extends JpaRepository<FestivalDate, Long> {
     @Query("SELECT f " +
             " FROM FestivalDate f " +
@@ -16,7 +18,7 @@ public interface FestivalDateRepository extends JpaRepository<FestivalDate, Long
             " WHERE tf.user.id = :userId AND f.id = :festivalDateId"
     )
 
-    FestivalDate findByFestivalDateId(
+    Optional<FestivalDate> findByFestivalDateId(
             @Param("userId") long userId,
             @Param("festivalDateId") long festivalDateId);
 }
