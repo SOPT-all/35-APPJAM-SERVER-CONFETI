@@ -1,6 +1,5 @@
 package org.sopt.confeti.domain.festival.application;
 
-import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -32,9 +31,8 @@ public class FestivalService {
 
     @Transactional(readOnly = true)
     public Festival findById(Long festivalId) {
-        Festival festival = festivalRepository.findById(festivalId)
+        return festivalRepository.findById(festivalId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-        return festival;
     }
 
     @Transactional(readOnly = true)
