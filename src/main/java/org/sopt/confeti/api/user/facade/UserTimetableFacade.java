@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalArtiestDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
+import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
+import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
@@ -14,20 +16,17 @@ import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivaldate.FestivalDate;
 import org.sopt.confeti.domain.festivaldate.application.FestivalDateService;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
-import org.sopt.confeti.domain.festivaldate.FestivalDate;
-import org.sopt.confeti.domain.festivaldate.application.FestivalDateService;
 import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 import org.sopt.confeti.domain.timetablefestival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
+import org.sopt.confeti.domain.usertimetable.application.UserTimetableService;
 import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.artistsearcher.ArtistResolver;
-import org.sopt.confeti.global.util.artistsearcher.ArtistResolver;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -45,8 +44,8 @@ public class UserTimetableFacade {
     private final FestivalService festivalService;
     private final FestivalDateService festivalDateService;
     private final ArtistResolver artistResolver;
+    private final UserTimetableService userTimetableService;
 
-    @Transactional(readOnly = true)
     public UserTimetableDTO getTimetablesListAndDate(long userId) {
         validateExistUser(userId);
 
@@ -170,6 +169,12 @@ public class UserTimetableFacade {
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
+    }
+
+    @Transactional
+    public void patchTimetableFestivals(final long userId, final PatchTimetableDTO timetableDTO) {
+        validateUserExists(userId);
+        userTimetableService.patchTimetableFestival(userId, timetableDTO);
     }
 }
 
