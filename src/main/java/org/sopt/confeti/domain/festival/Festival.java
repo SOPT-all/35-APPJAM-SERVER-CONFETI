@@ -12,6 +12,7 @@ import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.sopt.confeti.domain.user.User;
 
 @Entity
 @Table(name="festivals")
@@ -54,7 +55,7 @@ public class Festival {
     private String festivalLogoPath;
 
     @Column(nullable = false)
-    private LocalDateTime reserveAt;
+    private LocalDate reserveAt;
 
     @Column(length = 250, nullable = false)
     private String reservationUrl;
