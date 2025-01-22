@@ -7,7 +7,7 @@ import java.util.List;
 
 public record UserTimetableFestivalResponse (
         String ticketOpenAt,
-        Integer stageCount,
+        int stageCount,
         List<UserTimetableFestivalStageResponse> stages
 ){
     public static UserTimetableFestivalResponse from(UserTimetableFestivalBasicDTO timetableFestival) {

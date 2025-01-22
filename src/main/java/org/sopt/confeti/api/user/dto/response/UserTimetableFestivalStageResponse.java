@@ -5,7 +5,7 @@ import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalStageD
 import java.util.List;
 
 public record UserTimetableFestivalStageResponse(
-        Integer stageOrder,
+        int stageOrder,
         String stageName,
         List<UserTimetableFestivalTimeResponse> festivalTimes
 ){
