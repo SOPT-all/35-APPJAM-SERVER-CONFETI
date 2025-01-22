@@ -59,7 +59,6 @@ public class FestivalService {
         return festivalRepository.findFestivalsByIdIn(festivalIds);
     }
 
-
     @Transactional(readOnly = true)
     public List<Festival> findFestivalsUsingInitCursor(final long userId, final int size) {
         return festivalRepository.findFestivalsUsingInitCursor(
