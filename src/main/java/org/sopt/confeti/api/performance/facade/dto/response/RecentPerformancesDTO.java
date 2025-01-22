@@ -1,6 +1,5 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
