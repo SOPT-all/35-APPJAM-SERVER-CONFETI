@@ -46,7 +46,7 @@ public class Concert {
     @Column(length = 250, nullable = false)
     private String concertInfoImgPath;
 
-    @Column(length = 250, nullable = false)
+    @Column(length = 250) // 나중에 nullable = false로 수정
     private String concertReservationBgPath;
 
     @Column(nullable = false)

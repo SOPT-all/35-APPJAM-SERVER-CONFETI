@@ -50,7 +50,7 @@ public class Festival {
     @Column(length = 250, nullable = false)
     private String festivalInfoImgPath;
 
-    @Column(length = 250)
+    @Column(length = 250) // 나중에 nullable = false로 수정
     private String festivalReservationBgPath;
 
     @Column(length = 250)
