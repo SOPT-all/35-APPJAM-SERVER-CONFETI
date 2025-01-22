@@ -21,7 +21,8 @@ public record ConcertDetailInfoResponse(
         String ageRating,
         String reservationOffice,
         String price,
-        String infoImgUrl
+        String infoImgUrl,
+        boolean isFavorite
 ) {
     public static ConcertDetailInfoResponse of(final ConcertDetailDTO concertDetailDTO, final S3FileHandler s3FileHandler) {
         return new ConcertDetailInfoResponse(
@@ -39,7 +40,8 @@ public record ConcertDetailInfoResponse(
                 concertDetailDTO.ageRating(),
                 concertDetailDTO.reservationOffice(),
                 concertDetailDTO.price(),
-                s3FileHandler.getFileUrl(concertDetailDTO.infoImgPath())
+                s3FileHandler.getFileUrl(concertDetailDTO.infoImgPath()),
+                concertDetailDTO.isFavorite()
         );
     }
 }
