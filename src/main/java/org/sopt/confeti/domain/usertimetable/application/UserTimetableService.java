@@ -38,7 +38,5 @@ public class UserTimetableService {
                 timetable.setIsSelected(isSelected);
             }
         }
-
-        userTimetableRepository.saveAll(userTimetables);
     }
 }
