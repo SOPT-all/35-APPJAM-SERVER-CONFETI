@@ -31,7 +31,7 @@ public record RecentPerformanceDTO(
         return new RecentPerformanceDTO(
                 performanceId,
                 festival.getId(),
-                PerformanceType.CONCERT,
+                PerformanceType.FESTIVAL,
                 festival.getFestivalTitle(),
                 festival.getFestivalSubtitle(),
                 festival.getFestivalStartAt(),
