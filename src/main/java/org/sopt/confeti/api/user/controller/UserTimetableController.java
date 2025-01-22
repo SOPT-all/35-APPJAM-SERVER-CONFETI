@@ -5,10 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.request.AddTimetableFestivalRequest;
 import org.sopt.confeti.api.user.dto.response.TimetablesToAddResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetableDetailResponse;
+import org.sopt.confeti.api.user.dto.response.UserTimetableFestivalResponse;
 import org.sopt.confeti.api.user.facade.UserTimetableFacade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.message.SuccessMessage;
@@ -66,5 +68,14 @@ public class UserTimetableController {
     ) {
         userTimetableFacade.removeTimetableFestival(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @GetMapping("/{festivalDateId}")
+    public ResponseEntity<BaseResponse<?>> getTimetableFestival(
+            @RequestHeader("Authorization") long userId,
+            @PathVariable(name = "festivalDateId") @Min(value=0, message="요청 형식이 올바르지 않습니다.") long festivalDateId
+    ){
+        UserTimetableFestivalBasicDTO response = userTimetableFacade.getTimetableInfo(userId, festivalDateId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetableFestivalResponse.from(response));
     }
 }
