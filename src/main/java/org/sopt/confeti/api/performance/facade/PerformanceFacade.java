@@ -1,6 +1,6 @@
 package org.sopt.confeti.api.performance.facade;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     protected void validateConcertNotPassed(final Concert concert) {
-        if (LocalDate.now().isAfter(concert.getConcertEndAt())) {
+        if (LocalDateTime.now().isAfter(concert.getConcertEndAt())) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
@@ -76,7 +76,7 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     protected void validateFestivalNotPassed(final Festival festival) {
-        if (LocalDate.now().isAfter(festival.getFestivalEndAt())) {
+        if (LocalDateTime.now().isAfter(festival.getFestivalEndAt())) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
