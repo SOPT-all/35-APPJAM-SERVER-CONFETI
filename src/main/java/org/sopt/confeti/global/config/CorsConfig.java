@@ -20,6 +20,7 @@ public class CorsConfig {
         allowedOriginPatterns.add("http://localhost:5174");
         allowedOriginPatterns.add("https://35-appjam-web-confeti.vercel.app/");
         allowedOriginPatterns.add("https://confeti.co.kr");
+        allowedOriginPatterns.add("https://www.confeti.co.kr");
         allowedOriginPatterns.add("https://confeti.xyz");
         allowedOriginPatterns.add("https://api.confeti.xyz");
         configuration.setAllowedOrigins(allowedOriginPatterns);
