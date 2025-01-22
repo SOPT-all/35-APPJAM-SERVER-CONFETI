@@ -39,4 +39,9 @@ public class UserTimetableService {
             }
         }
     }
+
+    @Transactional(readOnly = true)
+    public List<UserTimetable> getUserTimetables(final long userId, final List<Long> festivalTimeIds) {
+        return userTimetableRepository.findByUserIdAndFestivalTimeIds(userId, festivalTimeIds);
+    }
 }

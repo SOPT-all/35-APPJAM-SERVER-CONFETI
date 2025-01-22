@@ -11,4 +11,13 @@ public interface UserTimetableRepository extends JpaRepository<UserTimetable, Lo
 
     @Query("SELECT ut FROM UserTimetable ut WHERE ut.timetableFestival.user.id = :userId")
     List<UserTimetable> findByUserId(@Param("userId") long userId);
+
+    @Query(value =
+            "SELECT DISTINCT ut" +
+                    " FROM UserTimetable ut" +
+                    " JOIN FETCH ut.timetableFestival tf" +
+                    " WHERE tf.user.id = :userId" +
+                    " AND ut.festivalTime.id IN :festivalTimeIds"
+    )
+    List<UserTimetable> findByUserIdAndFestivalTimeIds(final long userId, final List<Long> festivalTimeIds);
 }

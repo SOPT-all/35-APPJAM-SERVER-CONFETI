@@ -13,12 +13,8 @@ public interface FestivalDateRepository extends JpaRepository<FestivalDate, Long
             " JOIN f.stages s " +
             " JOIN s.times t " +
             " JOIN t.artists a " +
-            " JOIN t.timetables ut " +
-            " JOIN ut.timetableFestival tf " +
-            " WHERE tf.user.id = :userId AND f.id = :festivalDateId"
+            " WHERE f.id = :festivalDateId"
     )
-
     Optional<FestivalDate> findByFestivalDateId(
-            @Param("userId") long userId,
             @Param("festivalDateId") long festivalDateId);
 }

@@ -6,7 +6,7 @@ import org.sopt.confeti.global.util.DateConvertor;
 import java.util.List;
 
 public record UserTimetableFestivalTimeResponse(
-        Long festivalTimeId,
+        Long userTimetableId,
         String startAt,
         String endAt,
         Boolean isSelected,
@@ -14,7 +14,7 @@ public record UserTimetableFestivalTimeResponse(
 ) {
     public static UserTimetableFestivalTimeResponse from(UserTimetableFestivalTimeDTO festivalTime) {
         return new UserTimetableFestivalTimeResponse(
-                festivalTime.festivalTimeId(),
+                festivalTime.userTimetableId(),
                 DateConvertor.convert(festivalTime.startAt()),
                 DateConvertor.convert(festivalTime.endAt()),
                 festivalTime.isSelected(),
