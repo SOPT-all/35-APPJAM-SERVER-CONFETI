@@ -38,7 +38,7 @@ public class Festival {
     @Column(nullable = false)
     private LocalDate festivalEndAt;
 
-    @Column(length = 30, nullable = false)
+    @Column(length = 100, nullable = false)
     private String festivalArea;
 
     @Column(length = 250, nullable = false)
@@ -62,7 +62,7 @@ public class Festival {
     @Column(length = 250, nullable = false)
     private String reservationUrl;
 
-    @Column(length = 30, nullable = false)
+    @Column(length = 50, nullable = false)
     private String reservationOffice;
 
     @Column(length = 30, nullable = false)
@@ -71,7 +71,7 @@ public class Festival {
     @Column(name = "times", length = 30, nullable = false)
     private String time;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 200, nullable = false)
     private String price;
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
