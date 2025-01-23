@@ -6,10 +6,10 @@ import java.time.LocalTime;
 import java.util.List;
 
 public record CreateFestivalTimeRequest(
-        @JsonFormat(pattern = "HH:mm:ss")
+        @JsonFormat(pattern = "HH:mm:ss", timezone = "Asia/Seoul")
         @JsonProperty(value = "start_at")
         LocalTime startAt,
-        @JsonFormat(pattern = "HH:mm:ss")
+        @JsonFormat(pattern = "HH:mm:ss", timezone = "Asia/Seoul")
         @JsonProperty(value = "end_at")
         LocalTime endAt,
         @JsonProperty(value = "festival_artists")

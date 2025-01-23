@@ -18,17 +18,14 @@ public class ArtistFacade {
 
     @Transactional(readOnly = true)
     public SearchArtistDTO searchByKeyword(final Long userId, final String keyword) {
-        Optional<ConfetiArtist> confetiArtist = spotifyAPIHandler.findArtistsByKeyword(keyword);
+        ConfetiArtist confetiArtist = spotifyAPIHandler.findArtistsByKeyword(keyword);
 
         boolean isFavorite = false;
 
-        if (confetiArtist.isPresent() && userId != null) {
-            isFavorite = artistFavoriteService.isFavorite(userId, confetiArtist.get().getArtistId());
+        if (userId != null) {
+            isFavorite = artistFavoriteService.isFavorite(userId, confetiArtist.getArtistId());
         }
 
-        return SearchArtistDTO.from(
-                confetiArtist.orElse(ConfetiArtist.empty()),
-                isFavorite
-        );
+        return SearchArtistDTO.from(confetiArtist, isFavorite);
     }
 }

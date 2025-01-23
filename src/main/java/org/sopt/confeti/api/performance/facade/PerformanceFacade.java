@@ -36,11 +36,20 @@ public class PerformanceFacade {
     private final ConcertFavoriteService concertFavoriteService;
 
     @Transactional(readOnly = true)
-    public ConcertDetailDTO getConcertDetailInfo(final long concertId) {
+    public ConcertDetailDTO getConcertDetailInfo(final Long userId, final long concertId) {
         Concert concert = concertService.getConcertDetailByConcertId(concertId);
         validateConcertNotPassed(concert);
 
-        return ConcertDetailDTO.from(concert);
+        return ConcertDetailDTO.of(concert, getConcertFavorite(userId, concertId));
+    }
+
+    @Transactional(readOnly = true)
+    public boolean getConcertFavorite(final Long userId, final long concertId) {
+        if (userId == null) {
+            return false;
+        }
+
+        return concertFavoriteService.isFavorite(userId, concertId);
     }
 
     @Transactional(readOnly = true)
@@ -52,7 +61,8 @@ public class PerformanceFacade {
 
     @Transactional
     public void createFestival(final CreateFestivalDTO createFestivalDTO) {
-        festivalService.create(createFestivalDTO);
+        Festival festival = festivalService.create(createFestivalDTO);
+        performanceService.create(festival);
     }
 
     @Transactional(readOnly = true)

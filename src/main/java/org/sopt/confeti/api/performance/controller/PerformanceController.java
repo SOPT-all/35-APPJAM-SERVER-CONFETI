@@ -39,7 +39,7 @@ public class PerformanceController {
             @RequestHeader(name = "Authorization", required = false) Long userId,
             @PathVariable("concertId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long concertId
     ) {
-        ConcertDetailDTO concertDetailDTO = performanceFacade.getConcertDetailInfo(concertId);
+        ConcertDetailDTO concertDetailDTO = performanceFacade.getConcertDetailInfo(userId, concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, ConcertDetailResponse.of(concertDetailDTO, s3FileHandler));
     }
 
@@ -54,7 +54,7 @@ public class PerformanceController {
     public ResponseEntity<BaseResponse<?>> createConcert(@RequestBody CreateFestivalRequest createFestivalRequest) {
         performanceFacade.createFestival(CreateFestivalDTO.from(createFestivalRequest));
 
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+        return ApiResponseUtil.success(SuccessMessage.CREATED);
     }
 
     @GetMapping("/reservation")

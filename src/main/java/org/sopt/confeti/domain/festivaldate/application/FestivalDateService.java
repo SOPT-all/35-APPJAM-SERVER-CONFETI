@@ -18,8 +18,8 @@ public class FestivalDateService {
     private final FestivalDateRepository festivalDateRepository;
 
     @Transactional(readOnly = true)
-    public FestivalDate findFestivalDateId(final long userId, final long festivalDateId) {
-        return festivalDateRepository.findByFestivalDateId(userId, festivalDateId)
+    public FestivalDate findFestivalDateId(final long festivalDateId) {
+        return festivalDateRepository.findByFestivalDateId(festivalDateId)
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
