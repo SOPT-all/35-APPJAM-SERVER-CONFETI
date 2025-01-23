@@ -19,5 +19,8 @@ public interface UserTimetableRepository extends JpaRepository<UserTimetable, Lo
                     " WHERE tf.user.id = :userId" +
                     " AND ut.festivalTime.id IN :festivalTimeIds"
     )
-    List<UserTimetable> findByUserIdAndFestivalTimeIds(final long userId, final List<Long> festivalTimeIds);
+    List<UserTimetable> findByUserIdAndFestivalTimeIds(
+            final @Param("userId") long userId,
+            final @Param("festivalTimeIds") List<Long> festivalTimeIds
+    );
 }
