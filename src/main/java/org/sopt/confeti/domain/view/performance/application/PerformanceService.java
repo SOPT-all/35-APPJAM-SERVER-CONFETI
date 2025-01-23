@@ -46,15 +46,15 @@ public class PerformanceService {
                 festival.getDates().stream()
                         .flatMap(festivalDate -> festivalDate.getStages().stream())
                         .flatMap(festivalStage -> festivalStage.getTimes().stream())
-                        .flatMap(festivalTime -> festivalTime.getArtists().stream())
-                        .map(artist -> Performance.create(festival, artist.getArtist().getArtistId()))
-                        .toList()
+                        .flatMap(festivalTime -> festivalTime.getArtists().stream()
+                                .map(festivalArtist -> Performance.create(festival, festivalArtist.getArtist().getArtistId(), festivalTime.getStartAt()))
+                        ).toList()
         );
     }
 
     @Transactional(readOnly = true)
     public List<Performance> getPerformancesByArtistIds(final List<String> artistIds, final int size) {
-        return performanceRepository.findPerformancesByArtistIdInAndEndAtGreaterThanEqual(
+        return performanceRepository.findPerformancesByArtistIdInAndPerformanceEndAtGreaterThanEqual(
                 artistIds,
                 LocalDateTime.now(),
                 getPageRequest(size, getRecentPerformancesSort())

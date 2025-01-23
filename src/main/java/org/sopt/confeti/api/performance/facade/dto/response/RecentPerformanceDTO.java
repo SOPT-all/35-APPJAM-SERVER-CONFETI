@@ -46,7 +46,7 @@ public record RecentPerformanceDTO(
                 performance.getType(),
                 performance.getTitle(),
                 performance.getSubtitle(),
-                performance.getStartAt(),
+                performance.getPerformanceStartAt(),
                 performance.getPosterPath()
         );
     }
