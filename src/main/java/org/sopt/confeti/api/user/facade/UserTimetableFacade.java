@@ -167,7 +167,9 @@ public class UserTimetableFacade {
         List<UserTimetable> userTimetables = userTimetableService.getUserTimetables(userId, festivalTimeIds);
 
         Map<Long, UserTimetable> userTimetableMapper = userTimetables.stream()
-                .collect(Collectors.toMap(UserTimetable::getId, Function.identity()));
+                .collect(Collectors.toMap(userTimetable ->
+                        userTimetable.getFestivalTime().getId(), Function.identity())
+                );
 
         return UserTimetableFestivalBasicDTO.of(festivalDate, userTimetableMapper);
     }
