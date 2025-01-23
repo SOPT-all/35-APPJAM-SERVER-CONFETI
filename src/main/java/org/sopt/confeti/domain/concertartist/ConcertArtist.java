@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertArtistDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
 
@@ -24,4 +25,21 @@ public class ConcertArtist {
 
     @Embedded
     private ConfetiArtist artist;
+
+    public void setConcert(Concert concert) {
+        this.concert = concert;
+    }
+
+    @Builder
+    public ConcertArtist(ConfetiArtist artist) {
+        this.artist = artist;
+    }
+
+    public static ConcertArtist create(final CreateConcertArtistDTO concertArtistDTO) {
+        return ConcertArtist.builder()
+                .artist(
+                        ConfetiArtist.from(concertArtistDTO.artistId())
+                )
+                .build();
+    }
 }

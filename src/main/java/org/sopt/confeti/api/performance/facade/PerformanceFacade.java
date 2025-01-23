@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
+import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
@@ -71,6 +72,12 @@ public class PerformanceFacade {
         if (LocalDateTime.now().isAfter(concert.getConcertEndAt())) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
+    }
+
+    @Transactional
+    public void createConcert(final CreateConcertDTO from) {
+        Concert concert = concertService.create(from);
+        performanceService.create(concert);
     }
 
     @Transactional
