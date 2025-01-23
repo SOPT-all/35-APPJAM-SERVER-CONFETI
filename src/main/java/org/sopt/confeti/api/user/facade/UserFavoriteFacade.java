@@ -123,7 +123,7 @@ public class UserFavoriteFacade {
         User user = userService.findById(userId);
         Concert concert = concertService.findById(concertId);
 
-        validateExistConcertFavorite(userId, concertId);
+        validateNotExistConcertFavorite(userId, concertId);
 
         concertFavoriteService.addFavorite(user, concert);
     }
@@ -149,6 +149,13 @@ public class UserFavoriteFacade {
     protected void validateExistConcertFavorite(final long userId, final long concertId) {
         if (!concertFavoriteService.isFavorite(userId, concertId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    protected void validateNotExistConcertFavorite(final long userId, final long concertId) {
+        if (concertFavoriteService.isFavorite(userId, concertId)) {
+            throw new ConflictException(ErrorMessage.CONFLICT);
         }
     }
 

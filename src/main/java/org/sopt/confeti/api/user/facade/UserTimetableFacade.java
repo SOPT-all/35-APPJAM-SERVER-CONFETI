@@ -51,6 +51,7 @@ public class UserTimetableFacade {
     private final ArtistResolver artistResolver;
     private final UserTimetableService userTimetableService;
 
+    @Transactional(readOnly = true)
     public UserTimetableDTO getTimetablesListAndDate(long userId) {
         validateExistUser(userId);
 
