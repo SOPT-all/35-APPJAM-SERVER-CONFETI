@@ -3,6 +3,7 @@ package org.sopt.confeti.api.performance.facade.dto.response;
 import java.time.LocalDateTime;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record RecentPerformanceDTO(
@@ -35,6 +36,18 @@ public record RecentPerformanceDTO(
                 festival.getFestivalSubtitle(),
                 festival.getFestivalStartAt(),
                 festival.getFestivalPosterPath()
+        );
+    }
+
+    public static RecentPerformanceDTO from(final Performance performance) {
+        return new RecentPerformanceDTO(
+                performance.getId(),
+                performance.getTypeId(),
+                performance.getType(),
+                performance.getTitle(),
+                performance.getSubtitle(),
+                performance.getStartAt(),
+                performance.getPosterPath()
         );
     }
 }
