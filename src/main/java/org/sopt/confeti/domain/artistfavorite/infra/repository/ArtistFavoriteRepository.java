@@ -16,4 +16,9 @@ public interface ArtistFavoriteRepository extends JpaRepository<ArtistFavorite, 
     void deleteByUserIdAndArtist_ArtistId(final long userId, final String artistId);
 
     boolean existsByUserId(final long userId);
+
+    @Query(
+            value = "SELECT af FROM ArtistFavorite af JOIN FETCH af.user u WHERE u.id = :userId"
+    )
+    List<ArtistFavorite> findArtistFavoritesByUserId(final @Param("userId") long userId);
 }
