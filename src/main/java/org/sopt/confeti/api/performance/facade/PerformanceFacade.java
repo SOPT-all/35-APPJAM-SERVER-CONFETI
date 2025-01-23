@@ -13,6 +13,8 @@ import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
+import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
+import org.sopt.confeti.domain.artistfavorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concertfavorite.application.ConcertFavoriteService;
@@ -20,6 +22,7 @@ import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festivalfavorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.user.application.UserService;
+import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.request.GetPerformanceIdRequest;
@@ -28,6 +31,7 @@ import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
+import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
@@ -43,6 +47,7 @@ public class PerformanceFacade {
     private final S3FileHandler s3FileHandler;
     private final PerformanceService performanceService;
     private final ConcertFavoriteService concertFavoriteService;
+    private final ArtistFavoriteService artistFavoriteService;
 
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final Long userId, final long concertId) {
@@ -117,10 +122,25 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public RecentPerformancesDTO getRecentPerformances(final Long userId) {
-        if (userId == null || (!hasFavoriteFestivals(userId) && !hasFavoriteConcerts(userId))) {
+        if (userId == null || !hasFavoriteArtists(userId)) {
             return getRecentPerformancesWithoutFavorites();
         }
-        return null;
+
+        return getRecentPerformancesWithFavorites(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public RecentPerformancesDTO getRecentPerformancesWithFavorites(final long userId) {
+        List<ArtistFavorite> artistFavorites = artistFavoriteService.getArtistList(userId);
+
+        return RecentPerformancesDTO.from(
+                performanceService.getPerformancesByArtistIds(
+                        artistFavorites.stream()
+                                .map(artistFavorite -> artistFavorite.getArtist().getArtistId())
+                                .toList(),
+                        RECENT_PERFORMANCES_SIZE
+                )
+        );
     }
 
     @Transactional(readOnly = true)
@@ -135,12 +155,7 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public boolean hasFavoriteFestivals(final long userId) {
-        return festivalFavoriteService.existsByUserId(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean hasFavoriteConcerts(final long userId) {
-        return concertFavoriteService.existsByUserId(userId);
+    public boolean hasFavoriteArtists(final long userId) {
+        return artistFavoriteService.existsByUserId(userId);
     }
 }
