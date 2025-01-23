@@ -3,29 +3,20 @@ package org.sopt.confeti.api.performance.controller;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.dto.request.CreateFestivalRequest;
-import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
-import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
-import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
+import org.sopt.confeti.api.performance.dto.response.*;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
-import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
+import org.sopt.confeti.api.performance.facade.dto.response.*;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -64,6 +55,16 @@ public class PerformanceController {
     ) {
         PerformanceReservationDTO performanceReservationDTO = performanceFacade.getPerformReservationInfo(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, PerformanceReservationResponse.of(performanceReservationDTO, s3FileHandler));
+    }
+
+    @GetMapping("/association/{artistId}")
+    public ResponseEntity<BaseResponse<?>> getPerformanceByArtist(
+            @RequestHeader(name="Authorization", required = false) Long userId,
+            @PathVariable(name="artistId") String artistId,
+            @RequestParam(name="cursor", required = false) Long cursor
+    ){
+        CursorPage<PerformanceByArtistListDTO> performances = performanceFacade.getPerformanceByArtistId(userId, artistId, cursor);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, PerformanceByArtistResponse.of(performances, s3FileHandler));
     }
 
     @GetMapping("/info")
