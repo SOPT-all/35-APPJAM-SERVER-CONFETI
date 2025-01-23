@@ -2,9 +2,11 @@ package org.sopt.confeti.api.performance.controller;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.performance.dto.request.CreateConcertRequest;
 import org.sopt.confeti.api.performance.dto.request.CreateFestivalRequest;
 import org.sopt.confeti.api.performance.dto.response.*;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
+import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.*;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
@@ -43,8 +45,14 @@ public class PerformanceController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, FestivalDetailResponse.from(festivalDetailDTO));
     }
 
+    @PostMapping("/concerts")
+    public ResponseEntity<BaseResponse<?>> createConcert(@RequestBody CreateConcertRequest createConcertRequest) {
+        performanceFacade.createConcert(CreateConcertDTO.from(createConcertRequest));
+        return ApiResponseUtil.success(SuccessMessage.CREATED);
+    }
+
     @PostMapping("/festivals")
-    public ResponseEntity<BaseResponse<?>> createConcert(@RequestBody CreateFestivalRequest createFestivalRequest) {
+    public ResponseEntity<BaseResponse<?>> createFestival(@RequestBody CreateFestivalRequest createFestivalRequest) {
         performanceFacade.createFestival(CreateFestivalDTO.from(createFestivalRequest));
 
         return ApiResponseUtil.success(SuccessMessage.CREATED);

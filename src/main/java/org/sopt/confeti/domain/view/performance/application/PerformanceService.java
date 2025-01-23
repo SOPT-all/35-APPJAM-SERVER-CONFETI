@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceDTO;
@@ -53,6 +54,15 @@ public class PerformanceService {
                         .flatMap(festivalTime -> festivalTime.getArtists().stream()
                                 .map(festivalArtist -> Performance.create(festival, festivalArtist.getArtist().getArtistId(), festivalTime.getStartAt()))
                         ).toList()
+        );
+    }
+
+    @Transactional
+    public void create(final Concert concert) {
+        performanceRepository.saveAll(
+                concert.getArtists().stream()
+                        .map(concertArtist -> Performance.create(concert, concertArtist.getArtist().getArtistId()))
+                        .toList()
         );
     }
 

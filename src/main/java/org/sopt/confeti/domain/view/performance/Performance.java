@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
@@ -93,6 +94,22 @@ public class Performance {
                 .artistStartAt(artistStartAt)
                 .posterPath(festival.getFestivalPosterPath())
                 .reservationBgPath(festival.getFestivalReservationBgPath())
+                .build();
+    }
+
+    public static Performance create(final Concert concert, final String artistId) {
+        return Performance.builder()
+                .typeId(concert.getId())
+                .type(PerformanceType.CONCERT)
+                .artistId(artistId)
+                .area(concert.getConcertArea())
+                .title(concert.getConcertTitle())
+                .subtitle(concert.getConcertSubtitle())
+                .performanceStartAt(concert.getConcertStartAt())
+                .performanceEndAt(concert.getConcertEndAt())
+                .artistStartAt(null)
+                .posterPath(concert.getConcertPosterPath())
+                .reservationBgPath(concert.getConcertReservationBgPath())
                 .build();
     }
 }
