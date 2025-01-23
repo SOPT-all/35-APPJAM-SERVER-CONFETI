@@ -1,12 +1,16 @@
 package org.sopt.confeti.domain.view.performance.application;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
+import org.sopt.confeti.domain.view.performance.application.dto.PerformanceCursorDTO;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceDTORepository;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceRepository;
 import org.springframework.data.domain.PageRequest;
@@ -70,4 +74,20 @@ public class PerformanceService {
                 Order.asc(START_AT_COLUMN)
         );
     }
+
+    @Transactional(readOnly = true)
+    public List<Performance> findPerformanceUsingInitCursor(final String artistId, final int size) {
+        return performanceRepository.findPerformanceUsingInitCursor(artistId, PageRequest.of(INIT_PAGE, size));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<PerformanceCursorDTO> findPerformanceCursor(final long performanceId) {
+        return performanceRepository.findCursorByPerformanceId(performanceId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getPerformanceUsingCursor(final String artistId, final LocalDateTime performanceCursor, final LocalTime artistPerformanceCursor, final int size){
+        return performanceRepository.getPerformanceUsingCursor(artistId, performanceCursor, artistPerformanceCursor, PageRequest.of(INIT_PAGE, size));
+    }
+
 }
