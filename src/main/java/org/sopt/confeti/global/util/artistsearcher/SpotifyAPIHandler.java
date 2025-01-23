@@ -54,13 +54,18 @@ public class SpotifyAPIHandler {
         refreshCount = REFRESH_INIT_VALUE;
     }
 
-    public ConfetiArtist findArtistsByKeyword(final String keyword) {
-        Artist artist = searchArtistByKeyword(keyword)
-                .orElseThrow(
-                        () -> new ConfetiException(ErrorMessage.NOT_FOUND)
-                );
+    public Optional<ConfetiArtist> findArtistsByKeyword(final String keyword) {
+        Optional<Artist> searched = searchArtistByKeyword(keyword);
 
-        return ConfetiArtist.toConfetiArtist(artist, findLatestReleaseAt(artist.getId()));
+        if (searched.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Artist artist = searched.get();
+
+        return Optional.of(
+                ConfetiArtist.toConfetiArtist(artist, findLatestReleaseAt(artist.getId()))
+        );
     }
 
     public Optional<ConfetiArtist> findArtistByArtistId(final String artistId) {
