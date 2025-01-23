@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PerformanceRepository extends JpaRepository<Performance, Long> {
 
-    List<Performance> findPerformancesByArtistIdInAndEndAtGreaterThanEqual(
+    List<Performance> findPerformancesByArtistIdInAndPerformanceEndAtGreaterThanEqual(
             final List<String> artistIds,
             final LocalDateTime now,
             final PageRequest pageRequest
