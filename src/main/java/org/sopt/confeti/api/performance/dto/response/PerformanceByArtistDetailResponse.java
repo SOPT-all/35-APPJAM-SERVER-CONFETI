@@ -24,7 +24,7 @@ public record PerformanceByArtistDetailResponse(
                 performanceByArtistListDTO.title(),
                 DateConvertor.convertToLocalDate(performanceByArtistListDTO.performanceStartAt()),
                 DateConvertor.convertToLocalDate(performanceByArtistListDTO.performanceEndAt()),
-                s3FileHandler.getFileUrl(performanceByArtistListDTO.posterUrl()),
+                s3FileHandler.getFileUrl(performanceByArtistListDTO.posterPath()),
                 performanceByArtistListDTO.area(),
                 performanceByArtistListDTO.isFavorite()
         );

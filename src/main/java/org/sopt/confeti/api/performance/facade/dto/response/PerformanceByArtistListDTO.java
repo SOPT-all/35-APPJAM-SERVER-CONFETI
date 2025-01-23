@@ -12,7 +12,7 @@ public record PerformanceByArtistListDTO (
         String title,
         LocalDateTime performanceStartAt,
         LocalDateTime performanceEndAt,
-        String posterUrl,
+        String posterPath,
         String area,
         boolean isFavorite
 ) {
