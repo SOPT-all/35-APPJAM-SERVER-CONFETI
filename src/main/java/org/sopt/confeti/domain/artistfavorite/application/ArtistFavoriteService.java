@@ -41,4 +41,9 @@ public class ArtistFavoriteService {
     public void removeFavorite(final long userId, final String artistId) {
         artistFavoriteRepository.deleteByUserIdAndArtist_ArtistId(userId, artistId);
     }
+
+    @Transactional(readOnly = true)
+    public boolean existsByUserId(final long userId) {
+        return artistFavoriteRepository.existsByUserId(userId);
+    }
 }

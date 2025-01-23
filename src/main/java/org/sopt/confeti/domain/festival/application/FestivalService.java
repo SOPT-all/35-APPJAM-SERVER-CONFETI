@@ -1,6 +1,6 @@
 package org.sopt.confeti.domain.festival.application;
 
-import jakarta.persistence.EntityManager;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -21,18 +21,18 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class FestivalService {
 
+    private static final String START_AT_COLUMN = "festivalStartAt";
+
     private final FestivalRepository festivalRepository;
     private final ArtistResolver artistResolver;
-    private final EntityManager em;
 
     private static final int INIT_PAGE = 0;
     private static final String FESTIVAL_TITLE_COLUMN_NAME = "festivalTitle";
 
     @Transactional(readOnly = true)
     public Festival findById(Long festivalId) {
-        Festival festival = festivalRepository.findById(festivalId)
+        return festivalRepository.findById(festivalId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-        return festival;
     }
 
     @Transactional(readOnly = true)
@@ -99,5 +99,23 @@ public class FestivalService {
     @Transactional(readOnly = true)
     public Optional<FestivalCursorDTO> findFestivalCursor(final long userId, final long festivalId) {
         return festivalRepository.findFestivalCursor(userId, festivalId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Festival> getRecentFestivals(final int size) {
+        return festivalRepository.findAllByFestivalEndAtGreaterThanEqual(
+                LocalDateTime.now(),
+                getPageRequest(size, getRecentFestivalsSort())
+        );
+    }
+
+    private PageRequest getPageRequest(final int size, final Sort sort) {
+        return PageRequest.of(INIT_PAGE, size, sort);
+    }
+
+    private Sort getRecentFestivalsSort() {
+        return Sort.by(
+                Order.asc(START_AT_COLUMN)
+        );
     }
 }
