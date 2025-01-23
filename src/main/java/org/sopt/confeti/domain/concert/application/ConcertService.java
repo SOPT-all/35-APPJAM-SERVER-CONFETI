@@ -3,6 +3,7 @@ package org.sopt.confeti.domain.concert.application;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -64,6 +65,13 @@ public class ConcertService {
     private Sort getRecentConcertsSort() {
         return Sort.by(
                 Order.asc(START_AT_COLUMN)
+        );
+    }
+
+    @Transactional
+    public Concert create(final CreateConcertDTO from) {
+        return concertRepository.save(
+                Concert.create(from)
         );
     }
 }
