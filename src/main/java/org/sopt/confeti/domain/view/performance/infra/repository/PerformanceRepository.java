@@ -23,7 +23,6 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     @Query(value="SELECT p" +
             " FROM Performance p" +
             " WHERE p.artistId = :artistId " +
-            " AND p.performanceStartAt >= CURRENT_DATE " +
             " AND p.performanceEndAt >= CURRENT_DATE " +
             " ORDER BY p.performanceStartAt ASC, " +
             " CASE WHEN p.artistStartAt IS NOT NULL THEN p.artistStartAt END ASC "
@@ -46,7 +45,6 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             " WHERE p.performanceStartAt >= :performanceCursor " +
             " AND (p.artistStartAt IS NULL OR p.artistStartAt >= :artistPerformanceCursor) " +
             " AND p.artistId = :artistId " +
-            " AND p.performanceStartAt >= CURRENT_DATE " +
             " AND p.performanceEndAt >= CURRENT_DATE " +
             " ORDER BY p.performanceStartAt ASC, " +
             " CASE WHEN p.artistStartAt IS NOT NULL THEN p.artistStartAt END ASC "
