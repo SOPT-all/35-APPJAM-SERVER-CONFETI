@@ -68,7 +68,7 @@ public class UserTimetableController {
     @GetMapping("/{festivalDateId}")
     public ResponseEntity<BaseResponse<?>> getTimetableFestival(
             @RequestHeader("Authorization") long userId,
-            @PathVariable(name = "festivalDateId") @Min(value=0, message="요청 형식이 올바르지 않습니다.") long festivalDateId
+            @PathVariable(name = "festivalDateId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long festivalDateId
     ){
         UserTimetableFestivalBasicDTO response = userTimetableFacade.getTimetableInfo(userId, festivalDateId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetableFestivalResponse.from(response));
