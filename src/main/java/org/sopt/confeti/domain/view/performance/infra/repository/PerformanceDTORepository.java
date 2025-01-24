@@ -17,8 +17,8 @@ public class PerformanceDTORepository {
 
     private final EntityManager em;
 
-    private static final int PREVIEW_FAVORITE_PERFORMANCE_COUNT = 3;
-    private static final int  RESERVE_FAVORITE_PERFORMANCE_COUNT = 5;
+    private static final int PREVIEW_FAVORITE_PERFORMANCE_COUNT = 4;
+    private static final int RESERVE_FAVORITE_PERFORMANCE_COUNT = 5;
 
     public List<PerformanceDTO> findFavoritePerformancesPreview(final Long userId) {
         String sql =
