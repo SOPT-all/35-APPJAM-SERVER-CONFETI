@@ -130,8 +130,6 @@ public class SpotifyAPIHandler {
     }
 
     public List<ConfetiArtist> findArtistsByArtistIds(final List<String> artistIds) {
-        artistIds.forEach(artistId -> System.out.print(artistId + ","));
-        System.out.println();
         if (artistIds.isEmpty()) {
             return Collections.emptyList();
         }
