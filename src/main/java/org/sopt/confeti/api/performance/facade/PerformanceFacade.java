@@ -133,7 +133,13 @@ public class PerformanceFacade {
             return getRecentPerformancesWithoutFavorites();
         }
 
-        return getRecentPerformancesWithFavorites(userId);
+        RecentPerformancesDTO recentPerformances = getRecentPerformancesWithFavorites(userId);
+
+        if (recentPerformances.performances().isEmpty()) {
+            return getRecentPerformancesWithoutFavorites();
+        }
+
+        return recentPerformances;
     }
 
     @Transactional(readOnly = true)
