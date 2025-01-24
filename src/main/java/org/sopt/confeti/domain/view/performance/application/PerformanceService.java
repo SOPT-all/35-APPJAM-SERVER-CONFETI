@@ -68,7 +68,7 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public List<Performance> getPerformancesByArtistIds(final List<String> artistIds, final int size) {
-        return performanceRepository.findPerformancesByArtistIdInAndPerformanceEndAtGreaterThanEqual(
+        return performanceRepository.findPerformancesByArtistIds(
                 artistIds,
                 LocalDateTime.now(),
                 getPageRequest(size, getRecentPerformancesSort())

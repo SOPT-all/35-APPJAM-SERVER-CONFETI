@@ -14,7 +14,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface PerformanceRepository extends JpaRepository<Performance, Long> {
 
-    List<Performance> findPerformancesByArtistIdInAndPerformanceEndAtGreaterThanEqual(
+    List<Performance> findDistinctPerformancesByArtistIdInAndPerformanceEndAtGreaterThanEqual(
             final List<String> artistIds,
             final LocalDateTime now,
             final PageRequest pageRequest
@@ -64,4 +64,19 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     )
     long countAllByArtistId(final @Param("artistId") String artistId);
 
+    @Query(value = "SELECT p" +
+                " FROM Performance p" +
+                " WHERE p.id IN (" +
+                    " SELECT MIN(rp.id)" +
+                    " FROM Performance rp" +
+                    " WHERE rp.artistId IN :artistIds" +
+                    " AND rp.performanceEndAt >= :now" +
+                    " GROUP BY rp.typeId" +
+                " )"
+    )
+    List<Performance> findPerformancesByArtistIds(
+            final @Param("artistIds") List<String> artistIds,
+            final @Param("now") LocalDateTime now,
+            PageRequest pageRequest
+    );
 }
