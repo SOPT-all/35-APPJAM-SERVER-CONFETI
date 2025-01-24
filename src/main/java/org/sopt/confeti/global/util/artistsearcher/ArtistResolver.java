@@ -3,6 +3,7 @@ package org.sopt.confeti.global.util.artistsearcher;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -142,6 +143,6 @@ public class ArtistResolver {
     }
 
     private List<ConfetiArtist> searchByArtistIds(final List<String> artistIds) {
-        return spotifyAPIHandler.findArtistsByArtistIds(artistIds);
+        return spotifyAPIHandler.findArtistsByArtistIdsEntry(artistIds);
     }
 }

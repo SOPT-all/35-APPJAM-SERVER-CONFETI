@@ -2,6 +2,7 @@ package org.sopt.confeti.global.util.artistsearcher;
 
 import com.neovisionaries.i18n.CountryCode;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.stream.IntStream;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Handler;
@@ -36,6 +38,7 @@ public class SpotifyAPIHandler {
     private static final int ALBUM_OFFSET = 0;
     private static final int REFRESH_TRIAL = 5;
     private static final int REFRESH_INIT_VALUE = 0;
+    private static final int GET_SEVERAL_ARTIST_MAXIMUM_SIZE = 50;
 
     @Value("${spotify.credentials.client-id}")
     private String clientId;
@@ -92,6 +95,38 @@ public class SpotifyAPIHandler {
         } catch (Exception e) {
             throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public List<ConfetiArtist> findArtistsByArtistIdsEntry(final List<String> artistIds) {
+        // 아티스트 아이디 개수가 최대를 넘지 않는 경우 단일 호출
+        if (artistIds.size() <= GET_SEVERAL_ARTIST_MAXIMUM_SIZE) {
+            return findArtistsByArtistIds(artistIds);
+        }
+
+        // 최대를 넘는 경우 최대 개수(50개)씩 나눠서 가져옴
+        int iteration = (artistIds.size() - 1) / GET_SEVERAL_ARTIST_MAXIMUM_SIZE;
+        int remain = artistIds.size() % GET_SEVERAL_ARTIST_MAXIMUM_SIZE;
+
+        List<ConfetiArtist> artists = new ArrayList<>();
+
+        IntStream.range(0, iteration)
+                .forEach(i -> {
+                    artists.addAll(
+                            findArtistsByArtistIds(artistIds.subList(
+                                    i * GET_SEVERAL_ARTIST_MAXIMUM_SIZE,
+                                    (i + 1) * GET_SEVERAL_ARTIST_MAXIMUM_SIZE
+                            ))
+                    );
+                });
+
+        artists.addAll(
+                findArtistsByArtistIds(artistIds.subList(
+                        iteration * GET_SEVERAL_ARTIST_MAXIMUM_SIZE,
+                        iteration * GET_SEVERAL_ARTIST_MAXIMUM_SIZE + remain
+                ))
+        );
+
+        return artists;
     }
 
     public List<ConfetiArtist> findArtistsByArtistIds(final List<String> artistIds) {
