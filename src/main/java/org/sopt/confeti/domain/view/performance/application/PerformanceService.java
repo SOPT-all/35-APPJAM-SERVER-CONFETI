@@ -100,4 +100,8 @@ public class PerformanceService {
         return performanceRepository.getPerformanceUsingCursor(artistId, performanceCursor, artistPerformanceCursor, PageRequest.of(INIT_PAGE, size));
     }
 
+    @Transactional(readOnly = true)
+    public long countAllByArtistId(final String artistId){
+        return performanceRepository.countAllByArtistId(artistId);
+    }
 }

@@ -71,8 +71,8 @@ public class PerformanceController {
             @PathVariable(name="artistId") String artistId,
             @RequestParam(name="cursor", required = false) Long cursor
     ){
-        CursorPage<PerformanceByArtistListDTO> performances = performanceFacade.getPerformanceByArtistId(userId, artistId, cursor);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, PerformanceByArtistResponse.of(performances, s3FileHandler));
+        PerformanceByArtistDTO performances = performanceFacade.getPerformanceByArtistId(userId, artistId, cursor);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, PerformanceByArtistResponse.of(performances.cursorPage(), performances.totalCount(), s3FileHandler));
     }
 
     @GetMapping("/info")
