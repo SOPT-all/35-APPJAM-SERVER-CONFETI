@@ -14,18 +14,15 @@ import org.springframework.data.repository.query.Param;
 
 public interface PerformanceRepository extends JpaRepository<Performance, Long> {
 
-    List<Performance> findDistinctPerformancesByArtistIdInAndPerformanceEndAtGreaterThanEqual(
-            final List<String> artistIds,
-            final LocalDateTime now,
-            final PageRequest pageRequest
-    );
-
     @Query(value="SELECT p" +
             " FROM Performance p" +
-            " WHERE p.artistId = :artistId " +
-            " AND p.performanceEndAt >= CURRENT_DATE " +
-            " ORDER BY p.performanceStartAt ASC, " +
-            " CASE WHEN p.artistStartAt IS NOT NULL THEN p.artistStartAt END ASC "
+            " WHERE p.id IN (" +
+                " SELECT MIN(rp.id)" +
+                " FROM Performance rp" +
+                " WHERE rp.artistId = :artistId" +
+                " AND rp.performanceEndAt >= CURRENT_DATE" +
+                " GROUP BY rp.typeId" +
+            " )"
     )
     List<Performance> findPerformanceUsingInitCursor(
             @Param("artistId") String artistId,
@@ -42,25 +39,32 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
 
     @Query(value = "SELECT p " +
             " FROM Performance p " +
-            " WHERE p.performanceStartAt >= :performanceCursor " +
-            " AND (p.artistStartAt IS NULL OR p.artistStartAt >= :artistPerformanceCursor) " +
-            " AND p.artistId = :artistId " +
-            " AND p.performanceEndAt >= CURRENT_DATE " +
-            " ORDER BY p.performanceStartAt ASC, " +
-            " CASE WHEN p.artistStartAt IS NOT NULL THEN p.artistStartAt END ASC "
-
+            " WHERE p.id IN (" +
+                " SELECT MIN(rp.id)" +
+                " FROM Performance rp" +
+                " WHERE rp.artistId = :artistId" +
+                " AND rp.performanceEndAt >= CURRENT_DATE" +
+                " GROUP BY rp.typeId" +
+            " )" +
+            " AND p.performanceStartAt >= :performanceStartAt" +
+            " AND (p.artistStartAt IS NULL OR p.artistStartAt >= :artistStartAt)"
     )
     List<Performance> getPerformanceUsingCursor(
             @Param("artistId") String artistId,
-            @Param("performanceCursor") LocalDateTime performanceCursor,
-            @Param("artistPerformanceCursor") LocalTime artistPerformanceCursor,
+            @Param("performanceStartAt") LocalDateTime performanceStartAt,
+            @Param("artistStartAt") LocalTime artistStartAt,
             PageRequest pageRequest
     );
 
     @Query(value = "SELECT COUNT(p) " +
                 " FROM Performance p " +
-                " WHERE p.artistId = :artistId " +
-                "AND p.performanceEndAt >= CURRENT_DATE"
+                " WHERE p.id IN (" +
+                    " SELECT MIN(rp.id)" +
+                    " FROM Performance rp" +
+                    " WHERE rp.artistId = :artistId" +
+                    " AND rp.performanceEndAt >= CURRENT_DATE" +
+                    " GROUP BY rp.typeId" +
+                " )"
     )
     long countAllByArtistId(final @Param("artistId") String artistId);
 
@@ -70,13 +74,12 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
                     " SELECT MIN(rp.id)" +
                     " FROM Performance rp" +
                     " WHERE rp.artistId IN :artistIds" +
-                    " AND rp.performanceEndAt >= :now" +
+                    " AND rp.performanceEndAt >= CURRENT_DATE" +
                     " GROUP BY rp.typeId" +
                 " )"
     )
     List<Performance> findPerformancesByArtistIds(
             final @Param("artistIds") List<String> artistIds,
-            final @Param("now") LocalDateTime now,
             PageRequest pageRequest
     );
 }
