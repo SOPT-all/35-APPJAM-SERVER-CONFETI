@@ -16,17 +16,17 @@ public record PerformanceByArtistDetailResponse(
         String area,
         boolean isFavorite
 ) {
-    public static PerformanceByArtistDetailResponse of(PerformanceByArtistDetailDTO performanceByArtistDetailDTO, S3FileHandler s3FileHandler) {
+    public static PerformanceByArtistDetailResponse of(PerformanceByArtistDetailDTO performance, S3FileHandler s3FileHandler) {
         return new PerformanceByArtistDetailResponse(
-                performanceByArtistDetailDTO.performanceId(),
-                performanceByArtistDetailDTO.typeId(),
-                performanceByArtistDetailDTO.type(),
-                performanceByArtistDetailDTO.title(),
-                DateConvertor.convertToLocalDate(performanceByArtistDetailDTO.performanceStartAt()),
-                DateConvertor.convertToLocalDate(performanceByArtistDetailDTO.performanceEndAt()),
-                s3FileHandler.getFileUrl(performanceByArtistDetailDTO.posterPath()),
-                performanceByArtistDetailDTO.area(),
-                performanceByArtistDetailDTO.isFavorite()
+                performance.performanceId(),
+                performance.typeId(),
+                performance.type(),
+                performance.title(),
+                DateConvertor.convertToLocalDate(performance.performanceStartAt()),
+                DateConvertor.convertToLocalDate(performance.performanceEndAt()),
+                s3FileHandler.getFileUrl(performance.posterPath()),
+                performance.area(),
+                performance.isFavorite()
         );
     }
 }

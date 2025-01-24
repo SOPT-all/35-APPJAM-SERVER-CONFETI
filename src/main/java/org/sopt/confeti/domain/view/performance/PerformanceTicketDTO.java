@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.view.performance;
 
+import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record PerformanceTicketDTO(

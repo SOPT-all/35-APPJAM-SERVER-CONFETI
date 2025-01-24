@@ -62,6 +62,6 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
                 " WHERE p.artistId = :artistId " +
                 "AND p.performanceEndAt >= CURRENT_DATE"
     )
-    long countAllByArtistId(final String artistId);
+    long countAllByArtistId(final @Param("artistId") String artistId);
 
 }

@@ -118,4 +118,9 @@ public class FestivalService {
                 Order.asc(START_AT_COLUMN)
         );
     }
+
+    @Transactional(readOnly = true)
+    public List<Festival> getFestivals(final List<Long> festivalIds) {
+        return festivalRepository.findByIdIn(festivalIds);
+    }
 }
