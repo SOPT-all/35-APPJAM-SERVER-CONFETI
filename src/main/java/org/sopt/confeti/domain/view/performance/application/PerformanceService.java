@@ -70,7 +70,6 @@ public class PerformanceService {
     public List<Performance> getPerformancesByArtistIds(final List<String> artistIds, final int size) {
         return performanceRepository.findPerformancesByArtistIds(
                 artistIds,
-                LocalDateTime.now(),
                 getPageRequest(size, getRecentPerformancesSort())
         );
     }
@@ -87,7 +86,10 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public List<Performance> findPerformanceUsingInitCursor(final String artistId, final int size) {
-        return performanceRepository.findPerformanceUsingInitCursor(artistId, PageRequest.of(INIT_PAGE, size));
+        return performanceRepository.findPerformanceUsingInitCursor(
+                artistId,
+                getPageRequest(size, getRecentPerformancesSort())
+        );
     }
 
     @Transactional(readOnly = true)
@@ -101,7 +103,7 @@ public class PerformanceService {
                 artistId,
                 performanceCursor.performanceStartAt(),
                 performanceCursor.artistStartAt(),
-                PageRequest.of(INIT_PAGE, size)
+                getPageRequest(size, getRecentPerformancesSort())
         );
     }
 
