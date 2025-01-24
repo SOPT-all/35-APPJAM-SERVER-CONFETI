@@ -19,7 +19,7 @@ public record DummyPerformanceDTO(
                 PerformanceType.CONCERT,
                 concert.getConcertSubtitle(),
                 concert.getReserveAt(),
-                concert.getReservationUrl()
+                concert.getConcertReservationBgPath()
         );
     }
 
@@ -29,7 +29,7 @@ public record DummyPerformanceDTO(
                 PerformanceType.FESTIVAL,
                 festival.getFestivalSubtitle(),
                 festival.getReserveAt(),
-                festival.getReservationUrl()
+                festival.getFestivalReservationBgPath()
         );
     }
 }
