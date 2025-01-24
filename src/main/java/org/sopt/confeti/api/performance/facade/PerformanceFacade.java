@@ -173,10 +173,13 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public CursorPage<PerformanceByArtistListDTO> getPerformanceByArtistId(final Long userId, final String artistId, final Long cursor) {
+    public PerformanceByArtistDTO getPerformanceByArtistId(final Long userId, final String artistId, final Long cursor) {
+        long totalCount = performanceService.countAllByArtistId(artistId);
+        CursorPage<PerformanceByArtistListDTO> cursorPage;
+
         if (cursor == null) {
             List<Performance> performances = performanceService.findPerformanceUsingInitCursor(artistId, PERFORMANCE_TO_ADD_SIZE);
-            return CursorPage.of(
+            cursorPage = CursorPage.of(
                     performances.stream()
                             .map(performance -> {
                                         boolean isFavorite = hasFavoritePerformances(userId, performance.getTypeId(), performance.getType());
@@ -185,12 +188,13 @@ public class PerformanceFacade {
                             .toList(),
                     PERFORMANCE_TO_ADD_SIZE
           );
+            return new PerformanceByArtistDTO(totalCount, cursorPage);
         }
 
         PerformanceCursorDTO performanceCursor = getPerformanceCursor(cursor);
 
         List<Performance> performances = performanceService.getPerformanceUsingCursor(artistId, performanceCursor.performanceStartAt(), performanceCursor.artistStartAt() , PERFORMANCE_TO_ADD_SIZE);
-        return CursorPage.of(
+        cursorPage = CursorPage.of(
                 performances.stream()
                         .map(performance -> {
                             boolean isFavorite = hasFavoritePerformances(userId, performance.getTypeId(), performance.getType());
@@ -199,6 +203,7 @@ public class PerformanceFacade {
                         .toList(),
                 PERFORMANCE_TO_ADD_SIZE
         );
+        return new PerformanceByArtistDTO(totalCount, cursorPage);
     }
 
     @Transactional(readOnly = true)
