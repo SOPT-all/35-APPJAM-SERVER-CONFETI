@@ -175,7 +175,7 @@ public class PerformanceFacade {
     @Transactional(readOnly = true)
     public PerformanceByArtistDTO getPerformanceByArtistId(final Long userId, final String artistId, final Long cursor) {
         long totalCount = performanceService.countAllByArtistId(artistId);
-        CursorPage<PerformanceByArtistListDTO> cursorPage;
+        CursorPage<PerformanceByArtistDetailDTO> cursorPage;
 
         if (cursor == null) {
             List<Performance> performances = performanceService.findPerformanceUsingInitCursor(artistId, PERFORMANCE_TO_ADD_SIZE);
@@ -183,12 +183,12 @@ public class PerformanceFacade {
                     performances.stream()
                             .map(performance -> {
                                         boolean isFavorite = hasFavoritePerformances(userId, performance.getTypeId(), performance.getType());
-                                        return PerformanceByArtistListDTO.from(performance, isFavorite);
+                                        return PerformanceByArtistDetailDTO.from(performance, isFavorite);
                                     })
                             .toList(),
                     PERFORMANCE_TO_ADD_SIZE
           );
-            return new PerformanceByArtistDTO(totalCount, cursorPage);
+            return PerformanceByArtistDTO.of(totalCount, cursorPage);
         }
 
         PerformanceCursorDTO performanceCursor = getPerformanceCursor(cursor);
@@ -198,12 +198,12 @@ public class PerformanceFacade {
                 performances.stream()
                         .map(performance -> {
                             boolean isFavorite = hasFavoritePerformances(userId, performance.getTypeId(), performance.getType());
-                            return PerformanceByArtistListDTO.from(performance, isFavorite);
+                            return PerformanceByArtistDetailDTO.from(performance, isFavorite);
                         })
                         .toList(),
                 PERFORMANCE_TO_ADD_SIZE
         );
-        return new PerformanceByArtistDTO(totalCount, cursorPage);
+        return PerformanceByArtistDTO.of(totalCount, cursorPage);
     }
 
     @Transactional(readOnly = true)
