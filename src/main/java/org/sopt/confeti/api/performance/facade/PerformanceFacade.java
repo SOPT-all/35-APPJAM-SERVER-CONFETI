@@ -1,8 +1,11 @@
 package org.sopt.confeti.api.performance.facade;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Facade;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
@@ -49,6 +52,19 @@ public class PerformanceFacade {
     private final PerformanceService performanceService;
     private final ConcertFavoriteService concertFavoriteService;
     private final ArtistFavoriteService artistFavoriteService;
+
+    // 더미 데이터 고정값! - 스프린트 이후로 지우기
+    private final List<Long> dummyBannerConcertIds = new ArrayList<>() {{
+        add(28L);
+        add(29L);
+    }};
+
+    private final List<Long> dummyBannerFestivalIds = new ArrayList<>() {{
+        add(9L);
+        add(12L);
+        add(2L);
+    }};
+    // 더미 데이터 고정값! - 스프린트 이후로 지우기
 
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final Long userId, final long concertId) {
@@ -123,8 +139,19 @@ public class PerformanceFacade {
             return PerformanceReservationDTO.from(performanceReserve);
         }
 
-        List<PerformanceTicketDTO> performanceReserve=performanceService.getPerformancesReservation();
-        return PerformanceReservationDTO.from(performanceReserve);
+        // 더미 데이터 고정값! - 스프린트 이후로 지우기
+        List<DummyPerformanceDTO> dummyPerformanceDTOS = Stream.concat(
+                concertService.getConcerts(dummyBannerConcertIds).stream()
+                        .map(DummyPerformanceDTO::from),
+                festivalService.getFestivals(dummyBannerFestivalIds).stream()
+                        .map(DummyPerformanceDTO::from)
+        ).sorted(Comparator.comparing(DummyPerformanceDTO::reserveAt))
+                .toList();
+        return PerformanceReservationDTO.toDummy(dummyPerformanceDTOS);
+        // 더미 데이터 고정값! - 스프린트 이후로 지우기
+
+//        List<PerformanceTicketDTO> performanceReserve=performanceService.getPerformancesReservation();
+//        return PerformanceReservationDTO.from(performanceReserve);
     }
 
     @Transactional(readOnly = true)
@@ -193,7 +220,7 @@ public class PerformanceFacade {
 
         PerformanceCursorDTO performanceCursor = getPerformanceCursor(cursor);
 
-        List<Performance> performances = performanceService.getPerformanceUsingCursor(artistId, performanceCursor.performanceStartAt(), performanceCursor.artistStartAt() , PERFORMANCE_TO_ADD_SIZE);
+        List<Performance> performances = performanceService.getPerformanceUsingCursor(artistId, performanceCursor, PERFORMANCE_TO_ADD_SIZE);
         cursorPage = CursorPage.of(
                 performances.stream()
                         .map(performance -> {

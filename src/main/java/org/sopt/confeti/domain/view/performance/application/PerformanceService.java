@@ -96,8 +96,13 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getPerformanceUsingCursor(final String artistId, final LocalDateTime performanceCursor, final LocalTime artistPerformanceCursor, final int size){
-        return performanceRepository.getPerformanceUsingCursor(artistId, performanceCursor, artistPerformanceCursor, PageRequest.of(INIT_PAGE, size));
+    public List<Performance> getPerformanceUsingCursor(final String artistId, final PerformanceCursorDTO performanceCursor, final int size){
+        return performanceRepository.getPerformanceUsingCursor(
+                artistId,
+                performanceCursor.performanceStartAt(),
+                performanceCursor.artistStartAt(),
+                PageRequest.of(INIT_PAGE, size)
+        );
     }
 
     @Transactional(readOnly = true)

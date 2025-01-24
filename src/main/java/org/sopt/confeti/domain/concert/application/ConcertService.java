@@ -74,4 +74,9 @@ public class ConcertService {
                 Concert.create(from)
         );
     }
+
+    @Transactional(readOnly = true)
+    public List<Concert> getConcerts(final List<Long> concertIds) {
+        return concertRepository.findAllByIdIn(concertIds);
+    }
 }
