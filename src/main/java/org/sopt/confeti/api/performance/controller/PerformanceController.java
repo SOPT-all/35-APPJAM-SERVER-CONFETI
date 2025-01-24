@@ -12,7 +12,6 @@ import org.sopt.confeti.api.performance.facade.dto.response.*;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.global.common.BaseResponse;
-import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -71,7 +70,7 @@ public class PerformanceController {
             @PathVariable(name="artistId") String artistId,
             @RequestParam(name="cursor", required = false) Long cursor
     ){
-        CursorPage<PerformanceByArtistListDTO> performances = performanceFacade.getPerformanceByArtistId(userId, artistId, cursor);
+        PerformanceByArtistDTO performances = performanceFacade.getPerformanceByArtistId(userId, artistId, cursor);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, PerformanceByArtistResponse.of(performances, s3FileHandler));
     }
 

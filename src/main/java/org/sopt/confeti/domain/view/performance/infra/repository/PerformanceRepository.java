@@ -56,4 +56,12 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             @Param("artistPerformanceCursor") LocalTime artistPerformanceCursor,
             PageRequest pageRequest
     );
+
+    @Query(value = "SELECT COUNT(p) " +
+                " FROM Performance p " +
+                " WHERE p.artistId = :artistId " +
+                "AND p.performanceEndAt >= CURRENT_DATE"
+    )
+    long countAllByArtistId(final @Param("artistId") String artistId);
+
 }

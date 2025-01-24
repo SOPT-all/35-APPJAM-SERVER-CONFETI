@@ -67,7 +67,7 @@ public class Concert {
     @Column(length = 200, nullable = false)
     private String price;
 
-    @OneToMany(mappedBy = "concert", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "concert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConcertArtist> artists = new ArrayList<>();
 
     @Builder

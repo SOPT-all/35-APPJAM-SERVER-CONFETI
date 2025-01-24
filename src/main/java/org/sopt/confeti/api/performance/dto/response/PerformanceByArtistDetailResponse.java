@@ -1,6 +1,6 @@
 package org.sopt.confeti.api.performance.dto.response;
 
-import org.sopt.confeti.api.performance.facade.dto.response.PerformanceByArtistListDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformanceByArtistDetailDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.util.DateConvertor;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -16,17 +16,17 @@ public record PerformanceByArtistDetailResponse(
         String area,
         boolean isFavorite
 ) {
-    public static PerformanceByArtistDetailResponse of(PerformanceByArtistListDTO performanceByArtistListDTO, S3FileHandler s3FileHandler) {
+    public static PerformanceByArtistDetailResponse of(PerformanceByArtistDetailDTO performance, S3FileHandler s3FileHandler) {
         return new PerformanceByArtistDetailResponse(
-                performanceByArtistListDTO.performanceId(),
-                performanceByArtistListDTO.typeId(),
-                performanceByArtistListDTO.type(),
-                performanceByArtistListDTO.title(),
-                DateConvertor.convertToLocalDate(performanceByArtistListDTO.performanceStartAt()),
-                DateConvertor.convertToLocalDate(performanceByArtistListDTO.performanceEndAt()),
-                s3FileHandler.getFileUrl(performanceByArtistListDTO.posterPath()),
-                performanceByArtistListDTO.area(),
-                performanceByArtistListDTO.isFavorite()
+                performance.performanceId(),
+                performance.typeId(),
+                performance.type(),
+                performance.title(),
+                DateConvertor.convertToLocalDate(performance.performanceStartAt()),
+                DateConvertor.convertToLocalDate(performance.performanceEndAt()),
+                s3FileHandler.getFileUrl(performance.posterPath()),
+                performance.area(),
+                performance.isFavorite()
         );
     }
 }
