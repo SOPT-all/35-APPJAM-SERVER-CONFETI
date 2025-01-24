@@ -138,7 +138,7 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public RecentPerformancesDTO getRecentPerformancesWithFavorites(final long userId) {
-        List<ArtistFavorite> artistFavorites = artistFavoriteService.getArtistList(userId);
+        List<ArtistFavorite> artistFavorites = artistFavoriteService.getArtistIdsByUserId(userId);
 
         return RecentPerformancesDTO.from(
                 performanceService.getPerformancesByArtistIds(

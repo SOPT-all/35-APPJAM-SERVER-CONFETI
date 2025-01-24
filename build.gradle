@@ -29,8 +29,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     // psy
-    implementation 'p6spy:p6spy:3.9.1'
-    implementation 'com.github.gavlyukovskiy:datasource-decorator-spring-boot-autoconfigure:1.9.0'
+//    implementation 'p6spy:p6spy:3.9.1'
+//    implementation 'com.github.gavlyukovskiy:datasource-decorator-spring-boot-autoconfigure:1.9.0'
 
     // spotify api
     implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.4.1'

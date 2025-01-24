@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PerformanceService {
 
     private static final int INIT_PAGE = 0;
-    private static final String START_AT_COLUMN = "startAt";
+    private static final String START_AT_COLUMN = "performanceStartAt";
 
     private final PerformanceDTORepository performanceDTORepository;
     private final PerformanceRepository performanceRepository;

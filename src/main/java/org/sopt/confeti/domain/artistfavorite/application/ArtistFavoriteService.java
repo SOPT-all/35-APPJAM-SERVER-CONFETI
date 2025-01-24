@@ -46,4 +46,9 @@ public class ArtistFavoriteService {
     public boolean existsByUserId(final long userId) {
         return artistFavoriteRepository.existsByUserId(userId);
     }
+
+    @Transactional(readOnly = true)
+    public List<ArtistFavorite> getArtistIdsByUserId(final long userId) {
+        return artistFavoriteRepository.findArtistFavoritesByUserId(userId);
+    }
 }
