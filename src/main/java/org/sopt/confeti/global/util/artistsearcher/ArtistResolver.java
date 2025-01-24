@@ -2,9 +2,12 @@ package org.sopt.confeti.global.util.artistsearcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.annotation.Resolver;
@@ -12,6 +15,8 @@ import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festivaldate.FestivalDate;
+import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.IntegrateFunction;
 
 @Resolver
@@ -39,7 +44,7 @@ public class ArtistResolver {
     }};
 
     private List<String> artistIds;
-    private HashMap<String, ConfetiArtist> artistMapper;
+    private HashMap<String, Queue<ConfetiArtist>> artistMapper;
 
     private final SpotifyAPIHandler spotifyAPIHandler;
 
@@ -97,17 +102,14 @@ public class ArtistResolver {
         ArtistFavorite artistFavorite = (ArtistFavorite) target;
         ConfetiArtist confetiArtist = artistFavorite.getArtist();
         artistIds.add(confetiArtist.getArtistId());
-        artistMapper.put(confetiArtist.getArtistId(), artistFavorite.getArtist());
+        addArtistToMapper(confetiArtist.getArtistId(), artistFavorite.getArtist());
     }
 
     private void collectConcert(final Object target) {
         Concert concert = (Concert) target;
         concert.getArtists().forEach(artist -> {
                     artistIds.add(artist.getArtist().getArtistId());
-                    artistMapper.put(
-                            artist.getArtist().getArtistId(),
-                            artist.getArtist()
-                    );
+                    addArtistToMapper(artist.getArtist().getArtistId(), artist.getArtist());
                 });
     }
 
@@ -119,7 +121,7 @@ public class ArtistResolver {
                 .flatMap(time -> time.getArtists().stream())
                 .forEach(artist -> {
                     artistIds.add(artist.getArtist().getArtistId());
-                    artistMapper.put(artist.getArtist().getArtistId(), artist.getArtist());
+                    addArtistToMapper(artist.getArtist().getArtistId(), artist.getArtist());
                 });
     }
 
@@ -130,13 +132,18 @@ public class ArtistResolver {
                 .flatMap(time -> time.getArtists().stream())
                 .forEach(artist -> {
                     artistIds.add(artist.getArtist().getArtistId());
-                    artistMapper.put(artist.getArtist().getArtistId(), artist.getArtist());
+                    addArtistToMapper(artist.getArtist().getArtistId(), artist.getArtist());
                 });
     }
 
     private void injection(final List<ConfetiArtist> confetiArtists) {
         confetiArtists.forEach((confetiArtist -> {
-            ConfetiArtist mappedConfetiArtist = artistMapper.get(confetiArtist.getArtistId());
+            ConfetiArtist mappedConfetiArtist = artistMapper.get(confetiArtist.getArtistId()).poll();
+
+            if (mappedConfetiArtist == null) {
+                throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
+            }
+
             mappedConfetiArtist.setName(confetiArtist.getName());
             mappedConfetiArtist.setProfileUrl(confetiArtist.getProfileUrl());
         }));
@@ -144,5 +151,17 @@ public class ArtistResolver {
 
     private List<ConfetiArtist> searchByArtistIds(final List<String> artistIds) {
         return spotifyAPIHandler.findArtistsByArtistIdsEntry(artistIds);
+    }
+
+    private void addArtistToMapper(final String artistId, final ConfetiArtist artist) {
+        if (!artistMapper.containsKey(artistId)) {
+            createQueueToMapper(artistId);
+        }
+
+        artistMapper.get(artistId).add(artist);
+    }
+
+    private void createQueueToMapper(final String artistId) {
+        artistMapper.put(artistId, new LinkedList<>());
     }
 }
