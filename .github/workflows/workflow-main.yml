@@ -3,8 +3,10 @@ name: CD workflow
 
 # Event Trigger 환경
 on:
+  push:
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "main", "develop" ]  # push가 main 브랜치에 생성되면 트리거
+    branches: [ "main" ]
 
 permissions: # 워크플로우 권한
   id-token: write

@@ -4,7 +4,7 @@ name: CI workflow
 # Event Trigger 환경
 on:
   pull_request:
-    branches: [ "temp" ]  # pull request가 develop 브랜치에 생성되면 트리거
+    branches: [ "develop" ]
 
 permissions: # 워크플로우 권한
   contents: read # 읽기
