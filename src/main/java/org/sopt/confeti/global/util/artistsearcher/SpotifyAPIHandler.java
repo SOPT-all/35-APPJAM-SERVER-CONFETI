@@ -34,7 +34,7 @@ public class SpotifyAPIHandler {
 
     private static final int ARTIST_LIMIT = 1;
     private static final int ARTIST_OFFSET = 0;
-    private static final int ALBUM_LIMIT = 1;
+    private static final int ALBUM_LIMIT = 50;
     private static final int ALBUM_OFFSET = 0;
     private static final int REFRESH_TRIAL = 5;
     private static final int REFRESH_INIT_VALUE = 0;
@@ -179,31 +179,33 @@ public class SpotifyAPIHandler {
     }
 
     private LocalDate findLatestReleaseAt(final String artistId) {
-        Optional<Paging<AlbumSimplified>> searchedAlbums = searchAlbumByArtistId(artistId);
+        Optional<AlbumSimplified> searchedAlbum = searchAlbumByArtistId(artistId);
 
-        if (searchedAlbums.isEmpty()) {
+        if (searchedAlbum.isEmpty()) {
             return null;
         }
 
-        Paging<AlbumSimplified> albums = searchedAlbums.get();
+        AlbumSimplified album = searchedAlbum.get();
 
-        return Arrays.stream(albums.getItems())
-                .map(albumItem -> DateConvertor.convertToSpotifyLocalDate(albumItem.getReleaseDate()))
-                .findFirst()
-                .orElseGet(null);
+        return DateConvertor.convertToSpotifyLocalDate(album.getReleaseDate());
     }
 
-    private Optional<Paging<AlbumSimplified>> searchAlbumByArtistId(final String artistId) {
+    private Optional<AlbumSimplified> searchAlbumByArtistId(final String artistId) {
         try {
             generateAccessTokenIfExpired();
 
-            return executeWithTokenRefresh(() ->
-                    Optional.of(spotifyApi.getArtistsAlbums(artistId)
-                    .market(CountryCode.KR)
-                    .limit(ALBUM_LIMIT)
-                    .offset(ALBUM_OFFSET)
-                    .build()
-                    .execute()));
+            return executeWithTokenRefresh(() -> {
+                        Paging<AlbumSimplified> albums = spotifyApi.getArtistsAlbums(artistId)
+                                .market(CountryCode.KR)
+                                .limit(ALBUM_LIMIT)
+                                .offset(ALBUM_OFFSET)
+                                .build()
+                                .execute();
+
+                        return Arrays.stream(albums.getItems())
+                                .max(Comparator.comparing(AlbumSimplified::getReleaseDate));
+                    }
+            );
         } catch (NotFoundException | BadRequestException e) {
             return Optional.empty();
         } catch (Exception e) {
