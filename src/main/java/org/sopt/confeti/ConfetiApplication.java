@@ -1,7 +1,7 @@
 package org.sopt.confeti;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.global.util.artistsearcher.SpotifyAPIHandler;
+import org.sopt.confeti.global.util.SpotifyAPIHandler;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

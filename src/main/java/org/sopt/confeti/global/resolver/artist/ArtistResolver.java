@@ -1,4 +1,4 @@
-package org.sopt.confeti.global.util.artistsearcher;
+package org.sopt.confeti.global.resolver.artist;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +16,7 @@ import org.sopt.confeti.domain.festivaldate.FestivalDate;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.IntegrateFunction;
+import org.sopt.confeti.global.util.SpotifyAPIHandler;
 
 @Resolver
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)

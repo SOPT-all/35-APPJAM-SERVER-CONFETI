@@ -28,7 +28,7 @@ import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.util.artistsearcher.ArtistResolver;
+import org.sopt.confeti.global.resolver.artist.ArtistResolver;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

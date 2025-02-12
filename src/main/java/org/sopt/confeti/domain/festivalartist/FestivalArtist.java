@@ -7,14 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalArtistDTO;
-import org.sopt.confeti.domain.festivalstage.FestivalStage;
 import org.sopt.confeti.domain.festivaltime.FestivalTime;
-import org.sopt.confeti.domain.usertimetable.UserTimetable;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
+import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
 
 @Entity
 @Table(name="festival_artists")

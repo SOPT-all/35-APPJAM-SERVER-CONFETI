@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.api.artist.facade.dto.response.SearchArtistDTO;
 import org.sopt.confeti.domain.artistfavorite.application.ArtistFavoriteService;
-import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
-import org.sopt.confeti.global.util.artistsearcher.SpotifyAPIHandler;
+import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
+import org.sopt.confeti.global.util.SpotifyAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
