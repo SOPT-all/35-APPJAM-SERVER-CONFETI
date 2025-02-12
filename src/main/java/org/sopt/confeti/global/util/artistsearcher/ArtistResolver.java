@@ -8,7 +8,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.annotation.Resolver;
+import org.sopt.confeti.global.annotation.Resolver;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.festival.Festival;

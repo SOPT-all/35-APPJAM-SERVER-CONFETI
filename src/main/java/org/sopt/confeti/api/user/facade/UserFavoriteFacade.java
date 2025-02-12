@@ -2,7 +2,7 @@ package org.sopt.confeti.api.user.facade;
 
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.annotation.Facade;
+import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
