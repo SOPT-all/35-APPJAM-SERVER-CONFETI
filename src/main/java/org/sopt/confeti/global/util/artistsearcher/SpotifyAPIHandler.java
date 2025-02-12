@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
 import java.util.stream.IntStream;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.annotation.Handler;
+import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.DateConvertor;

@@ -1,15 +1,13 @@
 package org.sopt.confeti.api.user.facade;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.annotation.Facade;
+import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalArtiestDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
-import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;

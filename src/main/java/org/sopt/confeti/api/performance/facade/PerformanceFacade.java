@@ -7,7 +7,7 @@ import java.util.List;
 
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.annotation.Facade;
+import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;

@@ -1,6 +1,6 @@
 package org.sopt.confeti.global.util;
 
-import org.sopt.confeti.annotation.Handler;
+import org.sopt.confeti.global.annotation.Handler;
 import org.springframework.beans.factory.annotation.Value;
 
 @Handler
