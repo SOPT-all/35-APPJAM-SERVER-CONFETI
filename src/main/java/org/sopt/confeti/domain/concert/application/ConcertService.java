@@ -8,7 +8,7 @@ import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.util.artistsearcher.ArtistResolver;
+import org.sopt.confeti.global.resolver.artist.ArtistResolver;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;

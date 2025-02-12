@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertArtistDTO;
 import org.sopt.confeti.domain.concert.Concert;
-import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
+import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
 
 @Entity
 @Table(name="concert_artists")

@@ -1,4 +1,4 @@
-package org.sopt.confeti.global.util.artistsearcher;
+package org.sopt.confeti.global.util;
 
 import com.neovisionaries.i18n.CountryCode;
 import java.time.LocalDate;
@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.util.DateConvertor;
+import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
 import org.springframework.beans.factory.annotation.Value;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;

@@ -20,8 +20,8 @@ import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
-import org.sopt.confeti.global.util.artistsearcher.SpotifyAPIHandler;
+import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
+import org.sopt.confeti.global.util.SpotifyAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

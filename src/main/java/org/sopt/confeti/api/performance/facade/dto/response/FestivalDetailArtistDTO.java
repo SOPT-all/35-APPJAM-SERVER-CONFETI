@@ -2,7 +2,7 @@ package org.sopt.confeti.api.performance.facade.dto.response;
 
 import java.time.LocalDate;
 import org.sopt.confeti.domain.festivalartist.FestivalArtist;
-import org.sopt.confeti.global.util.artistsearcher.ConfetiArtist;
+import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
 
 public record FestivalDetailArtistDTO(
         String artistId,

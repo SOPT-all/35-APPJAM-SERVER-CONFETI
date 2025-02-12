@@ -1,4 +1,4 @@
-package org.sopt.confeti.global.util.artistsearcher;
+package org.sopt.confeti.global.resolver.artist;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
