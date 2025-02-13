@@ -13,15 +13,14 @@ public abstract class AbstractArtistStrategy implements ArtistStrategy {
     public abstract boolean supports(Class<?> clazz);
 
     protected void addArtistToMapper(
-            String artistId,
             HashMap<String, Queue<ConfetiArtist>> artistMapper,
             ConfetiArtist artist
     ) {
-        if (!artistMapper.containsKey(artistId)) {
-            createQueueToMapper(artistId, artistMapper);
+        if (!artistMapper.containsKey(artist.getArtistId())) {
+            createQueueToMapper(artist.getArtistId(), artistMapper);
         }
 
-        artistMapper.get(artistId).add(artist);
+        artistMapper.get(artist.getArtistId()).add(artist);
     }
 
     private void createQueueToMapper(
