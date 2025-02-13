@@ -15,13 +15,12 @@ import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
 public class FestivalDateArtistStrategy extends AbstractArtistStrategy {
 
     @Override
-    public void collect(List<String> artistIds, HashMap<String, Queue<ConfetiArtist>> artistMapper, Object target) {
+    public void collect(HashMap<String, Queue<ConfetiArtist>> artistMapper, Object target) {
         FestivalDate festivalDate = (FestivalDate) target;
         festivalDate.getStages().stream()
                 .flatMap(stage -> stage.getTimes().stream())
                 .flatMap(time -> time.getArtists().stream())
                 .forEach(artist -> {
-                    artistIds.add(artist.getArtist().getArtistId());
                     addArtistToMapper(artist.getArtist().getArtistId(), artistMapper, artist.getArtist());
                 });
     }

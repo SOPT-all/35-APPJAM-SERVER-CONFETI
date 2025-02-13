@@ -14,10 +14,9 @@ import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
 public class ArtistFavoriteArtistStrategy extends AbstractArtistStrategy {
 
     @Override
-    public void collect(List<String> artistIds, HashMap<String, Queue<ConfetiArtist>> artistMapper, Object target) {
+    public void collect(HashMap<String, Queue<ConfetiArtist>> artistMapper, Object target) {
         ArtistFavorite artistFavorite = (ArtistFavorite) target;
         ConfetiArtist confetiArtist = artistFavorite.getArtist();
-        artistIds.add(confetiArtist.getArtistId());
         addArtistToMapper(confetiArtist.getArtistId(), artistMapper, artistFavorite.getArtist());
     }
 

@@ -2,12 +2,10 @@ package org.sopt.confeti.global.resolver.artist;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 public abstract class AbstractArtistStrategy implements ArtistStrategy {
     public abstract void collect(
-            List<String> artistIds,
             HashMap<String, Queue<ConfetiArtist>> artistMapper,
             Object target
     );
