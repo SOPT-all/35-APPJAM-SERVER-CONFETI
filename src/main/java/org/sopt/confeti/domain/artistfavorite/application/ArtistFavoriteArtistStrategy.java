@@ -1,7 +1,6 @@
 package org.sopt.confeti.domain.artistfavorite.application;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Queue;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
