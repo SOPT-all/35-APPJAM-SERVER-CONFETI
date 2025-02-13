@@ -15,10 +15,9 @@ import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
 public class ConcertArtistStrategy extends AbstractArtistStrategy {
 
     @Override
-    public void collect(List<String> artistIds, HashMap<String, Queue<ConfetiArtist>> artistMapper, Object target) {
+    public void collect(HashMap<String, Queue<ConfetiArtist>> artistMapper, Object target) {
         Concert concert = (Concert) target;
         concert.getArtists().forEach(artist -> {
-            artistIds.add(artist.getArtist().getArtistId());
             addArtistToMapper(artist.getArtist().getArtistId(), artistMapper, artist.getArtist());
         });
     }

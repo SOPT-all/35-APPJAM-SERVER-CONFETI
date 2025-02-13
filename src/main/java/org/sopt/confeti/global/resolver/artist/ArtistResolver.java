@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Resolver;
@@ -15,34 +16,25 @@ import org.sopt.confeti.global.util.SpotifyAPIHandler;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArtistResolver {
 
-    private List<String> artistIds;
-    private HashMap<String, Queue<ConfetiArtist>> artistMapper;
-
     private final SpotifyAPIHandler spotifyAPIHandler;
     private final ArtistStrategyRegistry artistStrategyRegistry;
 
-    private void prologue() {
-        artistIds = new ArrayList<>();
-        artistMapper = new HashMap<>();
-    }
-
-    private void epilogue() {
-        artistIds.clear();
-        artistMapper.clear();
-    }
-
     // Spotify API를 사용해 아티스트를 로드하는 엔트리 포인트
     public void load(final Object target) {
-        prologue();
-        collect(target, artistStrategyRegistry.getArtistStrategyByClass(target.getClass()));
+        final HashMap<String, Queue<ConfetiArtist>> artistMapper = new HashMap<>();
 
-        List<ConfetiArtist> confetiArtists =  searchByArtistIds(artistIds);
+        collect(artistMapper, target, artistStrategyRegistry.getArtistStrategyByClass(target.getClass()));
 
-        injection(confetiArtists);
-        epilogue();
+        List<ConfetiArtist> confetiArtists =  searchByArtistIds(artistMapper.keySet());
+
+        injection(artistMapper, confetiArtists);
     }
 
-    private void collect(final Object target, final ArtistStrategy artistStrategy) {
+    private void collect(
+            final HashMap<String, Queue<ConfetiArtist>> artistMapper,
+            final Object target,
+            final ArtistStrategy artistStrategy
+    ) {
         if (target == null) {
             return;
         }
@@ -53,20 +45,23 @@ public class ArtistResolver {
 
             targets.forEach(loadTarget -> {
                 // Mapper에 등록된 클래스 타입인 경우
-                artistStrategy.collect(artistIds, artistMapper, loadTarget);
+                artistStrategy.collect(artistMapper, loadTarget);
             });
 
             return;
         }
         // Mapper에 등록된 클래스 타입인 경우
-        artistStrategy.collect(artistIds, artistMapper, target);
+        artistStrategy.collect(artistMapper, target);
     }
 
     private boolean isListType(final Object target) {
         return target.getClass() == ArrayList.class;
     }
 
-    private void injection(final List<ConfetiArtist> confetiArtists) {
+    private void injection(
+            final HashMap<String, Queue<ConfetiArtist>> artistMapper,
+            final List<ConfetiArtist> confetiArtists
+    ) {
         confetiArtists.forEach((confetiArtist -> {
             ConfetiArtist mappedConfetiArtist = artistMapper.get(confetiArtist.getArtistId()).poll();
 
@@ -79,7 +74,7 @@ public class ArtistResolver {
         }));
     }
 
-    private List<ConfetiArtist> searchByArtistIds(final List<String> artistIds) {
+    private List<ConfetiArtist> searchByArtistIds(final Set<String> artistIds) {
         return spotifyAPIHandler.findArtistsByArtistIdsEntry(artistIds);
     }
 }
