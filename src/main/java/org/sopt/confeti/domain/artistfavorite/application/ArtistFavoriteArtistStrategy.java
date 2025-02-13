@@ -15,8 +15,7 @@ public class ArtistFavoriteArtistStrategy extends AbstractArtistStrategy {
     @Override
     public void collect(HashMap<String, Queue<ConfetiArtist>> artistMapper, Object target) {
         ArtistFavorite artistFavorite = (ArtistFavorite) target;
-        ConfetiArtist confetiArtist = artistFavorite.getArtist();
-        addArtistToMapper(confetiArtist.getArtistId(), artistMapper, artistFavorite.getArtist());
+        addArtistToMapper(artistMapper, artistFavorite.getArtist());
     }
 
     @Override
