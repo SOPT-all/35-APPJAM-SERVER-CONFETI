@@ -63,14 +63,14 @@ public class ArtistResolver {
             final List<ConfetiArtist> confetiArtists
     ) {
         confetiArtists.forEach((confetiArtist -> {
-            ConfetiArtist mappedConfetiArtist = artistMapper.get(confetiArtist.getArtistId()).poll();
+            Queue<ConfetiArtist> mappedConfetiArtists = artistMapper.get(confetiArtist.getArtistId());
 
-            if (mappedConfetiArtist == null) {
-                throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
+            while (!mappedConfetiArtists.isEmpty()) {
+                ConfetiArtist mappedConfetiArtist = mappedConfetiArtists.poll();
+
+                mappedConfetiArtist.setName(confetiArtist.getName());
+                mappedConfetiArtist.setProfileUrl(confetiArtist.getProfileUrl());
             }
-
-            mappedConfetiArtist.setName(confetiArtist.getName());
-            mappedConfetiArtist.setProfileUrl(confetiArtist.getProfileUrl());
         }));
     }
 
