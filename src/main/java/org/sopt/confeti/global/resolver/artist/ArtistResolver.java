@@ -1,6 +1,5 @@
 package org.sopt.confeti.global.resolver.artist;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
@@ -20,42 +19,56 @@ public class ArtistResolver {
     private final ArtistStrategyRegistry artistStrategyRegistry;
 
     // Spotify API를 사용해 아티스트를 로드하는 엔트리 포인트
-    public void load(final Object target) {
+    public <T> void load(final T target) {
         final HashMap<String, Queue<ConfetiArtist>> artistMapper = new HashMap<>();
 
-        collect(artistMapper, target, artistStrategyRegistry.getArtistStrategyByClass(target.getClass()));
+        collect(artistMapper, target);
 
         List<ConfetiArtist> confetiArtists =  searchByArtistIds(artistMapper.keySet());
 
         injection(artistMapper, confetiArtists);
     }
 
-    private void collect(
+    private <T> void collect(
             final HashMap<String, Queue<ConfetiArtist>> artistMapper,
-            final Object target,
-            final ArtistStrategy artistStrategy
+            final T target
+    ) {
+        if (isListType(target)) {
+            collectList(artistMapper, (List<?>) target);
+            return;
+        }
+
+        collectSingle(artistMapper, target);
+    }
+
+    private <T> void collectList(
+            final HashMap<String, Queue<ConfetiArtist>> artistMapper,
+            final List<T> targets
+    ) {
+        if (targets.isEmpty()) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
+
+        ArtistStrategy artistStrategy = artistStrategyRegistry.getArtistStrategyByClass(targets.getFirst().getClass());
+        targets.forEach(target -> {
+            artistStrategy.collect(artistMapper, target);
+        });
+    }
+
+    private <T> void collectSingle(
+            final HashMap<String, Queue<ConfetiArtist>> artistMapper,
+            final T target
     ) {
         if (target == null) {
-            return;
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
 
-        // 주어진 타겟이 리스트일 경우
-        if (isListType(target)) {
-            List<Object> targets = (List<Object>) target;
-
-            targets.forEach(loadTarget -> {
-                // Mapper에 등록된 클래스 타입인 경우
-                artistStrategy.collect(artistMapper, loadTarget);
-            });
-
-            return;
-        }
-        // Mapper에 등록된 클래스 타입인 경우
+        ArtistStrategy artistStrategy = artistStrategyRegistry.getArtistStrategyByClass(target.getClass());
         artistStrategy.collect(artistMapper, target);
     }
 
-    private boolean isListType(final Object target) {
-        return target.getClass() == ArrayList.class;
+    private <T> boolean isListType(final T target) {
+        return target instanceof List<?>;
     }
 
     private void injection(
