@@ -1,6 +1,7 @@
 package org.sopt.confeti.global.util;
 
 import com.neovisionaries.i18n.CountryCode;
+import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,6 +53,7 @@ public class SpotifyAPIHandler {
 
     private int refreshCount;
 
+    @PostConstruct
     public void init() {
         createSpotifyApi();
         generateAccessToken();
