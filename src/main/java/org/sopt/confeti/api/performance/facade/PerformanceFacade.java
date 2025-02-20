@@ -53,19 +53,6 @@ public class PerformanceFacade {
     private final ConcertFavoriteService concertFavoriteService;
     private final ArtistFavoriteService artistFavoriteService;
 
-    // 더미 데이터 고정값! - 스프린트 이후로 지우기
-    private final List<Long> dummyBannerConcertIds = new ArrayList<>() {{
-        add(28L);
-        add(29L);
-    }};
-
-    private final List<Long> dummyBannerFestivalIds = new ArrayList<>() {{
-        add(9L);
-        add(12L);
-        add(2L);
-    }};
-    // 더미 데이터 고정값! - 스프린트 이후로 지우기
-
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final Long userId, final long concertId) {
         Concert concert = concertService.getConcertDetailByConcertId(concertId);
@@ -139,19 +126,8 @@ public class PerformanceFacade {
             return PerformanceReservationDTO.from(performanceReserve);
         }
 
-        // 더미 데이터 고정값! - 스프린트 이후로 지우기
-        List<DummyPerformanceDTO> dummyPerformanceDTOS = Stream.concat(
-                concertService.getConcerts(dummyBannerConcertIds).stream()
-                        .map(DummyPerformanceDTO::from),
-                festivalService.getFestivals(dummyBannerFestivalIds).stream()
-                        .map(DummyPerformanceDTO::from)
-        ).sorted(Comparator.comparing(DummyPerformanceDTO::reserveAt))
-                .toList();
-        return PerformanceReservationDTO.toDummy(dummyPerformanceDTOS);
-        // 더미 데이터 고정값! - 스프린트 이후로 지우기
-
-//        List<PerformanceTicketDTO> performanceReserve=performanceService.getPerformancesReservation();
-//        return PerformanceReservationDTO.from(performanceReserve);
+        List<PerformanceTicketDTO> performanceReserve=performanceService.getPerformancesReservation();
+        return PerformanceReservationDTO.from(performanceReserve);
     }
 
     @Transactional(readOnly = true)
