@@ -22,17 +22,4 @@ public record PerformanceReservationDetailDTO(
                 performanceTicketDTO.reservationBgUrl()
         );
     }
-
-    // 더미 데이터 고정값! - 스프린트 이후로 지우기
-    public static PerformanceReservationDetailDTO of(final DummyPerformanceDTO dummyPerformanceDTO, final int index) {
-        return new PerformanceReservationDetailDTO(
-                index,
-                dummyPerformanceDTO.typeId(),
-                dummyPerformanceDTO.type(),
-                dummyPerformanceDTO.subtitle(),
-                DateConvertor.convert(dummyPerformanceDTO.reserveAt()),
-                dummyPerformanceDTO.reservationBgUrl()
-        );
-    }
-    // 더미 데이터 고정값! - 스프린트 이후로 지우기
 }
