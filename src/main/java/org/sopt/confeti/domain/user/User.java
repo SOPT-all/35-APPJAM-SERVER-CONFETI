@@ -3,6 +3,7 @@ package org.sopt.confeti.domain.user;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
@@ -24,6 +25,10 @@ public class User {
     @Column(name="user_id")
     private Long id;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private OAuthProvider oauthProvider;
+
     @Column(length=20, nullable = false)
     private String username;
 
@@ -41,4 +46,21 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true )
     private List<TimetableFestival> timetableFestivals = new ArrayList<>();
+
+    @Builder
+    public User(long id, String username, String profilePath, OAuthProvider oauthProvider) {
+        this.id = id;
+        this.username = username;
+        this.profilePath = profilePath;
+        this.oauthProvider = oauthProvider;
+    }
+
+    public static User crate(AuthUser authUser) {
+        return new User(
+                authUser.getId(),
+                authUser.getSocialNickname(),
+                authUser.getSocialProfile(),
+                authUser.getProvider()
+        );
+    }
 }
