@@ -13,6 +13,10 @@ public enum ErrorMessage {
 
     /* 401 Unauthorized */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "사용자의 로그인 검증을 실패했습니다."),
+    WRONG_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다."),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
+    EMPTY_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 없습니다."),
+
 
     /* 403 Forbidden*/
     FORBIDDEN(HttpStatus.FORBIDDEN, "리소스 접근 권한이 없습니다."),
