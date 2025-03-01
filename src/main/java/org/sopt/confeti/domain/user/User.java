@@ -10,7 +10,6 @@ import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.concertfavorite.ConcertFavorite;
 import org.sopt.confeti.domain.festivalfavorite.FestivalFavorite;
 import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
-import org.sopt.confeti.domain.usertimetable.UserTimetable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,10 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
-    private OAuthProvider oauthProvider;
+    private OAuthProvider provider;
+
+    @Column(length = 20,nullable = false)
+    private String socialId;
 
     @Column(length=20, nullable = false)
     private String username;
@@ -47,20 +49,26 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true )
     private List<TimetableFestival> timetableFestivals = new ArrayList<>();
 
-    @Builder
-    public User(long id, String username, String profilePath, OAuthProvider oauthProvider) {
-        this.id = id;
-        this.username = username;
-        this.profilePath = profilePath;
-        this.oauthProvider = oauthProvider;
-    }
-
-    public static User crate(AuthUser authUser) {
+    public static User create(AuthUser authUser) {
         return new User(
                 authUser.getId(),
+                authUser.getProvider(),
+                authUser.getSocialId(),
                 authUser.getSocialNickname(),
-                authUser.getSocialProfile(),
-                authUser.getProvider()
+                authUser.getSocialProfile()
         );
+    }
+
+    public AuthUser toAuthUser() {
+        return AuthUser.createWithId(id, provider, socialId, username, profilePath);
+    }
+
+    @Builder
+    public User(long id, OAuthProvider provider, String socialId, String username, String profilePath) {
+        this.id = id;
+        this.provider = provider;
+        this.socialId = socialId;
+        this.username = username;
+        this.profilePath = profilePath;
     }
 }
