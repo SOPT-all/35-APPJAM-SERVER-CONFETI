@@ -9,7 +9,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 @RequiredArgsConstructor
@@ -48,12 +47,10 @@ public class KakaoApiClient implements OAuthApiClient {
     }
 
     private String createHttpBody(OAuthLoginParams params) {
-        return UriComponentsBuilder.newInstance()
-                .queryParam("grant_type", GRANT_TYPE)
-                .queryParam("client_id", clientId)
-                .queryParam("redirect_uri", params.redirectUrl())
-                .queryParam("code", params.code())
-                .toUriString();
+        return "grant_type=authorization_code" +
+                "&client_id=" + clientId +
+                "&redirect_uri=" + params.redirectUrl() +
+                "&code=" + params.code();
     }
 
     private String createAuthorizationHeader(String accessToken) {
