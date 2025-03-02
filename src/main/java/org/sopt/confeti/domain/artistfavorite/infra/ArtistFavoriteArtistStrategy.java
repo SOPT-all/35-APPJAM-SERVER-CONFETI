@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.artistfavorite.application;
+package org.sopt.confeti.domain.artistfavorite.infra;
 
 import java.util.HashMap;
 import java.util.Queue;
