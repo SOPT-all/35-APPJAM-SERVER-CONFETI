@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.festival.application;
+package org.sopt.confeti.domain.festival.infra;
 
 import java.util.HashMap;
 import java.util.Queue;

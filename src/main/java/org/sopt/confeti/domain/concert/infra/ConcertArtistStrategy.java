@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.concert.application;
+package org.sopt.confeti.domain.concert.infra;
 
 import java.util.HashMap;
 import java.util.Queue;
