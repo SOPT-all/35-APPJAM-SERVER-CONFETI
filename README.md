@@ -10,19 +10,6 @@
 
 ---
 
-## ✨ Contributors
-
-| |⭐️**리더** 오치현 [@ch1hyun](https://github.com/ch1hyun)|박상아 [@Ivoryeee](https://github.com/Ivoryeee)                                                                                                                             |
-| :---: |:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| |![치현](https://github.com/user-attachments/assets/41903db0-9064-43b7-8490-66218225899a)|![상아](https://github.com/user-attachments/assets/ca09e254-24ee-440d-9c09-f8201913c267)|| **역할** |백엔드 개발 / 인프라 담당|백엔드 개발 / QA 주관|
-| **담당 API** | <ul><li>최신 등록 순 공연 정보 조회 API</li><li>아티스트 검색 API</li><li>콘서트 정보 조회 API</li><li>페스티벌 정보 조회 API</li><li>타임테이블 페스티벌 삭제 API</li><li>예정된 페스티벌 목록 조회 API</li><li>타임테이블에 페스티벌 추가 API</li><li>아티스트 좋아요 추가 API</li><li>아티스트 좋아요 삭제 API</li><li>콘서트 좋아요 추가 API</li><li>콘서트 좋아요 삭제 API</li><li>관심 있는 공연 목록 조회 API</li></ul> | <ul><li>최신 공연 티켓팅 정보 조회 API</li><li>검색된 아티스트 정보 조회 API (공연 정보)</li><li>타임테이블 등록된 페스티벌, 날짜 조회 API</li><li>타임테이블 등록된 시간표 조회 API</li><li>타임테이블 시간표 수정 API</li><li>페스티벌 좋아요 추가 API</li><li>페스티벌 좋아요 삭제 API</li><li>프로필, 닉네임 정보 조회 API</li><li>관심 있는 아티스트 목록 조회 API</li></ul> |
-| **기타 작업** |<ul><li>서버 구축 및 유지보수</li><li>HTTPS 설정 및 도메인 연결</li><li>Docker 관련 설정 진행</li><li>무중단 배포를 위한 **스크립트 작성**</li></ul>|<ul><li>서버 내부 QA 주관 및 보수 작업 진행 </li><li>서버 구성, HTTPS, 무중단 배포 자료 조사</li></ul>|
-
-## 🔗 Architecture
-![image](https://github.com/user-attachments/assets/99057285-6e07-4ff6-8218-d1d65545ca74)
-
----
-
 ## 📌 Main Function
 ![image](https://github.com/user-attachments/assets/045e2344-fff3-459d-b419-d11628ad3fa8)
 ![image](https://github.com/user-attachments/assets/ed37656e-0f04-4e37-81f1-efdebe0ed554)
@@ -35,8 +22,24 @@
 ![image](https://github.com/user-attachments/assets/3f0ddc75-1792-4c8b-aa64-63b95d9579b9)
 ![image](https://github.com/user-attachments/assets/40b3facd-4fa6-49af-b3d8-c7c4be93ec6f)
 
+---
+
+## ✨ Contributors
+
+| 오치현 | 박상아 | 정정교 |
+| :---: | :---: | :---: |
+|![치현](https://github.com/user-attachments/assets/41903db0-9064-43b7-8490-66218225899a)|![상아](https://github.com/user-attachments/assets/ca09e254-24ee-440d-9c09-f8201913c267)|![image](https://github.com/user-attachments/assets/4aec7630-77a6-48a2-8802-26bf8f222152)|
+|[@chihyun](https://github.com/ch1hyun)|[@Ivoryeee](https://github.com/Ivoryeee)|[@junggyo1020](https://github.com/junggyo1020)|
+
+## 🔗 Architecture
+![image](https://github.com/user-attachments/assets/99057285-6e07-4ff6-8218-d1d65545ca74)
+
+---
+
 ## 💿 ERD
 <img width="1134" alt="image" src="https://github.com/user-attachments/assets/a25eb17d-6fa2-4255-9c6f-f55eb96c78c6" />
+
+---
 
 ## 🔖 Commit Convention
 - **feat**: 새로운 기능 추가 (feature)
@@ -50,12 +53,52 @@
 - **cd**: CD 관련 설정 변경
 - **perf**: 성능 개선 관련 변경
 
+---
+
 ## 🔥 Git Convention
-https://wonderful-celestite-e3c.notion.site/Git-Convention-165210e281b0802588eee44841095e16?pvs=4
+[Git Convention](https://wonderful-celestite-e3c.notion.site/Git-Convention-165210e281b0802588eee44841095e16?pvs=4)
+
+---
 
 ## 🔥 Code Convention
-https://wonderful-celestite-e3c.notion.site/Code-Convention-165210e281b080368966ccf6087e07ff?pvs=4
+[Code Convention](https://wonderful-celestite-e3c.notion.site/Code-Convention-165210e281b080368966ccf6087e07ff?pvs=4)
+
+---
 
 ## 📚 Tech Stack
+[![My Skills](https://skillicons.dev/icons?i=java,gradle,spring,mysql,aws,nginx,docker,githubactions)](https://skillicons.dev)
+
+---
 
 ## 📁 Folder Structure
+```
+📁 api
+┣ 📁 controller
+┣ 📁 dto
+┃┣ 📁 response
+┃┣ 📁 request
+┣ 📁 facade
+┣ 📁 vo (값 객체)
+📁 auth
+┣ 📁 command
+┣ 📁 dto
+┣ 📁 jwt
+📁 domain
+┣ 📁 model (entity 이름)
+┃┣ 📁 application (해당 서비스들이나, 비즈니스 로직들)
+┃┃┣ 📁 dto
+┃┃┃┣ 📁 response
+┃┃┃┣ 📁 request
+┃┣ 📁 infra (외부 의존성과 연결된 친구들 jpa repository 같은 친구, or aws 서비스들)
+┃┃┣ 📁 repository
+📁 global
+┣ 📁 annotation (커스텀 어노테이션)
+┣ 📁 common (공통 로직)
+┃┣ 📁 constant (상수값)
+┣ 📁 message (응답 메세지)
+┣ 📁 resolver (커스텀 리졸버)
+┃┣ 📁 artist (외부 음악 스트리밍 Open API 연동 로직)
+┣ 📁 util (유틸 객체, 모두가 사용할 수 있는 객체들)
+┣ 📁 exception (exception 및 exceptionHandler 관리)
+┣ 📁 config (설정 파일)
+```
