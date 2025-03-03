@@ -1,9 +1,8 @@
-package org.sopt.confeti.global.util;
+package org.sopt.confeti.global.util.music;
 
 import com.neovisionaries.i18n.CountryCode;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,15 +11,15 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
+import org.sopt.confeti.global.util.DateConvertor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.exceptions.detailed.BadRequestException;
@@ -32,8 +31,9 @@ import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 
 @Handler
+@Primary
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class SpotifyAPIHandler {
+public class SpotifyAPIHandler extends MusicAPIHandlerTemplate {
 
     private static final int ARTIST_LIMIT = 1;
     private static final int ARTIST_OFFSET = 0;
@@ -61,7 +61,13 @@ public class SpotifyAPIHandler {
         refreshCount = REFRESH_INIT_VALUE;
     }
 
-    public Optional<ConfetiArtist> findArtistsByKeyword(final String keyword) {
+    @Override
+    public List<ConfetiArtist> findArtistsByArtistIds(final Set<String> artistIds) {
+        return findArtistsByArtistIds(artistIds, GET_SEVERAL_ARTIST_MAXIMUM_SIZE);
+    }
+
+    @Override
+    public Optional<ConfetiArtist> findArtistByKeyword(final String keyword) {
         Optional<Artist> searched = searchArtistByKeyword(keyword);
 
         if (searched.isEmpty()) {
@@ -75,6 +81,7 @@ public class SpotifyAPIHandler {
         );
     }
 
+    @Override
     public Optional<ConfetiArtist> findArtistByArtistId(final String artistId) {
         if (artistId == null || artistId.isBlank()) {
             return Optional.empty();
@@ -101,27 +108,8 @@ public class SpotifyAPIHandler {
         }
     }
 
-    public List<ConfetiArtist> findArtistsByArtistIdsEntry(final Set<String> artistIds) {
-        // 아티스트 아이디 개수가 최대를 넘지 않는 경우 단일 호출
-        if (artistIds.size() <= GET_SEVERAL_ARTIST_MAXIMUM_SIZE) {
-            return findArtistsByArtistIds(artistIds.stream().toList());
-        }
-
-        List<ConfetiArtist> artists = new ArrayList<>();
-
-        AtomicInteger counter = new AtomicInteger();
-        artistIds.stream()
-                .collect(Collectors.groupingBy(artistId -> counter.getAndIncrement() / GET_SEVERAL_ARTIST_MAXIMUM_SIZE))
-                .values()
-                .parallelStream()
-                .forEach(consumeArtistIds -> {
-                    artists.addAll(findArtistsByArtistIds(consumeArtistIds));
-                });
-
-        return artists;
-    }
-
-    public List<ConfetiArtist> findArtistsByArtistIds(final List<String> artistIds) {
+    @Override
+    protected List<ConfetiArtist> findArtistsByArtistIds(final List<String> artistIds) {
         if (artistIds.isEmpty()) {
             return Collections.emptyList();
         }
