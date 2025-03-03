@@ -9,13 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Resolver;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.util.SpotifyAPIHandler;
+import org.sopt.confeti.global.util.music.MusicAPIHandler;
 
 @Resolver
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArtistResolver {
 
-    private final SpotifyAPIHandler spotifyAPIHandler;
+    private final MusicAPIHandler musicAPIHandler;
     private final ArtistStrategyRegistry artistStrategyRegistry;
 
     // Spotify API를 사용해 아티스트를 로드하는 엔트리 포인트
@@ -88,6 +88,6 @@ public class ArtistResolver {
     }
 
     private List<ConfetiArtist> searchByArtistIds(final Set<String> artistIds) {
-        return spotifyAPIHandler.findArtistsByArtistIdsEntry(artistIds);
+        return musicAPIHandler.findArtistsByArtistIds(artistIds);
     }
 }
