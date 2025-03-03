@@ -6,7 +6,7 @@ import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.api.artist.facade.dto.response.SearchArtistDTO;
 import org.sopt.confeti.domain.artistfavorite.application.ArtistFavoriteService;
 import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
-import org.sopt.confeti.global.util.SpotifyAPIHandler;
+import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
@@ -14,11 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArtistFacade {
 
     private final ArtistFavoriteService artistFavoriteService;
-    private final SpotifyAPIHandler spotifyAPIHandler;
+    private final MusicAPIHandler musicAPIHandler;
 
     @Transactional(readOnly = true)
     public SearchArtistDTO searchByKeyword(final Long userId, final String keyword) {
-        Optional<ConfetiArtist> confetiArtist = spotifyAPIHandler.findArtistsByKeyword(keyword);
+        Optional<ConfetiArtist> confetiArtist = musicAPIHandler.findArtistByKeyword(keyword);
 
         boolean isFavorite = false;
 

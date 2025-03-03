@@ -21,7 +21,7 @@ import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
-import org.sopt.confeti.global.util.SpotifyAPIHandler;
+import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class UserFavoriteFacade {
     private final ArtistFavoriteService artistFavoriteService;
     private final ConcertFavoriteService concertFavoriteService;
     private final ConcertService concertService;
-    private final SpotifyAPIHandler spotifyAPIHandler;
+    private final MusicAPIHandler musicAPIHandler;
     private final PerformanceService performanceService;
 
     @Transactional
@@ -98,7 +98,7 @@ public class UserFavoriteFacade {
     }
 
     private void validateExistArtist(final String artistId) {
-        Optional<ConfetiArtist> artist = spotifyAPIHandler.findArtistByArtistId(artistId);
+        Optional<ConfetiArtist> artist = musicAPIHandler.findArtistByArtistId(artistId);
         if (artist.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
