@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
 import org.sopt.confeti.auth.dto.OAuthLoginParams;
-import org.sopt.confeti.auth.dto.OAuthTokenResponse;
-import org.sopt.confeti.auth.dto.OAuthUserInfoResponse;
+import org.sopt.confeti.auth.dto.OAuthTokenResult;
+import org.sopt.confeti.auth.dto.OAuthUserInfoResult;
 import org.sopt.confeti.auth.jwt.JwtTokenGenerator;
 import org.sopt.confeti.domain.token.RefreshToken;
 import org.sopt.confeti.domain.token.infra.RefreshTokenRepository;
@@ -31,7 +31,7 @@ public class LoginService {
     public LoginResult login(LoginCommand command) {
 
           // 사용자 인증 후 사용자 정보 반환
-          OAuthUserInfoResponse socialUserInfo = getSocialInfo(command);
+          OAuthUserInfoResult socialUserInfo = getSocialInfo(command);
           // 사용자 입력값 + 사용자 정보로 실제 사용자인지 검사
           AuthUser authUser = loadOrCreateUser(command, socialUserInfo);
           Token token = createToken(authUser);
@@ -46,7 +46,7 @@ public class LoginService {
         );
     }
 
-    private AuthUser loadOrCreateUser(LoginCommand command, OAuthUserInfoResponse socialUserInfo) {
+    private AuthUser loadOrCreateUser(LoginCommand command, OAuthUserInfoResult socialUserInfo) {
         System.out.println("로그인 시도 - provider: " + command.provider() + ", socialId: " + socialUserInfo.id());
 
         // 사용자의 socialId로 사용자 가입돼 있는지 검사
@@ -82,10 +82,10 @@ public class LoginService {
      );
     }
 
-    private OAuthUserInfoResponse getSocialInfo(LoginCommand command) {
+    private OAuthUserInfoResult getSocialInfo(LoginCommand command) {
         OAuthLoginParams loginParams = new OAuthLoginParams(command.redirectUrl(), command.code());
-        OAuthTokenResponse tokenResponse = oAuthApiClient.requestAccessToken(loginParams);
-        OAuthUserInfoResponse userInfo = oAuthApiClient.getOAuthUserInfo(tokenResponse.accessToken());
+        OAuthTokenResult tokenResponse = oAuthApiClient.requestAccessToken(loginParams);
+        OAuthUserInfoResult userInfo = oAuthApiClient.getOAuthUserInfo(tokenResponse.accessToken());
         return userInfo;
     }
 }

@@ -2,9 +2,9 @@ package org.sopt.confeti.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.sopt.confeti.auth.dto.OAuthUserInfoResponse;
+import org.sopt.confeti.auth.dto.OAuthUserInfoResult;
 import org.sopt.confeti.auth.dto.OAuthLoginParams;
-import org.sopt.confeti.auth.dto.OAuthTokenResponse;
+import org.sopt.confeti.auth.dto.OAuthTokenResult;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -24,25 +24,25 @@ public class KakaoApiClient implements OAuthApiClient {
     private final RestClient restClient;
 
     @Override
-    public OAuthTokenResponse requestAccessToken(OAuthLoginParams params) {
+    public OAuthTokenResult requestAccessToken(OAuthLoginParams params) {
         return restClient
                 .method(HttpMethod.POST)
                 .uri(KAUTH_TOKEN_URL_HOST)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(createHttpBody(params))
                 .retrieve()
-                .toEntity(OAuthTokenResponse.class)
+                .toEntity(OAuthTokenResult.class)
                 .getBody();
     }
 
     @Override
-    public OAuthUserInfoResponse getOAuthUserInfo(String accessToken) {
+    public OAuthUserInfoResult getOAuthUserInfo(String accessToken) {
         return restClient
                 .method(HttpMethod.GET)
                 .uri(KAUTH_USER_URL_HOST)
                 .header("Authorization", createAuthorizationHeader(accessToken))
                 .retrieve()
-                .toEntity(OAuthUserInfoResponse.class)
+                .toEntity(OAuthUserInfoResult.class)
                 .getBody();
     }
 

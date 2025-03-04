@@ -1,10 +1,10 @@
 package org.sopt.confeti.auth;
 
-import org.sopt.confeti.auth.dto.OAuthUserInfoResponse;
+import org.sopt.confeti.auth.dto.OAuthUserInfoResult;
 import org.sopt.confeti.auth.dto.OAuthLoginParams;
-import org.sopt.confeti.auth.dto.OAuthTokenResponse;
+import org.sopt.confeti.auth.dto.OAuthTokenResult;
 
 public interface OAuthApiClient {
-    OAuthTokenResponse requestAccessToken(OAuthLoginParams params);
-    OAuthUserInfoResponse getOAuthUserInfo(String accessToken);
+    OAuthTokenResult requestAccessToken(OAuthLoginParams params);
+    OAuthUserInfoResult getOAuthUserInfo(String accessToken);
 }
