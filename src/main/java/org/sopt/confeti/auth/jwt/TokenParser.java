@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TokenParser {
     private static final String PREFIX  = "Bearer ";
-    public String getToken(String refreshToken) {
-        if (refreshToken.startsWith(PREFIX)) {
-            return refreshToken.substring(PREFIX.length());
+    public String getToken(String token) {
+        if (token.startsWith(PREFIX)) {
+            return token.substring(PREFIX.length());
         } else {
             throw new UnauthorizedException(ErrorMessage.WRONG_TOKEN_REQUEST);
         }

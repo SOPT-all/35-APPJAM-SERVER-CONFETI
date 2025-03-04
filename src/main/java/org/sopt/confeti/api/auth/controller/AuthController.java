@@ -6,6 +6,7 @@ import org.sopt.confeti.api.auth.facade.AuthFacade;
 import org.sopt.confeti.auth.Token;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
+import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -36,5 +37,11 @@ public class AuthController {
     ) {
         Token token = authFacade.reissue(refreshToken);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, token);
+    }
+
+    @PostMapping("/kakao/logout")
+    public ResponseEntity<BaseResponse<?>> logout(@UserId Long userId){
+        authFacade.logout(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }
