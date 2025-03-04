@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class AuthUser {
 
-    private long id;
+    private Long id;
     private final OAuthProvider provider;
     private final String socialId;
     private final String socialNickname;
@@ -18,7 +18,7 @@ public class AuthUser {
         this.socialProfile = socialProfile;
     }
 
-    private AuthUser(long id, OAuthProvider provider, String socialId, String socialNickname, String socialProfile) {
+    private AuthUser(Long id, OAuthProvider provider, String socialId, String socialNickname, String socialProfile) {
         this.id=id;
         this.provider=provider;
         this.socialId = socialId;
@@ -30,7 +30,7 @@ public class AuthUser {
         return new AuthUser(provider, socialId, socialNickname, socialProfile);
     }
 
-    public static AuthUser createWithId(long id, OAuthProvider provider, String socialId, String socialNickname, String socialProfile) {
+    public static AuthUser createWithId(Long id, OAuthProvider provider, String socialId, String socialNickname, String socialProfile) {
         return new AuthUser(id, provider, socialId, socialNickname, socialProfile);
     }
 

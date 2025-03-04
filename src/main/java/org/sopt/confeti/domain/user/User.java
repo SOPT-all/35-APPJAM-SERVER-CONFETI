@@ -51,7 +51,6 @@ public class User {
 
     public static User create(AuthUser authUser) {
         return new User(
-                authUser.getId(),
                 authUser.getProvider(),
                 authUser.getSocialId(),
                 authUser.getSocialNickname(),
@@ -64,8 +63,7 @@ public class User {
     }
 
     @Builder
-    public User(long id, OAuthProvider provider, String socialId, String username, String profilePath) {
-        this.id = id;
+    public User(OAuthProvider provider, String socialId, String username, String profilePath) {
         this.provider = provider;
         this.socialId = socialId;
         this.username = username;
