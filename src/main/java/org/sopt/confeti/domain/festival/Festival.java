@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festivaldate.FestivalDate;
 import org.sopt.confeti.domain.festivalfavorite.FestivalFavorite;
@@ -38,18 +39,23 @@ public class Festival {
     @Column(length = 100, nullable = false)
     private String festivalArea;
 
+    @Setter
     @Column(length = 250, nullable = false)
     private String festivalPosterPath;
 
+    @Setter
     @Column(length = 250, nullable = false)
     private String festivalPosterBgPath;
 
+    @Setter
     @Column(length = 250, nullable = false)
     private String festivalInfoImgPath;
 
+    @Setter
     @Column(length = 250) // 나중에 nullable = false로 수정
     private String festivalReservationBgPath;
 
+    @Setter
     @Column(length = 250)
     private String festivalLogoPath;
 
@@ -118,11 +124,11 @@ public class Festival {
                 .festivalStartAt(createFestivalDTO.festivalStartAt())
                 .festivalEndAt(createFestivalDTO.festivalEndAt())
                 .festivalArea(createFestivalDTO.festivalArea())
-                .festivalPosterPath(createFestivalDTO.festivalPosterPath())
-                .festivalPosterBgPath(createFestivalDTO.festivalPosterBgPath())
-                .festivalInfoImgPath(createFestivalDTO.festivalInfoImgPath())
-                .festivalReservationBgPath(createFestivalDTO.festivalReservationBgPath())
-                .festivalLogoPath(createFestivalDTO.festivalLogoPath())
+                .festivalPosterPath("")
+                .festivalPosterBgPath("")
+                .festivalInfoImgPath("")
+                .festivalReservationBgPath("")
+                .festivalLogoPath("")
                 .reserveAt(createFestivalDTO.reserveAt())
                 .reservationUrl(createFestivalDTO.reservationUrl())
                 .reservationOffice(createFestivalDTO.reservationOffice())

@@ -5,7 +5,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
+import org.sopt.confeti.domain.concert.application.dto.request.ConcertFileNamesDTO;
 import org.sopt.confeti.domain.concertartist.ConcertArtist;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,15 +38,19 @@ public class Concert {
     @Column(length = 100, nullable = false)
     private String concertArea;
 
+    @Setter
     @Column(length = 250, nullable = false)
     private String concertPosterPath;
 
+    @Setter
     @Column(length = 250, nullable = false)
     private String concertPosterBgPath;
 
+    @Setter
     @Column(length = 250, nullable = false)
     private String concertInfoImgPath;
 
+    @Setter
     @Column(length = 250) // 나중에 nullable = false로 수정
     private String concertReservationBgPath;
 
@@ -102,10 +108,10 @@ public class Concert {
                 .concertStartAt(from.concertStartAt())
                 .concertEndAt(from.concertEndAt())
                 .concertArea(from.concertArea())
-                .concertPosterPath(from.concertPosterPath())
-                .concertPosterBgPath(from.concertPosterBgPath())
-                .concertInfoImgPath(from.concertInfoImgPath())
-                .concertReservationBgPath(from.concertReservationBgPath())
+                .concertPosterPath("")
+                .concertPosterBgPath("")
+                .concertInfoImgPath("")
+                .concertReservationBgPath("")
                 .reserveAt(from.reserveAt())
                 .reservationUrl(from.reservationUrl())
                 .reservationOffice(from.reservationOffice())
