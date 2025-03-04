@@ -8,6 +8,8 @@ import java.net.URL;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
+import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,5 +64,17 @@ public class S3FileHandler {
      */
     public URL getFileUrl(String folderPath, String key) {
         return s3Operations.createSignedGetURL(bucket, folderPath + key, urlDuration);
+    }
+
+    /**
+     * 파일 수정 (삭제 -> 업로드)
+     */
+    public void updateFile(MultipartFile file, String folderPath, String key) throws IOException {
+        if (!s3Operations.objectExists(bucket, folderPath + key)) {
+            throw new ConfetiException(ErrorMessage.FORBIDDEN);
+        }
+
+        deleteFile(folderPath, key);
+        upload(folderPath + key, file.getInputStream(), getMetadata(file));
     }
 }
