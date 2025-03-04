@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
+import org.sopt.confeti.domain.festival.application.dto.request.FestivalFileNamesDTO;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -122,5 +123,18 @@ public class FestivalService {
     @Transactional(readOnly = true)
     public List<Festival> getFestivals(final List<Long> festivalIds) {
         return festivalRepository.findByIdIn(festivalIds);
+    }
+
+    @Transactional
+    public void updateFiles(final long festivalId, final FestivalFileNamesDTO fileNames) {
+        Festival festival = festivalRepository.findById(festivalId).orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+        );
+
+        festival.setFestivalPosterPath(fileNames.poster());
+        festival.setFestivalPosterBgPath(fileNames.posterBg());
+        festival.setFestivalInfoImgPath(fileNames.infoImg());
+        festival.setFestivalReservationBgPath(fileNames.reservationBg());
+        festival.setFestivalLogoPath(fileNames.logo());
     }
 }

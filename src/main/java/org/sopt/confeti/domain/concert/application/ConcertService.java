@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
+import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertFileDTO;
 import org.sopt.confeti.domain.concert.Concert;
+import org.sopt.confeti.domain.concert.application.dto.request.ConcertFileNamesDTO;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -78,5 +80,17 @@ public class ConcertService {
     @Transactional(readOnly = true)
     public List<Concert> getConcerts(final List<Long> concertIds) {
         return concertRepository.findAllByIdIn(concertIds);
+    }
+
+    @Transactional
+    public void updateFiles(final Long concertId, final ConcertFileNamesDTO fileNames) {
+        Concert concert = concertRepository.findById(concertId).orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+        );
+
+        concert.setConcertPosterPath(fileNames.poster());
+        concert.setConcertPosterBgPath(fileNames.posterBg());
+        concert.setConcertInfoImgPath(fileNames.infoImg());
+        concert.setConcertReservationBgPath(fileNames.reservationBg());
     }
 }
