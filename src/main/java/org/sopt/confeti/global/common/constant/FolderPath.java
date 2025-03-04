@@ -3,7 +3,7 @@ package org.sopt.confeti.global.common.constant;
 import java.util.Arrays;
 
 public enum FolderPath {
-    FESTIVAL("festival"), CONCERT("concert"),
+    FESTIVAL("festival"), CONCERT("concert"), USER("user"),
     DETAIL("detail"), LOGO("logo"), MAIN_BANNER("main-banner"),
     POSTER_BG("poster-bg"), POSTER("poster");
 
