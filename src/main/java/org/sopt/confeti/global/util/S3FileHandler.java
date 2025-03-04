@@ -56,4 +56,11 @@ public class S3FileHandler {
     public void deleteFile(String folderPath, String key) {
         s3Operations.deleteObject(bucket, folderPath + key);
     }
+
+    /**
+     * 파일 조회 URL 생성
+     */
+    public URL getFileUrl(String folderPath, String key) {
+        return s3Operations.createSignedGetURL(bucket, folderPath + key, urlDuration);
+    }
 }
