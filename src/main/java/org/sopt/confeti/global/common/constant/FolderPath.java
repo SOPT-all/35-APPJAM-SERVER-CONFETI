@@ -1,6 +1,8 @@
 package org.sopt.confeti.global.common.constant;
 
 import java.util.Arrays;
+import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.message.ErrorMessage;
 
 public enum FolderPath {
     FESTIVAL("festival"), CONCERT("concert"), USER("user"),
@@ -19,6 +21,18 @@ public enum FolderPath {
                 PATH_DELIMITER,
                 Arrays.stream(folderPaths).map(FolderPath::getSingle).toList()
         );
+    }
+
+    public static FolderPath getFolderPathByPerformanceType(PerformanceType performanceType) {
+        if (performanceType == PerformanceType.FESTIVAL) {
+            return FESTIVAL;
+        }
+
+        if (performanceType == PerformanceType.CONCERT) {
+            return CONCERT;
+        }
+
+        throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
     }
 
     public String getSingle() {
