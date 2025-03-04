@@ -3,6 +3,7 @@ package org.sopt.confeti.api.performance.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
+import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.DateConvertor;
 import org.sopt.confeti.global.util.S3FileHandler;
 
@@ -27,8 +28,8 @@ public record ConcertDetailInfoResponse(
     public static ConcertDetailInfoResponse of(final ConcertDetailDTO concertDetailDTO, final S3FileHandler s3FileHandler) {
         return new ConcertDetailInfoResponse(
                 concertDetailDTO.concertId(),
-                s3FileHandler.getFileUrl(concertDetailDTO.posterPath()),
-                s3FileHandler.getFileUrl(concertDetailDTO.posterBgPath()),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER), concertDetailDTO.posterPath()).getPath(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER_BG), concertDetailDTO.posterBgPath()).getPath(),
                 concertDetailDTO.title(),
                 concertDetailDTO.subtitle(),
                 DateConvertor.convertToLocalDate(concertDetailDTO.startAt()),
@@ -40,7 +41,7 @@ public record ConcertDetailInfoResponse(
                 concertDetailDTO.ageRating(),
                 concertDetailDTO.reservationOffice(),
                 concertDetailDTO.price(),
-                s3FileHandler.getFileUrl(concertDetailDTO.infoImgPath()),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.DETAIL), concertDetailDTO.infoImgPath()).getPath(),
                 concertDetailDTO.isFavorite()
         );
     }
