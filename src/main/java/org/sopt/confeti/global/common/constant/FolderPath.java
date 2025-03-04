@@ -7,7 +7,7 @@ public enum FolderPath {
     DETAIL("detail"), LOGO("logo"), MAIN_BANNER("main-banner"),
     POSTER_BG("poster-bg"), POSTER("poster");
 
-    private static final String delimiter = "/";
+    private static final String PATH_DELIMITER = "/";
     private final String path;
 
     FolderPath(String path) {
@@ -16,7 +16,7 @@ public enum FolderPath {
 
     public static String combine(FolderPath... folderPaths) {
         return String.join(
-                delimiter,
+                PATH_DELIMITER,
                 Arrays.stream(folderPaths).map(FolderPath::getSingle).toList()
         );
     }
