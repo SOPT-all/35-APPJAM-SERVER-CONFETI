@@ -18,14 +18,6 @@ public record CreateConcertRequest(
         LocalDate concertEndAt,
         @JsonProperty(value = "concert_area")
         String concertArea,
-        @JsonProperty(value = "concert_poster_path")
-        String concertPosterPath,
-        @JsonProperty(value = "concert_poster_bg_path")
-        String concertPosterBgPath,
-        @JsonProperty(value = "concert_info_img_path")
-        String concertInfoImgPath,
-        @JsonProperty(value = "concert_reservation_bg_path")
-        String concertReservationBgPath,
         @JsonFormat(pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
         @JsonProperty(value = "reserve_at")
         LocalDate reserveAt,

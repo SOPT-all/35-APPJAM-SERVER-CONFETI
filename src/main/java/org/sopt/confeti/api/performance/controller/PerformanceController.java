@@ -7,7 +7,9 @@ import org.sopt.confeti.api.performance.dto.request.CreateFestivalRequest;
 import org.sopt.confeti.api.performance.dto.response.*;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
+import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertFileDTO;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
+import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalFileDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.*;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
@@ -18,6 +20,7 @@ import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,10 +53,35 @@ public class PerformanceController {
         return ApiResponseUtil.success(SuccessMessage.CREATED);
     }
 
+    @PostMapping("/concerts/{concertId}/files")
+    public ResponseEntity<BaseResponse<?>> createConcertFiles(
+            @PathVariable("concertId") Long concertId,
+            @RequestPart("poster") MultipartFile poster,
+            @RequestPart("posterBg") MultipartFile posterBg,
+            @RequestPart("infoImg") MultipartFile infoImg,
+            @RequestPart("reservationBg") MultipartFile reservationBg
+            ) {
+        performanceFacade.createConcertFiles(concertId, CreateConcertFileDTO.of(poster, posterBg, infoImg, reservationBg));
+        return ApiResponseUtil.success(SuccessMessage.CREATED);
+    }
+
     @PostMapping("/festivals")
     public ResponseEntity<BaseResponse<?>> createFestival(@RequestBody CreateFestivalRequest createFestivalRequest) {
         performanceFacade.createFestival(CreateFestivalDTO.from(createFestivalRequest));
 
+        return ApiResponseUtil.success(SuccessMessage.CREATED);
+    }
+
+    @PostMapping("/festivals/{festivalId}/files")
+    public ResponseEntity<BaseResponse<?>> createFestivalFiles(
+            @PathVariable("festivalId") Long festivalId,
+            @RequestPart("poster") MultipartFile poster,
+            @RequestPart("posterBg") MultipartFile posterBg,
+            @RequestPart("infoImg") MultipartFile infoImg,
+            @RequestPart("reservationBg") MultipartFile reservationBg,
+            @RequestPart("logo") MultipartFile logo
+    ) {
+        performanceFacade.createFestivalFiles(festivalId, CreateFestivalFileDTO.of(poster, posterBg, infoImg, reservationBg, logo));
         return ApiResponseUtil.success(SuccessMessage.CREATED);
     }
 

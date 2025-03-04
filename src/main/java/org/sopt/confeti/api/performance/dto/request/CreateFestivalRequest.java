@@ -19,16 +19,6 @@ public record CreateFestivalRequest(
         LocalDate festivalEndAt,
         @JsonProperty(value = "festival_area")
         String festivalArea,
-        @JsonProperty(value = "festival_poster_path")
-        String festivalPosterPath,
-        @JsonProperty(value = "festival_poster_bg_path")
-        String festivalPosterBgPath,
-        @JsonProperty(value = "festival_info_img_path")
-        String festivalInfoImgPath,
-        @JsonProperty(value = "festival_reservation_bg_path")
-        String festivalReservationBgPath,
-        @JsonProperty(value = "festival_logo_path")
-        String festivalLogoPath,
         @JsonFormat(pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
         @JsonProperty(value = "reserve_at")
         LocalDate reserveAt,
