@@ -29,15 +29,11 @@ public class LoginService {
 
     @Transactional
     public LoginResult login(LoginCommand command) {
-
-          // 사용자 인증 후 사용자 정보 반환
-          OAuthUserInfoResult socialUserInfo = getSocialInfo(command);
-          // 사용자 입력값 + 사용자 정보로 실제 사용자인지 검사
-          AuthUser authUser = loadOrCreateUser(command, socialUserInfo);
-          Token token = createToken(authUser);
-          updateRefreshToken(token.refreshToken(), authUser.getId());
-
-          return LoginResult.from(token);
+        OAuthUserInfoResult socialUserInfo = getSocialInfo(command);
+        AuthUser authUser = loadOrCreateUser(command, socialUserInfo);
+        Token token = createToken(authUser);
+        updateRefreshToken(token.refreshToken(), authUser.getId());
+        return LoginResult.from(token);
     }
 
     private void updateRefreshToken(String refreshToken, long id) {
@@ -47,9 +43,6 @@ public class LoginService {
     }
 
     private AuthUser loadOrCreateUser(LoginCommand command, OAuthUserInfoResult socialUserInfo) {
-        System.out.println("로그인 시도 - provider: " + command.provider() + ", socialId: " + socialUserInfo.id());
-
-        // 사용자의 socialId로 사용자 가입돼 있는지 검사
         AuthUser retrievedAuthUser = userRepository.findBySocialIdAndProvider(
                         socialUserInfo.id(),
                         command.provider()
@@ -58,13 +51,9 @@ public class LoginService {
                 .orElse(null);
 
         if (retrievedAuthUser != null) {
-            System.out.println("기존 사용자 발견 - userId: " + retrievedAuthUser.getId());
             return retrievedAuthUser;
         }
 
-        System.out.println("기존 사용자 없음 - 새 사용자 생성 시작");
-
-        // 사용자 없슨!! 새로 회원가입 해야대
         return allUserRepository.save(
                 AuthUser.create(
                         command.provider(),
