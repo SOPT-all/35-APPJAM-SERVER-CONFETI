@@ -4,6 +4,8 @@ import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Operations;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class S3FileHandler {
 
     private static final String PATH_DELIMITER = "/";
+    private static final Duration urlDuration = Duration.ofMinutes(10L);
 
     private final S3Operations s3Operations;
     private final FileNameGenerator fileNameGenerator;
@@ -45,5 +48,12 @@ public class S3FileHandler {
 
     private void upload(String fullPath, InputStream is, ObjectMetadata metadata) {
         s3Operations.upload(bucket, fullPath, is, metadata);
+    }
+
+    /**
+     * 파일 삭제
+     */
+    public void deleteFile(String folderPath, String key) {
+        s3Operations.deleteObject(bucket, folderPath + key);
     }
 }
