@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.auth.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.auth.dto.LoginRequest;
 import org.sopt.confeti.api.auth.facade.AuthFacade;
@@ -12,12 +13,10 @@ import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@Validated
 @RequestMapping("/auth")
 public class AuthController {
 
@@ -25,7 +24,7 @@ public class AuthController {
 
     @PostMapping("/kakao/login")
     public ResponseEntity<BaseResponse<?>> login(
-           @Validated @RequestBody LoginRequest request
+           @Valid @RequestBody LoginRequest request
     ) {
         LoginResult result = authFacade.login(new LoginCommand(request.provider(), request.redirectUrl(), request.code()));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, result);
