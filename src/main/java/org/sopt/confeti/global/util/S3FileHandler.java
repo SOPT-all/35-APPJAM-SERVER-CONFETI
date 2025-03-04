@@ -29,14 +29,18 @@ public class S3FileHandler {
     /**
      * 파일 업로드
      */
-    public String uploadFile(MultipartFile file, String folderPath) throws IOException {
+    public String uploadFile(MultipartFile file, String folderPath) {
         final String fileName = fileNameGenerator.generate(file.getOriginalFilename());
         final ObjectMetadata metadata = getMetadata(file);
 
-        upload(
-                folderPath + PATH_DELIMITER + fileName,
-                file.getInputStream(), metadata
-        );
+        try {
+            upload(
+                    folderPath + PATH_DELIMITER + fileName,
+                    file.getInputStream(), metadata
+            );
+        } catch (IOException e) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
 
         return fileName;
     }
