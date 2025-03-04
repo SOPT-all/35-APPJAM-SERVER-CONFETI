@@ -2,9 +2,11 @@ package org.sopt.confeti.domain.token;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Table(name = "refresh_token")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken {

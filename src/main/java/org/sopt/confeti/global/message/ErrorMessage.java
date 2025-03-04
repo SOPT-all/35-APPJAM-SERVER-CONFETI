@@ -16,6 +16,7 @@ public enum ErrorMessage {
     WRONG_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다."),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
     EMPTY_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 없습니다."),
+    WRONG_TOKEN_REQUEST(HttpStatus.UNAUTHORIZED, "잘못된 토큰 형식입니다."),
 
 
     /* 403 Forbidden*/
