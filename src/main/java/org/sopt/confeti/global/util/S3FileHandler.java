@@ -1,17 +1,49 @@
 package org.sopt.confeti.global.util;
 
+import io.awspring.cloud.s3.ObjectMetadata;
+import io.awspring.cloud.s3.S3Operations;
+import java.io.IOException;
+import java.io.InputStream;
+import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
 
 @Handler
+@RequiredArgsConstructor
 public class S3FileHandler {
 
-    protected S3FileHandler() {}
+    private static final String PATH_DELIMITER = "/";
 
-    @Value("${cloud.aws.s3.url-prefix}")
-    private String urlPrefix;
+    private final S3Operations s3Operations;
+    private final FileNameGenerator fileNameGenerator;
 
-    public String getFileUrl(final String filePath) {
-        return urlPrefix + filePath;
+    @Value("${spring.cloud.aws.s3.bucket-name}")
+    private String bucket;
+
+    /**
+     * 파일 업로드
+     */
+    public String uploadFile(MultipartFile file, String folderPath) throws IOException {
+        final String fileName = fileNameGenerator.generate(file.getOriginalFilename());
+        final ObjectMetadata metadata = getMetadata(file);
+
+        upload(
+                folderPath + PATH_DELIMITER + fileName,
+                file.getInputStream(), metadata
+        );
+
+        return fileName;
+    }
+
+    private ObjectMetadata getMetadata(MultipartFile file) {
+        return new ObjectMetadata.Builder()
+                .contentLength(file.getSize())
+                .contentType(file.getContentType())
+                .build();
+    }
+
+    private void upload(String fullPath, InputStream is, ObjectMetadata metadata) {
+        s3Operations.upload(bucket, fullPath, is, metadata);
     }
 }
