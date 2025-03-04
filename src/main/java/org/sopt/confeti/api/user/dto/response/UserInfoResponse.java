@@ -1,6 +1,7 @@
 package org.sopt.confeti.api.user.dto.response;
 
 import org.sopt.confeti.api.user.facade.dto.response.UserInfoDTO;
+import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record UserInfoResponse (
@@ -11,7 +12,7 @@ public record UserInfoResponse (
     public static UserInfoResponse of(final UserInfoDTO userInfoDTO, final S3FileHandler s3FileHandler) {
         return new UserInfoResponse(
                 userInfoDTO.userId(),
-                s3FileHandler.getFileUrl(userInfoDTO.profilePath()),
+                s3FileHandler.getFileUrl(FolderPath.USER.getSingle(), userInfoDTO.profilePath()).getPath(),
                 userInfoDTO.username()
         );
     }

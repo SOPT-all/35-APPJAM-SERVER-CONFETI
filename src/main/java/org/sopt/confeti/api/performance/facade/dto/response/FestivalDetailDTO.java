@@ -3,6 +3,7 @@ package org.sopt.confeti.api.performance.facade.dto.response;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record FestivalDetailDTO(
@@ -34,11 +35,11 @@ public record FestivalDetailDTO(
                 festival.getFestivalStartAt(),
                 festival.getFestivalEndAt(),
                 festival.getFestivalArea(),
-                s3FileHandler.getFileUrl(festival.getFestivalPosterPath()),
-                s3FileHandler.getFileUrl(festival.getFestivalPosterBgPath()),
-                s3FileHandler.getFileUrl(festival.getFestivalInfoImgPath()),
-                s3FileHandler.getFileUrl(festival.getFestivalReservationBgPath()),
-                s3FileHandler.getFileUrl(festival.getFestivalLogoPath()),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER), festival.getFestivalPosterPath()).getPath(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER_BG), festival.getFestivalPosterBgPath()).getPath(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.DETAIL), festival.getFestivalInfoImgPath()).getPath(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.MAIN_BANNER), festival.getFestivalReservationBgPath()).getPath(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO), festival.getFestivalLogoPath()).getPath(),
                 festival.getReserveAt(),
                 festival.getReservationUrl(),
                 festival.getReservationOffice(),
