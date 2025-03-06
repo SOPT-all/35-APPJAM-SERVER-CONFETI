@@ -18,9 +18,9 @@ public class JwtTokenValidator {
 
     public void validate(String token) {
         try {
-            Jwts.parser()
+            Jwts.parserBuilder()
                     .setSigningKey(keyGenerator.getKeyFromString(jwtProperties.secretKey()))
-                    .parseClaimsJws(token);
+                    .build();
         } catch (SecurityException | MalformedJwtException | IllegalArgumentException | UnsupportedJwtException e) {
             throw UnauthorizedException.wrong();
         } catch (ExpiredJwtException e) {
