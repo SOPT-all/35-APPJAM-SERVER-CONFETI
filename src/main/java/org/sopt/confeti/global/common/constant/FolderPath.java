@@ -20,7 +20,7 @@ public enum FolderPath {
         return String.join(
                 PATH_DELIMITER,
                 Arrays.stream(folderPaths).map(FolderPath::getSingle).toList()
-        );
+        ) + PATH_DELIMITER;
     }
 
     public static FolderPath getFolderPathByPerformanceType(PerformanceType performanceType) {
