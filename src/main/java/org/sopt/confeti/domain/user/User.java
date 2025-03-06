@@ -3,13 +3,13 @@ package org.sopt.confeti.domain.user;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.concertfavorite.ConcertFavorite;
 import org.sopt.confeti.domain.festivalfavorite.FestivalFavorite;
 import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
-import org.sopt.confeti.domain.usertimetable.UserTimetable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="user_id")
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private OAuthProvider provider;
+
+    @Column(length = 20,nullable = false)
+    private String socialId;
 
     @Column(length=20, nullable = false)
     private String username;
@@ -41,4 +48,25 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true )
     private List<TimetableFestival> timetableFestivals = new ArrayList<>();
+
+    public static User create(AuthUser authUser) {
+        return new User(
+                authUser.getProvider(),
+                authUser.getSocialId(),
+                authUser.getSocialNickname(),
+                authUser.getSocialProfile()
+        );
+    }
+
+    public AuthUser toAuthUser() {
+        return AuthUser.createWithId(id, provider, socialId, username, profilePath);
+    }
+
+    @Builder
+    public User(OAuthProvider provider, String socialId, String username, String profilePath) {
+        this.provider = provider;
+        this.socialId = socialId;
+        this.username = username;
+        this.profilePath = profilePath;
+    }
 }
