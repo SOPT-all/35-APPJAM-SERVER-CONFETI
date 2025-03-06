@@ -1,6 +1,8 @@
 package org.sopt.confeti.global.oauth;
 
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.domain.user.OAuthProvider;
+import org.sopt.confeti.domain.user.constant.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.sopt.confeti.auth.dto.OAuthUserInfoResult;
 import org.sopt.confeti.auth.dto.OAuthLoginParams;
@@ -22,6 +24,11 @@ public class KakaoApiClient implements OAuthApiClient {
     private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com/v2/user/me";
 
     private final RestClient restClient;
+
+    @Override
+    public boolean supports(OAuthProvider provider) {
+        return provider == OAuthProvider.KAKAO;
+    }
 
     @Override
     public OAuthTokenResult requestAccessToken(OAuthLoginParams params) {
