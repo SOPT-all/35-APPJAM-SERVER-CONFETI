@@ -67,8 +67,8 @@ public class LoginService {
 
     private Token createToken(AuthUser authUser){
      return new Token(
-             jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId())),
-             jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()))
+             jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId()), authUser.getRole()),
+             jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()), authUser.getRole())
      );
     }
 
