@@ -36,6 +36,6 @@ public enum FolderPath {
     }
 
     public String getSingle() {
-        return this.path;
+        return this.path + PATH_DELIMITER;
     }
 }
