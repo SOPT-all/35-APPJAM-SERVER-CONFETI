@@ -36,9 +36,9 @@ public class LoginService {
         return LoginResult.from(token);
     }
 
-    private void updateRefreshToken(String refreshToken, long id) {
+    private void updateRefreshToken(String refreshToken, long userId) {
         refreshTokenRepository.save(
-                RefreshToken.of(refreshToken, id)
+                RefreshToken.of(refreshToken, userId)
         );
     }
 
