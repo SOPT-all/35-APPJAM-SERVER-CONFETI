@@ -55,7 +55,7 @@ public class PerformanceController {
 
     @PostMapping("/concerts/{concertId}/files")
     public ResponseEntity<BaseResponse<?>> createConcertFiles(
-            @PathVariable("concertId") Long concertId,
+            @PathVariable("concertId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long concertId,
             @RequestPart("poster") MultipartFile poster,
             @RequestPart("posterBg") MultipartFile posterBg,
             @RequestPart("infoImg") MultipartFile infoImg,
@@ -74,7 +74,7 @@ public class PerformanceController {
 
     @PostMapping("/festivals/{festivalId}/files")
     public ResponseEntity<BaseResponse<?>> createFestivalFiles(
-            @PathVariable("festivalId") Long festivalId,
+            @PathVariable("festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long festivalId,
             @RequestPart("poster") MultipartFile poster,
             @RequestPart("posterBg") MultipartFile posterBg,
             @RequestPart("infoImg") MultipartFile infoImg,

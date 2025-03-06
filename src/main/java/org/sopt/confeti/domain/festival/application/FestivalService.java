@@ -130,7 +130,6 @@ public class FestivalService {
         Festival festival = festivalRepository.findById(festivalId).orElseThrow(
                 () -> new NotFoundException(ErrorMessage.NOT_FOUND)
         );
-
         festival.setFestivalPosterPath(fileNames.poster());
         festival.setFestivalPosterBgPath(fileNames.posterBg());
         festival.setFestivalInfoImgPath(fileNames.infoImg());
