@@ -13,6 +13,7 @@ import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.sopt.confeti.domain.user.constant.Role;
 
 @Entity
 @Table(name="users")
@@ -37,6 +38,10 @@ public class User {
     @Column(length=250, nullable = false)
     private String profilePath;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private Role role;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true )
     private List<ArtistFavorite> artistFavorites = new ArrayList<>();
 
@@ -50,23 +55,25 @@ public class User {
     private List<TimetableFestival> timetableFestivals = new ArrayList<>();
 
     public static User create(AuthUser authUser) {
-        return new User(
-                authUser.getProvider(),
-                authUser.getSocialId(),
-                authUser.getSocialNickname(),
-                authUser.getSocialProfile()
-        );
+        return User.builder()
+                .provider(authUser.getProvider())
+                .socialId(authUser.getSocialId())
+                .username(authUser.getSocialNickname())
+                .profilePath(authUser.getSocialProfile())
+                .role(authUser.getRole())
+                .build();
     }
 
     public AuthUser toAuthUser() {
-        return AuthUser.createWithId(id, provider, socialId, username, profilePath);
+        return AuthUser.createWithId(id, provider, socialId, username, profilePath, role);
     }
 
     @Builder
-    public User(OAuthProvider provider, String socialId, String username, String profilePath) {
+    public User(OAuthProvider provider, String socialId, String username, String profilePath, Role role) {
         this.provider = provider;
         this.socialId = socialId;
         this.username = username;
         this.profilePath = profilePath;
+        this.role = role;
     }
 }
