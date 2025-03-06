@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.springframework.stereotype.Component;
 
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Component
