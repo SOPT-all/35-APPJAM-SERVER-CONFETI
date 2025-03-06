@@ -12,7 +12,7 @@ public record UserInfoResponse (
     public static UserInfoResponse of(final UserInfoDTO userInfoDTO, final S3FileHandler s3FileHandler) {
         return new UserInfoResponse(
                 userInfoDTO.userId(),
-                s3FileHandler.getFileUrl(FolderPath.USER.getSingle(), userInfoDTO.profilePath()).getPath(),
+                s3FileHandler.getFileUrl(FolderPath.USER.getSingle(), userInfoDTO.profilePath()).toString(),
                 userInfoDTO.username()
         );
     }

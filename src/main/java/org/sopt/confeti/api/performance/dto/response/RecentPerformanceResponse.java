@@ -24,7 +24,7 @@ public record RecentPerformanceResponse(
                 recentPerformanceDTO.title(),
                 recentPerformanceDTO.subtitle(),
                 DateConvertor.convertToLocalDate(recentPerformanceDTO.performanceAt()),
-                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), recentPerformanceDTO.posterPath()).getPath()
+                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), recentPerformanceDTO.posterPath()).toString()
         );
     }
 }

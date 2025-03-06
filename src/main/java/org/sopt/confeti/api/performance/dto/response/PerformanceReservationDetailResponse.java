@@ -22,7 +22,7 @@ public record PerformanceReservationDetailResponse(
                 performanceReservation.type(),
                 performanceReservation.subtitle(),
                 performanceReservation.reserveAt(),
-                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.MAIN_BANNER), performanceReservation.reservationBgUrl()).getPath()
+                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.MAIN_BANNER), performanceReservation.reservationBgUrl()).toString()
         );
     }
 }

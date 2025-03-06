@@ -16,7 +16,7 @@ public record UserTimetableDetailFestivalResponse(
         return new UserTimetableDetailFestivalResponse(
                 userTimetableFestivalDTO.festivalId(),
                 userTimetableFestivalDTO.title(),
-                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO), userTimetableFestivalDTO.logoPath()).getPath(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO), userTimetableFestivalDTO.logoPath()).toString(),
                 userTimetableFestivalDTO.festivalDates().stream()
                         .map(UserTimetableDetailDatesResponse::from)
                         .toList()
