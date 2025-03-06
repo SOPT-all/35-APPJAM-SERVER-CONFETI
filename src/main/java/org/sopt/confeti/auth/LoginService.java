@@ -14,6 +14,7 @@ import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.infra.repository.AllUserRepository;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.global.oauth.OAuthApiClient;
+import org.sopt.confeti.global.oauth.OAuthApiClientRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LoginService {
 
-    private final OAuthApiClient oAuthApiClient;
+    private final OAuthApiClientRegistry oAuthApiClientRegistry;
     private final UserRepository userRepository;
     private final AllUserRepository allUserRepository;
     private final JwtTokenGenerator jwtTokenGenerator;
@@ -73,6 +74,7 @@ public class LoginService {
     }
 
     private OAuthUserInfoResult getSocialInfo(LoginCommand command) {
+        OAuthApiClient oAuthApiClient = oAuthApiClientRegistry.getOAuthApiClientByProvider(command.provider());
         OAuthLoginParams loginParams = new OAuthLoginParams(command.redirectUrl(), command.code());
         OAuthTokenResult tokenResponse = oAuthApiClient.requestAccessToken(loginParams);
         OAuthUserInfoResult userInfo = oAuthApiClient.getOAuthUserInfo(tokenResponse.accessToken());
