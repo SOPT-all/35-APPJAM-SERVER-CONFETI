@@ -1,4 +1,4 @@
-package org.sopt.confeti.auth;
+package org.sopt.confeti.global.oauth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
