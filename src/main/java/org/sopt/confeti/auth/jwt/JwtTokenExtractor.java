@@ -2,11 +2,14 @@ package org.sopt.confeti.auth.jwt;
 
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.domain.user.constant.Role;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class JwtTokenExtractor {
+
+    private static final String JWT_CLAIM_ROLE = "role";
 
     private final JwtProperties jwtProperties;
     private final KeyGenerator keyGenerator;
@@ -18,5 +21,16 @@ public class JwtTokenExtractor {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public Role getRole(String token) {
+        String role = Jwts.parserBuilder()
+                .setSigningKey(keyGenerator.getKeyFromString(jwtProperties.secretKey()))
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get(JWT_CLAIM_ROLE, String.class);
+
+        return Role.from(role);
     }
 }
