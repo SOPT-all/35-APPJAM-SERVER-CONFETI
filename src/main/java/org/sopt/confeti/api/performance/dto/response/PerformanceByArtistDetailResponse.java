@@ -27,7 +27,7 @@ public record PerformanceByArtistDetailResponse(
                 performance.title(),
                 DateConvertor.convertToLocalDate(performance.performanceStartAt()),
                 DateConvertor.convertToLocalDate(performance.performanceEndAt()),
-                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), performance.posterPath()).getPath(),
+                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), performance.posterPath()).toString(),
                 performance.area(),
                 performance.isFavorite()
         );

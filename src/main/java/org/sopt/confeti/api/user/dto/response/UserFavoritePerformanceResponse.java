@@ -20,7 +20,7 @@ public record UserFavoritePerformanceResponse(
                 performanceDTO.typeId(),
                 performanceDTO.type().getType(),
                 performanceDTO.title(),
-                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), performanceDTO.posterPath()).getPath()
+                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), performanceDTO.posterPath()).toString()
         );
     }
 }
