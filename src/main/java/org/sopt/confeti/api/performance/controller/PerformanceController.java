@@ -1,6 +1,7 @@
 package org.sopt.confeti.api.performance.controller;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.dto.request.CreateConcertRequest;
 import org.sopt.confeti.api.performance.dto.request.CreateFestivalRequest;
@@ -56,10 +57,10 @@ public class PerformanceController {
     @PostMapping("/concerts/{concertId}/files")
     public ResponseEntity<BaseResponse<?>> createConcertFiles(
             @PathVariable("concertId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long concertId,
-            @RequestPart("poster") MultipartFile poster,
-            @RequestPart("posterBg") MultipartFile posterBg,
-            @RequestPart("infoImg") MultipartFile infoImg,
-            @RequestPart("reservationBg") MultipartFile reservationBg
+            @RequestPart("poster") @NotNull MultipartFile poster,
+            @RequestPart("posterBg") @NotNull MultipartFile posterBg,
+            @RequestPart("infoImg") @NotNull MultipartFile infoImg,
+            @RequestPart("reservationBg") @NotNull MultipartFile reservationBg
             ) {
         performanceFacade.createConcertFiles(concertId, CreateConcertFileDTO.of(poster, posterBg, infoImg, reservationBg));
         return ApiResponseUtil.success(SuccessMessage.CREATED);
@@ -75,11 +76,11 @@ public class PerformanceController {
     @PostMapping("/festivals/{festivalId}/files")
     public ResponseEntity<BaseResponse<?>> createFestivalFiles(
             @PathVariable("festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long festivalId,
-            @RequestPart("poster") MultipartFile poster,
-            @RequestPart("posterBg") MultipartFile posterBg,
-            @RequestPart("infoImg") MultipartFile infoImg,
-            @RequestPart("reservationBg") MultipartFile reservationBg,
-            @RequestPart("logo") MultipartFile logo
+            @RequestPart("poster") @NotNull MultipartFile poster,
+            @RequestPart("posterBg") @NotNull MultipartFile posterBg,
+            @RequestPart("infoImg") @NotNull MultipartFile infoImg,
+            @RequestPart("reservationBg") @NotNull MultipartFile reservationBg,
+            @RequestPart("logo") @NotNull MultipartFile logo
     ) {
         performanceFacade.createFestivalFiles(festivalId, CreateFestivalFileDTO.of(poster, posterBg, infoImg, reservationBg, logo));
         return ApiResponseUtil.success(SuccessMessage.CREATED);
