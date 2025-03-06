@@ -1,4 +1,4 @@
-package org.sopt.confeti.auth;
+package org.sopt.confeti.global.oauth;
 
 import org.sopt.confeti.auth.dto.OAuthUserInfoResult;
 import org.sopt.confeti.auth.dto.OAuthLoginParams;
