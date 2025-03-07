@@ -60,7 +60,7 @@ public class KakaoApiClient implements OAuthApiClient {
     }
 
     private String createHttpBody(KakaoLoginParams params) {
-        return "grant_type=authorization_code" +
+        return "grant_type=" + GRANT_TYPE +
                 "&client_id=" + clientId +
                 "&redirect_uri=" + params.redirectUrl() +
                 "&code=" + params.code();
