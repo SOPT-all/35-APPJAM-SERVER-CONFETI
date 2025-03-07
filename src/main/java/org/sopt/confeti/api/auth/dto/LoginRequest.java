@@ -10,6 +10,7 @@ public record LoginRequest (
         @NotBlank
         String redirectUrl,
         @NotBlank
-        String code
+        String code,
+        String name
 ) {
 }
