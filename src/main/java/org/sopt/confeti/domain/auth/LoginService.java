@@ -5,9 +5,12 @@ import org.sopt.confeti.domain.auth.command.LoginCommand;
 import org.sopt.confeti.domain.auth.dto.LoginResult;
 import org.sopt.confeti.domain.auth.dto.OAuthSocialInfoResult;
 import org.sopt.confeti.domain.auth.jwt.JwtTokenGenerator;
+import org.sopt.confeti.domain.token.AppleToken;
 import org.sopt.confeti.domain.token.RefreshToken;
+import org.sopt.confeti.domain.token.infra.AppleTokenRepository;
 import org.sopt.confeti.domain.token.infra.RefreshTokenRepository;
 import org.sopt.confeti.domain.user.AuthUser;
+import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.infra.repository.AllUserRepository;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
@@ -25,6 +28,7 @@ public class LoginService {
     private final AllUserRepository allUserRepository;
     private final JwtTokenGenerator jwtTokenGenerator;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AppleTokenRepository appleTokenRepository;
 
 
     @Transactional
@@ -34,6 +38,8 @@ public class LoginService {
         AuthUser authUser = loadOrCreateUser(command, socialInfo);
         Token token = createToken(authUser);
         updateRefreshToken(token.refreshToken(), authUser.getId());
+        saveSocialTokenIfApple(command.provider(), authUser.getId(), socialInfo);
+
         return LoginResult.from(token);
     }
 
@@ -41,6 +47,14 @@ public class LoginService {
         refreshTokenRepository.save(
                 RefreshToken.of(refreshToken, userId)
         );
+    }
+
+    private void saveSocialTokenIfApple(OAuthProvider provider, long userId, OAuthSocialInfoResult socialInfo) {
+        if (provider == OAuthProvider.APPLE) {
+            appleTokenRepository.save(
+                    AppleToken.create(userId, socialInfo)
+            );
+        }
     }
 
     private AuthUser loadOrCreateUser(LoginCommand command, OAuthSocialInfoResult socialInfo) {
@@ -67,8 +81,8 @@ public class LoginService {
 
     private Token createToken(AuthUser authUser){
      return new Token(
-             jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId()), authUser.getRole()),
-             jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()), authUser.getRole())
+             jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId()), authUser.getRole(), authUser.getProvider()),
+             jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()), authUser.getRole(), authUser.getProvider())
      );
     }
 }
