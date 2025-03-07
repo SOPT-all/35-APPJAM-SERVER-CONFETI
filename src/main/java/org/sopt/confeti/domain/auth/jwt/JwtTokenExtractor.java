@@ -15,20 +15,20 @@ public class JwtTokenExtractor {
     private final KeyGenerator keyGenerator;
 
     public String getSubject(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(keyGenerator.getKeyFromString(jwtProperties.secretKey()))
+        return Jwts.parser()
+                .verifyWith(keyGenerator.getKeyFromString(jwtProperties.secretKey()))
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
+                .parseSignedClaims(token)
+                .getPayload()
                 .getSubject();
     }
 
     public Role getRole(String token) {
-        String role = Jwts.parserBuilder()
-                .setSigningKey(keyGenerator.getKeyFromString(jwtProperties.secretKey()))
+        String role = Jwts.parser()
+                .verifyWith(keyGenerator.getKeyFromString(jwtProperties.secretKey()))
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
+                .parseSignedClaims(token)
+                .getPayload()
                 .get(JWT_CLAIM_ROLE, String.class);
 
         return Role.from(role);

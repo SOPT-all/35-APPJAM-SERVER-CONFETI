@@ -26,7 +26,7 @@ public class AuthController {
     public ResponseEntity<BaseResponse<?>> login(
            @Valid @RequestBody LoginRequest request
     ) {
-        LoginResult result = authFacade.login(new LoginCommand(request.provider(), request.redirectUrl(), request.code()));
+        LoginResult result = authFacade.login(LoginCommand.from(request));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, result);
     }
 

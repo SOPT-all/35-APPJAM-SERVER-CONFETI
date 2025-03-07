@@ -1,19 +1,34 @@
 package org.sopt.confeti.global.oauth;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Base64;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.domain.auth.dto.kakao.KakaoLoginParams;
-import org.sopt.confeti.domain.auth.dto.kakao.KakaoTokenResult;
-import org.sopt.confeti.domain.auth.dto.kakao.KakaoSocialInfoResult;
+import org.sopt.confeti.domain.auth.command.LoginCommand;
+import org.sopt.confeti.domain.auth.dto.OAuthSocialInfoResult;
+import org.sopt.confeti.domain.auth.dto.apple.ApplePublicKeys;
+import org.sopt.confeti.domain.auth.dto.apple.AppleSocialInfoResult;
+import org.sopt.confeti.domain.auth.dto.apple.AppleTokenRequestParams;
+import org.sopt.confeti.domain.auth.dto.apple.AppleTokenResult;
+import org.sopt.confeti.domain.auth.jwt.MyKeyLocator;
 import org.sopt.confeti.domain.user.OAuthProvider;
+import org.sopt.confeti.global.annotation.OAuthClient;
+import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-@Component
+@OAuthClient
 @RequiredArgsConstructor
-public class AppleApiClient {
+public class AppleApiClient implements OAuthApiClient {
 
     @Value("${apple.client-id}")
     private String clientId;
@@ -24,48 +39,93 @@ public class AppleApiClient {
     @Value("${apple.key-id}")
     private String keyId;
 
-    @Value("${apple.key-path}")
-    private String keyPath;
+    @Value("${apple.private-key")
+    private String privateKey;
 
     private static final String GRANT_TYPE = "authorization_code";
+    private final String AAUTH_AUDIENCE_URL_HOST = "https://appleid.apple.com";
     private final String AAUTH_TOKEN_URL_HOST = "https://appleid.apple.com/auth/token";
     private final String AAUTH_PUBLIC_KEY_URL_HOST = "https://appleid.apple.com/auth/keys";
+    private final int CLIENT_SECRET_EXPIRATION_MINUTE = 30;
+    private final String PRIVATE_KEY_ALGORITHM = "EC";
 
     private final RestClient restClient;
 
+    @Override
     public boolean supports(OAuthProvider provider) {
         return provider == OAuthProvider.APPLE;
     }
 
-    public KakaoTokenResult requestAccessToken(KakaoLoginParams params) {
+    @Override
+    public OAuthSocialInfoResult getSocialInfo(LoginCommand command) {
+        AppleTokenResult tokenResult = requestTokens(
+                AppleTokenRequestParams.of(clientId, generateClientSecret(), GRANT_TYPE, command.code())
+        );
+        AppleSocialInfoResult socialInfo = getAppleSocialInfo(tokenResult.idToken(), command.name());
+        return OAuthSocialInfoResult.from(socialInfo);
+    }
+
+    private AppleTokenResult requestTokens(AppleTokenRequestParams params) {
         return restClient
                 .method(HttpMethod.POST)
                 .uri(AAUTH_TOKEN_URL_HOST)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(createHttpBody(params))
                 .retrieve()
-                .toEntity(KakaoTokenResult.class)
+                .toEntity(AppleTokenResult.class)
                 .getBody();
     }
 
-    public KakaoSocialInfoResult getOAuthUserInfo(String accessToken) {
+    private ApplePublicKeys requestPublicKeys() {
         return restClient
                 .method(HttpMethod.GET)
-                .uri(AAUTH_TOKEN_URL_HOST)
-                .header("Authorization", createAuthorizationHeader(accessToken))
+                .uri(AAUTH_PUBLIC_KEY_URL_HOST)
                 .retrieve()
-                .toEntity(KakaoSocialInfoResult.class)
+                .toEntity(ApplePublicKeys.class)
                 .getBody();
     }
 
-    private String createHttpBody(KakaoLoginParams params) {
-        return "grant_type=authorization_code" +
-                "&client_id=" + clientId +
-                "&redirect_uri=" + params.redirectUrl() +
+    private AppleSocialInfoResult getAppleSocialInfo(String idToken, String name) {
+        MyKeyLocator keyLocator = new MyKeyLocator(requestPublicKeys());
+
+        Claims claims = Jwts.parser()
+                .keyLocator(keyLocator)
+                .build()
+                .parseSignedClaims(idToken)
+                .getPayload();
+
+        return AppleSocialInfoResult.of(claims, name);
+    }
+
+    private String createHttpBody(AppleTokenRequestParams params) {
+        return "grant_type=" + params.grantType() +
+                "&client_id=" + params.clientId() +
+                "&client_secret=" + params.clientSecret() +
                 "&code=" + params.code();
     }
 
-    private String createAuthorizationHeader(String accessToken) {
-        return String.format("Bearer %s", accessToken);
+    private String generateClientSecret() {
+        LocalDateTime expiration = LocalDateTime.now().plusMinutes(CLIENT_SECRET_EXPIRATION_MINUTE);
+
+        return Jwts.builder()
+                .header().keyId(keyId).and()
+                .issuer(teamId)
+                .audience().add(AAUTH_AUDIENCE_URL_HOST).and()
+                .subject(clientId)
+                .expiration(Date.from(expiration.atZone(ZoneId.systemDefault()).toInstant()))
+                .issuedAt(new Date())
+                .signWith(getPrivateKey())
+                .compact();
+    }
+
+    private PrivateKey getPrivateKey() {
+        try {
+            byte[] privateKeyBytes = Base64.getDecoder().decode(privateKey);
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance(PRIVATE_KEY_ALGORITHM);
+            return keyFactory.generatePrivate(keySpec);
+        } catch (Exception e) {
+            throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
+        }
     }
 }
