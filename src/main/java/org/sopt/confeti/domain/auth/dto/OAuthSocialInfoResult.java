@@ -1,5 +1,7 @@
 package org.sopt.confeti.domain.auth.dto;
 
+import org.sopt.confeti.domain.auth.dto.kakao.KakaoSocialInfoResult;
+
 public record OAuthSocialInfoResult(
         String id,
         String name,
