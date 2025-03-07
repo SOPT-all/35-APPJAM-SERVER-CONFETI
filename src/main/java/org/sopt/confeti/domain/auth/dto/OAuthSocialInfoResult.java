@@ -6,13 +6,15 @@ import org.sopt.confeti.domain.auth.dto.kakao.KakaoSocialInfoResult;
 public record OAuthSocialInfoResult(
         String id,
         String name,
-        String profileImgUrl
+        String profileImgUrl,
+        OAuthTokenInfoResult token
 ) {
     public static OAuthSocialInfoResult from(KakaoSocialInfoResult kakaoInfo) {
         return new OAuthSocialInfoResult(
                 kakaoInfo.id(),
                 kakaoInfo.kakaoAccount().profile().nickname(),
-                kakaoInfo.kakaoAccount().profile().profileImageUrl()
+                kakaoInfo.kakaoAccount().profile().profileImageUrl(),
+                null
         );
     }
 
@@ -20,7 +22,8 @@ public record OAuthSocialInfoResult(
         return new OAuthSocialInfoResult(
                 appleInfo.id(),
                 appleInfo.name(),
-                null
+                null,
+                OAuthTokenInfoResult.from(appleInfo.token())
         );
     }
 }

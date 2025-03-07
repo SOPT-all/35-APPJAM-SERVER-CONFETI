@@ -61,7 +61,7 @@ public class AppleApiClient implements OAuthApiClient {
         AppleTokenResult tokenResult = requestTokens(
                 AppleTokenRequestParams.of(clientId, generateClientSecret(), GRANT_TYPE, command.code())
         );
-        AppleSocialInfoResult socialInfo = getAppleSocialInfo(tokenResult.idToken(), command.name());
+        AppleSocialInfoResult socialInfo = getAppleSocialInfo(tokenResult, command.name());
         return OAuthSocialInfoResult.from(socialInfo);
     }
 
@@ -85,16 +85,16 @@ public class AppleApiClient implements OAuthApiClient {
                 .getBody();
     }
 
-    private AppleSocialInfoResult getAppleSocialInfo(String idToken, String name) {
+    private AppleSocialInfoResult getAppleSocialInfo(AppleTokenResult tokenResult, String name) {
         MyKeyLocator keyLocator = new MyKeyLocator(requestPublicKeys());
 
         Claims claims = Jwts.parser()
                 .keyLocator(keyLocator)
                 .build()
-                .parseSignedClaims(idToken)
+                .parseSignedClaims(tokenResult.idToken())
                 .getPayload();
 
-        return AppleSocialInfoResult.of(claims, name);
+        return AppleSocialInfoResult.of(claims, name, tokenResult.accessToken(), tokenResult.refreshToken(), tokenResult.expiresIn());
     }
 
     private String createHttpBody(AppleTokenRequestParams params) {

@@ -4,12 +4,14 @@ import io.jsonwebtoken.Claims;
 
 public record AppleSocialInfoResult(
         String id,
-        String name
+        String name,
+        AppleTokenInfoResult token
 ) {
-        public static AppleSocialInfoResult of(Claims claims, String name) {
+        public static AppleSocialInfoResult of(Claims claims, String name, String accessToken, String refreshToken, String expiresIn) {
                 return new AppleSocialInfoResult(
                         claims.getSubject(),
-                        name
+                        name,
+                        AppleTokenInfoResult.create(accessToken, refreshToken, expiresIn)
                 );
         }
 }
