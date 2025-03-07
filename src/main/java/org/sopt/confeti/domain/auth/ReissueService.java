@@ -7,6 +7,7 @@ import org.sopt.confeti.domain.auth.jwt.JwtTokenValidator;
 import org.sopt.confeti.domain.auth.jwt.TokenParser;
 import org.sopt.confeti.domain.token.RefreshToken;
 import org.sopt.confeti.domain.token.infra.RefreshTokenRepository;
+import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.springframework.stereotype.Service;
@@ -26,9 +27,10 @@ public class ReissueService {
         RefreshToken validatedRefreshToken = getValidatedRefreshToken(refreshToken);
         String userId = jwtTokenExtractor.getSubject(validatedRefreshToken.getRefreshToken());
         Role role = jwtTokenExtractor.getRole(validatedRefreshToken.getRefreshToken());
+        OAuthProvider provider = jwtTokenExtractor.getProvider(validatedRefreshToken.getRefreshToken());
 
-        String newAccessToken = jwtTokenGenerator.createAccessToken(userId, role);
-        String newRefreshToken = jwtTokenGenerator.createRefreshToken(userId, role);
+        String newAccessToken = jwtTokenGenerator.createAccessToken(userId, role, provider);
+        String newRefreshToken = jwtTokenGenerator.createRefreshToken(userId, role, provider);
 
         refreshTokenRepository.save(RefreshToken.of(newRefreshToken, Long.parseLong(userId)));
         refreshTokenRepository.deleteAllByRefreshTokenAndUserId(validatedRefreshToken.getRefreshToken(), Long.parseLong(userId));
