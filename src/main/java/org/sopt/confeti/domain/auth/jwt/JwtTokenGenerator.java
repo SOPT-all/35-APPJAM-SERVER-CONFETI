@@ -4,6 +4,7 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.springframework.stereotype.Component;
 
@@ -15,45 +16,49 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JwtTokenGenerator {
 
+    private static final String JWT_TYPE = "JWT";
     private static final String JWT_IS_ACCESS_TOKEN = "isAccessToken";
     private static final String JWT_CLAIM_ROLE = "role";
+    private static final String JWT_CLAIM_PROVIDER = "provider";
 
     private final JwtProperties jwtProperties;
     private final KeyGenerator keyGenerator;
 
-    public String createAccessToken(String payload, Role role) {
+    public String createAccessToken(String payload, Role role, OAuthProvider provider) {
 
         Date now = new Date();
         Map<String, Object> claims = new HashMap<>();
 
         claims.put(JWT_IS_ACCESS_TOKEN, true);
         claims.put(JWT_CLAIM_ROLE, role);
+        claims.put(JWT_CLAIM_PROVIDER, provider);
 
         return Jwts.builder()
-                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setClaims(claims)
-                .setSubject(payload)
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + jwtProperties.accessTokenValidTime()))
-                .signWith(keyGenerator.getKeyFromString(jwtProperties.secretKey()), SignatureAlgorithm.HS256)
+                .header().type(JWT_TYPE).and()
+                .claims(claims)
+                .subject(payload)
+                .issuedAt(now)
+                .expiration(new Date(now.getTime() + jwtProperties.accessTokenValidTime()))
+                .signWith(keyGenerator.getKeyFromString(jwtProperties.secretKey()))
                 .compact();
     }
 
-    public String createRefreshToken(String payload, Role role) {
+    public String createRefreshToken(String payload, Role role, OAuthProvider provider) {
 
         Date now = new Date();
         Map<String, Object> claims = new HashMap<>();
 
         claims.put(JWT_IS_ACCESS_TOKEN, true);
         claims.put(JWT_CLAIM_ROLE, role);
+        claims.put(JWT_CLAIM_PROVIDER, provider);
 
         return Jwts.builder()
-                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setClaims(claims)
-                .setSubject(payload)
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + jwtProperties.refreshTokenValidTime()))
-                .signWith(keyGenerator.getKeyFromString(jwtProperties.secretKey()), SignatureAlgorithm.HS256)
+                .header().type(JWT_TYPE).and()
+                .claims(claims)
+                .subject(payload)
+                .issuedAt(now)
+                .expiration(new Date(now.getTime() + jwtProperties.refreshTokenValidTime()))
+                .signWith(keyGenerator.getKeyFromString(jwtProperties.secretKey()))
                 .compact();
     }
 
