@@ -1,12 +1,13 @@
-package org.sopt.confeti.auth;
+package org.sopt.confeti.domain.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.auth.command.LoginCommand;
-import org.sopt.confeti.auth.dto.LoginResult;
-import org.sopt.confeti.auth.dto.OAuthLoginParams;
-import org.sopt.confeti.auth.dto.OAuthTokenResult;
-import org.sopt.confeti.auth.dto.OAuthUserInfoResult;
-import org.sopt.confeti.auth.jwt.JwtTokenGenerator;
+import org.sopt.confeti.domain.auth.command.LoginCommand;
+import org.sopt.confeti.domain.auth.dto.LoginResult;
+import org.sopt.confeti.domain.auth.dto.KakaoLoginParams;
+import org.sopt.confeti.domain.auth.dto.KakaoTokenResult;
+import org.sopt.confeti.domain.auth.dto.KakaoSocialInfoResult;
+import org.sopt.confeti.domain.auth.dto.OAuthSocialInfoResult;
+import org.sopt.confeti.domain.auth.jwt.JwtTokenGenerator;
 import org.sopt.confeti.domain.token.RefreshToken;
 import org.sopt.confeti.domain.token.infra.RefreshTokenRepository;
 import org.sopt.confeti.domain.user.AuthUser;
@@ -31,8 +32,9 @@ public class LoginService {
 
     @Transactional
     public LoginResult login(LoginCommand command) {
-        OAuthUserInfoResult socialUserInfo = getSocialInfo(command);
-        AuthUser authUser = loadOrCreateUser(command, socialUserInfo);
+        OAuthApiClient oAuthApiClient = oAuthApiClientRegistry.getOAuthApiClientByProvider(command.provider());
+        OAuthSocialInfoResult socialInfo = oAuthApiClient.getSocialInfo(command);
+        AuthUser authUser = loadOrCreateUser(command, socialInfo);
         Token token = createToken(authUser);
         updateRefreshToken(token.refreshToken(), authUser.getId());
         return LoginResult.from(token);
@@ -44,9 +46,9 @@ public class LoginService {
         );
     }
 
-    private AuthUser loadOrCreateUser(LoginCommand command, OAuthUserInfoResult socialUserInfo) {
+    private AuthUser loadOrCreateUser(LoginCommand command, OAuthSocialInfoResult socialInfo) {
         AuthUser retrievedAuthUser = userRepository.findBySocialIdAndProvider(
-                        socialUserInfo.id(),
+                        socialInfo.id(),
                         command.provider()
                 )
                 .map(User::toAuthUser)
@@ -59,9 +61,9 @@ public class LoginService {
         return allUserRepository.save(
                 AuthUser.create(
                         command.provider(),
-                        socialUserInfo.id(),
-                        socialUserInfo.kakaoAccount().profile().nickname(),
-                        socialUserInfo.kakaoAccount().profile().profileImageUrl()
+                        socialInfo.id(),
+                        socialInfo.name(),
+                        socialInfo.profileImgUrl()
                 )
         );
     }
@@ -71,13 +73,5 @@ public class LoginService {
              jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId()), authUser.getRole()),
              jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()), authUser.getRole())
      );
-    }
-
-    private OAuthUserInfoResult getSocialInfo(LoginCommand command) {
-        OAuthApiClient oAuthApiClient = oAuthApiClientRegistry.getOAuthApiClientByProvider(command.provider());
-        OAuthLoginParams loginParams = new OAuthLoginParams(command.redirectUrl(), command.code());
-        OAuthTokenResult tokenResponse = oAuthApiClient.requestAccessToken(loginParams);
-        OAuthUserInfoResult userInfo = oAuthApiClient.getOAuthUserInfo(tokenResponse.accessToken());
-        return userInfo;
     }
 }

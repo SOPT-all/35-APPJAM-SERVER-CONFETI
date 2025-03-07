@@ -1,4 +1,4 @@
-package org.sopt.confeti.auth;
+package org.sopt.confeti.domain.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.token.infra.RefreshTokenRepository;
