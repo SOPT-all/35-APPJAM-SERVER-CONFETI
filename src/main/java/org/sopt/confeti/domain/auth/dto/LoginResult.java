@@ -1,6 +1,6 @@
-package org.sopt.confeti.auth.dto;
+package org.sopt.confeti.domain.auth.dto;
 
-import org.sopt.confeti.auth.Token;
+import org.sopt.confeti.domain.auth.Token;
 
 public record LoginResult (
         String accessToken,

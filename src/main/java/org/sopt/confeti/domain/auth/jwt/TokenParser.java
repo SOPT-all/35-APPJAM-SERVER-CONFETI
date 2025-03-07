@@ -1,4 +1,4 @@
-package org.sopt.confeti.auth.jwt;
+package org.sopt.confeti.domain.auth.jwt;
 
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.exception.UnauthorizedException;

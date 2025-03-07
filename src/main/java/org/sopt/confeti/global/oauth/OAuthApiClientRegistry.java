@@ -11,7 +11,7 @@ import org.sopt.confeti.global.message.ErrorMessage;
 @RequiredArgsConstructor
 public class OAuthApiClientRegistry {
 
-    private final List<OAuthApiClient> oAuthApiClients;
+    private List<OAuthApiClient> oAuthApiClients;
 
     public OAuthApiClient getOAuthApiClientByProvider(OAuthProvider provider) {
         return oAuthApiClients.stream()

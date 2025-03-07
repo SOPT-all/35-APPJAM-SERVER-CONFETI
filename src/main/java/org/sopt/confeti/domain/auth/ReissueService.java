@@ -1,10 +1,10 @@
-package org.sopt.confeti.auth;
+package org.sopt.confeti.domain.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.auth.jwt.JwtTokenExtractor;
-import org.sopt.confeti.auth.jwt.JwtTokenGenerator;
-import org.sopt.confeti.auth.jwt.JwtTokenValidator;
-import org.sopt.confeti.auth.jwt.TokenParser;
+import org.sopt.confeti.domain.auth.jwt.JwtTokenExtractor;
+import org.sopt.confeti.domain.auth.jwt.JwtTokenGenerator;
+import org.sopt.confeti.domain.auth.jwt.JwtTokenValidator;
+import org.sopt.confeti.domain.auth.jwt.TokenParser;
 import org.sopt.confeti.domain.token.RefreshToken;
 import org.sopt.confeti.domain.token.infra.RefreshTokenRepository;
 import org.sopt.confeti.domain.user.constant.Role;

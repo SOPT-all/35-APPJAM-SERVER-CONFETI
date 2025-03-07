@@ -1,4 +1,4 @@
-package org.sopt.confeti.auth.jwt;
+package org.sopt.confeti.domain.auth.jwt;
 
 import io.jsonwebtoken.io.Decoders;
 import org.springframework.stereotype.Component;

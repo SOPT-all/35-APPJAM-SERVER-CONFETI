@@ -1,47 +1,46 @@
 package org.sopt.confeti.global.oauth;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.domain.auth.command.LoginCommand;
-import org.sopt.confeti.domain.auth.dto.OAuthSocialInfoResult;
-import org.sopt.confeti.domain.user.OAuthProvider;
-import org.sopt.confeti.global.annotation.OAuthClient;
-import org.springframework.beans.factory.annotation.Value;
-import org.sopt.confeti.domain.auth.dto.KakaoSocialInfoResult;
 import org.sopt.confeti.domain.auth.dto.KakaoLoginParams;
 import org.sopt.confeti.domain.auth.dto.KakaoTokenResult;
+import org.sopt.confeti.domain.auth.dto.KakaoSocialInfoResult;
+import org.sopt.confeti.domain.user.OAuthProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-@OAuthClient
+@Component
 @RequiredArgsConstructor
-public class KakaoApiClient implements OAuthApiClient {
+public class AppleApiClient {
 
-    @Value("${kakao.client-id}")
+    @Value("${apple.client-id}")
     private String clientId;
 
+    @Value("${apple.team-id}")
+    private String teamId;
+
+    @Value("${apple.key-id}")
+    private String keyId;
+
+    @Value("${apple.key-path}")
+    private String keyPath;
+
     private static final String GRANT_TYPE = "authorization_code";
-    private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com/oauth/token";
-    private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com/v2/user/me";
+    private final String AAUTH_TOKEN_URL_HOST = "https://appleid.apple.com/auth/token";
+    private final String AAUTH_PUBLIC_KEY_URL_HOST = "https://appleid.apple.com/auth/keys";
 
     private final RestClient restClient;
 
-    @Override
     public boolean supports(OAuthProvider provider) {
-        return provider == OAuthProvider.KAKAO;
+        return provider == OAuthProvider.APPLE;
     }
 
-    @Override
-    public OAuthSocialInfoResult getSocialInfo(LoginCommand command) {
-        KakaoTokenResult tokenResult = requestAccessToken(KakaoLoginParams.from(command));
-        KakaoSocialInfoResult socialInfo = getSocialInfo(tokenResult.accessToken());
-        return OAuthSocialInfoResult.from(socialInfo);
-    }
-
-    private KakaoTokenResult requestAccessToken(KakaoLoginParams params) {
+    public KakaoTokenResult requestAccessToken(KakaoLoginParams params) {
         return restClient
                 .method(HttpMethod.POST)
-                .uri(KAUTH_TOKEN_URL_HOST)
+                .uri(AAUTH_TOKEN_URL_HOST)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(createHttpBody(params))
                 .retrieve()
@@ -49,10 +48,10 @@ public class KakaoApiClient implements OAuthApiClient {
                 .getBody();
     }
 
-    private KakaoSocialInfoResult getSocialInfo(String accessToken) {
+    public KakaoSocialInfoResult getOAuthUserInfo(String accessToken) {
         return restClient
                 .method(HttpMethod.GET)
-                .uri(KAUTH_USER_URL_HOST)
+                .uri(AAUTH_TOKEN_URL_HOST)
                 .header("Authorization", createAuthorizationHeader(accessToken))
                 .retrieve()
                 .toEntity(KakaoSocialInfoResult.class)

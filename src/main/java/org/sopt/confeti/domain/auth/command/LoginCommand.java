@@ -1,4 +1,4 @@
-package org.sopt.confeti.auth.command;
+package org.sopt.confeti.domain.auth.command;
 
 import org.sopt.confeti.domain.user.OAuthProvider;
 
