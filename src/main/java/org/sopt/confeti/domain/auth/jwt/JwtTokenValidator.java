@@ -1,4 +1,4 @@
-package org.sopt.confeti.auth.jwt;
+package org.sopt.confeti.domain.auth.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

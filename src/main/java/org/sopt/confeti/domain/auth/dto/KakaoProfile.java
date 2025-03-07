@@ -1,4 +1,4 @@
-package org.sopt.confeti.auth.dto;
+package org.sopt.confeti.domain.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

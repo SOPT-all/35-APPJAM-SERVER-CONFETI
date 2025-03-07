@@ -1,4 +1,4 @@
-package org.sopt.confeti.auth;
+package org.sopt.confeti.domain.auth;
 
 public record Token (
         String accessToken,
