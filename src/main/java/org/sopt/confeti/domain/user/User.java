@@ -35,7 +35,7 @@ public class User {
     @Column(length=20, nullable = false)
     private String username;
 
-    @Column(length=250, nullable = false)
+    @Column(length=250)
     private String profilePath;
 
     @Enumerated(EnumType.STRING)
