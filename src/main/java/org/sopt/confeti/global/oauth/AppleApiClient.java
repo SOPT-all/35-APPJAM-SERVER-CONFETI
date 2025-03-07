@@ -1,9 +1,9 @@
 package org.sopt.confeti.global.oauth;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.domain.auth.dto.KakaoLoginParams;
-import org.sopt.confeti.domain.auth.dto.KakaoTokenResult;
-import org.sopt.confeti.domain.auth.dto.KakaoSocialInfoResult;
+import org.sopt.confeti.domain.auth.dto.kakao.KakaoLoginParams;
+import org.sopt.confeti.domain.auth.dto.kakao.KakaoTokenResult;
+import org.sopt.confeti.domain.auth.dto.kakao.KakaoSocialInfoResult;
 import org.sopt.confeti.domain.user.OAuthProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
