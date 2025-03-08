@@ -16,19 +16,8 @@ public class CorsConfig {
 
         //리소스를 허용할 URL 지정
         ArrayList<String> allowedOriginPatterns = new ArrayList<>();
-        allowedOriginPatterns.add("http://localhost:5173");
-        allowedOriginPatterns.add("http://localhost:5174");
-        allowedOriginPatterns.add("http://172.30.1.58:5173/");
-        allowedOriginPatterns.add("http://172.30.1.39:5173/");
-        allowedOriginPatterns.add("http://192.168.3.21:5173/");
-        allowedOriginPatterns.add("http://192.168.1.55:5173/");
-        allowedOriginPatterns.add("http://192.168.3.19:5173/");
-        allowedOriginPatterns.add("https://35-appjam-web-confeti.vercel.app/");
-        allowedOriginPatterns.add("https://confeti.co.kr");
-        allowedOriginPatterns.add("https://www.confeti.co.kr");
-        allowedOriginPatterns.add("https://confeti.xyz");
-        allowedOriginPatterns.add("https://api.confeti.xyz");
-        configuration.setAllowedOrigins(allowedOriginPatterns);
+        allowedOriginPatterns.add("*");
+        configuration.setAllowedOriginPatterns(allowedOriginPatterns);
 
         //허용하는 HTTP METHOD 지정
         ArrayList<String> allowedHttpMethods = new ArrayList<>();
