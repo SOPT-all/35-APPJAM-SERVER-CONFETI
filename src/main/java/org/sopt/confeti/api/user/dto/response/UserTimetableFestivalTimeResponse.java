@@ -16,8 +16,8 @@ public record UserTimetableFestivalTimeResponse(
     public static UserTimetableFestivalTimeResponse of(LocalDate festivalDate, UserTimetableFestivalTimeDTO festivalTime) {
         return new UserTimetableFestivalTimeResponse(
                 festivalTime.userTimetableId(),
-                DateConvertor.convert(festivalDate, festivalTime.startAt()),
-                DateConvertor.convert(festivalDate, festivalTime.endAt()),
+                DateConvertor.convertToDefaultFormat(festivalDate, festivalTime.startAt()),
+                DateConvertor.convertToDefaultFormat(festivalDate, festivalTime.endAt()),
                 festivalTime.isSelected(),
                 festivalTime.artists().stream()
                         .map(UserTimetableFestivalArtistResponse::from)

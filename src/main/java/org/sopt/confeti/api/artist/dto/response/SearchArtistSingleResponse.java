@@ -17,7 +17,7 @@ public record SearchArtistSingleResponse(
                 searchArtistDTO.artistId(),
                 searchArtistDTO.name(),
                 searchArtistDTO.profileUrl(),
-                DateConvertor.convert(searchArtistDTO.latestReleaseAt()),
+                DateConvertor.convertToDefaultFormat(searchArtistDTO.latestReleaseAt()),
                 searchArtistDTO.isFavorite(),
                 searchArtistDTO.isMultipleArtists()
         );

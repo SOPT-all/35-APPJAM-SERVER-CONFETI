@@ -23,7 +23,7 @@ public record RecentPerformanceResponse(
                 recentPerformanceDTO.type().getType(),
                 recentPerformanceDTO.title(),
                 recentPerformanceDTO.subtitle(),
-                DateConvertor.convertToLocalDate(recentPerformanceDTO.performanceAt()),
+                DateConvertor.convertToDefaultFormat(recentPerformanceDTO.performanceAt()),
                 s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), recentPerformanceDTO.posterPath()).toString()
         );
     }
