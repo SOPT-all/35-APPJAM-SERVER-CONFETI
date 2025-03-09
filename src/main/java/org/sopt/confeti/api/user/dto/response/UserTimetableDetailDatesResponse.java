@@ -12,7 +12,7 @@ public record UserTimetableDetailDatesResponse(
     public static UserTimetableDetailDatesResponse from(UserTimetableDatesDTO userTimetableDatesDTO) {
         return new UserTimetableDetailDatesResponse(
                 userTimetableDatesDTO.festivalDateId(),
-                DateConvertor.convert(userTimetableDatesDTO.festivalAt())
+                DateConvertor.convertToDefaultFormat(userTimetableDatesDTO.festivalAt())
         );
     }
 }

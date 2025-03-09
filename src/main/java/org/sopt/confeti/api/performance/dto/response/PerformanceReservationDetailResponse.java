@@ -22,7 +22,7 @@ public record PerformanceReservationDetailResponse(
                 performanceReservation.typeId(),
                 performanceReservation.type(),
                 performanceReservation.subtitle(),
-                DateConvertor.convert(performanceReservation.reserveAt()),
+                DateConvertor.convertToDefaultFormat(performanceReservation.reserveAt()),
                 s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.MAIN_BANNER), performanceReservation.reservationBgUrl()).toString()
         );
     }
