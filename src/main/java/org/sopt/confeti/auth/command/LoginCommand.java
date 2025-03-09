@@ -1,6 +1,6 @@
 package org.sopt.confeti.auth.command;
 
-import org.sopt.confeti.api.auth.dto.LoginRequest;
+import org.sopt.confeti.api.auth.dto.request.LoginRequest;
 import org.sopt.confeti.domain.user.OAuthProvider;
 
 public record LoginCommand(
