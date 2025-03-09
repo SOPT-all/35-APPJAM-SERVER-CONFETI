@@ -3,6 +3,7 @@ package org.sopt.confeti.api.performance.dto.response;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDetailDTO;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.util.DateConvertor;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record PerformanceReservationDetailResponse(
@@ -21,7 +22,7 @@ public record PerformanceReservationDetailResponse(
                 performanceReservation.typeId(),
                 performanceReservation.type(),
                 performanceReservation.subtitle(),
-                performanceReservation.reserveAt(),
+                DateConvertor.convert(performanceReservation.reserveAt()),
                 s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.MAIN_BANNER), performanceReservation.reservationBgUrl()).toString()
         );
     }

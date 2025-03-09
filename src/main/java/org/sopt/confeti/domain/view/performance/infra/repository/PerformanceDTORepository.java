@@ -4,6 +4,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.view.performance.PerformanceDTO;
@@ -112,7 +116,7 @@ public class PerformanceDTORepository {
                         ((Number) row[1]).longValue(),
                         (String) row[2],
                         (String) row[3],
-                        row[4] != null ? ((Timestamp) row[4]).toString() : null,
+                        LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) row[4]).getTime()), ZoneId.of("UTC")),
                         (String) row[5]
                 ))
                 .toList();

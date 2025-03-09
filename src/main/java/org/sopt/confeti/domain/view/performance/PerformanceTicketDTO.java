@@ -1,6 +1,6 @@
 package org.sopt.confeti.domain.view.performance;
 
-import org.sopt.confeti.domain.concert.Concert;
+import java.time.LocalDateTime;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record PerformanceTicketDTO(
@@ -8,7 +8,7 @@ public record PerformanceTicketDTO(
         long typeId,
         PerformanceType type,
         String subtitle,
-        String reserveAt,
+        LocalDateTime reserveAt,
         String reservationBgUrl
 ) {
     public static PerformanceTicketDTO of(
@@ -16,7 +16,7 @@ public record PerformanceTicketDTO(
             final long performanceId,
             final String type,
             final String subtitle,
-            final String reserveAt,
+            final LocalDateTime reserveAt,
             final String reservationBgUrl
     ) {
         return new PerformanceTicketDTO(
