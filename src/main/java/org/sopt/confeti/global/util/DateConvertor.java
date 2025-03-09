@@ -15,15 +15,15 @@ public class DateConvertor {
             return null;
         }
 
-        return localDate.format(DEFAULT_TIME_FORMAT);
+        return LocalDateTime.of(localDate, LocalTime.MIN).format(DEFAULT_TIME_FORMAT);
     }
 
-    public static String convert(final LocalTime localTime) {
+    public static String convert(final LocalDate localDate, final LocalTime localTime) {
         if (localTime == null) {
             return null;
         }
 
-        return localTime.format(DEFAULT_TIME_FORMAT);
+        return LocalDateTime.of(localDate, localTime).format(DEFAULT_TIME_FORMAT);
     }
 
     public static String convert(final LocalDateTime localDateTime) {
