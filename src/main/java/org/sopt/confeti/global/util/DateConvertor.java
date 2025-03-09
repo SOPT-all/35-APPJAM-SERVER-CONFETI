@@ -7,17 +7,15 @@ import java.time.format.DateTimeFormatter;
 
 public class DateConvertor {
 
-    private static final DateTimeFormatter spotifyLocalDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter localDateFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-    private static final DateTimeFormatter localTimeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private static final DateTimeFormatter localDateTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter SPOTIFY_LOCAL_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter DEFAULT_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     public static String convert(final LocalDate localDate) {
         if (localDate == null) {
             return null;
         }
 
-        return localDate.format(localDateFormat);
+        return localDate.format(DEFAULT_TIME_FORMAT);
     }
 
     public static String convert(final LocalTime localTime) {
@@ -25,7 +23,7 @@ public class DateConvertor {
             return null;
         }
 
-        return localTime.format(localTimeFormat);
+        return localTime.format(DEFAULT_TIME_FORMAT);
     }
 
     public static String convert(final LocalDateTime localDateTime) {
@@ -33,7 +31,7 @@ public class DateConvertor {
             return null;
         }
 
-        return localDateTime.format(localDateTimeFormat);
+        return localDateTime.format(DEFAULT_TIME_FORMAT);
     }
 
     public static String convertToLocalDate(final LocalDateTime localDateTime) {
@@ -41,22 +39,10 @@ public class DateConvertor {
             return null;
         }
 
-        return localDateTime.format(localDateFormat);
-    }
-
-    public static LocalDate convertToLocalDate(final String localDate) {
-        return LocalDate.parse(localDate, localDateFormat);
-    }
-
-    public static LocalTime convertToLocalTime(final String localTime) {
-        return LocalTime.parse(localTime, localTimeFormat);
-    }
-
-    public static LocalDateTime convertToLocalDateTime(final String localDateTime) {
-        return LocalDateTime.parse(localDateTime, localDateTimeFormat);
+        return localDateTime.format(DEFAULT_TIME_FORMAT);
     }
 
     public static LocalDate convertToSpotifyLocalDate(final String spotifyLocalDate) {
-        return LocalDate.parse(spotifyLocalDate, spotifyLocalDateFormat);
+        return LocalDate.parse(spotifyLocalDate, SPOTIFY_LOCAL_DATE_FORMAT);
     }
 }
