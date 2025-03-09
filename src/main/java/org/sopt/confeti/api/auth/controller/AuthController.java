@@ -2,8 +2,10 @@ package org.sopt.confeti.api.auth.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.auth.dto.LoginRequest;
+import org.sopt.confeti.api.auth.dto.request.LoginRequest;
+import org.sopt.confeti.api.auth.dto.request.OnboardRequest;
 import org.sopt.confeti.api.auth.facade.AuthFacade;
+import org.sopt.confeti.api.auth.facade.dto.request.OnboardDTO;
 import org.sopt.confeti.auth.Token;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
@@ -45,6 +47,16 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<BaseResponse<?>> logout(@UserId Long userId){
         authFacade.logout(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @Permission(role = {Role.ONBOARDING})
+    @PostMapping("/onboard")
+    public ResponseEntity<BaseResponse<?>> onboard(
+            @UserId long userId,
+            @Valid @RequestBody OnboardRequest request
+    ) {
+        authFacade.onboard(userId, OnboardDTO.from(request));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }
