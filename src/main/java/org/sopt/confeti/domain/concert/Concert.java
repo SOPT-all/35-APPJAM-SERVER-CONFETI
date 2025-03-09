@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
-import org.sopt.confeti.domain.concert.application.dto.request.ConcertFileNamesDTO;
 import org.sopt.confeti.domain.concertartist.ConcertArtist;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
