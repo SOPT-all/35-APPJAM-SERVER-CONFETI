@@ -7,7 +7,6 @@ import org.sopt.confeti.domain.user.OAuthProvider;
 public record LoginRequest (
         @NotNull
         OAuthProvider provider,
-        @NotBlank
         String redirectUrl,
         @NotBlank
         String code,
