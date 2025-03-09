@@ -35,4 +35,9 @@ public class UserService {
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
     }
+
+    @Transactional
+    public void deleteUser(User user) {
+        userRepository.delete(user);
+    }
 }

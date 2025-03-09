@@ -49,4 +49,10 @@ public class AuthFacade {
                 artistFavoriteService.addFavorite(user, favoriteArtist.artistId())
         );
     }
+
+    @Transactional
+    public void withdraw(long userId) {
+        User user = userService.findById(userId);
+        userService.deleteUser(user);
+    }
 }
