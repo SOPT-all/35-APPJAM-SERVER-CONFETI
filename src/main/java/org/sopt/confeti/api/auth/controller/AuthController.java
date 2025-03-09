@@ -34,7 +34,7 @@ public class AuthController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, result);
     }
 
-    @Permission(role =  {Role.GENERAL})
+    @Permission(role =  {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/reissue")
     public ResponseEntity<BaseResponse<?>> reissue(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String refreshToken
@@ -43,7 +43,7 @@ public class AuthController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, token);
     }
 
-    @Permission(role = {Role.GENERAL})
+    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/logout")
     public ResponseEntity<BaseResponse<?>> logout(@UserId Long userId){
         authFacade.logout(userId);
@@ -57,6 +57,15 @@ public class AuthController {
             @Valid @RequestBody OnboardRequest request
     ) {
         authFacade.onboard(userId, OnboardDTO.from(request));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<BaseResponse<?>> withdraw(
+            @UserId long userId
+    ) {
+        authFacade.withdraw(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }
