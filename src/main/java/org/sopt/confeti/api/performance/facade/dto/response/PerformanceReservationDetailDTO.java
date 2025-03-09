@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
+import java.time.LocalDateTime;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.util.DateConvertor;
@@ -9,7 +10,7 @@ public record PerformanceReservationDetailDTO(
         long typeId,
         PerformanceType type,
         String subtitle,
-        String reserveAt,
+        LocalDateTime reserveAt,
         String reservationBgUrl
 ) {
     public static PerformanceReservationDetailDTO from(PerformanceTicketDTO performanceTicketDTO) {
