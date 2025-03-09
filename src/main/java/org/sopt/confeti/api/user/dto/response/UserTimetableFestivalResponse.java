@@ -12,10 +12,10 @@ public record UserTimetableFestivalResponse (
 ){
     public static UserTimetableFestivalResponse from(UserTimetableFestivalBasicDTO timetableFestival) {
         return new UserTimetableFestivalResponse(
-                DateConvertor.convert(timetableFestival.ticketOpenAt()),
+                DateConvertor.convert(timetableFestival.festivalDate(), timetableFestival.ticketOpenAt()),
                 timetableFestival.stages().size(),
                 timetableFestival.stages().stream()
-                        .map(UserTimetableFestivalStageResponse::from)
+                        .map(stage -> UserTimetableFestivalStageResponse.of(timetableFestival.festivalDate(), stage))
                         .toList()
         );
     }
