@@ -26,20 +26,24 @@ public class JwtTokenExtractor {
     }
 
     public Role getRole(String token) {
-        return Jwts.parser()
+        String role = Jwts.parser()
                 .verifyWith(keyGenerator.getKeyFromString(jwtProperties.secretKey()))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .get(JWT_CLAIM_ROLE, Role.class);
+                .get(JWT_CLAIM_ROLE, String.class);
+
+        return Role.from(role);
     }
 
     public OAuthProvider getProvider(String token) {
-        return Jwts.parser()
+        String provider = Jwts.parser()
                 .verifyWith(keyGenerator.getKeyFromString(jwtProperties.secretKey()))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .get(JWT_CLAIM_PROVIDER, OAuthProvider.class);
+                .get(JWT_CLAIM_PROVIDER, String.class);
+
+        return OAuthProvider.valueOf(provider);
     }
 }
