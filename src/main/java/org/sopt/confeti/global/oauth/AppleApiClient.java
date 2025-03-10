@@ -39,7 +39,7 @@ public class AppleApiClient implements OAuthApiClient {
     @Value("${apple.key-id}")
     private String keyId;
 
-    @Value("${apple.private-key")
+    @Value("${apple.private-key}")
     private String privateKey;
 
     private static final String GRANT_TYPE = "authorization_code";
