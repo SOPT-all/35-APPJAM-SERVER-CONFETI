@@ -53,7 +53,7 @@ public class AuthController {
     @Permission(role = {Role.ONBOARDING})
     @PostMapping("/onboard")
     public ResponseEntity<BaseResponse<?>> onboard(
-            @UserId long userId,
+            @UserId Long userId,
             @Valid @RequestBody OnboardRequest request
     ) {
         authFacade.onboard(userId, OnboardDTO.from(request));
@@ -63,7 +63,7 @@ public class AuthController {
     @Permission(role = {Role.GENERAL})
     @DeleteMapping("/withdraw")
     public ResponseEntity<BaseResponse<?>> withdraw(
-            @UserId long userId
+            @UserId Long userId
     ) {
         authFacade.withdraw(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
