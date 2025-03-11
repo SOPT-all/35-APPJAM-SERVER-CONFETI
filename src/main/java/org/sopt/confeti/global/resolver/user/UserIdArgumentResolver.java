@@ -35,7 +35,7 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
 
-        UserId userIdAnnotation = parameter.getMethodAnnotation(UserId.class);
+        UserId userIdAnnotation = parameter.getParameterAnnotation(UserId.class);
         if (Objects.isNull(userIdAnnotation)) {
             throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
