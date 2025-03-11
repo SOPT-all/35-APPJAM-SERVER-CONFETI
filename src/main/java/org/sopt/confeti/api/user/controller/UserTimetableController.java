@@ -14,6 +14,9 @@ import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalDTO;
+import org.sopt.confeti.domain.user.constant.Role;
+import org.sopt.confeti.global.annotation.Permission;
+import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.message.SuccessMessage;
@@ -32,51 +35,59 @@ public class UserTimetableController {
     private final UserTimetableFacade userTimetableFacade;
     private final S3FileHandler s3FileHandler;
 
+    @Permission(role = {Role.GENERAL})
     @GetMapping
-    public ResponseEntity<BaseResponse<?>> getTimetablesListAndDate(@RequestHeader("Authorization") long userId) {
+    public ResponseEntity<BaseResponse<?>> getTimetablesListAndDate(
+            @UserId Long userId
+    ) {
         UserTimetableDTO userTimetableDTO =  userTimetableFacade.getTimetablesListAndDate(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetableDetailResponse.of(userTimetableDTO, s3FileHandler));
     }
 
+    @Permission(role = {Role.GENERAL})
     @GetMapping("/add")
     public ResponseEntity<BaseResponse<?>> getTimetablesToAdd(
-            @RequestHeader("Authorization") long userId,
+            @UserId Long userId,
             @RequestParam(name = "cursor", required = false) Long cursor
     ) {
         CursorPage<TimetableToAddDTO> timetablesToAdd = userTimetableFacade.getTimetablesToAdd(userId, cursor);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, TimetablesToAddResponse.of(timetablesToAdd, s3FileHandler));
     }
 
+    @Permission(role = {Role.GENERAL})
     @PostMapping
     public ResponseEntity<BaseResponse<?>> addTimetableFestival(
-            @RequestHeader("Authorization") long userId,
+            @UserId Long userId,
             @RequestBody AddTimetableFestivalRequest addTimetableFestivalRequest
     ) {
         userTimetableFacade.addTimetableFestivals(userId, AddTimetableFestivalDTO.from(addTimetableFestivalRequest));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @Permission(role = {Role.GENERAL})
     @DeleteMapping("/{festivalId}")
     public ResponseEntity<BaseResponse<?>> removeTimetableFestival(
-            @RequestHeader("Authorization") long userId,
+            @UserId Long userId,
             @PathVariable(name = "festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long festivalId
     ) {
         userTimetableFacade.removeTimetableFestival(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @Permission(role = {Role.GENERAL})
     @GetMapping("/{festivalDateId}")
     public ResponseEntity<BaseResponse<?>> getTimetableFestival(
-            @RequestHeader("Authorization") long userId,
+            @UserId Long userId,
             @PathVariable(name = "festivalDateId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long festivalDateId
     ){
         UserTimetableFestivalBasicDTO response = userTimetableFacade.getTimetableInfo(userId, festivalDateId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetableFestivalResponse.from(response));
     }
 
+    @Permission(role = {Role.GENERAL})
     @PatchMapping
     public ResponseEntity<BaseResponse<?>> updateTimetableFestival(
-            @RequestHeader("Authorization") long userId,
+            @UserId Long userId,
             @RequestBody PatchTimetableRequest patchTimetablerequest
     ){
         userTimetableFacade.patchTimetableFestivals(userId, PatchTimetableDTO.from(patchTimetablerequest));

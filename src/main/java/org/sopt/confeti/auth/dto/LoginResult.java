@@ -4,8 +4,9 @@ import org.sopt.confeti.auth.Token;
 
 public record LoginResult (
         String accessToken,
-        String refreshToken
+        String refreshToken,
+        boolean isOnboarding
 ){
-    public static LoginResult from(Token token) {
-        return new LoginResult(token.accessToken(), token.refreshToken());
+    public static LoginResult from(Token token, boolean isOnboarding) {
+        return new LoginResult(token.accessToken(), token.refreshToken(), isOnboarding);
     }}

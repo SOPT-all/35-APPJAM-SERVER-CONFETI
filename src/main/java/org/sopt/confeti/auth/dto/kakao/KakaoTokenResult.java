@@ -1,8 +1,8 @@
-package org.sopt.confeti.auth.dto;
+package org.sopt.confeti.auth.dto.kakao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record OAuthTokenResult(
+public record KakaoTokenResult(
         @JsonProperty("access_token")
         String accessToken,
 

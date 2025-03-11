@@ -2,11 +2,15 @@ package org.sopt.confeti.api.auth.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.auth.dto.LoginRequest;
+import org.sopt.confeti.api.auth.dto.request.LoginRequest;
+import org.sopt.confeti.api.auth.dto.request.OnboardRequest;
 import org.sopt.confeti.api.auth.facade.AuthFacade;
+import org.sopt.confeti.api.auth.facade.dto.request.OnboardDTO;
 import org.sopt.confeti.auth.Token;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
+import org.sopt.confeti.domain.user.constant.Role;
+import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
@@ -22,15 +26,16 @@ public class AuthController {
 
     private final AuthFacade authFacade;
 
-    @PostMapping("/kakao/login")
+    @PostMapping("/login")
     public ResponseEntity<BaseResponse<?>> login(
            @Valid @RequestBody LoginRequest request
     ) {
-        LoginResult result = authFacade.login(new LoginCommand(request.provider(), request.redirectUrl(), request.code()));
+        LoginResult result = authFacade.login(LoginCommand.from(request));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, result);
     }
 
-    @PostMapping("/kakao/reissue")
+    @Permission(role =  {Role.ONBOARDING, Role.GENERAL})
+    @PostMapping("/reissue")
     public ResponseEntity<BaseResponse<?>> reissue(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String refreshToken
     ) {
@@ -38,9 +43,29 @@ public class AuthController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, token);
     }
 
-    @PostMapping("/kakao/logout")
+    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @PostMapping("/logout")
     public ResponseEntity<BaseResponse<?>> logout(@UserId Long userId){
         authFacade.logout(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @Permission(role = {Role.ONBOARDING})
+    @PostMapping("/onboard")
+    public ResponseEntity<BaseResponse<?>> onboard(
+            @UserId Long userId,
+            @Valid @RequestBody OnboardRequest request
+    ) {
+        authFacade.onboard(userId, OnboardDTO.from(request));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<BaseResponse<?>> withdraw(
+            @UserId Long userId
+    ) {
+        authFacade.withdraw(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }

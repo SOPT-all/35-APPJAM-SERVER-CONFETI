@@ -1,16 +1,19 @@
-package org.sopt.confeti.auth;
+package org.sopt.confeti.global.oauth;
 
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.auth.command.LoginCommand;
+import org.sopt.confeti.auth.dto.OAuthSocialInfoResult;
+import org.sopt.confeti.domain.user.OAuthProvider;
+import org.sopt.confeti.global.annotation.OAuthClient;
 import org.springframework.beans.factory.annotation.Value;
-import org.sopt.confeti.auth.dto.OAuthUserInfoResult;
-import org.sopt.confeti.auth.dto.OAuthLoginParams;
-import org.sopt.confeti.auth.dto.OAuthTokenResult;
+import org.sopt.confeti.auth.dto.kakao.KakaoSocialInfoResult;
+import org.sopt.confeti.auth.dto.kakao.KakaoLoginParams;
+import org.sopt.confeti.auth.dto.kakao.KakaoTokenResult;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-@Component
+@OAuthClient
 @RequiredArgsConstructor
 public class KakaoApiClient implements OAuthApiClient {
 
@@ -24,30 +27,40 @@ public class KakaoApiClient implements OAuthApiClient {
     private final RestClient restClient;
 
     @Override
-    public OAuthTokenResult requestAccessToken(OAuthLoginParams params) {
+    public boolean supports(OAuthProvider provider) {
+        return provider == OAuthProvider.KAKAO;
+    }
+
+    @Override
+    public OAuthSocialInfoResult getSocialInfo(LoginCommand command) {
+        KakaoTokenResult tokenResult = requestAccessToken(KakaoLoginParams.from(command));
+        KakaoSocialInfoResult socialInfo = getSocialInfo(tokenResult.accessToken());
+        return OAuthSocialInfoResult.from(socialInfo);
+    }
+
+    private KakaoTokenResult requestAccessToken(KakaoLoginParams params) {
         return restClient
                 .method(HttpMethod.POST)
                 .uri(KAUTH_TOKEN_URL_HOST)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(createHttpBody(params))
                 .retrieve()
-                .toEntity(OAuthTokenResult.class)
+                .toEntity(KakaoTokenResult.class)
                 .getBody();
     }
 
-    @Override
-    public OAuthUserInfoResult getOAuthUserInfo(String accessToken) {
+    private KakaoSocialInfoResult getSocialInfo(String accessToken) {
         return restClient
                 .method(HttpMethod.GET)
                 .uri(KAUTH_USER_URL_HOST)
                 .header("Authorization", createAuthorizationHeader(accessToken))
                 .retrieve()
-                .toEntity(OAuthUserInfoResult.class)
+                .toEntity(KakaoSocialInfoResult.class)
                 .getBody();
     }
 
-    private String createHttpBody(OAuthLoginParams params) {
-        return "grant_type=authorization_code" +
+    private String createHttpBody(KakaoLoginParams params) {
+        return "grant_type=" + GRANT_TYPE +
                 "&client_id=" + clientId +
                 "&redirect_uri=" + params.redirectUrl() +
                 "&code=" + params.code();

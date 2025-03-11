@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TokenParser {
     private static final String PREFIX  = "Bearer ";
+
     public String getToken(String token) {
         if (token.startsWith(PREFIX)) {
             return token.substring(PREFIX.length());

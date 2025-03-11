@@ -1,4 +1,4 @@
-package org.sopt.confeti.auth.dto;
+package org.sopt.confeti.auth.dto.kakao;
 
 public record KakaoAccount (
         KakaoProfile profile

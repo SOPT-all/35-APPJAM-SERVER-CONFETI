@@ -3,16 +3,20 @@ package org.sopt.confeti.auth;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
-import org.sopt.confeti.auth.dto.OAuthLoginParams;
-import org.sopt.confeti.auth.dto.OAuthTokenResult;
-import org.sopt.confeti.auth.dto.OAuthUserInfoResult;
+import org.sopt.confeti.auth.dto.OAuthSocialInfoResult;
 import org.sopt.confeti.auth.jwt.JwtTokenGenerator;
+import org.sopt.confeti.domain.token.AppleToken;
 import org.sopt.confeti.domain.token.RefreshToken;
+import org.sopt.confeti.domain.token.infra.AppleTokenRepository;
 import org.sopt.confeti.domain.token.infra.RefreshTokenRepository;
 import org.sopt.confeti.domain.user.AuthUser;
+import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.domain.user.infra.repository.AllUserRepository;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
+import org.sopt.confeti.global.oauth.OAuthApiClient;
+import org.sopt.confeti.global.oauth.OAuthApiClientRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,31 +24,45 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LoginService {
 
-    private final OAuthApiClient oAuthApiClient;
+    private final OAuthApiClientRegistry oAuthApiClientRegistry;
     private final UserRepository userRepository;
     private final AllUserRepository allUserRepository;
     private final JwtTokenGenerator jwtTokenGenerator;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AppleTokenRepository appleTokenRepository;
 
 
     @Transactional
     public LoginResult login(LoginCommand command) {
-        OAuthUserInfoResult socialUserInfo = getSocialInfo(command);
-        AuthUser authUser = loadOrCreateUser(command, socialUserInfo);
+        OAuthApiClient oAuthApiClient = oAuthApiClientRegistry.getOAuthApiClientByProvider(command.provider());
+        OAuthSocialInfoResult socialInfo = oAuthApiClient.getSocialInfo(command);
+        AuthUser authUser = loadOrCreateUser(command, socialInfo);
         Token token = createToken(authUser);
-        updateRefreshToken(token.refreshToken(), authUser.getId());
-        return LoginResult.from(token);
+        saveRefreshToken(token.refreshToken(), authUser.getId());
+        saveSocialTokenIfAppleLogin(command.provider(), authUser.getId(), socialInfo);
+
+        return LoginResult.from(token, isOnboarding(authUser.getRole()));
     }
 
-    private void updateRefreshToken(String refreshToken, long userId) {
+    private void saveRefreshToken(String refreshToken, long userId) {
+        refreshTokenRepository.deleteAllByUserId(userId);
         refreshTokenRepository.save(
                 RefreshToken.of(refreshToken, userId)
         );
     }
 
-    private AuthUser loadOrCreateUser(LoginCommand command, OAuthUserInfoResult socialUserInfo) {
+    private void saveSocialTokenIfAppleLogin(OAuthProvider provider, long userId, OAuthSocialInfoResult socialInfo) {
+        if (isAppleLogin(provider)) {
+            appleTokenRepository.deleteAllByUserId(userId);
+            appleTokenRepository.save(
+                    AppleToken.create(userId, socialInfo)
+            );
+        }
+    }
+
+    private AuthUser loadOrCreateUser(LoginCommand command, OAuthSocialInfoResult socialInfo) {
         AuthUser retrievedAuthUser = userRepository.findBySocialIdAndProvider(
-                        socialUserInfo.id(),
+                        socialInfo.id(),
                         command.provider()
                 )
                 .map(User::toAuthUser)
@@ -57,24 +75,25 @@ public class LoginService {
         return allUserRepository.save(
                 AuthUser.create(
                         command.provider(),
-                        socialUserInfo.id(),
-                        socialUserInfo.kakaoAccount().profile().nickname(),
-                        socialUserInfo.kakaoAccount().profile().profileImageUrl()
+                        socialInfo.id(),
+                        socialInfo.name(),
+                        socialInfo.profileImgUrl()
                 )
         );
     }
 
     private Token createToken(AuthUser authUser){
-     return new Token(
-             jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId())),
-             jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()))
-     );
+         return new Token(
+                 jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId()), authUser.getRole(), authUser.getProvider()),
+                 jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()), authUser.getRole(), authUser.getProvider())
+         );
     }
 
-    private OAuthUserInfoResult getSocialInfo(LoginCommand command) {
-        OAuthLoginParams loginParams = new OAuthLoginParams(command.redirectUrl(), command.code());
-        OAuthTokenResult tokenResponse = oAuthApiClient.requestAccessToken(loginParams);
-        OAuthUserInfoResult userInfo = oAuthApiClient.getOAuthUserInfo(tokenResponse.accessToken());
-        return userInfo;
+    private boolean isAppleLogin(OAuthProvider provider) {
+        return provider.equals(OAuthProvider.APPLE);
+    }
+
+    private boolean isOnboarding(Role role) {
+        return role.equals(Role.ONBOARDING);
     }
 }
