@@ -12,6 +12,7 @@ import org.sopt.confeti.domain.token.infra.RefreshTokenRepository;
 import org.sopt.confeti.domain.user.AuthUser;
 import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.domain.user.infra.repository.AllUserRepository;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.global.oauth.OAuthApiClient;
@@ -40,7 +41,7 @@ public class LoginService {
         saveRefreshToken(token.refreshToken(), authUser.getId());
         saveSocialTokenIfAppleLogin(command.provider(), authUser.getId(), socialInfo);
 
-        return LoginResult.from(token);
+        return LoginResult.from(token, isOnboarding(authUser.getRole()));
     }
 
     private void saveRefreshToken(String refreshToken, long userId) {
@@ -90,5 +91,9 @@ public class LoginService {
 
     private boolean isAppleLogin(OAuthProvider provider) {
         return provider.equals(OAuthProvider.APPLE);
+    }
+
+    private boolean isOnboarding(Role role) {
+        return role.equals(Role.ONBOARDING);
     }
 }
