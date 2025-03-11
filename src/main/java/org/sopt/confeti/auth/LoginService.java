@@ -37,13 +37,14 @@ public class LoginService {
         OAuthSocialInfoResult socialInfo = oAuthApiClient.getSocialInfo(command);
         AuthUser authUser = loadOrCreateUser(command, socialInfo);
         Token token = createToken(authUser);
-        updateRefreshToken(token.refreshToken(), authUser.getId());
+        saveRefreshToken(token.refreshToken(), authUser.getId());
         saveSocialTokenIfAppleLogin(command.provider(), authUser.getId(), socialInfo);
 
         return LoginResult.from(token);
     }
 
-    private void updateRefreshToken(String refreshToken, long userId) {
+    private void saveRefreshToken(String refreshToken, long userId) {
+        refreshTokenRepository.deleteAllByUserId(userId);
         refreshTokenRepository.save(
                 RefreshToken.of(refreshToken, userId)
         );

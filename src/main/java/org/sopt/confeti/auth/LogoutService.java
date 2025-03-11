@@ -1,8 +1,6 @@
 package org.sopt.confeti.auth;
 
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.domain.token.AppleToken;
 import org.sopt.confeti.domain.token.infra.AppleTokenRepository;
 import org.sopt.confeti.domain.token.infra.RefreshTokenRepository;
 import org.springframework.stereotype.Component;

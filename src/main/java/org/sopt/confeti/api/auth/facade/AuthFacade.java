@@ -58,6 +58,7 @@ public class AuthFacade {
     public void withdraw(long userId) {
         User user = userService.findById(userId);
         userService.deleteUser(user);
-        withdrawService.deleteAllExistTokensByUserId(userId);
+        withdrawService.deleteAllExistAppleTokensByUserId(userId);
+        withdrawService.deleteAllExistRefreshTokensByUserId(userId);
     }
 }
