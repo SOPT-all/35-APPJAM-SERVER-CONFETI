@@ -4,6 +4,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Objects;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.auth.jwt.JwtTokenExtractor;
@@ -34,11 +35,15 @@ public class PermissionInterceptor implements HandlerInterceptor {
 
         HandlerMethod method = (HandlerMethod) handler;
         Permission permission = method.getMethodAnnotation(Permission.class);
-        if (permission == null) {
+        if (Objects.isNull(permission)) {
             return true;
         }
 
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (Objects.isNull(token)) {
+            return true;
+        }
+
         Role role;
 
         try {
