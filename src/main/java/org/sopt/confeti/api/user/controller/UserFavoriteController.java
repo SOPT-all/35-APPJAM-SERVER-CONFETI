@@ -7,6 +7,9 @@ import org.sopt.confeti.api.user.dto.response.UserFavoriteResponse;
 import org.sopt.confeti.api.user.facade.UserFavoriteFacade;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
+import org.sopt.confeti.domain.user.constant.Role;
+import org.sopt.confeti.global.annotation.Permission;
+import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -24,67 +27,77 @@ public class UserFavoriteController {
     private final UserFavoriteFacade userFavoriteFacade;
     private final S3FileHandler s3FileHandler;
 
+    @Permission(role = {Role.GENERAL})
     @PostMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<?>> postFavoriteFestival(
-            @RequestHeader("Authorization") Long userId,
+            @UserId Long userId,
             @PathVariable(name = "festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
         userFavoriteFacade.addFestivalFavorite(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @Permission(role = {Role.GENERAL})
     @DeleteMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<?>> deleteFavoriteFestival(
-            @RequestHeader("Authorization") Long userId,
+            @UserId Long userId,
             @PathVariable(name = "festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
         userFavoriteFacade.removeFestivalFavorite(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @Permission(role = {Role.GENERAL})
     @GetMapping("/artists")
-    public ResponseEntity<BaseResponse<?>> getFavoriteArtists(@RequestHeader("Authorization") Long userId) {
+    public ResponseEntity<BaseResponse<?>> getFavoriteArtists(
+            @UserId Long userId
+    ) {
         UserFavoriteArtistDTO userFavoriteArtistDTO = userFavoriteFacade.getArtistList(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserFavoriteResponse.from(userFavoriteArtistDTO.artists()));
     }
 
+    @Permission(role = {Role.GENERAL})
     @PostMapping("/artists/{artistId}")
     public ResponseEntity<BaseResponse<?>> addArtistFavorite(
-            @RequestHeader("Authorization") long userId,
+            @UserId Long userId,
             @PathVariable(name = "artistId") String artistId
     ) {
         userFavoriteFacade.addArtistFavorite(userId, artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @Permission(role = {Role.GENERAL})
     @DeleteMapping("/artists/{artistId}")
     public ResponseEntity<BaseResponse<?>> removeArtistFavorite(
-            @RequestHeader("Authorization") Long userId,
+            @UserId Long userId,
             @PathVariable(name = "artistId") String artistId
     ) {
         userFavoriteFacade.removeArtistFavorite(userId, artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @Permission(role = {Role.GENERAL})
     @PostMapping("/concerts/{concertId}")
     public ResponseEntity<BaseResponse<?>> addConcertFavorite(
-            @RequestHeader("Authorization") Long userId,
+            @UserId Long userId,
             @PathVariable(name = "concertId") Long concertId
     ) {
         userFavoriteFacade.addConcertFavorite(userId, concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @Permission(role = {Role.GENERAL})
     @DeleteMapping("/concerts/{concertId}")
     public ResponseEntity<BaseResponse<?>> removeConcertFavorite(
-            @RequestHeader("Authorization") Long userId,
+            @UserId Long userId,
             @PathVariable(name = "concertId") Long concertId
     ) {
         userFavoriteFacade.removeConcertFavorite(userId, concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @Permission(role = {Role.GENERAL})
     @GetMapping("/performances/preview")
     public ResponseEntity<BaseResponse<?>> getFavoritePerformances(
-            @RequestHeader("Authorization") long userId
+            @UserId Long userId
     ) {
         UserFavoritePerformancesDTO userFavoritePerformancesDTO = userFavoriteFacade.getFavoritePerformances(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserFavoritePerformancesResponse.of(userFavoritePerformancesDTO, s3FileHandler));

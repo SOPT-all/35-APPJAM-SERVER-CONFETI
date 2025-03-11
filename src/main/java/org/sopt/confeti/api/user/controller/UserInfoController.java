@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.response.UserInfoResponse;
 import org.sopt.confeti.api.user.facade.UserInfoFacade;
 import org.sopt.confeti.api.user.facade.dto.response.UserInfoDTO;
+import org.sopt.confeti.domain.user.constant.Role;
+import org.sopt.confeti.global.annotation.Permission;
+import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -22,8 +25,11 @@ public class UserInfoController {
     private final UserInfoFacade userInfoFacade;
     private final S3FileHandler s3FileHandler;
 
+    @Permission(role = {Role.GENERAL})
     @GetMapping
-    public ResponseEntity<BaseResponse<?>> getUserInfo(@RequestHeader("Authorization") long userId) {
+    public ResponseEntity<BaseResponse<?>> getUserInfo(
+            @UserId Long userId
+    ) {
         UserInfoDTO userInfo = userInfoFacade.getUserInfo(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserInfoResponse.of(userInfo, s3FileHandler));
     }
