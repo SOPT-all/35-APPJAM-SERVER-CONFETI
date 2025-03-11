@@ -19,7 +19,8 @@ public enum FolderPath {
     public static String combine(FolderPath... folderPaths) {
         return String.join(
                 PATH_DELIMITER,
-                Arrays.stream(folderPaths).map(FolderPath::getSingle).toList()
+                Arrays.stream(folderPaths)
+                        .map(folderPath -> folderPath.path).toList()
         ) + PATH_DELIMITER;
     }
 
