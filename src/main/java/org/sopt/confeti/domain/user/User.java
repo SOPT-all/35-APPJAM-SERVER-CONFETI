@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.concertfavorite.ConcertFavorite;
 import org.sopt.confeti.domain.festivalfavorite.FestivalFavorite;
@@ -29,7 +30,7 @@ public class User {
     @Column(length = 20, nullable = false)
     private OAuthProvider provider;
 
-    @Column(length = 20,nullable = false)
+    @Column(length = 100, nullable = false)
     private String socialId;
 
     @Column(length=20, nullable = false)
@@ -38,6 +39,7 @@ public class User {
     @Column(length=250)
     private String profilePath;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
     private Role role;

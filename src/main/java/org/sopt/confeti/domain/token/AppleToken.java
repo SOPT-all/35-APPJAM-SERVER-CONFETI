@@ -22,7 +22,8 @@ public class AppleToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String tokenId;
+    @Column(name = "apple_token_id")
+    private Long id;
 
     @Column(nullable = false)
     private long userId;

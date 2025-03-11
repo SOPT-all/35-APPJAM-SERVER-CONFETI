@@ -38,7 +38,7 @@ public class LoginService {
         AuthUser authUser = loadOrCreateUser(command, socialInfo);
         Token token = createToken(authUser);
         updateRefreshToken(token.refreshToken(), authUser.getId());
-        saveSocialTokenIfApple(command.provider(), authUser.getId(), socialInfo);
+        saveSocialTokenIfAppleLogin(command.provider(), authUser.getId(), socialInfo);
 
         return LoginResult.from(token);
     }
@@ -49,8 +49,9 @@ public class LoginService {
         );
     }
 
-    private void saveSocialTokenIfApple(OAuthProvider provider, long userId, OAuthSocialInfoResult socialInfo) {
-        if (provider == OAuthProvider.APPLE) {
+    private void saveSocialTokenIfAppleLogin(OAuthProvider provider, long userId, OAuthSocialInfoResult socialInfo) {
+        if (isAppleLogin(provider)) {
+            appleTokenRepository.deleteAllByUserId(userId);
             appleTokenRepository.save(
                     AppleToken.create(userId, socialInfo)
             );
@@ -80,9 +81,13 @@ public class LoginService {
     }
 
     private Token createToken(AuthUser authUser){
-     return new Token(
-             jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId()), authUser.getRole(), authUser.getProvider()),
-             jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()), authUser.getRole(), authUser.getProvider())
-     );
+         return new Token(
+                 jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId()), authUser.getRole(), authUser.getProvider()),
+                 jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()), authUser.getRole(), authUser.getProvider())
+         );
+    }
+
+    private boolean isAppleLogin(OAuthProvider provider) {
+        return provider.equals(OAuthProvider.APPLE);
     }
 }

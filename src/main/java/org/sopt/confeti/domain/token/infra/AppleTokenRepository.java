@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AppleTokenRepository extends JpaRepository<AppleToken, Long> {
     Optional<AppleToken> findByUserId(long userId);
+
+    void deleteAllByUserId(long userId);
 }

@@ -24,7 +24,6 @@ public class LogoutService {
 
     @Transactional
     protected void removeSocialTokenIfPresent(long userId) {
-        Optional<AppleToken> token = appleTokenRepository.findByUserId(userId);
-        token.ifPresent(appleTokenRepository::delete);
+        appleTokenRepository.deleteAllByUserId(userId);
     }
 }

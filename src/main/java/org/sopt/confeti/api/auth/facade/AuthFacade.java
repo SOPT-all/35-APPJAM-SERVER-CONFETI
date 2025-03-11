@@ -7,11 +7,13 @@ import org.sopt.confeti.auth.LogoutService;
 import org.sopt.confeti.auth.OnboardService;
 import org.sopt.confeti.auth.ReissueService;
 import org.sopt.confeti.auth.Token;
+import org.sopt.confeti.auth.WithdrawService;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
 import org.sopt.confeti.domain.artistfavorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
+import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Facade;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class AuthFacade {
     private final UserService userService;
     private final ArtistFavoriteService artistFavoriteService;
     private final OnboardService onboardService;
+    private final WithdrawService withdrawService;
 
     @Transactional
     public LoginResult login(LoginCommand loginCommand) {
@@ -48,11 +51,13 @@ public class AuthFacade {
         onboardDTO.favoriteArtists().forEach(favoriteArtist ->
                 artistFavoriteService.addFavorite(user, favoriteArtist.artistId())
         );
+        user.setRole(Role.GENERAL);
     }
 
     @Transactional
     public void withdraw(long userId) {
         User user = userService.findById(userId);
         userService.deleteUser(user);
+        withdrawService.deleteAllExistTokensByUserId(userId);
     }
 }
