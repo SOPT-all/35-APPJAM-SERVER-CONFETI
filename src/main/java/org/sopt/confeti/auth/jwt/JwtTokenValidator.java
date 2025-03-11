@@ -20,7 +20,8 @@ public class JwtTokenValidator {
         try {
             Jwts.parser()
                     .verifyWith(keyGenerator.getKeyFromString(jwtProperties.secretKey()))
-                    .build();
+                    .build()
+                    .parseSignedClaims(token);
         } catch (SecurityException | MalformedJwtException | IllegalArgumentException | UnsupportedJwtException e) {
             throw UnauthorizedException.wrong();
         } catch (ExpiredJwtException e) {

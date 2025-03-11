@@ -16,6 +16,7 @@ public class JwtTokenGenerator {
 
     private static final String JWT_TYPE = "JWT";
     private static final String JWT_IS_ACCESS_TOKEN = "isAccessToken";
+    private static final String JWT_IS_REFRESH_TOKEN = "isRefreshToken";
     private static final String JWT_CLAIM_ROLE = "role";
     private static final String JWT_CLAIM_PROVIDER = "provider";
 
@@ -46,7 +47,7 @@ public class JwtTokenGenerator {
         Date now = new Date();
         Map<String, Object> claims = new HashMap<>();
 
-        claims.put(JWT_IS_ACCESS_TOKEN, true);
+        claims.put(JWT_IS_REFRESH_TOKEN, true);
         claims.put(JWT_CLAIM_ROLE, role);
         claims.put(JWT_CLAIM_PROVIDER, provider);
 
