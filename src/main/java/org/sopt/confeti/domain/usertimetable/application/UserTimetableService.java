@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +27,16 @@ public class UserTimetableService {
 
         if (userTimetables.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+
+        Set<Long> existingIds = userTimetables.stream()
+                .map(UserTimetable::getId)
+                .collect(Collectors.toSet());
+
+        for (PatchTimetableListDTO timetableListDTO : timetableDTO.userTimetables()) {
+            if (!existingIds.contains(timetableListDTO.userTimetableId())) {
+                throw new NotFoundException(ErrorMessage.NOT_FOUND);
+            }
         }
 
         Map<Long, Boolean> updateMap = timetableDTO.userTimetables()
