@@ -168,8 +168,11 @@ public class UserTimetableFacade {
                 .collect(Collectors.toMap(userTimetable ->
                         userTimetable.getFestivalTime().getId(), Function.identity())
                 );
-
-        return UserTimetableFestivalBasicDTO.of(festivalDate, userTimetableMapper);
+        try {
+            return UserTimetableFestivalBasicDTO.of(festivalDate, userTimetableMapper);
+        } catch (NullPointerException e) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
     }
 
     @Transactional(readOnly = true)
