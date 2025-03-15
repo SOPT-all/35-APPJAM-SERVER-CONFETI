@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.artistfavorite.infra.repository.ArtistFavoriteRepository;
 import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.global.exception.NotFoundException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.artist.ArtistResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +21,10 @@ public class ArtistFavoriteService {
     @Transactional(readOnly = true)
     public List<ArtistFavorite> getArtistList(Long userId) {
         List<ArtistFavorite> artistList = artistFavoriteRepository.findTop6ByUserIdOrderByRand(userId);
-        artistResolver.load(artistList);
+
+        if (!artistList.isEmpty()) {
+            artistResolver.load(artistList);
+        }
 
         return artistList;
     }
