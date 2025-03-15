@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
 import org.sopt.confeti.domain.artistfavorite.infra.repository.ArtistFavoriteRepository;
 import org.sopt.confeti.domain.user.User;
-import org.sopt.confeti.global.exception.NotFoundException;
-import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.artist.ArtistResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
