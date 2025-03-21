@@ -158,18 +158,14 @@ public class UserTimetableFacade {
                 .flatMap(festivalStage -> festivalStage.getTimes().stream())
                 .map(FestivalTime::getId)
                 .toList();
+        validateExistFestivalTimeIds(festivalTimeIds);
 
         List<UserTimetable> userTimetables = userTimetableService.getUserTimetables(userId, festivalTimeIds);
 
-        Map<Long, UserTimetable> userTimetableMapper = userTimetables.stream()
-                .collect(Collectors.toMap(userTimetable ->
-                        userTimetable.getFestivalTime().getId(), Function.identity())
-                );
-        try {
-            return UserTimetableFestivalBasicDTO.of(festivalDate, userTimetableMapper);
-        } catch (NullPointerException e) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
+        Map<Long, UserTimetable> userTimetableMapper = createUserTimetableMapper(userTimetables);
+        validateExistUserTimetableMapper(userTimetableMapper);
+
+        return UserTimetableFestivalBasicDTO.of(festivalDate, userTimetableMapper);
     }
 
     @Transactional(readOnly = true)
@@ -191,6 +187,28 @@ public class UserTimetableFacade {
     public void patchTimetableFestivals(final long userId, final PatchTimetableDTO timetableDTO) {
         validateUserExists(userId);
         userTimetableService.patchTimetableFestival(userId, timetableDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public void validateExistFestivalTimeIds(final List<Long> festivalTimeIds){
+        if (festivalTimeIds == null || festivalTimeIds.isEmpty()) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, UserTimetable> createUserTimetableMapper(List<UserTimetable> userTimetables) {
+        return userTimetables.stream()
+                .collect(Collectors.toMap(userTimetable ->
+                        userTimetable.getFestivalTime().getId(), Function.identity())
+                );
+    }
+
+    @Transactional(readOnly = true)
+    public void validateExistUserTimetableMapper( Map<Long, UserTimetable> userTimetables) {
+        if (userTimetables.isEmpty()) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
     }
 }
 

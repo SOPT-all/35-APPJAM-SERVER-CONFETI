@@ -42,6 +42,12 @@ public class UserTimetableService {
 
     @Transactional(readOnly = true)
     public List<UserTimetable> getUserTimetables(final long userId, final List<Long> festivalTimeIds) {
-        return userTimetableRepository.findByUserIdAndFestivalTimeIds(userId, festivalTimeIds);
+        List<UserTimetable> userTimetables = userTimetableRepository.findByUserIdAndFestivalTimeIds(userId, festivalTimeIds);
+
+        if (userTimetables.isEmpty()) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+
+        return userTimetables;
     }
 }
