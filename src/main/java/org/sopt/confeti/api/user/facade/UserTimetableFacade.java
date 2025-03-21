@@ -1,11 +1,9 @@
 package org.sopt.confeti.api.user.facade;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalArtiestDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
@@ -162,9 +160,7 @@ public class UserTimetableFacade {
                 .toList();
         validateExistFestivalTimeIds(festivalTimeIds);
 
-
-        List<UserTimetable> userTimetables = userTimetableService.getUserTimetablesByFestivalTimeId(userId, festivalTimeIds);
-        validateExistUserTimetables(userTimetables);
+        List<UserTimetable> userTimetables = userTimetableService.getUserTimetables(userId, festivalTimeIds);
 
         Map<Long, UserTimetable> userTimetableMapper = createUserTimetableMapper(userTimetables);
         validateExistUserTimetableMapper(userTimetableMapper);
@@ -190,22 +186,18 @@ public class UserTimetableFacade {
     @Transactional
     public void patchTimetableFestivals(final long userId, final PatchTimetableDTO timetableDTO) {
         validateUserExists(userId);
-
-        List<UserTimetable> userTimetables= userTimetableService.getUserTimeTables(userId);
-        validateExistUserTimetables(userTimetables);
-        validateExistTimetableIds(userTimetables, timetableDTO);
-
-        userTimetableService.patchTimetableFestival(userTimetables, timetableDTO);
+        userTimetableService.patchTimetableFestival(userId, timetableDTO);
     }
 
     @Transactional(readOnly = true)
-    protected void validateExistFestivalTimeIds(final List<Long> festivalTimeIds){
+    public void validateExistFestivalTimeIds(final List<Long> festivalTimeIds){
         if (festivalTimeIds == null || festivalTimeIds.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
-    private Map<Long, UserTimetable> createUserTimetableMapper(List<UserTimetable> userTimetables) {
+    @Transactional(readOnly = true)
+    public Map<Long, UserTimetable> createUserTimetableMapper(List<UserTimetable> userTimetables) {
         return userTimetables.stream()
                 .collect(Collectors.toMap(userTimetable ->
                         userTimetable.getFestivalTime().getId(), Function.identity())
@@ -213,31 +205,10 @@ public class UserTimetableFacade {
     }
 
     @Transactional(readOnly = true)
-    protected void validateExistUserTimetableMapper( Map<Long, UserTimetable> userTimetables) {
+    public void validateExistUserTimetableMapper( Map<Long, UserTimetable> userTimetables) {
         if (userTimetables.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
-
-    @Transactional(readOnly = true)
-    protected void validateExistUserTimetables(List<UserTimetable> userTimetables) {
-        if (userTimetables.isEmpty()) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
-    }
-
-    @Transactional(readOnly = true)
-    protected void validateExistTimetableIds(List<UserTimetable> userTimetables, PatchTimetableDTO timetableDTO) {
-        Set<Long> existingIds = userTimetables.stream()
-                .map(UserTimetable::getId)
-                .collect(Collectors.toSet());
-
-        for (PatchTimetableListDTO timetableListDTO : timetableDTO.userTimetables()) {
-            if (!existingIds.contains(timetableListDTO.userTimetableId())) {
-                throw new NotFoundException(ErrorMessage.NOT_FOUND);
-            }
-        }
-    }
-
 }
 
