@@ -28,7 +28,6 @@ import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.resolver.artist.ArtistResolver;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -46,7 +45,6 @@ public class UserTimetableFacade {
     private final TimetableFestivalService timetableFestivalService;
     private final FestivalService festivalService;
     private final FestivalDateService festivalDateService;
-    private final ArtistResolver artistResolver;
     private final UserTimetableService userTimetableService;
 
     @Transactional(readOnly = true)
@@ -155,7 +153,6 @@ public class UserTimetableFacade {
         validateUserExists(userId);
 
         FestivalDate festivalDate = festivalDateService.findFestivalDateId(festivalDateId);
-        artistResolver.load(festivalDate);
 
         List<Long> festivalTimeIds = festivalDate.getStages().stream()
                 .flatMap(festivalStage -> festivalStage.getTimes().stream())
