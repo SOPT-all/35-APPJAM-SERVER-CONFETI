@@ -5,14 +5,11 @@ import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
 import org.sopt.confeti.domain.usertimetable.UserTimetable;
 import org.sopt.confeti.domain.usertimetable.infra.repository.UserTimetableRepository;
-import org.sopt.confeti.global.exception.NotFoundException;
-import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
