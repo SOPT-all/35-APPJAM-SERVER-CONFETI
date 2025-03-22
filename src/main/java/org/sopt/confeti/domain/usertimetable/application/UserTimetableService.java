@@ -21,24 +21,13 @@ public class UserTimetableService {
 
     private final UserTimetableRepository userTimetableRepository;
 
+    @Transactional(readOnly = true)
+    public List<UserTimetable> getUserTimeTables(long userId) {
+        return userTimetableRepository.findByUserId(userId);
+    }
+
     @Transactional
-    public void patchTimetableFestival(long userId, PatchTimetableDTO timetableDTO) {
-        List<UserTimetable> userTimetables = userTimetableRepository.findByUserId(userId);
-
-        if (userTimetables.isEmpty()) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
-
-        Set<Long> existingIds = userTimetables.stream()
-                .map(UserTimetable::getId)
-                .collect(Collectors.toSet());
-
-        for (PatchTimetableListDTO timetableListDTO : timetableDTO.userTimetables()) {
-            if (!existingIds.contains(timetableListDTO.userTimetableId())) {
-                throw new NotFoundException(ErrorMessage.NOT_FOUND);
-            }
-        }
-
+    public void patchTimetableFestival(List<UserTimetable> userTimetables, PatchTimetableDTO timetableDTO) {
         Map<Long, Boolean> updateMap = timetableDTO.userTimetables()
                 .stream()
                 .collect(Collectors.toMap(PatchTimetableListDTO::userTimetableId, PatchTimetableListDTO::isSelected));
@@ -52,13 +41,7 @@ public class UserTimetableService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserTimetable> getUserTimetables(final long userId, final List<Long> festivalTimeIds) {
-        List<UserTimetable> userTimetables = userTimetableRepository.findByUserIdAndFestivalTimeIds(userId, festivalTimeIds);
-
-        if (userTimetables.isEmpty()) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
-
-        return userTimetables;
+    public List<UserTimetable> getUserTimetablesByFestivalTimeId(final long userId, final List<Long> festivalTimeIds) {
+        return userTimetableRepository.findByUserIdAndFestivalTimeIds(userId, festivalTimeIds);
     }
 }
