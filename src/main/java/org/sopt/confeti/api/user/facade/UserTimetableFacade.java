@@ -160,7 +160,8 @@ public class UserTimetableFacade {
                 .flatMap(festivalStage -> festivalStage.getTimes().stream())
                 .map(FestivalTime::getId)
                 .toList();
-          validateExistFestivalTimeIds(festivalTimeIds);
+        validateExistFestivalTimeIds(festivalTimeIds);
+
 
         List<UserTimetable> userTimetables = userTimetableService.getUserTimetablesByFestivalTimeId(userId, festivalTimeIds);
         validateExistUserTimetables(userTimetables);
@@ -237,5 +238,6 @@ public class UserTimetableFacade {
             }
         }
     }
+
 }
 
