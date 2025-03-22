@@ -160,7 +160,7 @@ public class UserTimetableFacade {
                 .flatMap(festivalStage -> festivalStage.getTimes().stream())
                 .map(FestivalTime::getId)
                 .toList();
-        validateExistFestivalTimeIds(festivalTimeIds);
+          validateExistFestivalTimeIds(festivalTimeIds);
 
         List<UserTimetable> userTimetables = userTimetableService.getUserTimetablesByFestivalTimeId(userId, festivalTimeIds);
         validateExistUserTimetables(userTimetables);
@@ -192,20 +192,19 @@ public class UserTimetableFacade {
 
         List<UserTimetable> userTimetables= userTimetableService.getUserTimeTables(userId);
         validateExistUserTimetables(userTimetables);
-        validateTimetableIds(userTimetables, timetableDTO);
+        validateExistTimetableIds(userTimetables, timetableDTO);
 
         userTimetableService.patchTimetableFestival(userTimetables, timetableDTO);
     }
 
     @Transactional(readOnly = true)
-    public void validateExistFestivalTimeIds(final List<Long> festivalTimeIds){
+    protected void validateExistFestivalTimeIds(final List<Long> festivalTimeIds){
         if (festivalTimeIds == null || festivalTimeIds.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
-    @Transactional(readOnly = true)
-    public Map<Long, UserTimetable> createUserTimetableMapper(List<UserTimetable> userTimetables) {
+    private Map<Long, UserTimetable> createUserTimetableMapper(List<UserTimetable> userTimetables) {
         return userTimetables.stream()
                 .collect(Collectors.toMap(userTimetable ->
                         userTimetable.getFestivalTime().getId(), Function.identity())
@@ -213,7 +212,7 @@ public class UserTimetableFacade {
     }
 
     @Transactional(readOnly = true)
-    public void validateExistUserTimetableMapper( Map<Long, UserTimetable> userTimetables) {
+    protected void validateExistUserTimetableMapper( Map<Long, UserTimetable> userTimetables) {
         if (userTimetables.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
@@ -227,7 +226,7 @@ public class UserTimetableFacade {
     }
 
     @Transactional(readOnly = true)
-    protected void validateTimetableIds(List<UserTimetable> userTimetables, PatchTimetableDTO timetableDTO) {
+    protected void validateExistTimetableIds(List<UserTimetable> userTimetables, PatchTimetableDTO timetableDTO) {
         Set<Long> existingIds = userTimetables.stream()
                 .map(UserTimetable::getId)
                 .collect(Collectors.toSet());
