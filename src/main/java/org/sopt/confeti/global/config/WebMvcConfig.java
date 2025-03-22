@@ -1,4 +1,4 @@
-package org.sopt.confeti.api.config;
+package org.sopt.confeti.global.config;
 
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.resolver.user.UserIdArgumentResolver;
