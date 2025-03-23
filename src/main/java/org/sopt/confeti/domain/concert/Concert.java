@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
 import org.sopt.confeti.domain.concert_music.ConcertMusic;
+import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
 import org.sopt.confeti.domain.concertartist.ConcertArtist;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -80,12 +81,15 @@ public class Concert {
     @OneToMany(mappedBy = "concert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConcertMusic> musics = new ArrayList<>();
 
+    @OneToMany(mappedBy = "concert", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ConcertReservationUrl> reservationUrls = new ArrayList<>();
+
     @Builder
     public Concert(String title, String subtitle, LocalDateTime startAt, LocalDateTime endAt, String area,
                    String posterPath, String posterBgPath, String concertInfoImgPath, String concertReservationBgPath,
                    LocalDateTime reserveAt, String reservationUrl, String reservationOffice, String ageRating,
                    String time, String price, String address,
-                   List<ConcertArtist> artists, List<ConcertMusic> musics
+                   List<ConcertArtist> artists, List<ConcertMusic> musics, List<ConcertReservationUrl> reservationUrls
     ) {
         this.title = title;
         this.subtitle = subtitle;
@@ -105,9 +109,11 @@ public class Concert {
         this.address = address;
         this.artists = artists;
         this.musics = musics;
+        this.reservationUrls = reservationUrls;
 
         artists.forEach(artist -> artist.setConcert(this));
         musics.forEach(music -> music.setConcert(this));
+        reservationUrls.forEach(url -> url.setConcert(this));
     }
 
     public static Concert create(final CreateConcertDTO from) {
