@@ -18,7 +18,6 @@ public class TimetableFestival {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "timetable_festival_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

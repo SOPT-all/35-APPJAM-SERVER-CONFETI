@@ -77,7 +77,7 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     protected void validateConcertNotPassed(final Concert concert) {
-        if (LocalDateTime.now().isAfter(concert.getConcertEndAt())) {
+        if (LocalDateTime.now().isAfter(concert.getEndAt())) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
@@ -136,7 +136,7 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     protected void validateFestivalNotPassed(final Festival festival) {
-        if (LocalDateTime.now().isAfter(festival.getFestivalEndAt())) {
+        if (LocalDateTime.now().isAfter(festival.getEndAt())) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }

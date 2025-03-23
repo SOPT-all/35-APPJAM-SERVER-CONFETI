@@ -13,9 +13,9 @@ import org.sopt.confeti.domain.user.User;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConcertFavorite {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "concert_favorite_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

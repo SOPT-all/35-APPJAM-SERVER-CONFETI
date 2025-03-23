@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
+import org.sopt.confeti.domain.concert_music.ConcertMusic;
 import org.sopt.confeti.domain.concertartist.ConcertArtist;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,48 +20,47 @@ import java.util.List;
 public class Concert {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="concert_id")
     private Long id;
 
     @Column(length = 50, nullable = false)
-    private String concertTitle;
+    private String title;
 
     @Column(length = 50, nullable = false)
-    private String concertSubtitle;
+    private String subtitle;
 
     @Column(nullable = false)
-    private LocalDateTime concertStartAt;
+    private LocalDateTime startAt;
 
     @Column(nullable = false)
-    private LocalDateTime concertEndAt;
+    private LocalDateTime endAt;
 
     @Column(length = 100, nullable = false)
-    private String concertArea;
+    private String area;
 
     @Setter
     @Column(length = 250, nullable = false)
-    private String concertPosterPath;
+    private String posterPath;
 
     @Setter
     @Column(length = 250, nullable = false)
-    private String concertPosterBgPath;
+    private String posterBgPath;
 
     @Setter
     @Column(length = 250, nullable = false)
-    private String concertInfoImgPath;
+    private String concertInfoImgPath; // 제거 대상
 
     @Setter
     @Column(length = 250) // 나중에 nullable = false로 수정
-    private String concertReservationBgPath;
+    private String concertReservationBgPath; // 제거 대상
 
     @Column(nullable = false)
     private LocalDateTime reserveAt;
 
     @Column(length = 250, nullable = false)
-    private String reservationUrl;
+    private String reservationUrl; // 제거 대상
 
     @Column(length = 50, nullable = false)
-    private String reservationOffice;
+    private String reservationOffice; // 제거 대상
 
     @Column(length = 30, nullable = false)
     private String ageRating;
@@ -71,22 +71,29 @@ public class Concert {
     @Column(length = 200, nullable = false)
     private String price;
 
+    @Column(length = 100, nullable = false)
+    private String address;
+
     @OneToMany(mappedBy = "concert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConcertArtist> artists = new ArrayList<>();
 
+    @OneToMany(mappedBy = "concert", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ConcertMusic> musics = new ArrayList<>();
+
     @Builder
-    public Concert(String concertTitle, String concertSubtitle, LocalDateTime concertStartAt,
-                   LocalDateTime concertEndAt, String concertArea, String concertPosterPath, String concertPosterBgPath,
-                   String concertInfoImgPath, String concertReservationBgPath, LocalDateTime reserveAt,
-                   String reservationUrl, String reservationOffice, String ageRating, String time, String price,
-                   List<ConcertArtist> artists) {
-        this.concertTitle = concertTitle;
-        this.concertSubtitle = concertSubtitle;
-        this.concertStartAt = concertStartAt;
-        this.concertEndAt = concertEndAt;
-        this.concertArea = concertArea;
-        this.concertPosterPath = concertPosterPath;
-        this.concertPosterBgPath = concertPosterBgPath;
+    public Concert(String title, String subtitle, LocalDateTime startAt, LocalDateTime endAt, String area,
+                   String posterPath, String posterBgPath, String concertInfoImgPath, String concertReservationBgPath,
+                   LocalDateTime reserveAt, String reservationUrl, String reservationOffice, String ageRating,
+                   String time, String price, String address,
+                   List<ConcertArtist> artists, List<ConcertMusic> musics
+    ) {
+        this.title = title;
+        this.subtitle = subtitle;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.area = area;
+        this.posterPath = posterPath;
+        this.posterBgPath = posterBgPath;
         this.concertInfoImgPath = concertInfoImgPath;
         this.concertReservationBgPath = concertReservationBgPath;
         this.reserveAt = reserveAt;
@@ -95,20 +102,23 @@ public class Concert {
         this.ageRating = ageRating;
         this.time = time;
         this.price = price;
+        this.address = address;
         this.artists = artists;
+        this.musics = musics;
 
         artists.forEach(artist -> artist.setConcert(this));
+        musics.forEach(music -> music.setConcert(this));
     }
 
     public static Concert create(final CreateConcertDTO from) {
         return Concert.builder()
-                .concertTitle(from.concertTitle())
-                .concertSubtitle(from.concertSubtitle())
-                .concertStartAt(from.concertStartAt())
-                .concertEndAt(from.concertEndAt())
-                .concertArea(from.concertArea())
-                .concertPosterPath("")
-                .concertPosterBgPath("")
+                .title(from.concertTitle())
+                .subtitle(from.concertSubtitle())
+                .startAt(from.concertStartAt())
+                .endAt(from.concertEndAt())
+                .area(from.concertArea())
+                .posterPath("")
+                .posterBgPath("")
                 .concertInfoImgPath("")
                 .concertReservationBgPath("")
                 .reserveAt(from.reserveAt())
@@ -122,6 +132,7 @@ public class Concert {
                                 .map(ConcertArtist::create)
                                 .toList()
                 )
+                // TODO : 콘서트 생성 로직에 음악 넣기
                 .build();
     }
 }

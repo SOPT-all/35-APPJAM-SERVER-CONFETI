@@ -13,8 +13,8 @@ public record UserTimetableFestivalDTO(
     public static UserTimetableFestivalDTO from(TimetableFestival timetableFestival) {
         return new UserTimetableFestivalDTO(
                 timetableFestival.getFestival().getId(),
-                timetableFestival.getFestival().getFestivalTitle(),
-                timetableFestival.getFestival().getFestivalLogoPath(),
+                timetableFestival.getFestival().getTitle(),
+                timetableFestival.getFestival().getLogoPath(),
                 timetableFestival.getFestival().getDates().stream()
                         .map(UserTimetableDatesDTO::from)
                         .toList()

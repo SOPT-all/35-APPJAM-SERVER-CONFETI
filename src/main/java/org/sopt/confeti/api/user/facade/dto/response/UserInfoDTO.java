@@ -11,7 +11,7 @@ public record UserInfoDTO (
         return new UserInfoDTO(
                 user.getId(),
                 user.getProfilePath(),
-                user.getUsername()
+                user.getName()
         );
     }
 }

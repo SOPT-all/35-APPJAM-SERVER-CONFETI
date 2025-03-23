@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.sopt.confeti.domain.festivaltime.FestivalTime;
 import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
 import org.sopt.confeti.domain.user.User;
@@ -14,9 +15,9 @@ import org.sopt.confeti.domain.user.User;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserTimetable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="user_timetable_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,6 +28,7 @@ public class UserTimetable {
     @JoinColumn(name="festival_time_id")
     private FestivalTime festivalTime;
 
+    @Setter
     @Column(nullable = false)
     private boolean isSelected;
 
@@ -44,9 +46,4 @@ public class UserTimetable {
                 .isSelected(isSelected)
                 .build();
     }
-
-    public void setIsSelected(boolean isSelected) {
-        this.isSelected = isSelected;
-    }
-
 }

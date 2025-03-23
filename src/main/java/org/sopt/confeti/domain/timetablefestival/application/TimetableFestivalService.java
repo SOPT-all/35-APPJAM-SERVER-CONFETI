@@ -39,9 +39,4 @@ public class TimetableFestivalService {
                         .toList()
         );
     }
-
-    @Transactional(readOnly = true)
-    public List<TimetableFestival> findByUserId(final long userId) {
-        return timetableFestivalRepository.findByUserId(userId);
-    }
 }

@@ -104,7 +104,7 @@ public class FestivalService {
 
     @Transactional(readOnly = true)
     public List<Festival> getRecentFestivals(final int size) {
-        return festivalRepository.findAllByFestivalEndAtGreaterThanEqual(
+        return festivalRepository.findAllByEndAtGreaterThanEqual(
                 LocalDateTime.now(),
                 getPageRequest(size, getRecentFestivalsSort())
         );
@@ -130,10 +130,10 @@ public class FestivalService {
         Festival festival = festivalRepository.findById(festivalId).orElseThrow(
                 () -> new NotFoundException(ErrorMessage.NOT_FOUND)
         );
-        festival.setFestivalPosterPath(fileNames.poster());
-        festival.setFestivalPosterBgPath(fileNames.posterBg());
+        festival.setPosterPath(fileNames.poster());
+        festival.setPosterBgPath(fileNames.posterBg());
         festival.setFestivalInfoImgPath(fileNames.infoImg());
         festival.setFestivalReservationBgPath(fileNames.reservationBg());
-        festival.setFestivalLogoPath(fileNames.logo());
+        festival.setLogoPath(fileNames.logo());
     }
 }
