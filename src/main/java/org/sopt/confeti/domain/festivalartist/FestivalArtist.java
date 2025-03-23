@@ -16,9 +16,9 @@ import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FestivalArtist {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "festival_artist_id")
     private Long id;
 
     @Embedded

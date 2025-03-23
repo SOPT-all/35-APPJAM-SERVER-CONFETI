@@ -43,7 +43,7 @@ public class AuthUser {
                 user.getId(),
                 user.getProvider(),
                 user.getSocialId(),
-                user.getUsername(),
+                user.getName(),
                 user.getProfilePath(),
                 user.getRole()
         );

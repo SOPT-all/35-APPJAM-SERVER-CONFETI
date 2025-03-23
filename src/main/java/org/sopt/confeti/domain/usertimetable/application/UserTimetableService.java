@@ -32,7 +32,7 @@ public class UserTimetableService {
         for (UserTimetable timetable : userTimetables) {
             Boolean isSelected = updateMap.get(timetable.getId());
             if (isSelected != null) {
-                timetable.setIsSelected(isSelected);
+                timetable.setSelected(isSelected);
             }
         }
     }

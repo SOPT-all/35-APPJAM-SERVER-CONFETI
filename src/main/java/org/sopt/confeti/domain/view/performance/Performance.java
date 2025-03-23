@@ -26,7 +26,6 @@ public class Performance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "performance_id")
     private Long id;
 
     @Column(nullable = false)
@@ -49,10 +48,10 @@ public class Performance {
     private String subtitle;
 
     @Column(nullable = false)
-    private LocalDateTime performanceStartAt;
+    private LocalDateTime startAt;
 
     @Column(nullable = false)
-    private LocalDateTime performanceEndAt;
+    private LocalDateTime endAt;
 
     @Column
     private LocalTime artistStartAt;
@@ -65,7 +64,7 @@ public class Performance {
 
     @Builder
     public Performance(long typeId, PerformanceType type, String artistId, String area, String title,
-                       String subtitle, LocalDateTime performanceStartAt, LocalDateTime performanceEndAt, LocalTime artistStartAt, String posterPath,
+                       String subtitle, LocalDateTime startAt, LocalDateTime endAt, LocalTime artistStartAt, String posterPath,
                        String reservationBgPath) {
         this.typeId = typeId;
         this.type = type;
@@ -73,8 +72,8 @@ public class Performance {
         this.area = area;
         this.title = title;
         this.subtitle = subtitle;
-        this.performanceStartAt = performanceStartAt;
-        this.performanceEndAt = performanceEndAt;
+        this.startAt = startAt;
+        this.endAt = endAt;
         this.artistStartAt = artistStartAt;
         this.posterPath = posterPath;
         this.reservationBgPath = reservationBgPath;
@@ -86,13 +85,13 @@ public class Performance {
                 .typeId(festival.getId())
                 .type(PerformanceType.FESTIVAL)
                 .artistId(artistId)
-                .area(festival.getFestivalArea())
-                .title(festival.getFestivalTitle())
-                .subtitle(festival.getFestivalSubtitle())
-                .performanceStartAt(festival.getFestivalStartAt())
-                .performanceEndAt(festival.getFestivalEndAt())
+                .area(festival.getArea())
+                .title(festival.getTitle())
+                .subtitle(festival.getSubtitle())
+                .startAt(festival.getStartAt())
+                .endAt(festival.getEndAt())
                 .artistStartAt(artistStartAt)
-                .posterPath(festival.getFestivalPosterPath())
+                .posterPath(festival.getPosterPath())
                 .reservationBgPath(festival.getFestivalReservationBgPath())
                 .build();
     }
@@ -102,13 +101,13 @@ public class Performance {
                 .typeId(concert.getId())
                 .type(PerformanceType.CONCERT)
                 .artistId(artistId)
-                .area(concert.getConcertArea())
-                .title(concert.getConcertTitle())
-                .subtitle(concert.getConcertSubtitle())
-                .performanceStartAt(concert.getConcertStartAt())
-                .performanceEndAt(concert.getConcertEndAt())
+                .area(concert.getArea())
+                .title(concert.getTitle())
+                .subtitle(concert.getSubtitle())
+                .startAt(concert.getStartAt())
+                .endAt(concert.getEndAt())
                 .artistStartAt(null)
-                .posterPath(concert.getConcertPosterPath())
+                .posterPath(concert.getPosterPath())
                 .reservationBgPath(concert.getConcertReservationBgPath())
                 .build();
     }

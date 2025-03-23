@@ -10,8 +10,8 @@ public record TimetableToAddDTO(
     public static TimetableToAddDTO from(final Festival festival) {
         return new TimetableToAddDTO(
                 festival.getId(),
-                festival.getFestivalPosterPath(),
-                festival.getFestivalTitle()
+                festival.getPosterPath(),
+                festival.getTitle()
         );
     }
 }

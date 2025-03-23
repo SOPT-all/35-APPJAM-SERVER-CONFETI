@@ -18,7 +18,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
                     " FROM Festival f" +
                     " LEFT JOIN FestivalFavorite ff" +
                     " ON f.id = ff.festival.id AND ff.user.id = :userId" +
-                    " WHERE f.festivalEndAt >= CURRENT_DATE AND f.id NOT IN (" +
+                    " WHERE f.endAt >= CURRENT_DATE AND f.id NOT IN (" +
                         " SELECT tf.festival.id" +
                         " FROM TimetableFestival tf" +
                         " INNER JOIN tf.user u" +
@@ -36,7 +36,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
                     " FROM Festival f" +
                     " LEFT JOIN FestivalFavorite ff" +
                     " ON f.id = ff.festival.id AND ff.user.id = :userId" +
-                    " WHERE f.festivalEndAt >= CURRENT_DATE AND f.id NOT IN (" +
+                    " WHERE f.endAt >= CURRENT_DATE AND f.id NOT IN (" +
                         " SELECT tf.festival.id" +
                         " FROM TimetableFestival tf" +
                         " INNER JOIN tf.user u" +
@@ -44,7 +44,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
                     " ) AND " +
                     " (" +
                         " (" +
-                            " ((:cursorIsFavorite = true AND ff.id IS NOT NULL) OR (:cursorIsFavorite = false AND ff.id IS NULL)) AND (:cursorTitle <= f.festivalTitle)" +
+                            " ((:cursorIsFavorite = true AND ff.id IS NOT NULL) OR (:cursorIsFavorite = false AND ff.id IS NULL)) AND (:cursorTitle <= f.title)" +
                         " ) OR (" +
                             " :cursorIsFavorite = true AND ff.id IS NULL" +
                         " ) " +
@@ -60,7 +60,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
 
     @Query(value =
         "SELECT new org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO(" +
-                " f.festivalTitle," +
+                " f.title," +
                 " CASE WHEN ff.id IS NULL THEN false ELSE true END" +
                 " )" +
                 " FROM Festival f" +
@@ -73,7 +73,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             final @Param("festivalId") long festivalId
     );
 
-    List<Festival> findAllByFestivalEndAtGreaterThanEqual(final LocalDateTime now, final PageRequest pageRequest);
+    List<Festival> findAllByEndAtGreaterThanEqual(final LocalDateTime now, final PageRequest pageRequest);
 
     List<Festival> findByIdIn(final List<Long> festivalIds);
 }

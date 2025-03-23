@@ -20,7 +20,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
                 " SELECT MIN(rp.id)" +
                 " FROM Performance rp" +
                 " WHERE rp.artistId = :artistId" +
-                " AND rp.performanceEndAt >= CURRENT_DATE" +
+                " AND rp.endAt >= CURRENT_DATE" +
                 " GROUP BY rp.typeId" +
             " )"
     )
@@ -30,7 +30,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     );
 
     @Query(value = "SELECT new org.sopt.confeti.domain.view.performance.application.dto.PerformanceCursorDTO(" +
-            " p.performanceStartAt, " +
+            " p.startAt, " +
             " p.artistStartAt) " +
             " FROM Performance p " +
             " WHERE p.id = :performanceId"
@@ -43,10 +43,10 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
                 " SELECT MIN(rp.id)" +
                 " FROM Performance rp" +
                 " WHERE rp.artistId = :artistId" +
-                " AND rp.performanceEndAt >= CURRENT_DATE" +
+                " AND rp.endAt >= CURRENT_DATE" +
                 " GROUP BY rp.typeId" +
             " )" +
-            " AND p.performanceStartAt >= :performanceStartAt" +
+            " AND p.startAt >= :performanceStartAt" +
             " AND (p.artistStartAt IS NULL OR p.artistStartAt >= :artistStartAt)"
     )
     List<Performance> getPerformanceUsingCursor(
@@ -62,7 +62,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
                     " SELECT MIN(rp.id)" +
                     " FROM Performance rp" +
                     " WHERE rp.artistId = :artistId" +
-                    " AND rp.performanceEndAt >= CURRENT_DATE" +
+                    " AND rp.endAt >= CURRENT_DATE" +
                     " GROUP BY rp.typeId" +
                 " )"
     )
@@ -74,7 +74,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
                     " SELECT MIN(rp.id)" +
                     " FROM Performance rp" +
                     " WHERE rp.artistId IN :artistIds" +
-                    " AND rp.performanceEndAt >= CURRENT_DATE" +
+                    " AND rp.endAt >= CURRENT_DATE" +
                     " GROUP BY rp.typeId" +
                 " )"
     )
