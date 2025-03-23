@@ -11,6 +11,7 @@ import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -31,7 +32,7 @@ public class UserFavoriteController {
     @PostMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<?>> postFavoriteFestival(
             @UserId Long userId,
-            @PathVariable(name = "festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
+            @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId) {
         userFavoriteFacade.addFestivalFavorite(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
@@ -40,7 +41,7 @@ public class UserFavoriteController {
     @DeleteMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<?>> deleteFavoriteFestival(
             @UserId Long userId,
-            @PathVariable(name = "festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId) {
+            @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId) {
         userFavoriteFacade.removeFestivalFavorite(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }

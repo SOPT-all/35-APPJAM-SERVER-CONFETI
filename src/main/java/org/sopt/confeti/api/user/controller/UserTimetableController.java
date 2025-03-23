@@ -19,6 +19,7 @@ import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.CursorPage;
+import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -68,7 +69,7 @@ public class UserTimetableController {
     @DeleteMapping("/{festivalId}")
     public ResponseEntity<BaseResponse<?>> removeTimetableFestival(
             @UserId Long userId,
-            @PathVariable(name = "festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long festivalId
+            @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) long festivalId
     ) {
         userTimetableFacade.removeTimetableFestival(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
@@ -78,7 +79,7 @@ public class UserTimetableController {
     @GetMapping("/{festivalDateId}")
     public ResponseEntity<BaseResponse<?>> getTimetableFestival(
             @UserId Long userId,
-            @PathVariable(name = "festivalDateId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long festivalDateId
+            @PathVariable(name = "festivalDateId") @Min(RequestConstraint.ID) long festivalDateId
     ){
         UserTimetableFestivalBasicDTO response = userTimetableFacade.getTimetableInfo(userId, festivalDateId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetableFestivalResponse.from(response));
