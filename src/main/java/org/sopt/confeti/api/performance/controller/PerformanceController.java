@@ -18,6 +18,7 @@ import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -39,7 +40,7 @@ public class PerformanceController {
     @GetMapping("/concerts/{concertId}")
     public ResponseEntity<BaseResponse<?>> getConcertInfo(
             @UserId(require = false) Long userId,
-            @PathVariable("concertId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long concertId
+            @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId
     ) {
         ConcertDetailDTO concertDetailDTO = performanceFacade.getConcertDetailInfo(userId, concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, ConcertDetailResponse.of(concertDetailDTO, s3FileHandler));
@@ -49,7 +50,7 @@ public class PerformanceController {
     @GetMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<?>> getFestivalInfo(
             @UserId(require = false) Long userId,
-            @PathVariable("festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") Long festivalId
+            @PathVariable("festivalId") @Min(RequestConstraint.ID) Long festivalId
     ) {
         FestivalDetailDTO festivalDetailDTO = performanceFacade.getFestivalDetailInfo(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, FestivalDetailResponse.from(festivalDetailDTO));
@@ -71,7 +72,7 @@ public class PerformanceController {
     @PostMapping("/concerts/{concertId}/files")
     public ResponseEntity<BaseResponse<?>> createConcertFiles(
             @UserId Long userId,
-            @PathVariable("concertId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long concertId,
+            @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId,
             @RequestPart("poster") @NotNull MultipartFile poster,
             @RequestPart("posterBg") @NotNull MultipartFile posterBg,
             @RequestPart("infoImg") @NotNull MultipartFile infoImg,
@@ -98,7 +99,7 @@ public class PerformanceController {
     @PostMapping("/festivals/{festivalId}/files")
     public ResponseEntity<BaseResponse<?>> createFestivalFiles(
             @UserId Long userId,
-            @PathVariable("festivalId") @Min(value = 0, message = "요청 형식이 올바르지 않습니다.") long festivalId,
+            @PathVariable("festivalId") @Min(RequestConstraint.ID) long festivalId,
             @RequestPart("poster") @NotNull MultipartFile poster,
             @RequestPart("posterBg") @NotNull MultipartFile posterBg,
             @RequestPart("infoImg") @NotNull MultipartFile infoImg,
