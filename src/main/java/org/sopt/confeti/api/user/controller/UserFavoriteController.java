@@ -50,7 +50,7 @@ public class UserFavoriteController {
     public ResponseEntity<BaseResponse<?>> getFavoriteArtists(
             @UserId Long userId
     ) {
-        UserFavoriteArtistDTO userFavoriteArtistDTO = userFavoriteFacade.getArtistList(userId);
+        UserFavoriteArtistDTO userFavoriteArtistDTO = userFavoriteFacade.getArtistListPreview(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserFavoriteResponse.from(userFavoriteArtistDTO.artists()));
     }
 

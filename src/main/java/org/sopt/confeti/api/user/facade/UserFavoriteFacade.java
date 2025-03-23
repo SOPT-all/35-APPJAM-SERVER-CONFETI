@@ -73,10 +73,10 @@ public class UserFavoriteFacade {
     }
 
     @Transactional(readOnly = true)
-    public UserFavoriteArtistDTO getArtistList(long userId) {
+    public UserFavoriteArtistDTO getArtistListPreview(long userId) {
         validateExistUser(userId);
 
-        List<ArtistFavorite> artists = artistFavoriteService.getArtistList(userId);
+        List<ArtistFavorite> artists = artistFavoriteService.getArtistListPreview(userId);
         return UserFavoriteArtistDTO.from(artists);
     }
 
