@@ -1,6 +1,6 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
-import org.sopt.confeti.domain.festivalartist.FestivalArtist;
+import org.sopt.confeti.domain.festival_artist.FestivalArtist;
 
 public record UserTimetableFestivalArtistDTO (String artistId, String artistName
 ){

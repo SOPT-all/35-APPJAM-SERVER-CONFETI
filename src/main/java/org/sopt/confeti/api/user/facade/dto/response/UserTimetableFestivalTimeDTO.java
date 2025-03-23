@@ -1,7 +1,7 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
-import org.sopt.confeti.domain.festivaltime.FestivalTime;
-import org.sopt.confeti.domain.usertimetable.UserTimetable;
+import org.sopt.confeti.domain.festival_time.FestivalTime;
+import org.sopt.confeti.domain.user_timetable.UserTimetable;
 
 import java.time.LocalTime;
 import java.util.List;

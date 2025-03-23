@@ -7,10 +7,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
-import org.sopt.confeti.domain.concertfavorite.ConcertFavorite;
-import org.sopt.confeti.domain.festivalfavorite.FestivalFavorite;
-import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
+import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
+import org.sopt.confeti.domain.concert_favorite.ConcertFavorite;
+import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
+import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 
 import java.util.ArrayList;
 import java.util.List;

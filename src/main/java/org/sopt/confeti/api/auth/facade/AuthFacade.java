@@ -10,7 +10,7 @@ import org.sopt.confeti.auth.Token;
 import org.sopt.confeti.auth.WithdrawService;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
-import org.sopt.confeti.domain.artistfavorite.application.ArtistFavoriteService;
+import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.user.constant.Role;
