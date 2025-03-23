@@ -1,11 +1,8 @@
 package org.sopt.confeti.api.performance.facade;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertFileDTO;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalFileDTO;
@@ -18,15 +15,15 @@ import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
-import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
-import org.sopt.confeti.domain.artistfavorite.application.ArtistFavoriteService;
+import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
+import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.api.performance.facade.dto.response.*;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
-import org.sopt.confeti.domain.concertfavorite.application.ConcertFavoriteService;
+import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
-import org.sopt.confeti.domain.festivalfavorite.application.FestivalFavoriteService;
+import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;

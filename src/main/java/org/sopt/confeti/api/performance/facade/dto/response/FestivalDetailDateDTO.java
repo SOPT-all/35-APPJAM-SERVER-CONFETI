@@ -3,7 +3,7 @@ package org.sopt.confeti.api.performance.facade.dto.response;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import org.sopt.confeti.domain.festivaldate.FestivalDate;
+import org.sopt.confeti.domain.festival_date.FestivalDate;
 
 public record FestivalDetailDateDTO(
         long festivalDateId,

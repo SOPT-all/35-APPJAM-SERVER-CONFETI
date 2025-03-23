@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
 import org.sopt.confeti.domain.concert_music.ConcertMusic;
 import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
-import org.sopt.confeti.domain.concertartist.ConcertArtist;
+import org.sopt.confeti.domain.concert_artist.ConcertArtist;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,7 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
-import org.sopt.confeti.domain.festivalstage.FestivalStage;
-import org.sopt.confeti.domain.usertimetable.UserTimetable;
+import org.sopt.confeti.domain.festival_stage.FestivalStage;
+import org.sopt.confeti.domain.user_timetable.UserTimetable;
 
 import java.util.List;
 import java.util.Map;
