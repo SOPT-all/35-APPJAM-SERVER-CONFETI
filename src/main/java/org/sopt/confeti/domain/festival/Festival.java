@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
+import org.sopt.confeti.domain.festival_music.FestivalMusic;
 import org.sopt.confeti.domain.festivaldate.FestivalDate;
 import org.sopt.confeti.domain.festivalfavorite.FestivalFavorite;
 import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
@@ -83,6 +84,9 @@ public class Festival {
     @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FestivalDate> dates = new ArrayList<>();
 
+    @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FestivalMusic> musics = new ArrayList<>();
+
     @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
     private List<FestivalFavorite> festivalFavorites = new ArrayList<>();
 
@@ -95,7 +99,7 @@ public class Festival {
                     String festivalReservationBgPath,
                     String logoPath, LocalDateTime reserveAt, String reservationUrl, String reservationOffice,
                     String ageRating, String time, String price, String address,
-                    List<FestivalDate> dates
+                    List<FestivalDate> dates, List<FestivalMusic> musics
     ) {
         this.title = title;
         this.subtitle = subtitle;
@@ -115,6 +119,7 @@ public class Festival {
         this.price = price;
         this.address = address;
         this.dates = dates;
+        this.musics = musics;
     }
 
     public static Festival create(CreateFestivalDTO createFestivalDTO) {
