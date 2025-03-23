@@ -46,7 +46,7 @@ public class UserFavoriteController {
     }
 
     @Permission(role = {Role.GENERAL})
-    @GetMapping("/artists")
+    @GetMapping("/artists/preview")
     public ResponseEntity<BaseResponse<?>> getFavoriteArtists(
             @UserId Long userId
     ) {
