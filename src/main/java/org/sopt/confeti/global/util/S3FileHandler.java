@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -17,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class S3FileHandler {
 
-    private static final String PATH_DELIMITER = "/";
     private static final Duration urlDuration = Duration.ofMinutes(10L);
 
     private final S3Operations s3Operations;
@@ -35,7 +35,7 @@ public class S3FileHandler {
 
         try {
             upload(
-                    folderPath + PATH_DELIMITER + fileName,
+                    folderPath + fileName,
                     file.getInputStream(), metadata
             );
         } catch (IOException e) {

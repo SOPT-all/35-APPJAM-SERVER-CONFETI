@@ -35,7 +35,7 @@ public class Performance {
     @Enumerated(value = EnumType.STRING)
     private PerformanceType type;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 50, nullable = false)
     private String artistId;
 
     @Column(length = 100, nullable = false)

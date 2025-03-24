@@ -72,16 +72,4 @@ public class ConcertService {
     public List<Concert> getConcerts(final List<Long> concertIds) {
         return concertRepository.findAllByIdIn(concertIds);
     }
-
-    @Transactional
-    public void updateFiles(final Long concertId, final ConcertFileNamesDTO fileNames) {
-        Concert concert = concertRepository.findById(concertId).orElseThrow(
-                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-        );
-
-        concert.setPosterPath(fileNames.poster());
-        concert.setPosterBgPath(fileNames.posterBg());
-        concert.setConcertInfoImgPath(fileNames.infoImg());
-        concert.setConcertReservationBgPath(fileNames.reservationBg());
-    }
 }

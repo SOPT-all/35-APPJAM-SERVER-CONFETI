@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalTimeDTO;
 import org.sopt.confeti.domain.festival_artist.FestivalArtist;
 import org.sopt.confeti.domain.festival_stage.FestivalStage;
 import org.sopt.confeti.domain.user_timetable.UserTimetable;
@@ -50,5 +51,17 @@ public class FestivalTime {
         this.artists.forEach(artist -> {
             artist.setFestivalTime(this);
         });
+    }
+
+    public static FestivalTime create(CreateFestivalTimeDTO festivalTimeDTO) {
+        return FestivalTime.builder()
+                .startAt(festivalTimeDTO.startAt())
+                .endAt(festivalTimeDTO.endAt())
+                .artists(
+                        festivalTimeDTO.artists().stream()
+                                .map(FestivalArtist::create)
+                                .toList()
+                )
+                .build();
     }
 }

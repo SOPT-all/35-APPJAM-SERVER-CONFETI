@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival.application.dto.request.FestivalFileNamesDTO;
@@ -117,14 +118,7 @@ public class FestivalService {
     }
 
     @Transactional
-    public void updateFiles(final long festivalId, final FestivalFileNamesDTO fileNames) {
-        Festival festival = festivalRepository.findById(festivalId).orElseThrow(
-                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-        );
-        festival.setPosterPath(fileNames.poster());
-        festival.setPosterBgPath(fileNames.posterBg());
-        festival.setFestivalInfoImgPath(fileNames.infoImg());
-        festival.setFestivalReservationBgPath(fileNames.reservationBg());
-        festival.setLogoPath(fileNames.logo());
+    public void create(Festival festival) {
+        festivalRepository.save(festival);
     }
 }

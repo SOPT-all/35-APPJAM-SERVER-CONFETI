@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival_stage.FestivalStage;
 
@@ -48,5 +49,17 @@ public class FestivalDate {
         this.stages.forEach(stage -> {
             stage.setFestivalDate(this);
         });
+    }
+
+    public static FestivalDate create(CreateFestivalDateDTO festivalDateDTO) {
+        return FestivalDate.builder()
+                .festivalAt(festivalDateDTO.festivalAt())
+                .openAt(festivalDateDTO.openAt())
+                .stages(
+                        festivalDateDTO.stages().stream()
+                                .map(FestivalStage::create)
+                                .toList()
+                )
+                .build();
     }
 }
