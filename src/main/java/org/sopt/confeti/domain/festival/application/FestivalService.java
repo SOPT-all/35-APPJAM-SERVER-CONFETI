@@ -22,13 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class FestivalService {
 
-    private static final String START_AT_COLUMN = "festivalStartAt";
+    private static final String START_AT_COLUMN = "startAt";
 
     private final FestivalRepository festivalRepository;
     private final ArtistResolver artistResolver;
 
     private static final int INIT_PAGE = 0;
-    private static final String FESTIVAL_TITLE_COLUMN_NAME = "festivalTitle";
+    private static final String TITLE_COLUMN = "title";
 
     @Transactional(readOnly = true)
     public Festival findById(Long festivalId) {
@@ -78,7 +78,7 @@ public class FestivalService {
 
     private Sort getFestivalSort() {
         return Sort.by(
-                Order.asc(FESTIVAL_TITLE_COLUMN_NAME)
+                Order.asc(TITLE_COLUMN)
         );
     }
 
