@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalReservationUrlDTO;
 import org.sopt.confeti.domain.festival.Festival;
 
 @Entity
@@ -45,5 +46,13 @@ public class FestivalReservationUrl {
         this.reservationUrl = reservationUrl;
         this.name = name;
         this.logoPath = logoPath;
+    }
+
+    public static FestivalReservationUrl create(CreateFestivalReservationUrlDTO festivalReservationUrlDTO) {
+        return FestivalReservationUrl.builder()
+                .reservationUrl(festivalReservationUrlDTO.reservationUrl())
+                .name(festivalReservationUrlDTO.name())
+                .logoPath(festivalReservationUrlDTO.logoPath())
+                .build();
     }
 }

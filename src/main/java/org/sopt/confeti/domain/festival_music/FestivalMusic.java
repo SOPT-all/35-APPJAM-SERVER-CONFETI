@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalMusicDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.global.resolver.artist.ConfetiMusic;
 
@@ -40,9 +41,9 @@ public class FestivalMusic {
         this.music = music;
     }
 
-    public static FestivalMusic create(final String musicId) {
+    public static FestivalMusic create(CreateFestivalMusicDTO festivalMusicDTO) {
         return FestivalMusic.builder()
-                .music(ConfetiMusic.from(musicId))
+                .music(ConfetiMusic.from(festivalMusicDTO.musicId()))
                 .build();
     }
 }

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festival_music.FestivalMusic;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
@@ -14,6 +15,7 @@ import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.sopt.confeti.global.common.constant.Default;
 
 @Entity
 @Table(name="festivals")
@@ -128,6 +130,43 @@ public class Festival {
         this.dates.forEach(date -> date.setFestival(this));
         this.musics.forEach(music -> music.setFestival(this));
         this.reservationUrls.forEach(url -> url.setFestival(this));
+    }
+
+    public static Festival create(CreateFestivalDTO festivalDTO) {
+        return Festival.builder()
+                .title(festivalDTO.title())
+                .subtitle(festivalDTO.subtitle())
+                .startAt(festivalDTO.startAt())
+                .endAt(festivalDTO.endAt())
+                .area(festivalDTO.area())
+                .posterPath(festivalDTO.posterPath())
+                .posterBgPath(festivalDTO.posterBgPath())
+                .festivalInfoImgPath(Default.IMG_PATH) // 제거 대상
+                .festivalReservationBgPath(Default.IMG_PATH) // 제거 대상
+                .logoPath(festivalDTO.logoPath())
+                .reserveAt(festivalDTO.reserveAt())
+                .reservationUrl(Default.URL) // 제거 대상
+                .reservationOffice(Default.TEXT) // 제거 대상
+                .ageRating(festivalDTO.ageRating())
+                .time(festivalDTO.time())
+                .price(festivalDTO.price())
+                .address(festivalDTO.address())
+                .dates(
+                        festivalDTO.dates().stream()
+                                .map(FestivalDate::create)
+                                .toList()
+                )
+                .musics(
+                        festivalDTO.musics().stream()
+                                .map(FestivalMusic::create)
+                                .toList()
+                )
+                .reservationUrls(
+                        festivalDTO.reservationUrls().stream()
+                                .map(FestivalReservationUrl::create)
+                                .toList()
+                )
+                .build();
     }
 }
 
