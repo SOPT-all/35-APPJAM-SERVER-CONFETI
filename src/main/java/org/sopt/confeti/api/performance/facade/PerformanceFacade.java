@@ -4,14 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertFileDTO;
-import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalFileDTO;
-import org.sopt.confeti.domain.concert.application.dto.request.ConcertFileNamesDTO;
-import org.sopt.confeti.domain.festival.application.dto.request.FestivalFileNamesDTO;
 import org.sopt.confeti.global.annotation.Facade;
-import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
-import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
@@ -30,7 +23,6 @@ import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.PerformanceCursorDTO;
-import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -38,7 +30,6 @@ import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Facade
 @RequiredArgsConstructor
 public class PerformanceFacade {
@@ -79,39 +70,6 @@ public class PerformanceFacade {
         if (LocalDateTime.now().isAfter(concert.getEndAt())) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
-    }
-
-    @Transactional
-    public void createConcert(final CreateConcertDTO from) {
-        Concert concert = concertService.create(from);
-        performanceService.create(concert);
-    }
-
-    @Transactional
-    public void createConcertFiles(final Long concertId, final CreateConcertFileDTO concertFiles) {
-        final String posterPath = s3FileHandler.uploadFile(concertFiles.poster(), FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER));
-        final String posterBgPath = s3FileHandler.uploadFile(concertFiles.posterBg(), FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER_BG));
-        final String infoImgPath = s3FileHandler.uploadFile(concertFiles.infoImg(), FolderPath.combine(FolderPath.CONCERT, FolderPath.DETAIL));
-        final String reservationBgPath = s3FileHandler.uploadFile(concertFiles.reservationBg(), FolderPath.combine(FolderPath.CONCERT, FolderPath.MAIN_BANNER));
-
-        concertService.updateFiles(concertId, ConcertFileNamesDTO.of(posterPath, posterBgPath, infoImgPath, reservationBgPath));
-    }
-
-    @Transactional
-    public void createFestival(final CreateFestivalDTO createFestivalDTO) {
-        Festival festival = festivalService.create(createFestivalDTO);
-        performanceService.create(festival);
-    }
-
-    @Transactional
-    public void createFestivalFiles(final Long festivalId, final CreateFestivalFileDTO festivalFiles) {
-        final String posterPath = s3FileHandler.uploadFile(festivalFiles.poster(), FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER));
-        final String posterBgPath = s3FileHandler.uploadFile(festivalFiles.posterBg(), FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER_BG));
-        final String infoImgPath = s3FileHandler.uploadFile(festivalFiles.infoImg(), FolderPath.combine(FolderPath.FESTIVAL, FolderPath.DETAIL));
-        final String reservationBgPath = s3FileHandler.uploadFile(festivalFiles.reservationBg(), FolderPath.combine(FolderPath.FESTIVAL, FolderPath.MAIN_BANNER));
-        final String logoPath = s3FileHandler.uploadFile(festivalFiles.logo(), FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO));
-
-        festivalService.updateFiles(festivalId, FestivalFileNamesDTO.of(posterPath, posterBgPath, infoImgPath, reservationBgPath, logoPath));
     }
 
     @Transactional(readOnly = true)

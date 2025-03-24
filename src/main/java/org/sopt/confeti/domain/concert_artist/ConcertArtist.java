@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertArtistDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
 
@@ -31,13 +30,5 @@ public class ConcertArtist {
     @Builder
     public ConcertArtist(ConfetiArtist artist) {
         this.artist = artist;
-    }
-
-    public static ConcertArtist create(final CreateConcertArtistDTO concertArtistDTO) {
-        return ConcertArtist.builder()
-                .artist(
-                        ConfetiArtist.from(concertArtistDTO.artistId())
-                )
-                .build();
     }
 }

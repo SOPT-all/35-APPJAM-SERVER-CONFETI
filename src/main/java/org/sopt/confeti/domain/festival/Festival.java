@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festival_music.FestivalMusic;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
@@ -129,33 +128,6 @@ public class Festival {
         this.dates.forEach(date -> date.setFestival(this));
         this.musics.forEach(music -> music.setFestival(this));
         this.reservationUrls.forEach(url -> url.setFestival(this));
-    }
-
-    public static Festival create(CreateFestivalDTO createFestivalDTO) {
-        return Festival.builder()
-                .title(createFestivalDTO.festivalTitle())
-                .subtitle(createFestivalDTO.festivalSubtitle())
-                .startAt(createFestivalDTO.festivalStartAt())
-                .endAt(createFestivalDTO.festivalEndAt())
-                .area(createFestivalDTO.festivalArea())
-                .posterPath("")
-                .posterBgPath("")
-                .festivalInfoImgPath("")
-                .festivalReservationBgPath("")
-                .logoPath("")
-                .reserveAt(createFestivalDTO.reserveAt())
-                .reservationUrl(createFestivalDTO.reservationUrl())
-                .reservationOffice(createFestivalDTO.reservationOffice())
-                .ageRating(createFestivalDTO.ageRating())
-                .time(createFestivalDTO.time())
-                .price(createFestivalDTO.price())
-                // TODO : 페스티벌 생성 시 주소 값 추가
-                .dates(
-                        createFestivalDTO.dates().stream()
-                                .map(FestivalDate::create)
-                                .toList()
-                )
-                .build();
     }
 }
 
