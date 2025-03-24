@@ -1,7 +1,7 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
 import java.util.List;
-import org.sopt.confeti.domain.festivalstage.FestivalStage;
+import org.sopt.confeti.domain.festival_stage.FestivalStage;
 
 public record FestivalDetailStageDTO(
         long festivalStageId,

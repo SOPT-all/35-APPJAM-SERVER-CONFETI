@@ -1,6 +1,6 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
-import org.sopt.confeti.domain.artistfavorite.ArtistFavorite;
+import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 
 public record UserFavoriteArtistListDTO (
         String artistId,

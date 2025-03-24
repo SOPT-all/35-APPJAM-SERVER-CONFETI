@@ -1,6 +1,6 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
-import org.sopt.confeti.domain.timetablefestival.TimetableFestival;
+import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 
 import java.util.List;
 
@@ -13,8 +13,8 @@ public record UserTimetableFestivalDTO(
     public static UserTimetableFestivalDTO from(TimetableFestival timetableFestival) {
         return new UserTimetableFestivalDTO(
                 timetableFestival.getFestival().getId(),
-                timetableFestival.getFestival().getFestivalTitle(),
-                timetableFestival.getFestival().getFestivalLogoPath(),
+                timetableFestival.getFestival().getTitle(),
+                timetableFestival.getFestival().getLogoPath(),
                 timetableFestival.getFestival().getDates().stream()
                         .map(UserTimetableDatesDTO::from)
                         .toList()

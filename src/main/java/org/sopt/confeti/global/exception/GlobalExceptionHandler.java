@@ -1,5 +1,6 @@
 package org.sopt.confeti.global.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -43,5 +44,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConfetiException.class)
     public ResponseEntity<BaseResponse<?>> handleConfetiException(ConfetiException e) {
         return ApiResponseUtil.failure(e.getErrorMessage());
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<BaseResponse<?>> handleConstraintViolationException(ConstraintViolationException e) {
+        return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
     }
 }

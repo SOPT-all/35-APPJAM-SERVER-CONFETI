@@ -20,10 +20,10 @@ public record RecentPerformanceDTO(
                 performanceId,
                 concert.getId(),
                 PerformanceType.CONCERT,
-                concert.getConcertTitle(),
-                concert.getConcertSubtitle(),
-                concert.getConcertStartAt(),
-                concert.getConcertPosterPath()
+                concert.getTitle(),
+                concert.getSubtitle(),
+                concert.getStartAt(),
+                concert.getPosterPath()
         );
     }
 
@@ -32,10 +32,10 @@ public record RecentPerformanceDTO(
                 performanceId,
                 festival.getId(),
                 PerformanceType.FESTIVAL,
-                festival.getFestivalTitle(),
-                festival.getFestivalSubtitle(),
-                festival.getFestivalStartAt(),
-                festival.getFestivalPosterPath()
+                festival.getTitle(),
+                festival.getSubtitle(),
+                festival.getStartAt(),
+                festival.getPosterPath()
         );
     }
 
@@ -46,7 +46,7 @@ public record RecentPerformanceDTO(
                 performance.getType(),
                 performance.getTitle(),
                 performance.getSubtitle(),
-                performance.getPerformanceStartAt(),
+                performance.getStartAt(),
                 performance.getPosterPath()
         );
     }

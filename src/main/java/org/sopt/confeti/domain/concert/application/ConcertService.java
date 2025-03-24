@@ -54,7 +54,7 @@ public class ConcertService {
 
     @Transactional(readOnly = true)
     public List<Concert> getRecentConcerts(final int size) {
-        return concertRepository.findAllByConcertEndAtGreaterThanEqual(
+        return concertRepository.findAllByEndAtGreaterThanEqual(
                 LocalDateTime.now(),
                 getPageRequest(size, getRecentConcertsSort())
         );
@@ -88,8 +88,8 @@ public class ConcertService {
                 () -> new NotFoundException(ErrorMessage.NOT_FOUND)
         );
 
-        concert.setConcertPosterPath(fileNames.poster());
-        concert.setConcertPosterBgPath(fileNames.posterBg());
+        concert.setPosterPath(fileNames.poster());
+        concert.setPosterBgPath(fileNames.posterBg());
         concert.setConcertInfoImgPath(fileNames.infoImg());
         concert.setConcertReservationBgPath(fileNames.reservationBg());
     }

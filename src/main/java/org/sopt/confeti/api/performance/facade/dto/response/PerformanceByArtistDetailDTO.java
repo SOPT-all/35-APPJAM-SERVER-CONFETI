@@ -22,8 +22,8 @@ public record PerformanceByArtistDetailDTO(
                 performance.getTypeId(),
                 performance.getType(),
                 performance.getTitle(),
-                performance.getPerformanceStartAt(),
-                performance.getPerformanceEndAt(),
+                performance.getStartAt(),
+                performance.getEndAt(),
                 performance.getPosterPath(),
                 performance.getArea(),
                 isFavorite
