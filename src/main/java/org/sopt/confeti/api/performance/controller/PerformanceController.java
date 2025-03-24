@@ -1,16 +1,9 @@
 package org.sopt.confeti.api.performance.controller;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.performance.dto.request.CreateConcertRequest;
-import org.sopt.confeti.api.performance.dto.request.CreateFestivalRequest;
 import org.sopt.confeti.api.performance.dto.response.*;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
-import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
-import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertFileDTO;
-import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
-import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalFileDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.*;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
@@ -25,7 +18,6 @@ import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,60 +46,6 @@ public class PerformanceController {
     ) {
         FestivalDetailDTO festivalDetailDTO = performanceFacade.getFestivalDetailInfo(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, FestivalDetailResponse.from(festivalDetailDTO));
-    }
-
-    // TODO: 관리자 검증 로직 추가, 더미 데이터 추가 로직 개선
-    @Permission(role = {Role.ADMIN})
-    @PostMapping("/concerts")
-    public ResponseEntity<BaseResponse<?>> createConcert(
-            @UserId Long userId,
-            @RequestBody CreateConcertRequest createConcertRequest
-    ) {
-        performanceFacade.createConcert(CreateConcertDTO.from(createConcertRequest));
-        return ApiResponseUtil.success(SuccessMessage.CREATED);
-    }
-
-    // TODO: 관리자 검증 로직 추가, 더미 데이터 추가 로직 개선
-    @Permission(role = {Role.ADMIN})
-    @PostMapping("/concerts/{concertId}/files")
-    public ResponseEntity<BaseResponse<?>> createConcertFiles(
-            @UserId Long userId,
-            @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId,
-            @RequestPart("poster") @NotNull MultipartFile poster,
-            @RequestPart("posterBg") @NotNull MultipartFile posterBg,
-            @RequestPart("infoImg") @NotNull MultipartFile infoImg,
-            @RequestPart("reservationBg") @NotNull MultipartFile reservationBg
-    ) {
-        performanceFacade.createConcertFiles(concertId, CreateConcertFileDTO.of(poster, posterBg, infoImg, reservationBg));
-        return ApiResponseUtil.success(SuccessMessage.CREATED);
-    }
-
-    // TODO: 관리자 검증 로직 추가, 더미 데이터 추가 로직 개선
-    @Permission(role = {Role.ADMIN})
-    @PostMapping("/festivals")
-    public ResponseEntity<BaseResponse<?>> createFestival(
-            @UserId Long userId,
-            @RequestBody CreateFestivalRequest createFestivalRequest
-    ) {
-        performanceFacade.createFestival(CreateFestivalDTO.from(createFestivalRequest));
-
-        return ApiResponseUtil.success(SuccessMessage.CREATED);
-    }
-
-    // TODO: 관리자 검증 로직 추가, 더미 데이터 추가 로직 개선
-    @Permission(role = {Role.ADMIN})
-    @PostMapping("/festivals/{festivalId}/files")
-    public ResponseEntity<BaseResponse<?>> createFestivalFiles(
-            @UserId Long userId,
-            @PathVariable("festivalId") @Min(RequestConstraint.ID) long festivalId,
-            @RequestPart("poster") @NotNull MultipartFile poster,
-            @RequestPart("posterBg") @NotNull MultipartFile posterBg,
-            @RequestPart("infoImg") @NotNull MultipartFile infoImg,
-            @RequestPart("reservationBg") @NotNull MultipartFile reservationBg,
-            @RequestPart("logo") @NotNull MultipartFile logo
-    ) {
-        performanceFacade.createFestivalFiles(festivalId, CreateFestivalFileDTO.of(poster, posterBg, infoImg, reservationBg, logo));
-        return ApiResponseUtil.success(SuccessMessage.CREATED);
     }
 
     @Permission(role = {Role.GENERAL})

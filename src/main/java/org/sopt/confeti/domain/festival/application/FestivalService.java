@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival.application.dto.request.FestivalFileNamesDTO;
@@ -43,14 +42,6 @@ public class FestivalService {
         artistResolver.load(festival);
 
         return festival;
-    }
-
-    @Transactional
-    public Festival create(final CreateFestivalDTO createFestivalDTO) {
-
-        return festivalRepository.save(
-                Festival.create(createFestivalDTO)
-        );
     }
 
     @Transactional(readOnly = true)

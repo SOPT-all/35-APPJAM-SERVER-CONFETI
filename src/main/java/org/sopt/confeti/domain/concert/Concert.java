@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertDTO;
 import org.sopt.confeti.domain.concert_music.ConcertMusic;
 import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
 import org.sopt.confeti.domain.concert_artist.ConcertArtist;
@@ -114,31 +113,5 @@ public class Concert {
         this.artists.forEach(artist -> artist.setConcert(this));
         this.musics.forEach(music -> music.setConcert(this));
         this.reservationUrls.forEach(url -> url.setConcert(this));
-    }
-
-    public static Concert create(final CreateConcertDTO from) {
-        return Concert.builder()
-                .title(from.concertTitle())
-                .subtitle(from.concertSubtitle())
-                .startAt(from.concertStartAt())
-                .endAt(from.concertEndAt())
-                .area(from.concertArea())
-                .posterPath("")
-                .posterBgPath("")
-                .concertInfoImgPath("")
-                .concertReservationBgPath("")
-                .reserveAt(from.reserveAt())
-                .reservationUrl(from.reservationUrl())
-                .reservationOffice(from.reservationOffice())
-                .ageRating(from.ageRating())
-                .time(from.time())
-                .price(from.price())
-                .artists(
-                        from.concertArtists().stream()
-                                .map(ConcertArtist::create)
-                                .toList()
-                )
-                // TODO : 콘서트 생성 로직에 음악 넣기
-                .build();
     }
 }
