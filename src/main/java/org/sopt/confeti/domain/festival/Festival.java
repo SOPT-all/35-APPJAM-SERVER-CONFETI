@@ -10,6 +10,7 @@ import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festival_music.FestivalMusic;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
+import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -87,6 +88,9 @@ public class Festival {
     @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FestivalMusic> musics = new ArrayList<>();
 
+    @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FestivalReservationUrl> reservationUrls = new ArrayList<>();
+
     @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
     private List<FestivalFavorite> festivalFavorites = new ArrayList<>();
 
@@ -99,7 +103,7 @@ public class Festival {
                     String festivalReservationBgPath,
                     String logoPath, LocalDateTime reserveAt, String reservationUrl, String reservationOffice,
                     String ageRating, String time, String price, String address,
-                    List<FestivalDate> dates, List<FestivalMusic> musics
+                    List<FestivalDate> dates, List<FestivalMusic> musics, List<FestivalReservationUrl> reservationUrls
     ) {
         this.title = title;
         this.subtitle = subtitle;
@@ -120,6 +124,7 @@ public class Festival {
         this.address = address;
         this.dates = dates;
         this.musics = musics;
+        this.reservationUrls = reservationUrls;
     }
 
     public static Festival create(CreateFestivalDTO createFestivalDTO) {
