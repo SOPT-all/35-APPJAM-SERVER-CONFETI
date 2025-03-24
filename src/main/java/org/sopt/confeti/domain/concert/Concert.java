@@ -111,9 +111,9 @@ public class Concert {
         this.musics = musics;
         this.reservationUrls = reservationUrls;
 
-        artists.forEach(artist -> artist.setConcert(this));
-        musics.forEach(music -> music.setConcert(this));
-        reservationUrls.forEach(url -> url.setConcert(this));
+        this.artists.forEach(artist -> artist.setConcert(this));
+        this.musics.forEach(music -> music.setConcert(this));
+        this.reservationUrls.forEach(url -> url.setConcert(this));
     }
 
     public static Concert create(final CreateConcertDTO from) {
