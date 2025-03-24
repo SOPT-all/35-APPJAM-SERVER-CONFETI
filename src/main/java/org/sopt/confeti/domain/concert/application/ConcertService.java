@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ConcertService {
 
     private static final int INIT_PAGE = 0;
-    private static final String START_AT_COLUMN = "concertStartAt";
+    private static final String START_AT_COLUMN = "startAt";
 
     private final ConcertRepository concertRepository;
     private final ArtistResolver artistResolver;
