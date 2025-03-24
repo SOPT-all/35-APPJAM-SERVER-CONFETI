@@ -12,16 +12,21 @@ public record RecentPerformancesDTO(
 ) {
     public static RecentPerformancesDTO of(
             List<Concert> concerts,
-            List<Festival> festivals
+            List<Festival> festivals,
+            int recentPerformanceSize
     ) {
-        return new RecentPerformancesDTO(
-                Stream.concat(
-                        IntStream.range(0, concerts.size())
-                                .mapToObj(i -> RecentPerformanceDTO.of(concerts.get(i), i)),
-                        IntStream.range(concerts.size(), festivals.size())
-                                .mapToObj(i -> RecentPerformanceDTO.of(festivals.get(i), i))
-                ).toList()
-        );
+        List<RecentPerformanceDTO> performances = Stream.concat(
+                IntStream.range(0, concerts.size())
+                        .mapToObj(i -> RecentPerformanceDTO.of(concerts.get(i), i)),
+                        IntStream.range(0, festivals.size())
+                                .mapToObj(i -> RecentPerformanceDTO.of(festivals.get(i), i + concerts.size()))
+                ).toList();
+
+        if (performances.size() >= recentPerformanceSize) {
+            performances = performances.subList(0, recentPerformanceSize);
+        }
+
+        return new RecentPerformancesDTO(performances);
     }
 
     public static RecentPerformancesDTO from(final List<Performance> performances) {
