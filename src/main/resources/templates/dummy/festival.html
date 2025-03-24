@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>페스티벌 등록</title>
+    <title>페스티벌 등록(임시)</title>
     <style>
         * {
             box-sizing: border-box;
@@ -102,11 +102,26 @@
             padding: 12px 30px;
             font-size: 18px;
         }
+        .image-preview {
+            margin-top: 10px;
+            width: 200px;
+            height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            display: none;
+            overflow: hidden;
+        }
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>페스티벌 등록</h1>
+    <h1>페스티벌 등록(임시)</h1>
 
     <form th:action="@{/dummy/page/festivals}" method="post" enctype="multipart/form-data" th:object="${festival}">
         <!-- 기본 정보 섹션 -->
@@ -165,17 +180,26 @@
 
             <div class="form-group">
                 <label for="poster">포스터 이미지</label>
-                <input type="file" id="poster" name="posterFile" accept="image/*" required>
+                <input type="file" id="poster" name="posterFile" accept="image/*" required onchange="previewImage(this, 'posterPreview')">
+                <div id="posterPreview" class="image-preview">
+                    <img src="#" alt="포스터 미리보기">
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="posterBg">배경 이미지</label>
-                <input type="file" id="posterBg" name="posterBgFile" accept="image/*" required>
+                <input type="file" id="posterBg" name="posterBgFile" accept="image/*" required onchange="previewImage(this, 'posterBgPreview')">
+                <div id="posterBgPreview" class="image-preview">
+                    <img src="#" alt="배경 이미지 미리보기">
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="logo">로고 이미지</label>
-                <input type="file" id="logo" name="logoFile" accept="image/*" required>
+                <input type="file" id="logo" name="logoFile" accept="image/*" required onchange="previewImage(this, 'logoPreview')">
+                <div id="logoPreview" class="image-preview">
+                    <img src="#" alt="로고 이미지 미리보기">
+                </div>
             </div>
         </div>
 
@@ -210,7 +234,10 @@
                     </div>
                     <div class="form-group">
                         <label th:for="${'reservationLogoFile' + urlStat.index}">로고</label>
-                        <input type="file" th:id="${'reservationLogoFile' + urlStat.index}" name="reservationLogoFile" accept="image/*" required>
+                        <input type="file" th:id="${'reservationLogoFile' + urlStat.index}" name="reservationLogoFile" accept="image/*" required th:onchange="'previewImage(this, &quot;reservationLogoPreview' + ${urlStat.index} + '&quot;)'">
+                        <div th:id="${'reservationLogoPreview' + urlStat.index}" class="image-preview">
+                            <img src="#" alt="로고 미리보기">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -300,6 +327,26 @@
     let urlCounter = [[${festival?.reservationUrls?.size() ?: 0}]];
     let dateCounter = [[${festival?.dates?.size() ?: 0}]];
 
+    // 이미지 미리보기 함수
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        const previewImg = preview.querySelector('img');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                preview.style.display = 'block';
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            previewImg.src = '#';
+            preview.style.display = 'none';
+        }
+    }
+
     function addFestivalMusic() {
         const container = document.getElementById('festivalMusicContainer');
         const newItem = document.createElement('div');
@@ -331,7 +378,10 @@
                 </div>
                 <div class="form-group">
                     <label for="reservationLogoFile${urlCounter}">로고</label>
-                    <input type="file" id="reservationLogoFile${urlCounter}" name="reservationLogoFile" accept="image/*" required>
+                    <input type="file" id="reservationLogoFile${urlCounter}" name="reservationLogoFile" accept="image/*" required onchange="previewImage(this, 'reservationLogoPreview${urlCounter}')">
+                    <div id="reservationLogoPreview${urlCounter}" class="image-preview">
+                        <img src="#" alt="로고 미리보기">
+                    </div>
                 </div>
             `;
         container.appendChild(newItem);
