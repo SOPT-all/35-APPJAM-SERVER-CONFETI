@@ -125,6 +125,10 @@ public class Festival {
         this.dates = dates;
         this.musics = musics;
         this.reservationUrls = reservationUrls;
+
+        this.dates.forEach(date -> date.setFestival(this));
+        this.musics.forEach(music -> music.setFestival(this));
+        this.reservationUrls.forEach(url -> url.setFestival(this));
     }
 
     public static Festival create(CreateFestivalDTO createFestivalDTO) {
