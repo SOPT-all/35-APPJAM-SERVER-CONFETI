@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateConcertFileDTO;
 import org.sopt.confeti.api.performance.facade.dto.request.CreateFestivalFileDTO;
 import org.sopt.confeti.domain.concert.application.dto.request.ConcertFileNamesDTO;
@@ -37,6 +38,7 @@ import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Facade
 @RequiredArgsConstructor
 public class PerformanceFacade {
@@ -190,7 +192,7 @@ public class PerformanceFacade {
         // 최신 페스티벌 조회
         List<Festival> festivals = festivalService.getRecentFestivals(RECENT_PERFORMANCES_SIZE);
 
-        return RecentPerformancesDTO.of(concerts, festivals);
+        return RecentPerformancesDTO.of(concerts, festivals, RECENT_PERFORMANCES_SIZE);
     }
 
     @Transactional(readOnly = true)
