@@ -123,7 +123,7 @@
 <div class="container">
     <h1>콘서트 등록(임시)</h1>
 
-    <form th:action="@{/dummy/page/concerts}" method="post" enctype="multipart/form-data" th:object="${concert}">
+    <form th:action="${actionUrl}" method="post" enctype="multipart/form-data" th:object="${concert}">
         <!-- 기본 정보 섹션 -->
         <div class="form-section">
             <div class="section-title">기본 정보</div>

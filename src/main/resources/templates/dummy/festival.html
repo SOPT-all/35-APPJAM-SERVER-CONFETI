@@ -262,7 +262,7 @@
 <div class="container">
     <h1>페스티벌 등록(임시)</h1>
 
-    <form th:action="@{/dummy/page/festivals}" method="post" enctype="multipart/form-data" th:object="${festival}">
+    <form th:action="${actionUrl}" method="post" enctype="multipart/form-data" th:object="${festival}">
         <!-- 탭 네비게이션 -->
         <ul class="nav-tabs">
             <li><button type="button" class="tab-link active" data-tab="basic-info">기본 정보</button></li>
