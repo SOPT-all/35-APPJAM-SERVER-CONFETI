@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Music API Tester</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .api-card {
+            transition: all 0.3s;
+            height: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .api-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .api-header {
+            background-color: #f2f2f2;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+        }
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .api-body {
+            padding: 20px;
+            background-color: white;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #dc3545; /* Apple Red */
+        }
+        .nav-pills .nav-link {
+            color: #212529;
+        }
+        .btn-apple {
+            background-color: #dc3545; /* Apple Red */
+            border-color: #dc3545;
+            color: white;
+        }
+        .btn-apple:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+            color: white;
+        }
+        #responseContainer {
+            max-height: 600px;
+            overflow-y: auto;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        #jsonResponse {
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        .param-container {
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .loading-spinner {
+            display: none;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .api-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .required-param {
+            font-weight: bold;
+        }
+        .required-param::after {
+            content: " *";
+            color: #dc3545;
+        }
+        .tab-content {
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="text-center mb-5">
+        <h1 class="display-4 mb-3">Apple Music API 테스터</h1>
+        <p class="lead">아직 Apple Music API 교체 작업이 완료되지 않아 해당 페이지 이용 불가합니다.</p>
+    </div>
+
+    <!-- Main Category Selection -->
+    <div class="row mb-5">
+        <div class="col-md-3">
+            <div class="api-card" data-category="albums">
+                <div class="api-header text-center">
+                    <i class="fas fa-compact-disc category-icon"></i>
+                    <h3>Albums</h3>
+                </div>
+                <div class="api-body">
+                    <p>Access Albums API to retrieve album data, relationships, and more.</p>
+                    <button class="btn btn-apple w-100 select-category" data-category="albums">Select</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="api-card" data-category="artists">
+                <div class="api-header text-center">
+                    <i class="fas fa-microphone category-icon"></i>
+                    <h3>Artists</h3>
+                </div>
+                <div class="api-body">
+                    <p>Access Artists API to retrieve artist data, relationships, and more.</p>
+                    <button class="btn btn-apple w-100 select-category" data-category="artists">Select</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="api-card" data-category="songs">
+                <div class="api-header text-center">
+                    <i class="fas fa-music category-icon"></i>
+                    <h3>Songs</h3>
+                </div>
+                <div class="api-body">
+                    <p>Access Songs API to retrieve song data, relationships, and more.</p>
+                    <button class="btn btn-apple w-100 select-category" data-category="songs">Select</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="api-card" data-category="search">
+                <div class="api-header text-center">
+                    <i class="fas fa-search category-icon"></i>
+                    <h3>Search</h3>
+                </div>
+                <div class="api-body">
+                    <p>Use Search API to find catalog resources, get hints, and suggestions.</p>
+                    <button class="btn btn-apple w-100 select-category" data-category="search">Select</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Details Section -->
+    <div id="apiDetails" class="mb-5" style="display: none;">
+        <div class="card">
+            <div class="card-header">
+                <h2 id="categoryTitle">Category Title</h2>
+            </div>
+            <div class="card-body">
+                <!-- Sub-category tabs -->
+                <ul class="nav nav-pills mb-3" id="apiTabs" role="tablist"></ul>
+
+                <!-- Tab content -->
+                <div class="tab-content" id="apiTabContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Response Section -->
+    <div id="responseSection" class="mb-5" style="display: none;">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Response</h3>
+                <button id="copyResponseBtn" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner-border text-danger" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading response...</p>
+                </div>
+                <div id="responseContainer">
+                    <pre id="jsonResponse">Select an API endpoint and submit a request to see the response here.</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- API Configuration -->
+<script th:inline="javascript">
+    // API Configuration
+    const apiConfig = {
+        albums: {
+            title: "Albums API",
+            endpoints: [
+                {
+                    id: "getCatalogAlbum",
+                    name: "Get a Catalog Album",
+                    description: "Fetch an album by using its catalog ID.",
+                    params: [
+                        { name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
+                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., artists,tracks" }
+                    ]
+                },
+                {
+                    id: "getCatalogAlbumRelationship",
+                    name: "Get a Catalog Album's Relationship Directly by Name",
+                    description: "Fetch an album's relationship data directly by relationship name.",
+                    params: [
+                        { name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
+                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["artists", "tracks", "genres", "record-labels"] },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                    ]
+                },
+                {
+                    id: "getCatalogAlbumRelationshipView",
+                    name: "Get a Catalog Album's Relationship View Directly by Name",
+                    description: "Fetch a view of an album's relationship data.",
+                    params: [
+                        { name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
+                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["artists", "tracks"] },
+                        { name: "view", label: "View", type: "select", required: true, options: ["appears-on", "featured-on", "more-by-artist", "more-in-genre", "related"] },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                    ]
+                },
+                {
+                    id: "getMultipleCatalogAlbums",
+                    name: "Get Multiple Catalog Albums",
+                    description: "Fetch multiple albums by their catalog IDs.",
+                    params: [
+                        { name: "ids", label: "Album IDs (comma-separated)", type: "text", required: true, placeholder: "e.g., 1234567890,0987654321" },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
+                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., artists,tracks" }
+                    ]
+                }
+            ]
+        },
+        artists: {
+            title: "Artists API",
+            endpoints: [
+                {
+                    id: "getCatalogArtist",
+                    name: "Get a Catalog Artist",
+                    description: "Fetch an artist by using their catalog ID.",
+                    params: [
+                        { name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
+                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., albums,songs" }
+                    ]
+                },
+                {
+                    id: "getCatalogArtistRelationship",
+                    name: "Get a Catalog Artist's Relationship Directly by Name",
+                    description: "Fetch an artist's relationship data directly by relationship name.",
+                    params: [
+                        { name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
+                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["albums", "songs", "music-videos", "playlists", "station"] },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                    ]
+                },
+                {
+                    id: "getCatalogArtistRelationshipView",
+                    name: "Get a Catalog Artist's Relationship View Directly by Name",
+                    description: "Fetch a view of an artist's relationship data.",
+                    params: [
+                        { name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
+                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["albums", "songs", "music-videos", "playlists"] },
+                        { name: "view", label: "View", type: "select", required: true, options: ["appears-on", "featured-on", "more-by-artist", "more-in-genre", "related"] },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                    ]
+                },
+                {
+                    id: "getMultipleCatalogArtists",
+                    name: "Get Multiple Catalog Artists",
+                    description: "Fetch multiple artists by their catalog IDs.",
+                    params: [
+                        { name: "ids", label: "Artist IDs (comma-separated)", type: "text", required: true, placeholder: "e.g., 1234567890,0987654321" },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
+                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., albums,songs" }
+                    ]
+                }
+            ]
+        },
+        songs: {
+            title: "Songs API",
+            endpoints: [
+                {
+                    id: "getCatalogSong",
+                    name: "Get a Catalog Song",
+                    description: "Fetch a song by using its catalog ID.",
+                    params: [
+                        { name: "id", label: "Song ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
+                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., artists,albums" }
+                    ]
+                },
+                {
+                    id: "getCatalogSongRelationship",
+                    name: "Get a Catalog Song's Relationship Directly by Name",
+                    description: "Fetch a song's relationship data directly by relationship name.",
+                    params: [
+                        { name: "id", label: "Song ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
+                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["artists", "albums", "music-videos", "genres", "station"] },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                    ]
+                },
+                {
+                    id: "getMultipleCatalogSongs",
+                    name: "Get Multiple Catalog Songs by ID",
+                    description: "Fetch multiple songs by their catalog IDs.",
+                    params: [
+                        { name: "ids", label: "Song IDs (comma-separated)", type: "text", required: true, placeholder: "e.g., 1234567890,0987654321" },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
+                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., artists,albums" }
+                    ]
+                },
+                {
+                    id: "getEquivalentCatalogSongs",
+                    name: "Get Equivalent Catalog Songs by ID",
+                    description: "Fetch equivalent songs across different Apple Music storefronts.",
+                    params: [
+                        { name: "ids", label: "Song IDs (comma-separated)", type: "text", required: true, placeholder: "e.g., 1234567890,0987654321" },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                    ]
+                }
+            ]
+        },
+        search: {
+            title: "Search API",
+            endpoints: [
+                {
+                    id: "searchCatalogResources",
+                    name: "Search for Catalog Resources",
+                    description: "Search for resources in the Apple Music catalog.",
+                    params: [
+                        { name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor swift" },
+                        { name: "types", label: "Resource Types", type: "text", required: true, placeholder: "e.g., albums,artists,songs" },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
+                        { name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25 }
+                    ]
+                },
+                {
+                    id: "getCatalogSearchHints",
+                    name: "Get Catalog Search Hints",
+                    description: "Fetch search hint results based on a search term.",
+                    params: [
+                        { name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor" },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
+                        { name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25 }
+                    ]
+                },
+                {
+                    id: "getCatalogSearchSuggestions",
+                    name: "Get Catalog Search Suggestions",
+                    description: "Fetch search suggestions based on a search term.",
+                    params: [
+                        { name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor" },
+                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
+                        { name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25 },
+                        { name: "types", label: "Resource Types", type: "text", placeholder: "e.g., albums,artists,songs" }
+                    ]
+                }
+            ]
+        }
+    };
+
+    // Base URL for API calls - Replace with your server endpoint
+    const API_BASE_URL = "/api/apple-music";
+</script>
+
+<!-- Main JavaScript Logic -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // DOM elements
+        const apiDetails = document.getElementById('apiDetails');
+        const categoryTitle = document.getElementById('categoryTitle');
+        const apiTabs = document.getElementById('apiTabs');
+        const apiTabContent = document.getElementById('apiTabContent');
+        const responseSection = document.getElementById('responseSection');
+        const jsonResponse = document.getElementById('jsonResponse');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const copyResponseBtn = document.getElementById('copyResponseBtn');
+
+        // Category selection
+        document.querySelectorAll('.select-category').forEach(button => {
+            button.addEventListener('click', function() {
+                const category = this.getAttribute('data-category');
+                showCategoryDetails(category);
+            });
+        });
+
+        // Copy response to clipboard
+        copyResponseBtn.addEventListener('click', function() {
+            const responseText = jsonResponse.textContent;
+            navigator.clipboard.writeText(responseText).then(() => {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+
+        // Show category details
+        function showCategoryDetails(category) {
+            const config = apiConfig[category];
+            if (!config) return;
+
+            // Update category title
+            categoryTitle.textContent = config.title;
+
+            // Clear existing tabs and content
+            apiTabs.innerHTML = '';
+            apiTabContent.innerHTML = '';
+
+            // Generate tabs for each endpoint
+            config.endpoints.forEach((endpoint, index) => {
+                // Create tab
+                const tab = document.createElement('li');
+                tab.className = 'nav-item';
+                tab.innerHTML = `
+                        <button class="nav-link ${index === 0 ? 'active' : ''}"
+                                id="tab-${endpoint.id}"
+                                data-bs-toggle="pill"
+                                data-bs-target="#content-${endpoint.id}"
+                                type="button"
+                                role="tab"
+                                aria-controls="content-${endpoint.id}"
+                                aria-selected="${index === 0 ? 'true' : 'false'}">
+                            ${endpoint.name}
+                        </button>
+                    `;
+                apiTabs.appendChild(tab);
+
+                // Create tab content
+                const content = document.createElement('div');
+                content.className = `tab-pane fade ${index === 0 ? 'show active' : ''}`;
+                content.id = `content-${endpoint.id}`;
+                content.setAttribute('role', 'tabpanel');
+                content.setAttribute('aria-labelledby', `tab-${endpoint.id}`);
+
+                // Endpoint description
+                content.innerHTML = `
+                        <div class="mb-4">
+                            <h4 class="api-name">${endpoint.name}</h4>
+                            <p>${endpoint.description}</p>
+                        </div>
+                    `;
+
+                // Create form for the endpoint
+                const form = document.createElement('form');
+                form.id = `form-${endpoint.id}`;
+                form.className = 'param-container';
+
+                // Add form fields for parameters
+                endpoint.params.forEach(param => {
+                    const formGroup = document.createElement('div');
+                    formGroup.className = 'mb-3';
+
+                    // Parameter label
+                    const label = document.createElement('label');
+                    label.className = param.required ? 'form-label required-param' : 'form-label';
+                    label.setAttribute('for', `${endpoint.id}-${param.name}`);
+                    label.textContent = param.label;
+                    formGroup.appendChild(label);
+
+                    // Parameter input
+                    if (param.type === 'select') {
+                        // Select dropdown
+                        const select = document.createElement('select');
+                        select.className = 'form-select';
+                        select.id = `${endpoint.id}-${param.name}`;
+                        select.name = param.name;
+                        if (param.required) select.required = true;
+
+                        // Add empty option
+                        const emptyOption = document.createElement('option');
+                        emptyOption.value = '';
+                        emptyOption.textContent = 'Select an option';
+                        select.appendChild(emptyOption);
+
+                        // Add options
+                        param.options.forEach(option => {
+                            const optElement = document.createElement('option');
+                            optElement.value = option;
+                            optElement.textContent = option;
+                            select.appendChild(optElement);
+                        });
+
+                        formGroup.appendChild(select);
+                    } else {
+                        // Text or number input
+                        const input = document.createElement('input');
+                        input.className = 'form-control';
+                        input.type = param.type;
+                        input.id = `${endpoint.id}-${param.name}`;
+                        input.name = param.name;
+                        if (param.placeholder) input.placeholder = param.placeholder;
+                        if (param.required) input.required = true;
+                        if (param.min !== undefined) input.min = param.min;
+                        if (param.max !== undefined) input.max = param.max;
+
+                        formGroup.appendChild(input);
+                    }
+
+                    form.appendChild(formGroup);
+                });
+
+                // Submit button
+                const submitBtn = document.createElement('button');
+                submitBtn.type = 'submit';
+                submitBtn.className = 'btn btn-apple';
+                submitBtn.textContent = 'Execute Request';
+                form.appendChild(submitBtn);
+
+                // Submit event handler
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    executeRequest(endpoint.id, category, this);
+                });
+
+                content.appendChild(form);
+                apiTabContent.appendChild(content);
+            });
+
+            // Show the API details section
+            apiDetails.style.display = 'block';
+
+            // Show the response section
+            responseSection.style.display = 'block';
+        }
+
+        // Execute API request
+        function executeRequest(endpointId, category, form) {
+            // Show loading spinner
+            loadingSpinner.style.display = 'block';
+            jsonResponse.style.display = 'none';
+
+            // Collect form data
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+
+            for (let [key, value] of formData.entries()) {
+                if (value) {
+                    params.append(key, value);
+                }
+            }
+
+            // Build the API URL
+            const url = `${API_BASE_URL}/${category}/${endpointId}?${params.toString()}`;
+
+            // Execute the request
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Format and display the response
+                    jsonResponse.textContent = JSON.stringify(data, null, 2);
+                    loadingSpinner.style.display = 'none';
+                    jsonResponse.style.display = 'block';
+
+                    // Scroll to response
+                    responseSection.scrollIntoView({ behavior: 'smooth' });
+                })
+                .catch(error => {
+                    // Display error
+                    jsonResponse.textContent = `Error: ${error.message}`;
+                    loadingSpinner.style.display = 'none';
+                    jsonResponse.style.display = 'block';
+                });
+        }
+    });
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

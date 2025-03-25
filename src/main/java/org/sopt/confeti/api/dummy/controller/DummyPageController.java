@@ -84,4 +84,9 @@ public class DummyPageController {
 
         return "redirect:/dummy/page/concerts";
     }
+
+    @GetMapping("/apple-music-api")
+    public String getAppleMusicApiPage() {
+        return "dummy/appleMusicApiTest";
+    }
 }
