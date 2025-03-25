@@ -13,6 +13,7 @@ import org.sopt.confeti.api.dummy.facade.dto.concert.request.UploadConcertFilesD
 import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFilesDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,18 +30,31 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @Validated
 @RequiredArgsConstructor
-@RequestMapping("/dummy/page")
+@RequestMapping("${api.endpoints.dummy.base}")
 public class DummyPageController {
 
     private final DummyFacade dummyFacade;
 
-    @GetMapping("/festivals")
+    @Value("${api.endpoints.dummy.base}")
+    private String dummyPageBase;
+
+    @Value("${api.endpoints.dummy.festival-page}")
+    private String festivalDummyPage;
+
+    @Value("${api.endpoints.dummy.concert-page}")
+    private String concertDummyPage;
+
+    @Value("${api.endpoints.dummy.apple-music-api-page}")
+    private String appleMusicAPIPage;
+
+    @GetMapping("${api.endpoints.dummy.festival-page}")
     public String getAddFestivalPage(Model model) {
         model.addAttribute("festival", new CreateFestivalRequest());
+        model.addAttribute("actionUrl", dummyPageBase + festivalDummyPage);
         return "dummy/festival";
     }
 
-    @PostMapping("/festivals")
+    @PostMapping("${api.endpoints.dummy.festival-page}")
     public String createFestival(
             @Valid @ModelAttribute("festival") CreateFestivalRequest request,
             @RequestParam("posterFile") MultipartFile poster,
@@ -57,16 +71,17 @@ public class DummyPageController {
 
         redirectAttributes.addFlashAttribute("message", "서버에 정상적으로 저장되었습니다.");
 
-        return "redirect:/dummy/page/festivals";
+        return "redirect:" + dummyPageBase + festivalDummyPage;
     }
 
-    @GetMapping("/concerts")
+    @GetMapping("${api.endpoints.dummy.concert-page}")
     public String getAddConcertPage(Model model) {
         model.addAttribute("concert", new CreateConcertRequest());
+        model.addAttribute("actionUrl", dummyPageBase + concertDummyPage);
         return "dummy/concert";
     }
 
-    @PostMapping("/concerts")
+    @PostMapping("${api.endpoints.dummy.concert-page}")
     public String createConcert(
             @Valid @ModelAttribute("concert") CreateConcertRequest request,
             @RequestParam("posterFile") MultipartFile poster,
@@ -82,10 +97,10 @@ public class DummyPageController {
 
         redirectAttributes.addFlashAttribute("message", "서버에 정상적으로 저장되었습니다.");
 
-        return "redirect:/dummy/page/concerts";
+        return "redirect:" + dummyPageBase + concertDummyPage;
     }
 
-    @GetMapping("/apple-music-api")
+    @GetMapping("${api.endpoints.dummy.apple-music-api-page}")
     public String getAppleMusicApiPage() {
         return "dummy/appleMusicApiTest";
     }
