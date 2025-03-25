@@ -3,6 +3,7 @@ package org.sopt.confeti.domain.concert.application;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.dto.request.ConcertFileNamesDTO;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
@@ -71,5 +72,10 @@ public class ConcertService {
     @Transactional(readOnly = true)
     public List<Concert> getConcerts(final List<Long> concertIds) {
         return concertRepository.findAllByIdIn(concertIds);
+    }
+
+    @Transactional
+    public void create(Concert concert) {
+        concertRepository.save(concert);
     }
 }

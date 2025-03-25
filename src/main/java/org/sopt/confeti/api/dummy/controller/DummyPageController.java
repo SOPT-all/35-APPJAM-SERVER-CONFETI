@@ -4,8 +4,12 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.api.dummy.dto.concert.CreateConcertRequest;
 import org.sopt.confeti.api.dummy.dto.festival.CreateFestivalRequest;
 import org.sopt.confeti.api.dummy.facade.DummyFacade;
+import org.sopt.confeti.api.dummy.facade.dto.concert.ConcertFilePathsDTO;
+import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
+import org.sopt.confeti.api.dummy.facade.dto.concert.request.UploadConcertFilesDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFilesDTO;
@@ -39,7 +43,6 @@ public class DummyPageController {
     @PostMapping("/festivals")
     public String createFestival(
             @Valid @ModelAttribute("festival") CreateFestivalRequest request,
-            BindingResult bindingResult,
             @RequestParam("posterFile") MultipartFile poster,
             @RequestParam("posterBgFile")MultipartFile posterBg,
             @RequestParam("logoFile") MultipartFile logo,
@@ -47,12 +50,38 @@ public class DummyPageController {
             RedirectAttributes redirectAttributes
     ) {
         FestivalFilePathsDTO filePaths = dummyFacade.uploadFestivalFiles(
-                UploadFestivalFilesDTO.of(poster, posterBg, logo, reservationLogos));
+                UploadFestivalFilesDTO.of(poster, posterBg, logo, reservationLogos)
+        );
 
         dummyFacade.createFestival(CreateFestivalDTO.of(request, filePaths));
 
         redirectAttributes.addFlashAttribute("message", "서버에 정상적으로 저장되었습니다.");
 
         return "redirect:/dummy/page/festivals";
+    }
+
+    @GetMapping("/concerts")
+    public String getAddConcertPage(Model model) {
+        model.addAttribute("concert", new CreateConcertRequest());
+        return "dummy/concert";
+    }
+
+    @PostMapping("/concerts")
+    public String createConcert(
+            @Valid @ModelAttribute("concert") CreateConcertRequest request,
+            @RequestParam("posterFile") MultipartFile poster,
+            @RequestParam("posterBgFile")MultipartFile posterBg,
+            @RequestParam(value = "reservationLogoFile", required = false) List<MultipartFile> reservationLogos,
+            RedirectAttributes redirectAttributes
+    ) {
+        ConcertFilePathsDTO filePaths = dummyFacade.uploadConcertFiles(
+                UploadConcertFilesDTO.of(poster, posterBg, reservationLogos)
+        );
+
+        dummyFacade.createConcert(CreateConcertDTO.of(request, filePaths));
+
+        redirectAttributes.addFlashAttribute("message", "서버에 정상적으로 저장되었습니다.");
+
+        return "redirect:/dummy/page/concerts";
     }
 }
