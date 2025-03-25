@@ -13,6 +13,9 @@
             margin: 0;
             padding: 20px;
             background-color: #f5f5f5;
+            height: auto;
+            min-height: 100vh;
+            overflow-y: auto;
         }
         .container {
             max-width: 1200px;
@@ -21,6 +24,9 @@
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            height: auto;
+            min-height: 100%;
+            overflow: visible;
         }
         h1 {
             color: #333;
@@ -43,6 +49,17 @@
             font-weight: bold;
             margin-bottom: 15px;
             color: #444;
+            display: flex;
+            align-items: center;
+        }
+        .section-title .toggle-btn {
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 0.8em;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 2px 5px;
         }
         label {
             display: block;
@@ -117,6 +134,128 @@
             height: 100%;
             object-fit: contain;
         }
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .nav-tabs li {
+            margin-right: 5px;
+        }
+        .nav-tabs button {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            background-color: #f8f8f8;
+            cursor: pointer;
+        }
+        .nav-tabs button.active {
+            background-color: #fff;
+            border-bottom: 2px solid #4CAF50;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 7px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 5px;
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        .date-header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .collapsible {
+            cursor: pointer;
+        }
+        .collapsible:after {
+            content: "▼";
+            float: right;
+            margin-left: 5px;
+        }
+        .active.collapsible:after {
+            content: "▲";
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .collapsible-content.show {
+            max-height: 2000px; /* 충분히 큰 값으로 설정 */
+            overflow: visible;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+        .form-col {
+            flex: 0 0 50%;
+            max-width: 50%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        .colored-section {
+            border-left: 5px solid;
+            padding-left: 15px;
+        }
+        .stage-section {
+            border-left-color: #2196F3;
+        }
+        .time-section {
+            border-left-color: #FF9800;
+        }
+        .artist-section {
+            border-left-color: #9C27B0;
+        }
+        .artists-container {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+            margin-bottom: 10px;
+        }
+        .scroll-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #fafafa;
+            margin-bottom: 15px;
+        }
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .summary-table th, .summary-table td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        .summary-table th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
@@ -124,180 +263,237 @@
     <h1>페스티벌 등록(임시)</h1>
 
     <form th:action="@{/dummy/page/festivals}" method="post" enctype="multipart/form-data" th:object="${festival}">
-        <!-- 기본 정보 섹션 -->
-        <div class="form-section">
-            <div class="section-title">기본 정보</div>
+        <!-- 탭 네비게이션 -->
+        <ul class="nav-tabs">
+            <li><button type="button" class="tab-link active" data-tab="basic-info">기본 정보</button></li>
+            <li><button type="button" class="tab-link" data-tab="stage-info">스테이지 설정</button></li>
+            <li><button type="button" class="tab-link" data-tab="festival-dates">페스티벌 날짜</button></li>
+            <li><button type="button" class="tab-link" data-tab="music-reservation">음악 및 예약</button></li>
+        </ul>
 
-            <div class="form-group">
-                <label for="title">페스티벌 제목</label>
-                <input type="text" id="title" th:field="*{title}" required>
-            </div>
+        <!-- 기본 정보 탭 -->
+        <div id="basic-info" class="tab-content active">
+            <div class="form-section">
+                <div class="section-title">기본 정보</div>
 
-            <div class="form-group">
-                <label for="subtitle">부제목</label>
-                <input type="text" id="subtitle" th:field="*{subtitle}">
-            </div>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="title">페스티벌 제목</label>
+                            <input type="text" id="title" th:field="*{title}" required>
+                        </div>
 
-            <div class="form-group">
-                <label for="startAt">시작일</label>
-                <input type="datetime-local" id="startAt" th:field="*{startAt}" required>
-            </div>
+                        <div class="form-group">
+                            <label for="subtitle">부제목</label>
+                            <input type="text" id="subtitle" th:field="*{subtitle}">
+                        </div>
 
-            <div class="form-group">
-                <label for="endAt">종료일</label>
-                <input type="datetime-local" id="endAt" th:field="*{endAt}" required>
-            </div>
+                        <div class="form-group">
+                            <label for="startAt">시작일</label>
+                            <input type="datetime-local" id="startAt" th:field="*{startAt}" required>
+                        </div>
 
-            <div class="form-group">
-                <label for="area">장소</label>
-                <input type="text" id="area" th:field="*{area}" required>
-            </div>
+                        <div class="form-group">
+                            <label for="endAt">종료일</label>
+                            <input type="datetime-local" id="endAt" th:field="*{endAt}" required>
+                        </div>
 
-            <div class="form-group">
-                <label for="reserveAt">예약 시작일</label>
-                <input type="datetime-local" id="reserveAt" th:field="*{reserveAt}" required>
-            </div>
-
-            <div class="form-group">
-                <label for="ageRating">연령 제한</label>
-                <input type="text" id="ageRating" th:field="*{ageRating}" required>
-            </div>
-
-            <div class="form-group">
-                <label for="time">시간</label>
-                <input type="text" id="time" th:field="*{time}" required>
-            </div>
-
-            <div class="form-group">
-                <label for="price">가격</label>
-                <textarea id="price" th:field="*{price}" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="address">주소</label>
-                <input type="text" id="address" th:field="*{address}" required>
-            </div>
-
-            <div class="form-group">
-                <label for="poster">포스터 이미지</label>
-                <input type="file" id="poster" name="posterFile" accept="image/*" required onchange="previewImage(this, 'posterPreview')">
-                <div id="posterPreview" class="image-preview">
-                    <img src="#" alt="포스터 미리보기">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="posterBg">배경 이미지</label>
-                <input type="file" id="posterBg" name="posterBgFile" accept="image/*" required onchange="previewImage(this, 'posterBgPreview')">
-                <div id="posterBgPreview" class="image-preview">
-                    <img src="#" alt="배경 이미지 미리보기">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="logo">로고 이미지</label>
-                <input type="file" id="logo" name="logoFile" accept="image/*" required onchange="previewImage(this, 'logoPreview')">
-                <div id="logoPreview" class="image-preview">
-                    <img src="#" alt="로고 이미지 미리보기">
-                </div>
-            </div>
-        </div>
-
-        <!-- 페스티벌 음악 섹션 -->
-        <div class="form-section">
-            <div class="section-title">페스티벌 음악</div>
-            <div id="festivalMusicContainer">
-                <div th:each="music, musicStat : *{musics}" class="nested-item">
-                    <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
-                    <div class="form-group">
-                        <label th:for="${'musics[' + musicStat.index + '].musicId'}">음악 ID</label>
-                        <input type="text" th:id="${'musics[' + musicStat.index + '].musicId'}" th:field="*{musics[__${musicStat.index}__].musicId}" required>
+                        <div class="form-group">
+                            <label for="area">장소</label>
+                            <input type="text" id="area" th:field="*{area}" required>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <button type="button" class="btn btn-secondary" onclick="addFestivalMusic()">음악 추가</button>
-        </div>
 
-        <!-- 페스티벌 예약 링크 섹션 -->
-        <div class="form-section">
-            <div class="section-title">예약 링크</div>
-            <div id="reservationUrlContainer">
-                <div th:each="url, urlStat : *{reservationUrls}" class="nested-item">
-                    <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
-                    <div class="form-group">
-                        <label th:for="${'reservationUrls[' + urlStat.index + '].reservationUrl'}">URL</label>
-                        <input type="text" th:id="${'reservationUrls[' + urlStat.index + '].reservationUrl'}" th:field="*{reservationUrls[__${urlStat.index}__].reservationUrl}" required>
-                    </div>
-                    <div class="form-group">
-                        <label th:for="${'reservationUrls[' + urlStat.index + '].name'}">이름</label>
-                        <input type="text" th:id="${'reservationUrls[' + urlStat.index + '].name'}" th:field="*{reservationUrls[__${urlStat.index}__].name}" required>
-                    </div>
-                    <div class="form-group">
-                        <label th:for="${'reservationLogoFile' + urlStat.index}">로고</label>
-                        <input type="file" th:id="${'reservationLogoFile' + urlStat.index}" name="reservationLogoFile" accept="image/*" required th:onchange="'previewImage(this, &quot;reservationLogoPreview' + ${urlStat.index} + '&quot;)'">
-                        <div th:id="${'reservationLogoPreview' + urlStat.index}" class="image-preview">
-                            <img src="#" alt="로고 미리보기">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="reserveAt">예약 시작일</label>
+                            <input type="datetime-local" id="reserveAt" th:field="*{reserveAt}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ageRating">연령 제한</label>
+                            <input type="text" id="ageRating" th:field="*{ageRating}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="time">시간</label>
+                            <input type="text" id="time" th:field="*{time}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="price">가격</label>
+                            <textarea id="price" th:field="*{price}" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">주소</label>
+                            <input type="text" id="address" th:field="*{address}" required>
                         </div>
                     </div>
                 </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="poster">포스터 이미지</label>
+                            <input type="file" id="poster" name="posterFile" accept="image/*" required onchange="previewImage(this, 'posterPreview')">
+                            <div id="posterPreview" class="image-preview">
+                                <img src="#" alt="포스터 미리보기">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="posterBg">배경 이미지</label>
+                            <input type="file" id="posterBg" name="posterBgFile" accept="image/*" required onchange="previewImage(this, 'posterBgPreview')">
+                            <div id="posterBgPreview" class="image-preview">
+                                <img src="#" alt="배경 이미지 미리보기">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="logo">로고 이미지</label>
+                    <input type="file" id="logo" name="logoFile" accept="image/*" required onchange="previewImage(this, 'logoPreview')">
+                    <div id="logoPreview" class="image-preview">
+                        <img src="#" alt="로고 이미지 미리보기">
+                    </div>
+                </div>
             </div>
-            <button type="button" class="btn btn-secondary" onclick="addReservationUrl()">예약 링크 추가</button>
         </div>
 
-        <!-- 페스티벌 날짜 섹션 -->
-        <div class="form-section">
-            <div class="section-title">페스티벌 날짜</div>
-            <div id="festivalDateContainer">
-                <div th:each="festDate, dateStat : *{dates}" class="nested-item">
-                    <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
-                    <div class="form-group">
-                        <label th:for="${'dates[' + dateStat.index + '].festivalAt'}">페스티벌 날짜</label>
-                        <input type="datetime-local" th:id="${'dates[' + dateStat.index + '].festivalAt'}" th:field="*{dates[__${dateStat.index}__].festivalAt}" required>
+        <!-- 스테이지 설정 탭 -->
+        <div id="stage-info" class="tab-content">
+            <div class="form-section">
+                <div class="section-title">공통 스테이지 설정 <span class="badge">모든 날짜에 적용됨</span></div>
+                <div id="stageContainer" class="scroll-container">
+                    <div th:each="stage, stageStat : ${commonStages}" class="nested-item">
+                        <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
+                        <div class="form-group">
+                            <label th:for="${'commonStages[' + stageStat.index + '].name'}">스테이지 이름</label>
+                            <input type="text" th:id="${'commonStages[' + stageStat.index + '].name'}" th:name="${'commonStages[' + stageStat.index + '].name'}" th:value="${stage.name}" required>
+                        </div>
+                        <div class="form-group">
+                            <label th:for="${'commonStages[' + stageStat.index + '].order'}">순서</label>
+                            <input type="number" th:id="${'commonStages[' + stageStat.index + '].order'}" th:name="${'commonStages[' + stageStat.index + '].order'}" th:value="${stage.order}" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label th:for="${'dates[' + dateStat.index + '].openAt'}">티켓 오픈 시간</label>
-                        <input type="datetime-local" th:id="${'dates[' + dateStat.index + '].openAt'}" th:field="*{dates[__${dateStat.index}__].openAt}" required>
-                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addStage()">스테이지 추가</button>
+            </div>
+        </div>
 
-                    <!-- 페스티벌 스테이지 중첩 섹션 -->
-                    <div class="form-section" style="background-color: #f0f8ff;">
-                        <div class="section-title">스테이지</div>
-                        <div th:id="${'stageContainer' + dateStat.index}">
-                            <div th:each="stage, stageStat : ${festDate.stages}" class="nested-item">
-                                <button type="button" class="remove-btn" onclick="removeNestedItem(this)">삭제</button>
-                                <div class="form-group">
-                                    <label th:for="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].name'}">스테이지 이름</label>
-                                    <input type="text" th:id="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].name'}" th:field="*{dates[__${dateStat.index}__].stages[__${stageStat.index}__].name}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label th:for="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].order'}">순서</label>
-                                    <input type="number" th:id="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].order'}" th:field="*{dates[__${dateStat.index}__].stages[__${stageStat.index}__].order}" required>
-                                </div>
+        <!-- 페스티벌 날짜 탭 -->
+        <div id="festival-dates" class="tab-content">
+            <div class="form-section">
+                <div class="section-title">페스티벌 날짜</div>
+                <div id="festivalDateContainer" class="scroll-container">
+                    <div th:each="festDate, dateStat : *{dates}" class="nested-item">
+                        <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
 
-                                <!-- 페스티벌 시간 중첩 섹션 -->
-                                <div class="form-section" style="background-color: #f5f5dc;">
-                                    <div class="section-title">타임 테이블</div>
-                                    <div th:id="${'timeContainer' + dateStat.index + '-' + stageStat.index}">
-                                        <div th:each="time, timeStat : ${stage.times}" class="nested-item">
-                                            <button type="button" class="remove-btn" onclick="removeNestedItem(this)">삭제</button>
-                                            <div class="form-group">
-                                                <label th:for="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].times[' + timeStat.index + '].startAt'}">시작 시간</label>
-                                                <input type="datetime-local" th:id="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].times[' + timeStat.index + '].startAt'}" th:field="*{dates[__${dateStat.index}__].stages[__${stageStat.index}__].times[__${timeStat.index}__].startAt}" required>
+                        <div class="date-header collapsible" onclick="toggleCollapse(this)">
+                            날짜 #<span th:text="${dateStat.count}"></span>
+                            <span th:text="${#temporals.format(festDate.festivalAt, 'yyyy-MM-dd')}"></span>
+                        </div>
+
+                        <div class="collapsible-content">
+                            <div class="form-group">
+                                <label th:for="${'dates[' + dateStat.index + '].festivalAt'}">페스티벌 날짜</label>
+                                <input type="datetime-local" th:id="${'dates[' + dateStat.index + '].festivalAt'}" th:field="*{dates[__${dateStat.index}__].festivalAt}" required>
+                            </div>
+                            <div class="form-group">
+                                <label th:for="${'dates[' + dateStat.index + '].openAt'}">티켓 오픈 시간</label>
+                                <input type="datetime-local" th:id="${'dates[' + dateStat.index + '].openAt'}" th:field="*{dates[__${dateStat.index}__].openAt}" required>
+                            </div>
+
+                            <!-- 날짜별 타임테이블 설정 -->
+                            <div id="dateTimeContainer${dateStat.index}">
+                                <div th:each="stage, stageStat : ${festDate.stages}" th:if="${stageStat.index == 0}">
+                                    <div th:each="time, timeStat : ${stage.times}" class="nested-item colored-section time-section">
+                                        <button type="button" class="remove-btn" onclick="removeTimeItem(this, ${dateStat.index})">삭제</button>
+                                        <h4>타임슬롯 #<span th:text="${timeStat.count}"></span></h4>
+
+                                        <div class="form-row">
+                                            <div class="form-col">
+                                                <div class="form-group">
+                                                    <label th:for="${'timeStartAt' + dateStat.index + '-' + timeStat.index}">시작 시간</label>
+                                                    <input type="datetime-local"
+                                                           th:id="${'timeStartAt' + dateStat.index + '-' + timeStat.index}"
+                                                           th:name="${'timeStartAt' + dateStat.index + '-' + timeStat.index}"
+                                                           th:value="${time.startAt}"
+                                                           onchange="updateAllStageTimeValue(this, ${dateStat.index}, ${timeStat.index}, 'startAt')"
+                                                           required>
+                                                </div>
                                             </div>
+                                            <div class="form-col">
+                                                <div class="form-group">
+                                                    <label th:for="${'timeEndAt' + dateStat.index + '-' + timeStat.index}">종료 시간</label>
+                                                    <input type="datetime-local"
+                                                           th:id="${'timeEndAt' + dateStat.index + '-' + timeStat.index}"
+                                                           th:name="${'timeEndAt' + dateStat.index + '-' + timeStat.index}"
+                                                           th:value="${time.endAt}"
+                                                           onchange="updateAllStageTimeValue(this, ${dateStat.index}, ${timeStat.index}, 'endAt')"
+                                                           required>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 타임슬롯 내 스테이지 선택 및 아티스트 설정 -->
+                                        <div>
+                                            <h4>스테이지 및 아티스트 설정</h4>
                                             <div class="form-group">
-                                                <label th:for="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].times[' + timeStat.index + '].endAt'}">종료 시간</label>
-                                                <input type="datetime-local" th:id="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].times[' + timeStat.index + '].endAt'}" th:field="*{dates[__${dateStat.index}__].stages[__${stageStat.index}__].times[__${timeStat.index}__].endAt}" required>
+                                                <label th:for="${'stageSelect' + dateStat.index + '-' + timeStat.index}">스테이지 선택</label>
+                                                <select
+                                                        th:id="${'stageSelect' + dateStat.index + '-' + timeStat.index}"
+                                                        class="stage-selector"
+                                                        style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;"
+                                                        onchange="showSelectedStage(this)">
+                                                    <option value="">스테이지를 선택하세요</option>
+                                                    <option th:each="stage, stageStat : ${festDate.stages}"
+                                                            th:value="${stageStat.index}"
+                                                            th:text="${stage.name + ' 스테이지'}"></option>
+                                                </select>
                                             </div>
 
-                                            <!-- 페스티벌 아티스트 중첩 섹션 -->
-                                            <div class="form-section" style="background-color: #f0fff0;">
-                                                <div class="section-title">아티스트</div>
-                                                <div th:id="${'artistContainer' + dateStat.index + '-' + stageStat.index + '-' + timeStat.index}">
-                                                    <div th:each="artist, artistStat : ${time.artists}" class="nested-item">
-                                                        <button type="button" class="remove-btn" onclick="removeNestedItem(this)">삭제</button>
-                                                        <div class="form-group">
-                                                            <label th:for="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].times[' + timeStat.index + '].artists[' + artistStat.index + '].artistId'}">아티스트 ID</label>
-                                                            <input type="text" th:id="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].times[' + timeStat.index + '].artists[' + artistStat.index + '].artistId'}" th:field="*{dates[__${dateStat.index}__].stages[__${stageStat.index}__].times[__${timeStat.index}__].artists[__${artistStat.index}__].artistId}" required>
+                                            <!-- 스테이지별 아티스트 세션 -->
+                                            <div th:each="stage, stageStat : ${festDate.stages}"
+                                                 th:id="${'stageSection' + dateStat.index + '-' + timeStat.index + '-' + stageStat.index}"
+                                                 class="nested-item colored-section artist-section stage-section"
+                                                 style="display: none;">
+                                                <h5 th:text="${stage.name + ' 스테이지'}"></h5>
+
+                                                <!-- 숨겨진 입력 필드 - 스테이지 정보 -->
+                                                <input type="hidden" th:name="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].name'}" th:value="${stage.name}">
+                                                <input type="hidden" th:name="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].order'}" th:value="${stage.order}">
+
+                                                <!-- 타임 데이터 -->
+                                                <input type="hidden"
+                                                       th:name="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].times[' + timeStat.index + '].startAt'}"
+                                                       th:id="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].times[' + timeStat.index + '].startAt'}"
+                                                       th:value="${time.startAt}">
+                                                <input type="hidden"
+                                                       th:name="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].times[' + timeStat.index + '].endAt'}"
+                                                       th:id="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].times[' + timeStat.index + '].endAt'}"
+                                                       th:value="${time.endAt}">
+
+                                                <!-- 아티스트 리스트 -->
+                                                <div class="artists-container">
+                                                    <div th:id="${'artistContainer' + dateStat.index + '-' + stageStat.index + '-' + timeStat.index}">
+                                                        <div th:each="artist, artistStat : ${time.artists}" class="form-group">
+                                                            <div class="form-row">
+                                                                <div class="form-col">
+                                                                    <label th:for="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].times[' + timeStat.index + '].artists[' + artistStat.index + '].artistId'}">아티스트 ID</label>
+                                                                    <input type="text"
+                                                                           th:id="${'dates[' + dateStat.index + '].stages[' + stageStat.index + '].times[' + timeStat.index + '].artists[' + artistStat.index + '].artistId'}"
+                                                                           th:field="*{dates[__${dateStat.index}__].stages[__${stageStat.index}__].times[__${timeStat.index}__].artists[__${artistStat.index}__].artistId}"
+                                                                           required>
+                                                                </div>
+                                                                <div class="form-col" style="display: flex; align-items: flex-end;">
+                                                                    <button type="button" class="btn btn-danger" onclick="removeArtist(this)">아티스트 삭제</button>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -305,15 +501,74 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-secondary" th:onclick="'addFestivalTime(' + ${dateStat.index} + ', ' + ${stageStat.index} + ')'">시간 추가</button>
                                 </div>
                             </div>
+                            <button type="button" class="btn btn-secondary" th:onclick="'addTimeSlot(' + ${dateStat.index} + ')'">시간대 추가</button>
                         </div>
-                        <button type="button" class="btn btn-secondary" th:onclick="'addFestivalStage(' + ${dateStat.index} + ')'">스테이지 추가</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addFestivalDate()">페스티벌 날짜 추가</button>
+
+                <!-- 페스티벌 스케줄 요약 -->
+                <div class="section-title collapsible" onclick="toggleCollapse(this)" style="margin-top: 20px;">
+                    페스티벌 스케줄 요약 (미리보기)
+                </div>
+                <div class="collapsible-content">
+                    <div id="schedulePreview">
+                        <!-- 자바스크립트로 내용이 채워집니다 -->
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn btn-secondary" onclick="addFestivalDate()">페스티벌 날짜 추가</button>
+        </div>
+
+        <!-- 음악 및 예약 탭 -->
+        <div id="music-reservation" class="tab-content">
+            <!-- 페스티벌 음악 섹션 -->
+            <div class="form-section">
+                <div class="section-title">페스티벌 음악</div>
+                <div id="festivalMusicContainer" class="scroll-container">
+                    <div th:each="music, musicStat : *{musics}" class="nested-item">
+                        <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
+                        <div class="form-group">
+                            <label th:for="${'musics[' + musicStat.index + '].musicId'}">음악 ID</label>
+                            <input type="text" th:id="${'musics[' + musicStat.index + '].musicId'}" th:field="*{musics[__${musicStat.index}__].musicId}" required>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addFestivalMusic()">음악 추가</button>
+            </div>
+
+            <!-- 페스티벌 예약 링크 섹션 -->
+            <div class="form-section">
+                <div class="section-title">예약 링크</div>
+                <div id="reservationUrlContainer" class="scroll-container">
+                    <div th:each="url, urlStat : *{reservationUrls}" class="nested-item">
+                        <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label th:for="${'reservationUrls[' + urlStat.index + '].reservationUrl'}">URL</label>
+                                    <input type="text" th:id="${'reservationUrls[' + urlStat.index + '].reservationUrl'}" th:field="*{reservationUrls[__${urlStat.index}__].reservationUrl}" required>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label th:for="${'reservationUrls[' + urlStat.index + '].name'}">이름</label>
+                                    <input type="text" th:id="${'reservationUrls[' + urlStat.index + '].name'}" th:field="*{reservationUrls[__${urlStat.index}__].name}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label th:for="${'reservationLogoFile' + urlStat.index}">로고</label>
+                            <input type="file" th:id="${'reservationLogoFile' + urlStat.index}" name="reservationLogoFile" accept="image/*" required th:onchange="'previewImage(this, &quot;reservationLogoPreview' + ${urlStat.index} + '&quot;)'">
+                            <div th:id="${'reservationLogoPreview' + urlStat.index}" class="image-preview">
+                                <img src="#" alt="로고 미리보기">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addReservationUrl()">예약 링크 추가</button>
+            </div>
         </div>
 
         <div class="submit-container">
@@ -321,11 +576,12 @@
         </div>
     </form>
 </div>
-
 <script th:inline="javascript">
     let musicCounter = [[${festival?.musics?.size() ?: 0}]];
     let urlCounter = [[${festival?.reservationUrls?.size() ?: 0}]];
     let dateCounter = [[${festival?.dates?.size() ?: 0}]];
+    let stageCounter = 0;
+    let stages = [];
 
     // 이미지 미리보기 함수
     function previewImage(input, previewId) {
@@ -347,6 +603,36 @@
         }
     }
 
+    // 토글 기능 구현
+    function toggleCollapse(element) {
+        element.classList.toggle("active");
+        const content = element.nextElementSibling;
+        if (content && content.classList.contains('collapsible-content')) {
+            content.classList.toggle("show");
+        }
+    }
+
+    // 탭 전환 함수
+    document.querySelectorAll('.tab-link').forEach(tab => {
+        tab.addEventListener('click', function() {
+            let tabId = this.getAttribute('data-tab');
+
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab-link').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            // 선택한 탭 활성화
+            this.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+
+            // 스케줄 미리보기 업데이트
+            if(tabId === 'festival-dates') {
+                updateSchedulePreview();
+            }
+        });
+    });
+
+    // 음악 추가 함수
     function addFestivalMusic() {
         const container = document.getElementById('festivalMusicContainer');
         const newItem = document.createElement('div');
@@ -362,19 +648,26 @@
         musicCounter++;
     }
 
+    // 예약 URL 추가 함수
     function addReservationUrl() {
         const container = document.getElementById('reservationUrlContainer');
         const newItem = document.createElement('div');
         newItem.className = 'nested-item';
         newItem.innerHTML = `
                 <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
-                <div class="form-group">
-                    <label for="reservationUrls[${urlCounter}].reservationUrl">URL</label>
-                    <input type="text" id="reservationUrls[${urlCounter}].reservationUrl" name="reservationUrls[${urlCounter}].reservationUrl" required>
-                </div>
-                <div class="form-group">
-                    <label for="reservationUrls[${urlCounter}].name">이름</label>
-                    <input type="text" id="reservationUrls[${urlCounter}].name" name="reservationUrls[${urlCounter}].name" required>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="reservationUrls[${urlCounter}].reservationUrl">URL</label>
+                            <input type="text" id="reservationUrls[${urlCounter}].reservationUrl" name="reservationUrls[${urlCounter}].reservationUrl" required>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="reservationUrls[${urlCounter}].name">이름</label>
+                            <input type="text" id="reservationUrls[${urlCounter}].name" name="reservationUrls[${urlCounter}].name" required>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="reservationLogoFile${urlCounter}">로고</label>
@@ -388,118 +681,469 @@
         urlCounter++;
     }
 
-    function addFestivalDate() {
-        const container = document.getElementById('festivalDateContainer');
+    // 스테이지 추가 함수
+    function addStage() {
+        const container = document.getElementById('stageContainer');
         const newItem = document.createElement('div');
         newItem.className = 'nested-item';
         newItem.innerHTML = `
                 <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
                 <div class="form-group">
-                    <label for="dates[${dateCounter}].festivalAt">페스티벌 날짜</label>
-                    <input type="datetime-local" id="dates[${dateCounter}].festivalAt" name="dates[${dateCounter}].festivalAt" required>
+                    <label for="commonStages[${stageCounter}].name">스테이지 이름</label>
+                    <input type="text" id="commonStages[${stageCounter}].name" name="commonStages[${stageCounter}].name" required>
                 </div>
                 <div class="form-group">
-                    <label for="dates[${dateCounter}].openAt">티켓 오픈 시간</label>
-                    <input type="datetime-local" id="dates[${dateCounter}].openAt" name="dates[${dateCounter}].openAt" required>
-                </div>
-
-                <div class="form-section" style="background-color: #f0f8ff;">
-                    <div class="section-title">스테이지</div>
-                    <div id="stageContainer${dateCounter}">
-                    </div>
-                    <button type="button" class="btn btn-secondary" onclick="addFestivalStage(${dateCounter})">스테이지 추가</button>
+                    <label for="commonStages[${stageCounter}].order">순서</label>
+                    <input type="number" id="commonStages[${stageCounter}].order" name="commonStages[${stageCounter}].order" value="${stageCounter + 1}" required>
                 </div>
             `;
         container.appendChild(newItem);
+        stageCounter++;
+
+        // 스테이지 정보 업데이트
+        updateStagesList();
+    }
+
+    // 페스티벌 날짜 추가 함수
+    function addFestivalDate() {
+        // 스테이지 목록 가져오기
+        updateStagesList();
+
+        const container = document.getElementById('festivalDateContainer');
+        const newItem = document.createElement('div');
+        newItem.className = 'nested-item';
+
+        const dateIndex = dateCounter;
+
+        newItem.innerHTML = `
+                <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
+
+                <div class="date-header collapsible" onclick="toggleCollapse(this)">
+                    날짜 #${dateCounter + 1}
+                </div>
+
+                <div class="collapsible-content">
+                    <div class="form-group">
+                        <label for="dates[${dateCounter}].festivalAt">페스티벌 날짜</label>
+                        <input type="datetime-local" id="dates[${dateCounter}].festivalAt" name="dates[${dateCounter}].festivalAt" required onchange="updateDateHeader(this)">
+                    </div>
+                    <div class="form-group">
+                        <label for="dates[${dateCounter}].openAt">티켓 오픈 시간</label>
+                        <input type="datetime-local" id="dates[${dateCounter}].openAt" name="dates[${dateCounter}].openAt" required>
+                    </div>
+
+                    <!-- 날짜별 타임테이블 설정 -->
+                    <div id="dateTimeContainer${dateCounter}">
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addTimeSlot(${dateCounter})">시간대 추가</button>
+                </div>
+            `;
+        container.appendChild(newItem);
+
+        // 토글 상태 초기화 - 처음에는 열린 상태로 표시
+        const collapsibleContent = newItem.querySelector('.collapsible-content');
+        collapsibleContent.classList.add("show");
+
         dateCounter++;
+
+        // 스케줄 미리보기 업데이트
+        updateSchedulePreview();
     }
 
-    function addFestivalStage(dateIndex) {
-        const stageCounter = document.querySelectorAll(`#stageContainer${dateIndex} > div`).length;
-        const container = document.getElementById(`stageContainer${dateIndex}`);
+    // 타임슬롯 추가 함수 (모든 스테이지에 동일한 시간대 추가)
+    function addTimeSlot(dateIndex) {
+        updateStagesList();
+
+        if (stages.length === 0) {
+            alert('스테이지를 먼저 추가해주세요.');
+            return;
+        }
+
+        const container = document.getElementById(`dateTimeContainer${dateIndex}`);
+        const timeslotIndex = container.children.length;
+
         const newItem = document.createElement('div');
-        newItem.className = 'nested-item';
+        newItem.className = 'nested-item colored-section time-section';
+
+        // 기본 시간 설정
+        const today = new Date();
+        const startTime = new Date(today);
+        startTime.setHours(today.getHours() + 1, 0, 0, 0);
+        const endTime = new Date(today);
+        endTime.setHours(today.getHours() + 2, 0, 0, 0);
+
+        const startTimeStr = startTime.toISOString().slice(0, 16);
+        const endTimeStr = endTime.toISOString().slice(0, 16);
+
         newItem.innerHTML = `
-                <button type="button" class="remove-btn" onclick="removeNestedItem(this)">삭제</button>
-                <div class="form-group">
-                    <label for="dates[${dateIndex}].stages[${stageCounter}].name">스테이지 이름</label>
-                    <input type="text" id="dates[${dateIndex}].stages[${stageCounter}].name" name="dates[${dateIndex}].stages[${stageCounter}].name" required>
+            <button type="button" class="remove-btn" onclick="removeTimeItem(this, ${dateIndex})">삭제</button>
+            <h4>타임슬롯 #${timeslotIndex + 1}</h4>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="timeStartAt${dateIndex}-${timeslotIndex}">시작 시간</label>
+                        <input type="datetime-local"
+                            id="timeStartAt${dateIndex}-${timeslotIndex}"
+                            name="timeStartAt${dateIndex}-${timeslotIndex}"
+                            value="${startTimeStr}"
+                            onchange="updateAllStageTimeValue(this, ${dateIndex}, ${timeslotIndex}, 'startAt')"
+                            required>
+                    </div>
                 </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="timeEndAt${dateIndex}-${timeslotIndex}">종료 시간</label>
+                        <input type="datetime-local"
+                            id="timeEndAt${dateIndex}-${timeslotIndex}"
+                            name="timeEndAt${dateIndex}-${timeslotIndex}"
+                            value="${endTimeStr}"
+                            onchange="updateAllStageTimeValue(this, ${dateIndex}, ${timeslotIndex}, 'endAt')"
+                            required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 타임슬롯 내 스테이지 선택 및 아티스트 설정 -->
+            <div>
+                <h4>스테이지 및 아티스트 설정</h4>
                 <div class="form-group">
-                    <label for="dates[${dateIndex}].stages[${stageCounter}].order">순서</label>
-                    <input type="number" id="dates[${dateIndex}].stages[${stageCounter}].order" name="dates[${dateIndex}].stages[${stageCounter}].order" required>
+                    <label for="stageSelect${dateIndex}-${timeslotIndex}">스테이지 선택</label>
+                    <select
+                        id="stageSelect${dateIndex}-${timeslotIndex}"
+                        class="stage-selector"
+                        style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;"
+                        onchange="showSelectedStage(this)">
+                        <option value="">스테이지를 선택하세요</option>
+                        ${stages.map((stage, stageIndex) => `
+                            <option value="${stageIndex}">${stage.name} 스테이지</option>
+                        `).join('')}
+                    </select>
                 </div>
 
-                <div class="form-section" style="background-color: #f5f5dc;">
-                    <div class="section-title">타임 테이블</div>
-                    <div id="timeContainer${dateIndex}-${stageCounter}">
+                ${stages.map((stage, stageIndex) => `
+                    <div id="stageSection${dateIndex}-${timeslotIndex}-${stageIndex}" class="nested-item colored-section artist-section stage-section" style="display: none;">
+                        <h5>${stage.name} 스테이지</h5>
+
+                        <!-- 숨겨진 입력 필드 - 스테이지 정보 -->
+                        <input type="hidden" name="dates[${dateIndex}].stages[${stageIndex}].name" value="${stage.name}">
+                        <input type="hidden" name="dates[${dateIndex}].stages[${stageIndex}].order" value="${stage.order}">
+
+                        <!-- 타임 데이터 -->
+                        <input type="hidden"
+                            name="dates[${dateIndex}].stages[${stageIndex}].times[${timeslotIndex}].startAt"
+                            id="dates[${dateIndex}].stages[${stageIndex}].times[${timeslotIndex}].startAt"
+                            value="${startTimeStr}">
+                        <input type="hidden"
+                            name="dates[${dateIndex}].stages[${stageIndex}].times[${timeslotIndex}].endAt"
+                            id="dates[${dateIndex}].stages[${stageIndex}].times[${timeslotIndex}].endAt"
+                            value="${endTimeStr}">
+
+                        <!-- 아티스트 리스트 -->
+                        <div class="artists-container">
+                            <div id="artistContainer${dateIndex}-${stageIndex}-${timeslotIndex}">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="addArtist(${dateIndex}, ${stageIndex}, ${timeslotIndex})">아티스트 추가</button>
                     </div>
-                    <button type="button" class="btn btn-secondary" onclick="addFestivalTime(${dateIndex}, ${stageCounter})">시간 추가</button>
-                </div>
-            `;
+                `).join('')}
+            </div>
+        `;
+
         container.appendChild(newItem);
+
+        // 스케줄 미리보기 업데이트
+        updateSchedulePreview();
     }
 
-    function addFestivalTime(dateIndex, stageIndex) {
-        const timeCounter = document.querySelectorAll(`#timeContainer${dateIndex}-${stageIndex} > div`).length;
-        const container = document.getElementById(`timeContainer${dateIndex}-${stageIndex}`);
-        const newItem = document.createElement('div');
-        newItem.className = 'nested-item';
-        newItem.innerHTML = `
-                <button type="button" class="remove-btn" onclick="removeNestedItem(this)">삭제</button>
-                <div class="form-group">
-                    <label for="dates[${dateIndex}].stages[${stageIndex}].times[${timeCounter}].startAt">시작 시간</label>
-                    <input type="datetime-local" id="dates[${dateIndex}].stages[${stageIndex}].times[${timeCounter}].startAt" name="dates[${dateIndex}].stages[${stageIndex}].times[${timeCounter}].startAt" required>
-                </div>
-                <div class="form-group">
-                    <label for="dates[${dateIndex}].stages[${stageIndex}].times[${timeCounter}].endAt">종료 시간</label>
-                    <input type="datetime-local" id="dates[${dateIndex}].stages[${stageIndex}].times[${timeCounter}].endAt" name="dates[${dateIndex}].stages[${stageIndex}].times[${timeCounter}].endAt" required>
-                </div>
-
-                <div class="form-section" style="background-color: #f0fff0;">
-                    <div class="section-title">아티스트</div>
-                    <div id="artistContainer${dateIndex}-${stageIndex}-${timeCounter}">
-                    </div>
-                    <button type="button" class="btn btn-secondary" onclick="addArtist(${dateIndex}, ${stageIndex}, ${timeCounter})">아티스트 추가</button>
-                </div>
-            `;
-        container.appendChild(newItem);
-    }
-
+    // 아티스트 추가 함수
     function addArtist(dateIndex, stageIndex, timeIndex) {
-        const artistCounter = document.querySelectorAll(`#artistContainer${dateIndex}-${stageIndex}-${timeIndex} > div`).length;
         const container = document.getElementById(`artistContainer${dateIndex}-${stageIndex}-${timeIndex}`);
+        const artistCounter = container.children.length;
+
         const newItem = document.createElement('div');
-        newItem.className = 'nested-item';
+        newItem.className = 'form-group';
         newItem.innerHTML = `
-                <button type="button" class="remove-btn" onclick="removeNestedItem(this)">삭제</button>
-                <div class="form-group">
+            <div class="form-row">
+                <div class="form-col">
                     <label for="dates[${dateIndex}].stages[${stageIndex}].times[${timeIndex}].artists[${artistCounter}].artistId">아티스트 ID</label>
-                    <input type="text" id="dates[${dateIndex}].stages[${stageIndex}].times[${timeIndex}].artists[${artistCounter}].artistId" name="dates[${dateIndex}].stages[${stageIndex}].times[${timeIndex}].artists[${artistCounter}].artistId" required>
+                    <input type="text"
+                        id="dates[${dateIndex}].stages[${stageIndex}].times[${timeIndex}].artists[${artistCounter}].artistId"
+                        name="dates[${dateIndex}].stages[${stageIndex}].times[${timeIndex}].artists[${artistCounter}].artistId"
+                        required>
                 </div>
-            `;
+                <div class="form-col" style="display: flex; align-items: flex-end;">
+                    <button type="button" class="btn btn-danger" onclick="removeArtist(this)">아티스트 삭제</button>
+                </div>
+            </div>
+        `;
+
         container.appendChild(newItem);
+
+        // 스케줄 미리보기 업데이트
+        updateSchedulePreview();
     }
 
+    // 스테이지 리스트 업데이트
+    function updateStagesList() {
+        stages = [];
+        document.querySelectorAll('#stageContainer .nested-item').forEach(function(item, index) {
+            const nameInput = item.querySelector('input[id^="commonStages"][id$="name"]');
+            const orderInput = item.querySelector('input[id^="commonStages"][id$="order"]');
+
+            if (nameInput && orderInput) {
+                stages.push({
+                    name: nameInput.value || `스테이지 ${index + 1}`,
+                    order: orderInput.value || index + 1
+                });
+            }
+        });
+    }
+
+    // 날짜 헤더 텍스트 업데이트
+    function updateDateHeader(input) {
+        const dateHeader = input.closest('.nested-item').querySelector('.date-header');
+        const dateValue = input.value ? new Date(input.value) : null;
+
+        if (dateValue) {
+            const dateIndex = parseInt(input.id.match(/\d+/)[0]) + 1;
+            const formattedDate = dateValue.toISOString().slice(0, 10);
+            dateHeader.innerHTML = `날짜 #${dateIndex} <span>${formattedDate}</span>`;
+        }
+    }
+
+    // 모든 스테이지의 타임 값 동기화
+    function updateAllStageTimeValue(input, dateIndex, timeIndex, field) {
+        const value = input.value;
+
+        // 각 스테이지의 해당 시간 필드 업데이트
+        document.querySelectorAll(`input[id^="dates[${dateIndex}].stages"][id$="times[${timeIndex}].${field}"]`).forEach(function(item) {
+            item.value = value;
+        });
+
+        // 스케줄 미리보기 업데이트
+        updateSchedulePreview();
+    }
+
+    // 스테이지 선택 드롭다운 처리 함수
+    function showSelectedStage(selectElement) {
+        const selectedValue = selectElement.value;
+        const [dateTimeId, stageIndex] = selectElement.id.match(/stageSelect(\d+-\d+)-?(\d+)?/).slice(1);
+
+        // 해당 타임슬롯의 모든 스테이지 섹션 숨기기
+        document.querySelectorAll(`[id^="stageSection${dateTimeId}-"]`).forEach(section => {
+            section.style.display = 'none';
+        });
+
+        // 선택된 스테이지만 표시
+        if (selectedValue !== '') {
+            const selectedSection = document.getElementById(`stageSection${dateTimeId}-${selectedValue}`);
+            if (selectedSection) {
+                selectedSection.style.display = 'block';
+            }
+        }
+    }
+
+    // 날짜의 모든 타임 삭제 (모든 스테이지에서)
+    function removeTimeItem(button, dateIndex) {
+        const timeItem = button.closest('.nested-item');
+        const container = timeItem.parentNode;
+        const timeIndex = Array.from(container.children).indexOf(timeItem);
+
+        if (confirm('이 시간대를 모든 스테이지에서 삭제하시겠습니까?')) {
+            container.removeChild(timeItem);
+
+            // 스케줄 미리보기 업데이트
+            updateSchedulePreview();
+        }
+    }
+
+    // 아티스트 삭제
+    function removeArtist(button) {
+        const artistItem = button.closest('.form-group');
+        const container = artistItem.parentNode;
+        container.removeChild(artistItem);
+
+        // 스케줄 미리보기 업데이트
+        updateSchedulePreview();
+    }
+
+    // 요소 삭제 함수
     function removeItem(button) {
         const item = button.parentNode;
         const container = item.parentNode;
         container.removeChild(item);
+
+        // 스테이지 삭제시 스테이지 리스트 업데이트
+        if (container.id === 'stageContainer') {
+            updateStagesList();
+        }
+
+        // 스케줄 미리보기 업데이트
+        updateSchedulePreview();
     }
 
+    // 중첩된 요소 삭제 함수
     function removeNestedItem(button) {
         const item = button.parentNode;
         const container = item.parentNode;
         container.removeChild(item);
+
+        // 스케줄 미리보기 업데이트
+        updateSchedulePreview();
     }
 
-    // 초기화: 이미 있는 데이터가 없으면 각각 하나씩 추가
-    document.addEventListener('DOMContentLoaded', function() {
+    // 페스티벌 스케줄 미리보기 업데이트
+    function updateSchedulePreview() {
+        const previewContainer = document.getElementById('schedulePreview');
+        previewContainer.innerHTML = '';
 
+        // 모든 데이터 수집
+        const scheduleData = [];
+
+        document.querySelectorAll('#festivalDateContainer > .nested-item').forEach(function(dateItem, dateIndex) {
+            const dateInput = dateItem.querySelector(`input[id^="dates[${dateIndex}].festivalAt"]`);
+
+            if (!dateInput || !dateInput.value) return;
+
+            const dateObj = {
+                date: new Date(dateInput.value),
+                times: []
+            };
+
+            // 시간대 수집
+            document.querySelectorAll(`#dateTimeContainer${dateIndex} > .nested-item`).forEach(function(timeItem, timeIndex) {
+                const startAtInput = timeItem.querySelector(`input[id="timeStartAt${dateIndex}-${timeIndex}"]`);
+                const endAtInput = timeItem.querySelector(`input[id="timeEndAt${dateIndex}-${timeIndex}"]`);
+
+                if (!startAtInput || !startAtInput.value || !endAtInput || !endAtInput.value) return;
+
+                const timeObj = {
+                    startAt: new Date(startAtInput.value),
+                    endAt: new Date(endAtInput.value),
+                    stages: []
+                };
+
+                // 스테이지별 아티스트 수집
+                stages.forEach(function(stage, stageIndex) {
+                    const stageObj = {
+                        name: stage.name,
+                        order: stage.order,
+                        artists: []
+                    };
+
+                    // 아티스트 수집
+                    document.querySelectorAll(`#artistContainer${dateIndex}-${stageIndex}-${timeIndex} input[name$="].artistId"]`).forEach(function(artistInput) {
+                        if (artistInput.value) {
+                            stageObj.artists.push({
+                                artistId: artistInput.value
+                            });
+                        }
+                    });
+
+                    timeObj.stages.push(stageObj);
+                });
+
+                dateObj.times.push(timeObj);
+            });
+
+            scheduleData.push(dateObj);
+        });
+
+        // 테이블 생성
+        if (scheduleData.length > 0) {
+            scheduleData.forEach(function(dateData) {
+                const dateTable = document.createElement('div');
+                dateTable.className = 'schedule-date';
+
+                const dateHeader = document.createElement('h3');
+                dateHeader.textContent = `${dateData.date.toLocaleDateString()} 스케줄`;
+                dateTable.appendChild(dateHeader);
+
+                const table = document.createElement('table');
+                table.className = 'summary-table';
+
+                // 테이블 헤더
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+
+                // 시간 헤더
+                const timeHeader = document.createElement('th');
+                timeHeader.textContent = '시간';
+                headerRow.appendChild(timeHeader);
+
+                // 스테이지 헤더
+                stages.forEach(function(stage) {
+                    const stageHeader = document.createElement('th');
+                    stageHeader.textContent = stage.name;
+                    headerRow.appendChild(stageHeader);
+                });
+
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                // 테이블 본문
+                const tbody = document.createElement('tbody');
+
+                dateData.times.forEach(function(timeData) {
+                    const timeRow = document.createElement('tr');
+
+                    // 시간 셀
+                    const timeCell = document.createElement('td');
+                    timeCell.textContent = `${timeData.startAt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${timeData.endAt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                    timeRow.appendChild(timeCell);
+
+                    // 스테이지별 아티스트 셀
+                    timeData.stages.forEach(function(stageData) {
+                        const stageCell = document.createElement('td');
+
+                        if (stageData.artists.length > 0) {
+                            const artistsList = document.createElement('ul');
+                            artistsList.style.margin = '0';
+                            artistsList.style.paddingLeft = '20px';
+
+                            stageData.artists.forEach(function(artist) {
+                                const artistItem = document.createElement('li');
+                                artistItem.textContent = artist.artistId;
+                                artistsList.appendChild(artistItem);
+                            });
+
+                            stageCell.appendChild(artistsList);
+                        } else {
+                            stageCell.textContent = '-';
+                        }
+
+                        timeRow.appendChild(stageCell);
+                    });
+
+                    tbody.appendChild(timeRow);
+                });
+
+                table.appendChild(tbody);
+                dateTable.appendChild(table);
+                previewContainer.appendChild(dateTable);
+            });
+        } else {
+            previewContainer.innerHTML = '<p>날짜 및 시간을 추가하면 스케줄이 여기에 표시됩니다.</p>';
+        }
+    }
+</script>
+<script th:inline="javascript">
+    // 페스티벌 등록 폼 제출 처리 로직
+    // 아티스트가 없는 스테이지 타임슬롯을 제거하고 동일 날짜 병합
+
+    // 페이지 로드 후 폼에 제출 처리 추가
+    document.addEventListener('DOMContentLoaded', function() {
         const message = [[${message}]];
         if (message) {
             alert(message);
         }
+
+        // 스테이지 카운터 초기화
+        stageCounter = document.querySelectorAll('#stageContainer > div').length;
+
+        // 스테이지 리스트 업데이트
+        updateStagesList();
 
         if (musicCounter === 0) {
             addFestivalMusic();
@@ -507,13 +1151,257 @@
         if (urlCounter === 0) {
             addReservationUrl();
         }
+        if (stageCounter === 0) {
+            addStage();
+        }
         if (dateCounter === 0) {
             addFestivalDate();
-            addFestivalStage(0);
-            addFestivalTime(0, 0);
-            addArtist(0, 0, 0);
         }
+
+        // 모든 collapsible 섹션 초기화 - 초기에는 모두 열어둠
+        document.querySelectorAll('.collapsible').forEach(function(collapsible) {
+            const content = collapsible.nextElementSibling;
+            if (content && content.classList.contains('collapsible-content')) {
+                content.classList.add('show');
+            }
+        });
+
+        // 스테이지 선택 드롭다운 초기화
+        document.querySelectorAll('.stage-selector').forEach(function(selector) {
+            // 첫 번째 실제 옵션(인덱스 1, "스테이지를 선택하세요" 다음)을 기본값으로 선택
+            if (selector.options.length > 1) {
+                selector.selectedIndex = 1;
+                showSelectedStage(selector); // 선택된 스테이지 표시
+            }
+        });
+
+        // 스케줄 미리보기 업데이트
+        updateSchedulePreview();
+        // 기존 초기화 로직이 모두 실행된 후에 적용
+        setTimeout(() => {
+            const festivalForm = document.querySelector('form');
+            if (festivalForm) {
+                // 기존 onsubmit 이벤트 백업
+                const originalOnSubmit = festivalForm.onsubmit;
+
+                // 폼 제출 이벤트 처리
+                festivalForm.onsubmit = function(event) {
+                    event.preventDefault();
+
+                    console.log("폼 데이터 정리 시작");
+
+                    // 1. 날짜별 데이터 수집 및 정리
+                    const dateData = collectDateData();
+
+                    // 2. 동일 날짜 병합 및 정리된 폼 데이터 생성
+                    const cleanFormData = createCleanFormData(dateData);
+
+                    // 3. 정리된 데이터로 새 폼 생성 및 제출
+                    submitCleanForm(cleanFormData);
+
+                    // 원래 onsubmit 이벤트는 실행하지 않음
+                    return false;
+                };
+
+                console.log("폼 제출 처리 로직이 적용되었습니다.");
+            }
+        }, 500);
     });
+
+
+    // 날짜별 데이터 수집
+    function collectDateData() {
+        const result = {};
+
+        // 모든 날짜 요소 순회
+        document.querySelectorAll('#festivalDateContainer > .nested-item').forEach((dateItem, dateIndex) => {
+            // CSS 선택자에서 대괄호와 마침표는 이스케이프가 필요합니다
+            const festivalAtInput = dateItem.querySelector(`input[id^="dates\\[${dateIndex}\\]"][id$="festivalAt"]`);
+            const openAtInput = dateItem.querySelector(`input[id^="dates\\[${dateIndex}\\]"][id$="openAt"]`);
+
+            if (festivalAtInput && festivalAtInput.value) {
+                const festivalAt = festivalAtInput.value;
+                const dateOnly = festivalAt.split('T')[0]; // 날짜 부분만 추출
+
+                // 해당 날짜의 데이터 준비
+                if (!result[dateOnly]) {
+                    result[dateOnly] = {
+                        indices: [],
+                        festivalAt: festivalAt,
+                        openAt: openAtInput ? openAtInput.value : '',
+                        stages: {}
+                    };
+                }
+
+                result[dateOnly].indices.push(dateIndex);
+
+                // 스테이지별 타임슬롯과 아티스트 정보 수집
+                const stages = {};
+
+                // 모든 타임슬롯 순회
+                document.querySelectorAll(`#dateTimeContainer${dateIndex} > .nested-item`).forEach((timeItem, timeIndex) => {
+                    const startAtInput = timeItem.querySelector(`input[id="timeStartAt${dateIndex}-${timeIndex}"]`);
+                    const endAtInput = timeItem.querySelector(`input[id="timeEndAt${dateIndex}-${timeIndex}"]`);
+
+                    if (startAtInput && startAtInput.value && endAtInput && endAtInput.value) {
+                        // 해당 타임슬롯의 모든 스테이지와 아티스트 수집
+                        document.querySelectorAll(`.stage-section[id^="stageSection${dateIndex}-${timeIndex}-"]`).forEach(stageSection => {
+                            const stageMatch = stageSection.id.match(/stageSection\d+-\d+-(\d+)/);
+                            if (stageMatch) {
+                                const stageIndex = stageMatch[1];
+                                const stageName = stageSection.querySelector('h5').textContent.replace(' 스테이지', '');
+                                const stageOrder = stageSection.querySelector(`input[name^="dates\\[${dateIndex}\\]\\.stages\\[${stageIndex}\\]\\.order"]`).value;
+
+                                // 아티스트 정보 수집
+                                const artists = [];
+                                stageSection.querySelectorAll(`input[id^="dates\\[${dateIndex}\\]\\.stages\\[${stageIndex}\\]\\.times\\[${timeIndex}\\]\\.artists"][id$="\\.artistId"]`).forEach(artistInput => {
+                                    if (artistInput.value) {
+                                        const artistMatch = artistInput.id.match(/\\.artists\\[(\d+)\\]/);
+                                        const artistIndex = artistMatch ? artistMatch[1] : '0';
+                                        artists.push({
+                                            index: artistIndex,
+                                            artistId: artistInput.value
+                                        });
+                                    }
+                                });
+
+                                // 아티스트가 있는 경우에만 스테이지 정보 기록
+                                if (artists.length > 0) {
+                                    if (!stages[stageIndex]) {
+                                        stages[stageIndex] = {
+                                            name: stageName,
+                                            order: stageOrder,
+                                            times: {}
+                                        };
+                                    }
+
+                                    // 타임슬롯 정보 기록
+                                    stages[stageIndex].times[timeIndex] = {
+                                        startAt: startAtInput.value,
+                                        endAt: endAtInput.value,
+                                        artists: artists
+                                    };
+                                }
+                            }
+                        });
+                    }
+                });
+
+                // 스테이지 정보 추가
+                Object.assign(result[dateOnly].stages, stages);
+            }
+        });
+
+        console.log("수집된 날짜 데이터:", result);
+        return result;
+    }
+
+    // 정리된 FormData 생성
+    function createCleanFormData(dateData) {
+        const formData = new FormData(document.querySelector('form'));
+        const keysToRemove = new Set();
+
+        // 모든 dates[] 관련 필드를 일단 제거 대상으로 표시
+        for (let key of formData.keys()) {
+            if (key.startsWith('dates[')) {
+                keysToRemove.add(key);
+            }
+        }
+
+        // 정리된 데이터로 새 FormData 생성
+        const cleanFormData = new FormData();
+
+        // 기존 폼의 dates[] 외 필드는 모두 유지
+        for (let [key, value] of formData.entries()) {
+            if (!key.startsWith('dates[')) {
+                cleanFormData.append(key, value);
+            }
+        }
+
+        // 정리된 날짜 데이터 추가
+        let dateIndex = 0;
+        for (const [dateStr, data] of Object.entries(dateData)) {
+            // 기본 날짜 정보
+            cleanFormData.append(`dates[${dateIndex}].festivalAt`, data.festivalAt);
+            cleanFormData.append(`dates[${dateIndex}].openAt`, data.openAt);
+
+            // 스테이지 정보
+            let stageIndex = 0;
+            for (const [origStageIndex, stageData] of Object.entries(data.stages)) {
+                // 스테이지 기본 정보
+                cleanFormData.append(`dates[${dateIndex}].stages[${stageIndex}].name`, stageData.name);
+                cleanFormData.append(`dates[${dateIndex}].stages[${stageIndex}].order`, stageData.order);
+
+                // 타임슬롯 정보
+                let timeIndex = 0;
+                for (const [origTimeIndex, timeData] of Object.entries(stageData.times)) {
+                    // 타임슬롯 기본 정보
+                    cleanFormData.append(`dates[${dateIndex}].stages[${stageIndex}].times[${timeIndex}].startAt`, timeData.startAt);
+                    cleanFormData.append(`dates[${dateIndex}].stages[${stageIndex}].times[${timeIndex}].endAt`, timeData.endAt);
+
+                    // 아티스트 정보
+                    let artistIndex = 0;
+                    for (const artistData of timeData.artists) {
+                        cleanFormData.append(`dates[${dateIndex}].stages[${stageIndex}].times[${timeIndex}].artists[${artistIndex}].artistId`, artistData.artistId);
+                        artistIndex++;
+                    }
+
+                    timeIndex++;
+                }
+
+                stageIndex++;
+            }
+
+            dateIndex++;
+        }
+
+        console.log("정리된 폼 데이터 생성 완료");
+        return cleanFormData;
+    }
+
+    // 정리된 데이터로 폼 제출
+    function submitCleanForm(cleanFormData) {
+        const originalForm = document.querySelector('form');
+
+        // 임시 폼 생성
+        const tempForm = document.createElement('form');
+        tempForm.method = originalForm.method;
+        tempForm.action = originalForm.action;
+        tempForm.enctype = originalForm.enctype;
+
+        // 파일 필드 처리
+        const fileInputs = originalForm.querySelectorAll('input[type="file"]');
+        const fileInputNames = Array.from(fileInputs).map(input => input.name);
+
+        // 파일 필드 복제
+        fileInputs.forEach(fileInput => {
+            if (fileInput.files.length > 0) {
+                // 원본 파일 입력 요소를 임시 폼에 복제
+                tempForm.appendChild(fileInput.cloneNode(true));
+            }
+        });
+
+        // 일반 필드 처리
+        for (let [key, value] of cleanFormData.entries()) {
+            // 파일 필드는 이미 처리했으므로 건너뜀
+            if (fileInputNames.includes(key)) continue;
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = value;
+            tempForm.appendChild(input);
+        }
+
+        // 폼 제출 (디버깅용 로그)
+        console.log("폼 제출 준비 완료");
+        console.log("필드 수:", tempForm.elements.length);
+
+        // 폼 제출
+        document.body.appendChild(tempForm);
+        tempForm.submit();
+        document.body.removeChild(tempForm);
+    }
 </script>
 </body>
 </html>
