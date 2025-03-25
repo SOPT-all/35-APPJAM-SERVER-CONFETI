@@ -6,12 +6,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.domain.concert_music.ConcertMusic;
 import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
 import org.sopt.confeti.domain.concert_artist.ConcertArtist;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.sopt.confeti.global.common.constant.Default;
 
 @Entity
 @Table(name="concerts")
@@ -113,5 +115,41 @@ public class Concert {
         this.artists.forEach(artist -> artist.setConcert(this));
         this.musics.forEach(music -> music.setConcert(this));
         this.reservationUrls.forEach(url -> url.setConcert(this));
+    }
+
+    public static Concert create(CreateConcertDTO concertDTO) {
+        return Concert.builder()
+                .title(concertDTO.title())
+                .subtitle(concertDTO.subtitle())
+                .startAt(concertDTO.startAt())
+                .endAt(concertDTO.endAt())
+                .area(concertDTO.area())
+                .posterPath(concertDTO.posterPath())
+                .posterBgPath(concertDTO.posterBgPath())
+                .concertInfoImgPath(Default.IMG_PATH)
+                .concertReservationBgPath(Default.IMG_PATH)
+                .reserveAt(concertDTO.reserveAt())
+                .reservationUrl(Default.URL)
+                .reservationOffice(Default.TEXT)
+                .ageRating(concertDTO.ageRating())
+                .time(concertDTO.time())
+                .price(concertDTO.price())
+                .address(concertDTO.address())
+                .artists(
+                        concertDTO.artists().stream()
+                                .map(ConcertArtist::create)
+                                .toList()
+                )
+                .musics(
+                        concertDTO.musics().stream()
+                                .map(ConcertMusic::create)
+                                .toList()
+                )
+                .reservationUrls(
+                        concertDTO.reservationUrls().stream()
+                                .map(ConcertReservationUrl::create)
+                                .toList()
+                )
+                .build();
     }
 }

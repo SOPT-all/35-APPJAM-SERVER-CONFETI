@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertMusicDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.global.resolver.artist.ConfetiMusic;
 
@@ -43,6 +44,12 @@ public class ConcertMusic {
     public static ConcertMusic create(final String musicId) {
         return ConcertMusic.builder()
                 .music(ConfetiMusic.from(musicId))
+                .build();
+    }
+
+    public static ConcertMusic create(CreateConcertMusicDTO concertMusicDTO) {
+        return ConcertMusic.builder()
+                .music(ConfetiMusic.from(concertMusicDTO.musicId()))
                 .build();
     }
 }
