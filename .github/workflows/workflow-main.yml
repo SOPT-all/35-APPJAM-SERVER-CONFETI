@@ -44,6 +44,13 @@ jobs:
           echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
         shell: bash
 
+      # application-common.yml 파일 생성
+      - name: make application-common.yml
+        run: |
+          touch ./src/main/resources/application-common.yml
+          echo "${{ secrets.APPLICATION_COMMON_YML }}" > ./src/main/resources/application-common.yml
+        shell: bash
+
       # cloud 폴더 생성
       - name: Create cloud folder if not exist
         run: |
