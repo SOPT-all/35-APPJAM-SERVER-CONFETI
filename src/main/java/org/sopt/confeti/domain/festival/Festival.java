@@ -55,10 +55,6 @@ public class Festival {
     private String festivalInfoImgPath; // 제거 대상
 
     @Setter
-    @Column(length = 250) // 나중에 nullable = false로 수정
-    private String festivalReservationBgPath; // 제거 대상
-
-    @Setter
     @Column(length = 250)
     private String logoPath;
 
@@ -101,7 +97,6 @@ public class Festival {
     @Builder
     public Festival(String title, String subtitle, LocalDateTime startAt, LocalDateTime endAt, String area,
                     String posterPath, String posterBgPath, String festivalInfoImgPath,
-                    String festivalReservationBgPath,
                     String logoPath, LocalDateTime reserveAt, String reservationUrl, String reservationOffice,
                     String ageRating, String time, String price, String address,
                     List<FestivalDate> dates, List<FestivalMusic> musics, List<FestivalReservationUrl> reservationUrls
@@ -114,7 +109,6 @@ public class Festival {
         this.posterPath = posterPath;
         this.posterBgPath = posterBgPath;
         this.festivalInfoImgPath = festivalInfoImgPath;
-        this.festivalReservationBgPath = festivalReservationBgPath;
         this.logoPath = logoPath;
         this.reserveAt = reserveAt;
         this.reservationUrl = reservationUrl;
@@ -142,7 +136,6 @@ public class Festival {
                 .posterPath(festivalDTO.posterPath())
                 .posterBgPath(festivalDTO.posterBgPath())
                 .festivalInfoImgPath(Default.IMG_PATH) // 제거 대상
-                .festivalReservationBgPath(Default.IMG_PATH) // 제거 대상
                 .logoPath(festivalDTO.logoPath())
                 .reserveAt(festivalDTO.reserveAt())
                 .reservationUrl(Default.URL) // 제거 대상

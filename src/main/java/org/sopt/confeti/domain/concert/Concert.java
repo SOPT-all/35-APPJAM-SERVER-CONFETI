@@ -51,10 +51,6 @@ public class Concert {
     @Column(length = 250, nullable = false)
     private String concertInfoImgPath; // 제거 대상
 
-    @Setter
-    @Column(length = 250) // 나중에 nullable = false로 수정
-    private String concertReservationBgPath; // 제거 대상
-
     @Column(nullable = false)
     private LocalDateTime reserveAt;
 
@@ -87,7 +83,7 @@ public class Concert {
 
     @Builder
     public Concert(String title, String subtitle, LocalDateTime startAt, LocalDateTime endAt, String area,
-                   String posterPath, String posterBgPath, String concertInfoImgPath, String concertReservationBgPath,
+                   String posterPath, String posterBgPath, String concertInfoImgPath,
                    LocalDateTime reserveAt, String reservationUrl, String reservationOffice, String ageRating,
                    String time, String price, String address,
                    List<ConcertArtist> artists, List<ConcertMusic> musics, List<ConcertReservationUrl> reservationUrls
@@ -100,7 +96,6 @@ public class Concert {
         this.posterPath = posterPath;
         this.posterBgPath = posterBgPath;
         this.concertInfoImgPath = concertInfoImgPath;
-        this.concertReservationBgPath = concertReservationBgPath;
         this.reserveAt = reserveAt;
         this.reservationUrl = reservationUrl;
         this.reservationOffice = reservationOffice;
@@ -127,7 +122,6 @@ public class Concert {
                 .posterPath(concertDTO.posterPath())
                 .posterBgPath(concertDTO.posterBgPath())
                 .concertInfoImgPath(Default.IMG_PATH)
-                .concertReservationBgPath(Default.IMG_PATH)
                 .reserveAt(concertDTO.reserveAt())
                 .reservationUrl(Default.URL)
                 .reservationOffice(Default.TEXT)

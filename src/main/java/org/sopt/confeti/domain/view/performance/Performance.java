@@ -59,13 +59,10 @@ public class Performance {
     @Column(length = 250, nullable = false)
     private String posterPath;
 
-    @Column(length = 250, nullable = false)
-    private String reservationBgPath;
-
     @Builder
     public Performance(long typeId, PerformanceType type, String artistId, String area, String title,
-                       String subtitle, LocalDateTime startAt, LocalDateTime endAt, LocalTime artistStartAt, String posterPath,
-                       String reservationBgPath) {
+                       String subtitle, LocalDateTime startAt, LocalDateTime endAt, LocalTime artistStartAt, String posterPath)
+    {
         this.typeId = typeId;
         this.type = type;
         this.artistId = artistId;
@@ -76,8 +73,6 @@ public class Performance {
         this.endAt = endAt;
         this.artistStartAt = artistStartAt;
         this.posterPath = posterPath;
-        this.reservationBgPath = reservationBgPath;
-
     }
 
     public static Performance create(final Festival festival, final String artistId, final LocalTime artistStartAt) {
@@ -92,7 +87,6 @@ public class Performance {
                 .endAt(festival.getEndAt())
                 .artistStartAt(artistStartAt)
                 .posterPath(festival.getPosterPath())
-                .reservationBgPath(festival.getFestivalReservationBgPath())
                 .build();
     }
 
@@ -108,7 +102,6 @@ public class Performance {
                 .endAt(concert.getEndAt())
                 .artistStartAt(null)
                 .posterPath(concert.getPosterPath())
-                .reservationBgPath(concert.getConcertReservationBgPath())
                 .build();
     }
 }
