@@ -54,7 +54,7 @@ public class PerformanceController {
             @UserId(require = false) Long userId
     ) {
         PerformanceReservationDTO performanceReservationDTO = performanceFacade.getPerformReservationInfo(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, PerformanceReservationResponse.of(performanceReservationDTO, s3FileHandler));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, PerformanceReservationResponse.from(performanceReservationDTO));
     }
 
     @Permission(role = {Role.GENERAL})
