@@ -8,24 +8,21 @@ public record PerformanceTicketDTO(
         long typeId,
         PerformanceType type,
         String subtitle,
-        LocalDateTime reserveAt,
-        String reservationBgUrl
+        LocalDateTime reserveAt
 ) {
     public static PerformanceTicketDTO of(
             final int index,
             final long performanceId,
             final String type,
             final String subtitle,
-            final LocalDateTime reserveAt,
-            final String reservationBgUrl
+            final LocalDateTime reserveAt
     ) {
         return new PerformanceTicketDTO(
                 index,
                 performanceId,
                 PerformanceType.convert(type),
                 subtitle,
-                reserveAt,
-                reservationBgUrl
+                reserveAt
         );
     }
 }

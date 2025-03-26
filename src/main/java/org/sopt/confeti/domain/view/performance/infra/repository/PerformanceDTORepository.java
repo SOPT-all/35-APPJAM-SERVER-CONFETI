@@ -58,21 +58,21 @@ public class PerformanceDTORepository {
 
     public List<PerformanceTicketDTO> findFavoritePerformancesReservation(final Long userId) {
         String sql = """
-            SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, subtitle, reserve_at, reservation_bg_url
+            SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, subtitle, reserve_at
             FROM (
-                SELECT c.id performance_id, :concertType type, c.subtitle subtitle, c.reserve_at, c.concert_reservation_bg_path reservation_bg_url
+                SELECT c.id performance_id, :concertType type, c.subtitle subtitle, c.reserve_at
                 FROM concert_favorites cf
                 JOIN concerts c ON cf.concert_id = c.id
                 WHERE cf.user_id = :userId AND c.reserve_at >= CURRENT_DATE 
                 UNION ALL
-                SELECT f.id performance_id, :festivalType type, f.subtitle subtitle, f.reserve_at, f.festival_reservation_bg_path reservation_bg_url
+                SELECT f.id performance_id, :festivalType type, f.subtitle subtitle, f.reserve_at
                 FROM festival_favorites ff
                 JOIN festivals f ON ff.festival_id = f.id
                 WHERE ff.user_id = :userId AND f.reserve_at >= CURRENT_DATE
             ) AS favorite_performances
             ORDER BY reserve_at ASC
             LIMIT :performanceReservationCount
-            """;;
+            """;
 
         Query query = em.createNativeQuery(sql)
                 .setParameter("userId", userId)
@@ -86,13 +86,13 @@ public class PerformanceDTORepository {
 
     public List<PerformanceTicketDTO> findPerformancesReservation() {
         String sql =  """
-            SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, subtitle, reserve_at, reservation_bg_url
+            SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, subtitle, reserve_at
             FROM (
-                SELECT c.id performance_id, :concertType type, c.subtitle subtitle, c.reserve_at, c.concert_reservation_bg_path reservation_bg_url
+                SELECT c.id performance_id, :concertType type, c.subtitle subtitle, c.reserve_at
                 FROM concerts c
                 WHERE c.reserve_at >= CURRENT_DATE
                 UNION ALL
-                SELECT f.id performance_id, :festivalType type, f.subtitle subtitle, f.reserve_at, f.festival_reservation_bg_path reservation_bg_url
+                SELECT f.id performance_id, :festivalType type, f.subtitle subtitle, f.reserve_at
                 FROM festivals f
                 WHERE f.reserve_at >= CURRENT_DATE
             ) AS all_performances
@@ -116,8 +116,7 @@ public class PerformanceDTORepository {
                         ((Number) row[1]).longValue(),
                         (String) row[2],
                         (String) row[3],
-                        LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) row[4]).getTime()), ZoneId.of("UTC")),
-                        (String) row[5]
+                        LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) row[4]).getTime()), ZoneId.of("UTC"))
                 ))
                 .toList();
     }

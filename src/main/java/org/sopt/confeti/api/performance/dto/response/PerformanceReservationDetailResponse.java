@@ -11,19 +11,16 @@ public record PerformanceReservationDetailResponse(
         long typeId,
         PerformanceType type,
         String subtitle,
-        String reserveAt,
-        String reservationBgUrl
+        String reserveAt
 ){
-    public static PerformanceReservationDetailResponse of(PerformanceReservationDetailDTO performanceReservation, S3FileHandler s3FileHandler) {
-        FolderPath topFolder = FolderPath.getFolderPathByPerformanceType(performanceReservation.type());
+    public static PerformanceReservationDetailResponse from(PerformanceReservationDetailDTO performanceReservation) {
 
         return new PerformanceReservationDetailResponse(
                 performanceReservation.index(),
                 performanceReservation.typeId(),
                 performanceReservation.type(),
                 performanceReservation.subtitle(),
-                DateConvertor.convertToDefaultFormat(performanceReservation.reserveAt()),
-                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.MAIN_BANNER), performanceReservation.reservationBgUrl()).toString()
+                DateConvertor.convertToDefaultFormat(performanceReservation.reserveAt())
         );
     }
 }

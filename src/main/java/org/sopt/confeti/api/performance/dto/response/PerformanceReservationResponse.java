@@ -9,12 +9,11 @@ public record PerformanceReservationResponse(
         int performanceCount,
         List<PerformanceReservationDetailResponse> performances
 ){
-    public static PerformanceReservationResponse of(final PerformanceReservationDTO performanceReservation,
-                                                    final S3FileHandler s3FileHandler) {
+    public static PerformanceReservationResponse from(final PerformanceReservationDTO performanceReservation) {
         return new PerformanceReservationResponse(
                 performanceReservation.performanceReservation().size(),
                 performanceReservation.performanceReservation().stream()
-                        .map(performanceReserve -> PerformanceReservationDetailResponse.of(performanceReserve, s3FileHandler))
+                        .map(PerformanceReservationDetailResponse::from)
                         .toList()
         );
     }

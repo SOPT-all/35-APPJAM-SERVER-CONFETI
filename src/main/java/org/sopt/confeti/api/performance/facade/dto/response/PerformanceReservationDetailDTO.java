@@ -10,8 +10,7 @@ public record PerformanceReservationDetailDTO(
         long typeId,
         PerformanceType type,
         String subtitle,
-        LocalDateTime reserveAt,
-        String reservationBgUrl
+        LocalDateTime reserveAt
 ) {
     public static PerformanceReservationDetailDTO from(PerformanceTicketDTO performanceTicketDTO) {
         return new PerformanceReservationDetailDTO(
@@ -19,8 +18,7 @@ public record PerformanceReservationDetailDTO(
                 performanceTicketDTO.typeId(),
                 performanceTicketDTO.type(),
                 performanceTicketDTO.subtitle(),
-                performanceTicketDTO.reserveAt(),
-                performanceTicketDTO.reservationBgUrl()
+                performanceTicketDTO.reserveAt()
         );
     }
 }
