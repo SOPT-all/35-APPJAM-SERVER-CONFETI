@@ -6,8 +6,8 @@ import org.sopt.confeti.domain.user.User;
 public record UserInfoDTO (
         long userId,
         String profilePath,
-        String username,
-        OAuthProvider oAuthProvider
+        String name,
+        OAuthProvider provider
 ){
     public static UserInfoDTO from (final User user) {
         return new UserInfoDTO(

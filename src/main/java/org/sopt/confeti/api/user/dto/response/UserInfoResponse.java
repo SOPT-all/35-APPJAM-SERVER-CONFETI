@@ -8,15 +8,15 @@ import org.sopt.confeti.global.util.S3FileHandler;
 public record UserInfoResponse (
         Long userId,
         String profileUrl,
-        String username,
-        OAuthProvider OAuthProvider
+        String name,
+        OAuthProvider provider
 ) {
     public static UserInfoResponse of(final UserInfoDTO userInfoDTO, final S3FileHandler s3FileHandler) {
         return new UserInfoResponse(
                 userInfoDTO.userId(),
                 s3FileHandler.getFileUrl(FolderPath.USER.getSingle(), userInfoDTO.profilePath()).toString(),
-                userInfoDTO.username(),
-                userInfoDTO.oAuthProvider()
+                userInfoDTO.name(),
+                userInfoDTO.provider()
         );
     }
 }
