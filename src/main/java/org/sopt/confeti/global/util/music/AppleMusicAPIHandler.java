@@ -19,12 +19,14 @@ import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.util.music.dto.album.AppleMusicAlbumsResponse;
 import org.sopt.confeti.global.module.web_client.builder.ApiWebClientBuilder;
+import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistsResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicsResponse;
 import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
