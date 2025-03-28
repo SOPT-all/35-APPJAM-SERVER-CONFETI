@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.sopt.confeti.global.util.music.dto.album.AppleMusicAlbumResponse;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistAlbumResponse;
 
 @Getter
@@ -21,11 +22,27 @@ public class ConfetiAlbum {
     @Setter
     private LocalDate releaseAt;
 
-    public static ConfetiAlbum from(final AppleMusicArtistAlbumResponse albumResponse) {
+    public static ConfetiAlbum from(final AppleMusicArtistAlbumResponse album) {
         return new ConfetiAlbum(
-                albumResponse.id(),
+                album.id(),
                 "",
                 null
+        );
+    }
+
+    public static ConfetiAlbum from(final String albumId) {
+        return new ConfetiAlbum(
+                albumId,
+                "",
+                null
+        );
+    }
+
+    public static ConfetiAlbum from(final AppleMusicAlbumResponse album) {
+        return new ConfetiAlbum(
+                album.id(),
+                album.attributes().name(),
+                album.attributes().releaseDate()
         );
     }
 }
