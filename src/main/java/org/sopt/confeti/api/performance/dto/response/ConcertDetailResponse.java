@@ -17,7 +17,7 @@ public record ConcertDetailResponse(
 
         return new ConcertDetailResponse(
                 ConcertDetailInfoResponse.of(concertDetailDTO, s3FileHandler),
-                concertArtists.size() > ArtistConstant.ARTIST_BOX_OPEN_CRITERIA,
+                concertArtists.size() > ArtistConstant.BOX_OPEN_CRITERIA,
                 concertArtists
         );
     }
