@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.module.web_client.builder.ApiWebClientBuilder;
-import org.sopt.confeti.global.resolver.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistsResponse;
 import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
 import org.springframework.http.HttpHeaders;

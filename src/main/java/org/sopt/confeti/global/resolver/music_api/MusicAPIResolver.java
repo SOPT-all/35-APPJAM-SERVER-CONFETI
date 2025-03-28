@@ -1,4 +1,4 @@
-package org.sopt.confeti.global.resolver.artist;
+package org.sopt.confeti.global.resolver.music_api;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Resolver;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.resolver.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategy;
+import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategyRegistry;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 
 @Resolver

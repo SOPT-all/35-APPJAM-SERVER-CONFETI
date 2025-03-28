@@ -1,4 +1,4 @@
-package org.sopt.confeti.global.resolver.artist.vo;
+package org.sopt.confeti.global.resolver.music_api.album.vo;
 
 import java.time.LocalDate;
 import lombok.AccessLevel;

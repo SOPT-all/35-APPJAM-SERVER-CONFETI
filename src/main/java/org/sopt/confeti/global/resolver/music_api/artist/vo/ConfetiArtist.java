@@ -1,4 +1,4 @@
-package org.sopt.confeti.global.resolver.artist.vo;
+package org.sopt.confeti.global.resolver.music_api.artist.vo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.global.common.constant.ArtistConstant;
+import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistAlbumResponse;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistResponse;
 import org.springframework.web.util.UriComponentsBuilder;

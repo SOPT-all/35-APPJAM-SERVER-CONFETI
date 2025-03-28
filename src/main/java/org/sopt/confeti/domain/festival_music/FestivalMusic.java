@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalMusicDTO;
 import org.sopt.confeti.domain.festival.Festival;
-import org.sopt.confeti.global.resolver.artist.vo.ConfetiMusic;
+import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 
 @Entity
 @Table(name = "festival_musics")
