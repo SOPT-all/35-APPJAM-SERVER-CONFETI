@@ -1,11 +1,8 @@
-package org.sopt.confeti.global.resolver.artist;
+package org.sopt.confeti.global.resolver.artist.vo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Transient;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
