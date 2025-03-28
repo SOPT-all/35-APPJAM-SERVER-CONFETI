@@ -3,15 +3,16 @@ package org.sopt.confeti.global.resolver.music_api;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Resolver;
+import org.sopt.confeti.global.resolver.music_api.album.AlbumResolver;
 import org.sopt.confeti.global.resolver.music_api.artist.ArtistResolver;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
 @Resolver
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class MusicAPIResolver {
 
     private final ArtistResolver artistResolver;
+    private final AlbumResolver albumResolver;
 
     /**
      * Apple Music API를 사용해 아티스트, 앨범, 음악 정보를 요청하는 엔트리 포인트
@@ -22,5 +23,6 @@ public class MusicAPIResolver {
     @Transactional
     public <T> void load(final T target) {
         artistResolver.load(target);
+        albumResolver.load(target);
     }
 }

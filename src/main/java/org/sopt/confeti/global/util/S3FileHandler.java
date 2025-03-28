@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;

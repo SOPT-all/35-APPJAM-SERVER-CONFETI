@@ -27,6 +27,12 @@ public class AppleMusicAPIURL {
     @Value("${apple-music.api.endpoints.artists-path.multiple}")
     private String artistsPathMultiple;
 
+    @Value("${apple-music.api.endpoints.albums-path.base}")
+    private String albumsPathBase;
+
+    @Value("${apple-music.api.endpoints.albums-path.multiple}")
+    private String albumsPathMultiple;
+
     @Value("${apple-music.api.endpoints.songs-path.base}")
     private String songsPathBase;
 
@@ -49,6 +55,10 @@ public class AppleMusicAPIURL {
         return pathPrefix + artistsPathBase;
     }
 
+    private String getAlbumsBasePath() {
+        return pathPrefix + albumsPathBase;
+    }
+
     private String getSongsBasePath() {
         return pathPrefix + songsPathBase;
     }
@@ -65,6 +75,10 @@ public class AppleMusicAPIURL {
 
     public String getMultipleArtistsUrl() {
         return getArtistsBasePath() + artistsPathMultiple;
+    }
+
+    public String getMultipleAlbumsUrl() {
+        return getAlbumsBasePath() + albumsPathMultiple;
     }
 
     public String getSingleSongUrl(String id) {

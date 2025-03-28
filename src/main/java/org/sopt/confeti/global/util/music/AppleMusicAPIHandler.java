@@ -14,26 +14,24 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.module.rest_client.builder.ApiRestClientBuilder;
-import org.sopt.confeti.global.module.web_client.builder.ApiWebClientBuilder;
 import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.util.music.dto.album.AppleMusicAlbumsResponse;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistsResponse;
 import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClient;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Handler
 @RequiredArgsConstructor
 public class AppleMusicAPIHandler implements MusicAPIHandler {
 
-    private static final String ARTISTS_MULTIPLE_DELIMITER = ",";
+    private static final String QUERY_PARAMETER_IDS_DELIMITER = ",";
     private static final String ARTISTS_TYPE = "artists";
 
     // Fetch Limit 목록
     private static final int ARTISTS_FETCH_LIMIT = 25;
+    private static final int ALBUMS_FETCH_LIMIT = 100;
 
     private final AppleMusicAPITokenGenerator tokenGenerator;
     private final AppleMusicAPIURL appleMusicAPIURL;
@@ -45,7 +43,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     @PostConstruct
     private void init() {
         accessToken = tokenGenerator.generateToken();
-        headers.put(HttpHeaders.AUTHORIZATION, accessToken);
+        headers.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
     }
 
     @Override
@@ -65,7 +63,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     private List<ConfetiArtist> getArtistsByArtistIds(List<String> artistIds) {
         Map<String, String> params = new HashMap<>();
-        params.put("ids", String.join(ARTISTS_MULTIPLE_DELIMITER, artistIds));
+        params.put("ids", String.join(QUERY_PARAMETER_IDS_DELIMITER, artistIds));
 
         return convertToConfetiArtists(
                 restClient.request()
@@ -135,6 +133,38 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     @Override
     public List<ConfetiAlbum> getAlbumsByAlbumIds(Set<String> albumIds) {
-        return List.of();
+        if (albumIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        AtomicInteger counter = new AtomicInteger();
+        return albumIds.stream()
+                .collect(Collectors.groupingBy(albumId -> counter.getAndIncrement() / ALBUMS_FETCH_LIMIT))
+                .values().parallelStream()
+                .map(this::getAlbumsByAlbumIds)
+                .flatMap(List::stream)
+                .toList();
+    }
+
+    private List<ConfetiAlbum> getAlbumsByAlbumIds(List<String> albumIds) {
+        Map<String, String> params = new HashMap<>();
+        params.put("ids", String.join(QUERY_PARAMETER_IDS_DELIMITER, albumIds));
+
+        return convertToConfetiAlbums(
+                restClient.request()
+                        .get()
+                        .baseUrl(appleMusicAPIURL.getBaseUrl())
+                        .path(appleMusicAPIURL.getMultipleAlbumsUrl())
+                        .params(MultiValueMap.fromSingleValue(params))
+                        .build()
+                        .connect(headers)
+                        .retrieve(AppleMusicAlbumsResponse.class)
+        );
+    }
+
+    private List<ConfetiAlbum> convertToConfetiAlbums(AppleMusicAlbumsResponse albums) {
+        return albums.data().stream()
+                .map(ConfetiAlbum::from)
+                .toList();
     }
 }
