@@ -4,5 +4,5 @@ import reactor.core.publisher.Mono;
 
 public interface MusicAPISpecificResolver {
 
-    <T> Mono<Void> load(final T target);
+    <T> void load(final T target);
 }
