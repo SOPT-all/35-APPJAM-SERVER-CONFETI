@@ -1,7 +1,7 @@
 package org.sopt.confeti.api.artist.facade.dto.response;
 
 import java.time.LocalDate;
-import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
+import org.sopt.confeti.global.resolver.artist.vo.ConfetiArtist;
 
 public record SearchArtistDTO(
         String artistId,
