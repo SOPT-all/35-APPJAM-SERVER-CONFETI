@@ -28,14 +28,16 @@ public class ConnectStepImpl implements ConnectStep {
      * @return {@link ResponseStep}
      */
     @Override
-    public ResponseStep connectBlock(Map<String, String> headers, Class<?> responseType) {
+    public <T> ResponseStep connectBlock(Map<String, String> headers, Class<T> responseType) {
         try {
             this.response = this.methodType
                     .headers(httpHeaders -> httpHeaders.setAll(headers == null || headers.isEmpty() ? new HashMap<>() : headers))
                     .retrieve()
-                    .onStatus(HttpStatusCode::isError, clientResponse ->
-                            clientResponse.bodyToMono(String.class)
-                                    .flatMap(msg -> Mono.error(new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR))))
+                    .onStatus(HttpStatusCode::isError, clientResponse -> {
+                        log.error("WebClient HTTP Error with code : {}, url : {}", clientResponse.statusCode(), clientResponse.request().getURI());
+                        return clientResponse.bodyToMono(String.class)
+                                .flatMap(msg -> Mono.error(new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR)));
+                    })
                     .bodyToMono(responseType)
                     .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))
                             .doBeforeRetry(before -> log.info("Retry: {} | {}", before.totalRetries(), before.failure())))
@@ -58,9 +60,11 @@ public class ConnectStepImpl implements ConnectStep {
         try {
             this.response = this.methodType
                     .retrieve()
-                    .onStatus(HttpStatusCode::isError, clientResponse ->
-                            clientResponse.bodyToMono(String.class)
-                                    .flatMap(msg -> Mono.error(new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR))))
+                    .onStatus(HttpStatusCode::isError, clientResponse -> {
+                        log.error("WebClient HTTP Error with code : {}, url : {}", clientResponse.statusCode(), clientResponse.request().getURI());
+                        return clientResponse.bodyToMono(String.class)
+                                .flatMap(msg -> Mono.error(new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR)));
+                    })
                     .bodyToMono(Object.class)
                     .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))
                             .doBeforeRetry(before -> log.info("Retry: {} | {}", before.totalRetries(), before.failure())))
@@ -79,14 +83,16 @@ public class ConnectStepImpl implements ConnectStep {
      * @return {@link ResponseStep}
      */
     @Override
-    public Mono<?> connectSubscribe(Map<String, String> headers, Class<?> responseType) {
+    public <T> Mono<T> connectSubscribe(Map<String, String> headers, Class<T> responseType) {
         try {
             return this.methodType
                     .headers(httpHeaders -> httpHeaders.setAll(headers == null || headers.isEmpty() ? new HashMap<>() : headers))
                     .retrieve()
-                    .onStatus(HttpStatusCode::isError, clientResponse ->
-                            clientResponse.bodyToMono(String.class)
-                                    .flatMap(msg -> Mono.error(new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR))))
+                    .onStatus(HttpStatusCode::isError, clientResponse -> {
+                        log.error("WebClient HTTP Error with code : {}, url : {}", clientResponse.statusCode(), clientResponse.request().getURI());
+                        return clientResponse.bodyToMono(String.class)
+                                .flatMap(msg -> Mono.error(new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR)));
+                    })
                     .bodyToMono(responseType)
                     .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))
                             .doBeforeRetry(before -> log.info("Retry: {} | {}", before.totalRetries(), before.failure())));
@@ -106,9 +112,11 @@ public class ConnectStepImpl implements ConnectStep {
         try {
             return this.methodType
                     .retrieve()
-                    .onStatus(HttpStatusCode::isError, clientResponse ->
-                            clientResponse.bodyToMono(String.class)
-                                    .flatMap(msg -> Mono.error(new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR))))
+                    .onStatus(HttpStatusCode::isError, clientResponse -> {
+                        log.error("WebClient HTTP Error with code : {}, url : {}", clientResponse.statusCode(), clientResponse.request().getURI());
+                        return clientResponse.bodyToMono(String.class)
+                                .flatMap(msg -> Mono.error(new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR)));
+                    })
                     .bodyToMono(String.class)
                     .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))
                             .doBeforeRetry(before -> log.info("Retry: {} | {}", before.totalRetries(), before.failure())));

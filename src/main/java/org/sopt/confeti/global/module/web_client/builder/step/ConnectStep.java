@@ -4,8 +4,8 @@ import java.util.Map;
 import reactor.core.publisher.Mono;
 
 public interface ConnectStep {
-    ResponseStep connectBlock(Map<String, String> headers, Class<?> responseType);
+    <T> ResponseStep connectBlock(Map<String, String> headers, Class<T> responseType);
     ResponseStep connectBlock();
-    Mono<?> connectSubscribe(Map<String, String> headers, Class<?> responseType);
+    <T> Mono<T> connectSubscribe(Map<String, String> headers, Class<T> responseType);
     Mono<String> connectSubscribe();
 }
