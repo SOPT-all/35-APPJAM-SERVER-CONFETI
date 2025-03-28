@@ -1,14 +1,31 @@
 package org.sopt.confeti.global.module.web_client.builder.step;
 
+import java.util.Map;
 import org.springframework.util.MultiValueMap;
 
 public interface MethodStep<T> {
-    ConnectStep post(String baseUrl, T requestBody);
-    ConnectStep post(String baseUrl, String path, T requestBody);
+    PostRequestBuilder post();
 
-    ConnectStep post(String baseUrl, MultiValueMap<String, String> params, T requestBody);
+    interface PostRequestBuilder {
+        PostRequestBuilder baseUrl(String baseUrl);
+        PostRequestBuilder path(String path);
+        PostRequestBuilder params(MultiValueMap<String, String> params);
+        <T> BodySpec<T> body(T requestBody);
+        ConnectStep build();
+    }
 
-    ConnectStep get(String baseUrl, MultiValueMap<String, String> params);
+    // body 설정 이후 사용
+    interface BodySpec<T> {
+        BodySpec<T> params(MultiValueMap<String, String> params);
+        ConnectStep build();
+    }
 
-    ConnectStep get(String baseUrl, String path, MultiValueMap<String, String> params);
+    GetRequestBuilder get();
+
+    interface GetRequestBuilder {
+        GetRequestBuilder baseUrl(String baseUrl);
+        GetRequestBuilder path(String path);
+        GetRequestBuilder params(MultiValueMap<String, String> params);
+        ConnectStep build();
+    }
 }
