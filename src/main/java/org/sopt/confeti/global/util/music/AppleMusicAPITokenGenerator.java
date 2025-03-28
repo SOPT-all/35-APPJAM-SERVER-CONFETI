@@ -42,7 +42,7 @@ public class AppleMusicAPITokenGenerator {
         Map<String, Object> claims = new HashMap<>();
         claims.put("iss", teamId);
         claims.put("iat", now);
-        claims.put("exp", new Date(expiration));
+        claims.put("exp", new Date(now.getTime() + expiration));
 
         return Jwts.builder()
                 .header().keyId(keyId).add("alg", "ES256").and()
