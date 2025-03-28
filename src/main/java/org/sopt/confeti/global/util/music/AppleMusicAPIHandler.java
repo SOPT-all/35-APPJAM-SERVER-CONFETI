@@ -1,7 +1,6 @@
 package org.sopt.confeti.global.util.music;
 
 import jakarta.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,7 @@ import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.util.music.dto.album.AppleMusicAlbumsResponse;
 import org.sopt.confeti.global.module.web_client.builder.ApiWebClientBuilder;
-import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
+import org.sopt.confeti.global.resolver.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistsResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicsResponse;
 import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
