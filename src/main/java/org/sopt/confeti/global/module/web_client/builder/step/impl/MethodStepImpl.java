@@ -1,7 +1,9 @@
 package org.sopt.confeti.global.module.web_client.builder.step.impl;
 
 import io.netty.channel.ChannelOption;
+import java.net.URI;
 import java.time.Duration;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.module.web_client.builder.step.ConnectStep;
@@ -15,6 +17,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriBuilder;
 import reactor.netty.http.client.HttpClient;
 
 @Slf4j
@@ -56,75 +59,163 @@ public class MethodStepImpl<T> implements MethodStep<T> {
     }
 
     /**
-     * WebClient의 HttpMethod를 POST로 설정.<br>
-     *
-     * @return {@link ConnectStep}
+     * GET 요청 빌더
      */
     @Override
-    public ConnectStep post(String baseUrl, T requestBody) {
-        this.methodType = this.setBaseUrl(!StringUtils.hasText(baseUrl) ? "" : baseUrl)
-                .post()
-                .bodyValue(requestBody);
-        return new ConnectStepImpl(this.methodType);
+    public GetRequestBuilder get() {
+        return new GetRequestBuilderImpl();
+    }
+
+    private class GetRequestBuilderImpl implements GetRequestBuilder {
+        private String baseUrl;
+        private String path;
+        private MultiValueMap<String, String> params;
+
+        @Override
+        public GetRequestBuilder baseUrl(String baseUrl) {
+            this.baseUrl = baseUrl;
+            return this;
+        }
+
+        @Override
+        public GetRequestBuilder path(String path) {
+            this.path = path;
+            return this;
+        }
+
+        @Override
+        public GetRequestBuilder params(MultiValueMap<String, String> params) {
+            this.params = params;
+            return this;
+        }
+
+        @Override
+        public ConnectStep build() {
+            // base url 기본 값
+            if (!StringUtils.hasText(baseUrl)) {
+                baseUrl = "";
+            }
+
+            WebClient webClient = setBaseUrl(baseUrl);
+
+            Function<UriBuilder, URI> uriFunction = uriBuilder -> {
+                // path
+                if (StringUtils.hasText(path)) {
+                    uriBuilder = uriBuilder.path(path);
+                }
+
+                // params
+                uriBuilder = uriBuilder.queryParams(
+                        params == null || params.isEmpty() ? new LinkedMultiValueMap<>() : params
+                );
+
+                return uriBuilder.build();
+            };
+
+            // Get 요청 생성
+            methodType = webClient
+                    .get()
+                    .uri(uriFunction);
+            return new ConnectStepImpl(methodType);
+        }
     }
 
     /**
-     * WebClient의 HttpMethod를 POST로 설정.<br>
-     * Path 사용
-     *
-     * @return {@link ConnectStep}
+     * POST 요청 빌더
      */
     @Override
-    public ConnectStep post(String baseUrl, String path, T requestBody) {
-        this.methodType = this.setBaseUrl(!StringUtils.hasText(baseUrl) ? "" : baseUrl)
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path(path)
-                        .build())
-                .bodyValue(requestBody);
-        return new ConnectStepImpl(this.methodType);
+    public PostRequestBuilder post() {
+        return new PostRequestBuilderImpl();
     }
 
-    /**
-     * WebClient의 HttpMethod를 POST로 설정.<br>
-     * queryParam 사용
-     *
-     * @return {@link ConnectStep}
-     */
-    @Override
-    public ConnectStep post(String baseUrl, MultiValueMap<String, String> params, T requestBody) {
-        this.methodType = this.setBaseUrl(baseUrl)
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParams(params)
-                        .build())
-                .bodyValue(requestBody);
-        return new ConnectStepImpl(this.methodType);
+    private class PostRequestBuilderImpl implements PostRequestBuilder {
+        private String baseUrl;
+        private String path;
+        private MultiValueMap<String, String> params;
+        private Object requestBody;
+        private boolean hasBody = false;
+
+        @Override
+        public PostRequestBuilderImpl baseUrl(String baseUrl) {
+            this.baseUrl = baseUrl;
+            return this;
+        }
+
+        @Override
+        public PostRequestBuilderImpl path(String path) {
+            this.path = path;
+            return this;
+        }
+
+        @Override
+        public PostRequestBuilderImpl params(MultiValueMap<String, String> params) {
+            this.params = params;
+            return this;
+        }
+
+        @Override
+        public <T> BodySpec<T> body(T requestBody) {
+            return new BodySpecImpl<>(this, requestBody);
+        }
+
+        @Override
+        public ConnectStep build() {
+            // base url 기본 값
+            if (!StringUtils.hasText(baseUrl)) {
+                baseUrl = "";
+            }
+
+            WebClient webClient = setBaseUrl(baseUrl);
+
+            Function<UriBuilder, URI> uriFunction = uriBuilder -> {
+                // path
+                if (StringUtils.hasText(path)) {
+                    uriBuilder = uriBuilder.path(path);
+                }
+
+                // params
+                uriBuilder = uriBuilder.queryParams(
+                        params == null || params.isEmpty() ? new LinkedMultiValueMap<>() : params
+                );
+
+                return uriBuilder.build();
+            };
+
+            // Post 요청 생성
+            WebClient.RequestBodySpec requestBodySpec = webClient
+                    .post()
+                    .uri(uriFunction);
+
+            WebClient.RequestHeadersSpec<?> requestHeadersSpec = requestBodySpec;
+
+            if (hasBody) {
+                requestHeadersSpec = requestBodySpec.bodyValue(requestBody);
+            }
+
+            methodType = requestHeadersSpec;
+            return new ConnectStepImpl(methodType);
+        }
     }
 
-    /**
-     * WebClient의 HttpMethod를 GET으로 설정.<br>
-     *
-     * @return {@link ConnectStep}
-     */
-    @Override
-    public ConnectStep get(String baseUrl, MultiValueMap<String, String> params) {
-        this.methodType = this.setBaseUrl(baseUrl)
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParams(params == null || params.isEmpty() ? new LinkedMultiValueMap<>() : params)
-                        .build());
-        return new ConnectStepImpl(this.methodType);
-    }
+    private class BodySpecImpl<R> implements BodySpec<R> {
+        private final PostRequestBuilderImpl builder;
 
-    @Override
-    public ConnectStep get(String baseUrl, String path, MultiValueMap<String, String> params) {
-        this.methodType = this.setBaseUrl(baseUrl)
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(path)
-                        .queryParams(params == null || params.isEmpty() ? new LinkedMultiValueMap<>() : params)
-                        .build());
-        return new ConnectStepImpl(this.methodType);
+        public BodySpecImpl(PostRequestBuilderImpl builder, R requestBody) {
+            this.builder = builder;
+
+            this.builder.requestBody = requestBody;
+            this.builder.hasBody = true;
+        }
+
+        @Override
+        public BodySpec<R> params(MultiValueMap<String, String> params) {
+            builder.params(params);
+            return this;
+        }
+
+        @Override
+        public ConnectStep build() {
+            return builder.build();
+        }
     }
 }
