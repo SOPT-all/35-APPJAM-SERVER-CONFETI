@@ -13,12 +13,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
+import org.sopt.confeti.global.module.rest_client.builder.ApiRestClientBuilder;
 import org.sopt.confeti.global.module.web_client.builder.ApiWebClientBuilder;
+import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistsResponse;
 import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -34,7 +37,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     private final AppleMusicAPITokenGenerator tokenGenerator;
     private final AppleMusicAPIURL appleMusicAPIURL;
-    private final ApiWebClientBuilder webClientBuilder;
+    private final ApiRestClientBuilder restClient;
 
     private final Map<String, String> headers = new ConcurrentHashMap<>();
     private String accessToken;
@@ -46,68 +49,65 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     @Override
-    public Mono<List<ConfetiArtist>> getArtistsByArtistIds(Set<String> artistIds) {
+    public List<ConfetiArtist> getArtistsByArtistIds(Set<String> artistIds) {
         if (artistIds.isEmpty()) {
-            return Mono.just(Collections.emptyList());
+            return Collections.emptyList();
         }
 
         AtomicInteger counter = new AtomicInteger();
-        Map<Integer, List<String>> groupedIds =  artistIds.stream()
-                        .collect(Collectors.groupingBy(artistId -> counter.getAndIncrement() / ARTISTS_FETCH_LIMIT));
-
-        List<Mono<List<ConfetiArtist>>> monoArtistGroups = groupedIds.values().parallelStream()
+        return artistIds.stream()
+                .collect(Collectors.groupingBy(artistId -> counter.getAndIncrement() / ARTISTS_FETCH_LIMIT))
+                .values().parallelStream()
                 .map(this::getArtistsByArtistIds)
+                .flatMap(List::stream)
                 .toList();
-
-        return Flux.fromIterable(monoArtistGroups)
-                .flatMap(mono -> mono)
-                .collectList()
-                .map(artists -> artists.stream()
-                        .flatMap(List::stream)
-                        .toList()
-                );
     }
 
-    private Mono<List<ConfetiArtist>> getArtistsByArtistIds(List<String> artistIds) {
+    private List<ConfetiArtist> getArtistsByArtistIds(List<String> artistIds) {
         Map<String, String> params = new HashMap<>();
         params.put("ids", String.join(ARTISTS_MULTIPLE_DELIMITER, artistIds));
 
-        // 애플 뮤직 api 사용
-        return webClientBuilder.request()
+        return convertToConfetiArtists(
+                restClient.request()
                 .get()
                 .baseUrl(appleMusicAPIURL.getBaseUrl())
                 .path(appleMusicAPIURL.getMultipleArtistsUrl())
                 .params(MultiValueMap.fromSingleValue(params))
                 .build()
-                .connectSubscribe(headers, AppleMusicArtistsResponse.class)
-                .map(this::convertToConfetiArtists);
+                .connect(headers)
+                .retrieve(AppleMusicArtistsResponse.class)
+        );
     }
 
     @Override
-    public Mono<Optional<ConfetiArtist>> findArtistByKeyword(String keyword) {
+    public Optional<ConfetiArtist> findArtistByKeyword(String keyword) {
         Map<String, String> params = new HashMap<>();
         params.put("term", keyword);
         params.put("types", ARTISTS_TYPE);
 
-        return webClientBuilder.request()
+        return convertToConfetiArtist(
+                restClient.request()
                 .get()
                 .baseUrl(appleMusicAPIURL.getBaseUrl())
                 .path(appleMusicAPIURL.getSingleSearchUrl())
                 .params(MultiValueMap.fromSingleValue(params))
                 .build()
-                .connectSubscribe(headers, AppleMusicSearchResponse.class)
-                .map(this::convertToConfetiArtist);
+                .connect(headers)
+                .retrieve(AppleMusicSearchResponse.class)
+        );
     }
 
     @Override
-    public Mono<Optional<ConfetiArtist>> findArtistByArtistId(String artistId) {
-        return webClientBuilder.request()
+    public Optional<ConfetiArtist> findArtistByArtistId(String artistId) {
+        return convertToConfetiArtist(
+                restClient.request()
                 .get()
                 .baseUrl(appleMusicAPIURL.getBaseUrl())
                 .path(appleMusicAPIURL.getSingleArtistPath(artistId))
                 .build()
-                .connectSubscribe(headers, AppleMusicArtistsResponse.class)
-                .map(this::convertToConfetiArtist);
+                .connect(headers)
+                .retrieve(AppleMusicArtistsResponse.class)
+        );
     }
 
     private List<ConfetiArtist> convertToConfetiArtists(AppleMusicArtistsResponse artists) {
@@ -131,5 +131,10 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                         .map(ConfetiArtist::from)
                         .orElse(ConfetiArtist.empty())
         );
+    }
+
+    @Override
+    public List<ConfetiAlbum> getAlbumsByAlbumIds(Set<String> albumIds) {
+        return List.of();
     }
 }

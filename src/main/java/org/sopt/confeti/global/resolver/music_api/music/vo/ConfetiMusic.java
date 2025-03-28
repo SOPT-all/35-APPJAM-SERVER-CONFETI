@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Embeddable
-@Getter @Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConfetiMusic {
@@ -18,6 +18,7 @@ public class ConfetiMusic {
     @Column(length = 50, nullable = false)
     private String musicId;
 
+    @Setter
     @Transient
     private String title;
 
