@@ -22,7 +22,7 @@ public record FestivalDetailDateResponse(
         return new FestivalDetailDateResponse(
                 festivalDate.festivalDateId(),
                 FESTIVAL_AT_PREFIX + order,
-                artists.size() > ArtistConstant.ARTIST_BOX_OPEN_CRITERIA,
+                artists.size() > ArtistConstant.BOX_OPEN_CRITERIA,
                 artists
         );
     }
