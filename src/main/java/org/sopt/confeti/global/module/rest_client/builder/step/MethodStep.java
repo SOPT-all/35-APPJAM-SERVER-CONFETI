@@ -1,4 +1,4 @@
-package org.sopt.confeti.global.module.web_client.builder.step;
+package org.sopt.confeti.global.module.rest_client.builder.step;
 
 import org.springframework.util.MultiValueMap;
 
