@@ -12,11 +12,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import se.michaelthelin.spotify.model_objects.specification.Artist;
-import se.michaelthelin.spotify.model_objects.specification.Image;
+import org.sopt.confeti.global.common.constant.ArtistConstant;
+import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistAlbumResponse;
+import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistResponse;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Embeddable
-@Getter @Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConfetiArtist {
@@ -24,40 +26,36 @@ public class ConfetiArtist {
     @Column(length = 50, nullable = false)
     private String artistId;
 
+    @Setter
     @Transient
     private String name;
 
+    @Setter
     @Transient
     private String profileUrl;
 
+    @Setter
     @Transient
-    private LocalDate latestReleaseAt;
+    private ConfetiAlbum latestReleaseAlbum;
 
     private ConfetiArtist(String artistId) {
         this.artistId = artistId;
     }
 
-    public static ConfetiArtist toConfetiArtist(final Artist artist) {
-        Optional<Image> image = Arrays.stream(artist.getImages())
-                .min(Comparator.comparingInt(Image::getHeight));
+    public static ConfetiArtist from(final AppleMusicArtistResponse artist) {
+        Optional<AppleMusicArtistAlbumResponse> album = artist
+                .relationships()
+                .albums()
+                .data()
+                .stream().findFirst();
 
         return new ConfetiArtist(
-                artist.getId(),
-                artist.getName(),
-                image.map(Image::getUrl).orElse(null),
-                null
-        );
-    }
-
-    public static ConfetiArtist toConfetiArtist(final Artist artist, final LocalDate latestReleaseAt) {
-        Optional<Image> image = Arrays.stream(artist.getImages())
-                .min(Comparator.comparingInt(Image::getHeight));
-
-        return new ConfetiArtist(
-                artist.getId(),
-                artist.getName(),
-                image.map(Image::getUrl).orElse(null),
-                latestReleaseAt
+                artist.id(),
+                artist.attributes().name(),
+                UriComponentsBuilder.fromUriString(artist.attributes().artwork().url())
+                        .buildAndExpand(ArtistConstant.PROFILE_IMG_SIZE)
+                        .toUriString(),
+                album.map(ConfetiAlbum::from).orElse(null)
         );
     }
 
