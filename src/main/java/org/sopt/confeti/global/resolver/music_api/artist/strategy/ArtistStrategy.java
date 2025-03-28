@@ -5,6 +5,6 @@ import lombok.NoArgsConstructor;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.strategy.AbstractMusicAPIStrategy;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class ArtistStrategy extends AbstractMusicAPIStrategy<ConfetiArtist> {
 }
