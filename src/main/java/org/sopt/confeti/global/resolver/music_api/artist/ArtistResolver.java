@@ -11,6 +11,7 @@ import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategy
 import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategyRegistry;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
+import reactor.core.publisher.Mono;
 
 @Resolver
 @RequiredArgsConstructor
@@ -20,20 +21,22 @@ public class ArtistResolver implements MusicAPISpecificResolver {
     private final ArtistStrategyRegistry artistStrategyRegistry;
 
     @Override
-    public <T> void load(T target) {
+    public <T> Mono<Void> load(T target) {
         if (isEmpty(target)) {
-            return;
+            return Mono.empty();
         }
 
         final ArtistStrategy strategy = getStrategy(target);
         if (notSupports(strategy)) {
-            return;
+            return Mono.empty();
         }
 
         final HashMap<String, Queue<ConfetiArtist>> artistMapper = new HashMap<>();
         collect(strategy, artistMapper, target);
-        List<ConfetiArtist> confetiArtists =  getArtistsByArtistIds(artistMapper.keySet());
-        injection(artistMapper, confetiArtists);
+
+        return getArtistsByArtistIds(artistMapper.keySet())
+                .doOnNext(confetiArtists -> injection(artistMapper, confetiArtists))
+                .then();
     }
 
     private <T> boolean isEmpty(T target) {
@@ -99,7 +102,7 @@ public class ArtistResolver implements MusicAPISpecificResolver {
         }));
     }
 
-    private List<ConfetiArtist> getArtistsByArtistIds(final Set<String> artistIds) {
+    private Mono<List<ConfetiArtist>> getArtistsByArtistIds(final Set<String> artistIds) {
         return musicAPIHandler.getArtistsByArtistIds(artistIds);
     }
 }
