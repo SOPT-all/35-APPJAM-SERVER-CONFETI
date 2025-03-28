@@ -1,59 +1,61 @@
-package org.sopt.confeti.global.module.web_client.builder.step.impl;
+package org.sopt.confeti.global.module.rest_client.builder.step.impl;
 
-import io.netty.channel.ChannelOption;
 import java.net.URI;
-import java.time.Duration;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.global.module.web_client.builder.step.ConnectStep;
-import org.sopt.confeti.global.module.web_client.builder.step.MethodStep;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.util.Timeout;
+import org.sopt.confeti.global.module.rest_client.builder.step.ConnectStep;
+import org.sopt.confeti.global.module.rest_client.builder.step.MethodStep;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.DefaultUriBuilderFactory.EncodingMode;
 import org.springframework.web.util.UriBuilder;
-import reactor.netty.http.client.HttpClient;
 
 @Slf4j
 @RequiredArgsConstructor
 public class MethodStepImpl<T> implements MethodStep<T> {
 
-    private final WebClient.Builder webClientBuilder;
-    private WebClient.RequestHeadersSpec<?> methodType;
+    private final RestClient.Builder restClientBuilder;
+    private RestClient.RequestHeadersSpec<?> methodType;
 
     /**
-     * WebClient의 baseUrl과 defaultHeader, encoding 설정
-     *
-     * @return {@link WebClient}
+     * RestClient의 baseUrl과 defaultHeader, encoding 설정
+     * @param baseUrl
+     * @return
      */
-    private WebClient setBaseUrl(String baseUrl) {
+    private RestClient setBaseUrl(String baseUrl) {
         // 인코딩 설정
-        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(baseUrl);
+        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
         factory.setEncodingMode(EncodingMode.VALUES_ONLY);
 
         // memory size 설정
         ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(50 * 1024 * 1024)) // to unlimited memory size
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(50 * 1024 * 1024))
                 .build();
 
-        // timeout 설정
-        ReactorClientHttpConnector httpConnector = new ReactorClientHttpConnector(
-                HttpClient.create()
-                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 120000)
-                        .responseTimeout(Duration.ofSeconds(120)));
+        // HttpClient 생성 (타임아웃 설정)
+        HttpClient httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(
+                        RequestConfig.custom()
+                                .setConnectionRequestTimeout(Timeout.ofSeconds(120))
+                                .setResponseTimeout(Timeout.ofSeconds(120))
+                                .build()
+                )
+                .build();
 
-
-        return this.webClientBuilder
-                .exchangeStrategies(exchangeStrategies)
-                .clientConnector(httpConnector)
-                .uriBuilderFactory(factory)
+        return this.restClientBuilder
+                .requestFactory(new HttpComponentsClientHttpRequestFactory(httpClient))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .baseUrl(baseUrl)
                 .build();
@@ -97,7 +99,7 @@ public class MethodStepImpl<T> implements MethodStep<T> {
                 baseUrl = "";
             }
 
-            WebClient webClient = setBaseUrl(baseUrl);
+            RestClient restClient = setBaseUrl(baseUrl);
 
             Function<UriBuilder, URI> uriFunction = uriBuilder -> {
                 // path
@@ -113,8 +115,8 @@ public class MethodStepImpl<T> implements MethodStep<T> {
                 return uriBuilder.build();
             };
 
-            // Get 요청 생성
-            methodType = webClient
+            // GET 요청 생성
+            methodType = restClient
                     .get()
                     .uri(uriFunction);
             return new ConnectStepImpl(methodType);
@@ -137,19 +139,19 @@ public class MethodStepImpl<T> implements MethodStep<T> {
         private boolean hasBody = false;
 
         @Override
-        public PostRequestBuilderImpl baseUrl(String baseUrl) {
+        public PostRequestBuilder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
             return this;
         }
 
         @Override
-        public PostRequestBuilderImpl path(String path) {
+        public PostRequestBuilder path(String path) {
             this.path = path;
             return this;
         }
 
         @Override
-        public PostRequestBuilderImpl params(MultiValueMap<String, String> params) {
+        public PostRequestBuilder params(MultiValueMap<String, String> params) {
             this.params = params;
             return this;
         }
@@ -166,7 +168,7 @@ public class MethodStepImpl<T> implements MethodStep<T> {
                 baseUrl = "";
             }
 
-            WebClient webClient = setBaseUrl(baseUrl);
+            RestClient restClient = setBaseUrl(baseUrl);
 
             Function<UriBuilder, URI> uriFunction = uriBuilder -> {
                 // path
@@ -182,15 +184,14 @@ public class MethodStepImpl<T> implements MethodStep<T> {
                 return uriBuilder.build();
             };
 
-            // Post 요청 생성
-            WebClient.RequestBodySpec requestBodySpec = webClient
+            RestClient.RequestBodySpec requestBodySpec = restClient
                     .post()
                     .uri(uriFunction);
 
-            WebClient.RequestHeadersSpec<?> requestHeadersSpec = requestBodySpec;
+            RestClient.RequestHeadersSpec<?> requestHeadersSpec = requestBodySpec;
 
             if (hasBody) {
-                requestHeadersSpec = requestBodySpec.bodyValue(requestBody);
+                requestHeadersSpec = requestBodySpec.body(requestBody);
             }
 
             methodType = requestHeadersSpec;
