@@ -9,7 +9,7 @@ import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.resolver.artist.MusicAPIResolver;
+import org.sopt.confeti.global.resolver.music_api.MusicAPIResolver;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;

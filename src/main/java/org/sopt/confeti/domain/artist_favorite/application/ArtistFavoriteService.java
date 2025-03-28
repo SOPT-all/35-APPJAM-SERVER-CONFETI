@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.infra.repository.ArtistFavoriteRepository;
 import org.sopt.confeti.domain.user.User;
-import org.sopt.confeti.global.resolver.artist.MusicAPIResolver;
+import org.sopt.confeti.global.resolver.music_api.MusicAPIResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
