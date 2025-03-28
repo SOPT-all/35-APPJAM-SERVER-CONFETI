@@ -3,9 +3,13 @@ package org.sopt.confeti.global.resolver.music_api.album.vo;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistAlbumResponse;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConfetiAlbum {
 
