@@ -12,7 +12,6 @@ import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategy
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
 @Resolver
 @RequiredArgsConstructor
@@ -23,22 +22,21 @@ public class ArtistResolver implements MusicAPISpecificResolver {
 
     @Override
     @Transactional
-    public <T> Mono<Void> load(T target) {
+    public <T> void load(T target) {
         if (isEmpty(target)) {
-            return Mono.empty();
+            return;
         }
 
         final ArtistStrategy strategy = getStrategy(target);
         if (notSupports(strategy)) {
-            return Mono.empty();
+            return;
         }
 
         final HashMap<String, Queue<ConfetiArtist>> artistMapper = new HashMap<>();
         collect(strategy, artistMapper, target);
-
-        return getArtistsByArtistIds(artistMapper.keySet())
-                .doOnNext(confetiArtists -> injection(artistMapper, confetiArtists))
-                .then();
+        injection(
+                artistMapper, getArtistsByArtistIds(artistMapper.keySet())
+        );
     }
 
     private <T> boolean isEmpty(T target) {
@@ -104,7 +102,7 @@ public class ArtistResolver implements MusicAPISpecificResolver {
         }));
     }
 
-    private Mono<List<ConfetiArtist>> getArtistsByArtistIds(final Set<String> artistIds) {
+    private List<ConfetiArtist> getArtistsByArtistIds(final Set<String> artistIds) {
         return musicAPIHandler.getArtistsByArtistIds(artistIds);
     }
 }

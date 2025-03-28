@@ -17,7 +17,7 @@ public record ConcertArtistDTO(
                 confetiArtist.getArtistId(),
                 confetiArtist.getName(),
                 confetiArtist.getProfileUrl(),
-                confetiArtist.getLatestReleaseAt()
+                confetiArtist.getLatestReleaseAlbum().getReleaseAt()
         );
     }
 }
