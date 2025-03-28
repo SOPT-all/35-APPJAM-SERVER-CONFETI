@@ -3,13 +3,11 @@ package org.sopt.confeti.domain.concert.application;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.domain.concert.Concert;
-import org.sopt.confeti.domain.concert.application.dto.request.ConcertFileNamesDTO;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.resolver.artist.ArtistResolver;
+import org.sopt.confeti.global.resolver.artist.MusicAPIResolver;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -24,7 +22,7 @@ public class ConcertService {
     private static final String START_AT_COLUMN = "startAt";
 
     private final ConcertRepository concertRepository;
-    private final ArtistResolver artistResolver;
+    private final MusicAPIResolver musicAPIResolver;
 
     @Transactional(readOnly = true)
     public Concert getConcertDetailByConcertId(final long concertId) {
@@ -33,7 +31,7 @@ public class ConcertService {
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
 
-        artistResolver.load(concert);
+        musicAPIResolver.load(concert);
 
         return concert;
     }

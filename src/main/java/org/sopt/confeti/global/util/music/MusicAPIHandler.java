@@ -3,7 +3,7 @@ package org.sopt.confeti.global.util.music;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
+import org.sopt.confeti.global.resolver.artist.vo.ConfetiArtist;
 import reactor.core.publisher.Mono;
 
 public interface MusicAPIHandler {

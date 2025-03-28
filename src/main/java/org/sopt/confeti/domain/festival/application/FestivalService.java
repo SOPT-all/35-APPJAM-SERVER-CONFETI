@@ -4,14 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
-import org.sopt.confeti.domain.festival.application.dto.request.FestivalFileNamesDTO;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.resolver.artist.ArtistResolver;
+import org.sopt.confeti.global.resolver.artist.MusicAPIResolver;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -25,7 +23,7 @@ public class FestivalService {
     private static final String START_AT_COLUMN = "startAt";
 
     private final FestivalRepository festivalRepository;
-    private final ArtistResolver artistResolver;
+    private final MusicAPIResolver musicAPIResolver;
 
     private static final int INIT_PAGE = 0;
     private static final String TITLE_COLUMN = "title";
@@ -40,7 +38,7 @@ public class FestivalService {
     public Festival getFestivalDetailByFestivalId(final long festivalId) {
         Festival festival = festivalRepository.findById(festivalId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-        artistResolver.load(festival);
+        musicAPIResolver.load(festival);
 
         return festival;
     }

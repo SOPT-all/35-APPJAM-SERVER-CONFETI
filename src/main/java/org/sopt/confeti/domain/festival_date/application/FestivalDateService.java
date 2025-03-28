@@ -7,20 +7,20 @@ import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.sopt.confeti.global.resolver.artist.ArtistResolver;
+import org.sopt.confeti.global.resolver.artist.MusicAPIResolver;
 
 @Service
 @RequiredArgsConstructor
 public class FestivalDateService {
 
     private final FestivalDateRepository festivalDateRepository;
-    private final ArtistResolver artistResolver;
+    private final MusicAPIResolver musicAPIResolver;
 
     @Transactional(readOnly = true)
     public FestivalDate findFestivalDateId(final long festivalDateId) {
         FestivalDate festivalDate = festivalDateRepository.findByFestivalDateId(festivalDateId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-        artistResolver.load(festivalDate);
+        musicAPIResolver.load(festivalDate);
 
         return festivalDate;
     }
