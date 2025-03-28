@@ -11,6 +11,7 @@ import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategy
 import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategyRegistry;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Resolver
@@ -21,6 +22,7 @@ public class ArtistResolver implements MusicAPISpecificResolver {
     private final ArtistStrategyRegistry artistStrategyRegistry;
 
     @Override
+    @Transactional
     public <T> Mono<Void> load(T target) {
         if (isEmpty(target)) {
             return Mono.empty();

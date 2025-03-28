@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Resolver;
 import org.sopt.confeti.global.resolver.music_api.artist.ArtistResolver;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Resolver
@@ -18,6 +19,7 @@ public class MusicAPIResolver {
      * @param <T> 대상 객체 타입
      * @return 비동기 작업 완료 상태의 Mono
      */
+    @Transactional
     public <T> Mono<Void> load(final T target) {
         return Mono.when(
                 artistResolver.load(target)
