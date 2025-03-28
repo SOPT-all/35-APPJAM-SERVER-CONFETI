@@ -3,6 +3,7 @@ package org.sopt.confeti.global.resolver.artist;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
+import org.sopt.confeti.global.resolver.artist.vo.ConfetiArtist;
 
 public abstract class AbstractArtistStrategy implements ArtistStrategy {
     public abstract void collect(
