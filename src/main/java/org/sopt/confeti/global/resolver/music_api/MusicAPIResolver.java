@@ -20,9 +20,7 @@ public class MusicAPIResolver {
      * @return 비동기 작업 완료 상태의 Mono
      */
     @Transactional
-    public <T> Mono<Void> load(final T target) {
-        return Mono.when(
-                artistResolver.load(target)
-        );
+    public <T> void load(final T target) {
+        artistResolver.load(target);
     }
 }

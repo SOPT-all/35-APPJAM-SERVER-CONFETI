@@ -16,7 +16,7 @@ public record FestivalDetailArtistDTO(
                 confetiArtist.getArtistId(),
                 confetiArtist.getName(),
                 confetiArtist.getProfileUrl(),
-                confetiArtist.getLatestReleaseAt()
+                confetiArtist.getLatestReleaseAlbum().getReleaseAt()
         );
     }
 }

@@ -18,7 +18,7 @@ public record SearchArtistDTO(
                 confetiArtist.getArtistId(),
                 confetiArtist.getName(),
                 confetiArtist.getProfileUrl(),
-                confetiArtist.getLatestReleaseAt(),
+                confetiArtist.getLatestReleaseAlbum().getReleaseAt(),
                 isFavorite,
                 fixedIsMultipleArtists
         );
