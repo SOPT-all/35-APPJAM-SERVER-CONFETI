@@ -7,7 +7,7 @@ import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.sopt.confeti.global.resolver.artist.MusicAPIResolver;
+import org.sopt.confeti.global.resolver.music_api.MusicAPIResolver;
 
 @Service
 @RequiredArgsConstructor

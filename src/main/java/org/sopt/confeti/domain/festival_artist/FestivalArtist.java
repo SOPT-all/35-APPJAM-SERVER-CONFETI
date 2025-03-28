@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalArtistDTO;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
 
-import org.sopt.confeti.global.resolver.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 
 @Entity
 @Table(name="festival_artists")

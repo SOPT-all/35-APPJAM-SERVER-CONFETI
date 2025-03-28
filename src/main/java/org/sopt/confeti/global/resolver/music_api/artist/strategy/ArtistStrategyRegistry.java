@@ -1,4 +1,4 @@
-package org.sopt.confeti.global.resolver.artist;
+package org.sopt.confeti.global.resolver.music_api.artist.strategy;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;

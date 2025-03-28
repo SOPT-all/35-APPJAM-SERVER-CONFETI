@@ -5,8 +5,8 @@ import java.util.Queue;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.global.annotation.Strategy;
-import org.sopt.confeti.global.resolver.artist.AbstractArtistStrategy;
-import org.sopt.confeti.global.resolver.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.resolver.music_api.artist.strategy.AbstractArtistStrategy;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 
 @Strategy
 @RequiredArgsConstructor
