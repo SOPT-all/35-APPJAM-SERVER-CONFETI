@@ -4,10 +4,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
+import reactor.core.publisher.Mono;
 
 public interface MusicAPIHandler {
 
-    List<ConfetiArtist> findArtistsByArtistIds(final Set<String> artistIds);
-    Optional<ConfetiArtist> findArtistByKeyword(final String keyword);
-    Optional<ConfetiArtist> findArtistByArtistId(final String artistId);
+    Mono<List<ConfetiArtist>> getArtistsByArtistIds(final Set<String> artistIds);
+    Mono<Optional<ConfetiArtist>> findArtistByKeyword(final String keyword);
+    Mono<Optional<ConfetiArtist>> findArtistByArtistId(final String artistId);
 }
