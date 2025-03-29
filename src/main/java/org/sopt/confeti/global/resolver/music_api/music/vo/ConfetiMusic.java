@@ -20,8 +20,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConfetiMusic {
 
-    @Column(length = 50, nullable = false)
-    private String musicId;
+    @Column(name = "music_id", length = 50, nullable = false)
+    private String id;
 
     @Setter
     @Transient
@@ -40,7 +40,7 @@ public class ConfetiMusic {
     private String previewUrl;
 
     private ConfetiMusic(String musicId) {
-        this.musicId = musicId;
+        this.id = musicId;
     }
 
     public static ConfetiMusic from(final String musicId) {

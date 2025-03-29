@@ -6,7 +6,7 @@ public record UserTimetableFestivalArtistDTO (String artistId, String artistName
 ){
     public static UserTimetableFestivalArtistDTO from(FestivalArtist festivalArtist) {
         return new UserTimetableFestivalArtistDTO(
-                festivalArtist.getArtist().getArtistId(),
+                festivalArtist.getArtist().getId(),
                 festivalArtist.getArtist().getName()
         );
     }

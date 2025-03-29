@@ -21,8 +21,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ConfetiArtist {
 
-    @Column(length = 50, nullable = false)
-    private String artistId;
+    @Column(name = "artist_id", length = 50, nullable = false)
+    private String id;
 
     @Setter
     @Transient
@@ -37,7 +37,7 @@ public class ConfetiArtist {
     private ConfetiAlbum latestReleaseAlbum;
 
     private ConfetiArtist(String artistId) {
-        this.artistId = artistId;
+        this.id = artistId;
     }
 
     public static ConfetiArtist from(final AppleMusicArtistResponse artist) {

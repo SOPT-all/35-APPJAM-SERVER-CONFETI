@@ -19,7 +19,7 @@ public class FestivalDateArtistStrategy extends ArtistStrategy {
                 .flatMap(stage -> stage.getTimes().stream())
                 .flatMap(time -> time.getArtists().stream())
                 .forEach(artist -> {
-                    addToMapper(artistMapper, artist.getArtist().getArtistId(), artist.getArtist());
+                    addToMapper(artistMapper, artist.getArtist().getId(), artist.getArtist());
                 });
     }
 

@@ -15,7 +15,7 @@ public record SearchArtistDTO(
 
     public static SearchArtistDTO from(final ConfetiArtist confetiArtist, final boolean isFavorite) {
         return new SearchArtistDTO(
-                confetiArtist.getArtistId(),
+                confetiArtist.getId(),
                 confetiArtist.getName(),
                 confetiArtist.getProfileUrl(),
                 confetiArtist.getLatestReleaseAlbum().getReleaseAt(),
