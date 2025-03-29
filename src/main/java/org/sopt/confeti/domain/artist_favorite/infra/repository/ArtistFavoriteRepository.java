@@ -11,9 +11,9 @@ public interface ArtistFavoriteRepository extends JpaRepository<ArtistFavorite, 
     @Query(value = "select * from artist_favorites where user_id = :userId order by rand() limit 3", nativeQuery = true)
     List<ArtistFavorite> findTop3ByUserIdOrderByRand(@Param("userId") Long userId);
 
-    boolean existsByUserIdAndArtist_ArtistId(long userId, String artistId);
+    boolean existsByUserIdAndArtist_id(long userId, String artistId);
 
-    void deleteByUserIdAndArtist_ArtistId(final long userId, final String artistId);
+    void deleteByUserIdAndArtist_id(final long userId, final String artistId);
 
     boolean existsByUserId(final long userId);
 

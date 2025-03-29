@@ -17,6 +17,7 @@ import reactor.util.retry.Retry;
 @Slf4j
 @RequiredArgsConstructor
 public class ConnectStepImpl implements ConnectStep {
+    // TODO: 401 Unauthorized 에러 핸들링
 
     private final WebClient.RequestHeadersSpec<?> methodType;
     private Object response;

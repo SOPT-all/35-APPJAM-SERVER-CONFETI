@@ -67,6 +67,9 @@ dependencies {
     // HTTP Client
     implementation 'org.apache.httpcomponents.client5:httpclient5'
 
+    // AOP
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
     // Bouncy Castle
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
