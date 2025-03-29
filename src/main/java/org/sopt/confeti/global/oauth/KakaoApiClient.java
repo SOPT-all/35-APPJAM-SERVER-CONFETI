@@ -1,16 +1,21 @@
 package org.sopt.confeti.global.oauth;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.OAuthSocialInfoResult;
 import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.global.annotation.OAuthClient;
+import org.sopt.confeti.global.module.rest_client.builder.ApiRestClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.sopt.confeti.auth.dto.kakao.KakaoSocialInfoResult;
 import org.sopt.confeti.auth.dto.kakao.KakaoLoginParams;
 import org.sopt.confeti.auth.dto.kakao.KakaoTokenResult;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
 @OAuthClient
@@ -24,7 +29,7 @@ public class KakaoApiClient implements OAuthApiClient {
     private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com/oauth/token";
     private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com/v2/user/me";
 
-    private final RestClient restClient;
+    private final ApiRestClientBuilder restClient;
 
     @Override
     public boolean supports(OAuthProvider provider) {
@@ -38,32 +43,32 @@ public class KakaoApiClient implements OAuthApiClient {
         return OAuthSocialInfoResult.from(socialInfo);
     }
 
-    private KakaoTokenResult requestAccessToken(KakaoLoginParams params) {
-        return restClient
-                .method(HttpMethod.POST)
-                .uri(KAUTH_TOKEN_URL_HOST)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(createHttpBody(params))
-                .retrieve()
-                .toEntity(KakaoTokenResult.class)
-                .getBody();
+    private KakaoTokenResult requestAccessToken(KakaoLoginParams requestParams) {
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", GRANT_TYPE);
+        params.put("client_id", clientId);
+        params.put("redirect_uri", requestParams.redirectUrl());
+        params.put("code", requestParams.code());
+
+        return restClient.request()
+                .post()
+                .baseUrl(KAUTH_TOKEN_URL_HOST)
+                .params(MultiValueMap.fromSingleValue(params))
+                .build()
+                .connect()
+                .retrieve(KakaoTokenResult.class);
     }
 
     private KakaoSocialInfoResult getSocialInfo(String accessToken) {
-        return restClient
-                .method(HttpMethod.GET)
-                .uri(KAUTH_USER_URL_HOST)
-                .header("Authorization", createAuthorizationHeader(accessToken))
-                .retrieve()
-                .toEntity(KakaoSocialInfoResult.class)
-                .getBody();
-    }
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HttpHeaders.AUTHORIZATION, createAuthorizationHeader(accessToken));
 
-    private String createHttpBody(KakaoLoginParams params) {
-        return "grant_type=" + GRANT_TYPE +
-                "&client_id=" + clientId +
-                "&redirect_uri=" + params.redirectUrl() +
-                "&code=" + params.code();
+        return restClient.request()
+                .post()
+                .baseUrl(KAUTH_USER_URL_HOST)
+                .build()
+                .connect(headers)
+                .retrieve(KakaoSocialInfoResult.class);
     }
 
     private String createAuthorizationHeader(String accessToken) {
