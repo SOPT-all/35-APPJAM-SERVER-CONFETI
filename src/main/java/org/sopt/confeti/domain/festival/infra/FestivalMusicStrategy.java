@@ -19,7 +19,7 @@ public class FestivalMusicStrategy extends MusicStrategy {
         Festival festival = (Festival) target;
         festival.getMusics().forEach(music -> {
             ConfetiMusic confetiMusic = music.getMusic();
-            addToMapper(musicMapper, confetiMusic.getMusicId(), confetiMusic);
+            addToMapper(musicMapper, confetiMusic.getId(), confetiMusic);
         });
     }
 

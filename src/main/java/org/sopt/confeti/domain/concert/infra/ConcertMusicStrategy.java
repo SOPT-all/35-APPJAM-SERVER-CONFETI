@@ -17,7 +17,7 @@ public class ConcertMusicStrategy extends MusicStrategy {
         Concert concert = (Concert) target;
         concert.getMusics().forEach(music ->  {
             ConfetiMusic confetiMusic = music.getMusic();
-            addToMapper(musicMapper, confetiMusic.getMusicId(), confetiMusic);
+            addToMapper(musicMapper, confetiMusic.getId(), confetiMusic);
         });
     }
 

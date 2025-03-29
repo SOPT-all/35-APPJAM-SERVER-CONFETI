@@ -23,7 +23,7 @@ public class ArtistFacade {
         boolean isFavorite = false;
 
         if (userId != null && confetiArtist.isPresent()) {
-            isFavorite = artistFavoriteService.isFavorite(userId, confetiArtist.get().getArtistId());
+            isFavorite = artistFavoriteService.isFavorite(userId, confetiArtist.get().getId());
         }
 
         return SearchArtistDTO.from(

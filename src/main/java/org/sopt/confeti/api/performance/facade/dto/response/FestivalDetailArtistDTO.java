@@ -13,7 +13,7 @@ public record FestivalDetailArtistDTO(
     public static FestivalDetailArtistDTO from(final FestivalArtist festivalArtist) {
         ConfetiArtist confetiArtist = festivalArtist.getArtist();
         return new FestivalDetailArtistDTO(
-                confetiArtist.getArtistId(),
+                confetiArtist.getId(),
                 confetiArtist.getName(),
                 confetiArtist.getProfileUrl(),
                 confetiArtist.getLatestReleaseAlbum().getReleaseAt()

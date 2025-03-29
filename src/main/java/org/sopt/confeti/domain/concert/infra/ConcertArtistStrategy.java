@@ -16,7 +16,7 @@ public class ConcertArtistStrategy extends ArtistStrategy {
     public void collect(HashMap<String, Queue<ConfetiArtist>> artistMapper, Object target) {
         Concert concert = (Concert) target;
         concert.getArtists().forEach(artist -> {
-            addToMapper(artistMapper, artist.getArtist().getArtistId(), artist.getArtist());
+            addToMapper(artistMapper, artist.getArtist().getId(), artist.getArtist());
         });
     }
 

@@ -134,7 +134,7 @@ public class PerformanceFacade {
         return RecentPerformancesDTO.from(
                 performanceService.getPerformancesByArtistIds(
                         artistFavorites.stream()
-                                .map(artistFavorite -> artistFavorite.getArtist().getArtistId())
+                                .map(artistFavorite -> artistFavorite.getArtist().getId())
                                 .toList(),
                         RECENT_PERFORMANCES_SIZE
                 )
