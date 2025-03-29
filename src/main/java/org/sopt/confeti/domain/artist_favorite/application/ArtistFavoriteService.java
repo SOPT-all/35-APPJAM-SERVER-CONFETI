@@ -26,7 +26,7 @@ public class ArtistFavoriteService {
 
     @Transactional(readOnly = true)
     public boolean isFavorite(final long userId, final String artistId) {
-        return artistFavoriteRepository.existsByUserIdAndArtist_ArtistId(userId, artistId);
+        return artistFavoriteRepository.existsByUserIdAndArtist_id(userId, artistId);
     }
 
     @Transactional
@@ -38,7 +38,7 @@ public class ArtistFavoriteService {
 
     @Transactional
     public void removeFavorite(final long userId, final String artistId) {
-        artistFavoriteRepository.deleteByUserIdAndArtist_ArtistId(userId, artistId);
+        artistFavoriteRepository.deleteByUserIdAndArtist_id(userId, artistId);
     }
 
     @Transactional(readOnly = true)

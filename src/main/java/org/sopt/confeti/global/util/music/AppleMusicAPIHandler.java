@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
+import org.sopt.confeti.global.annotation.RetryOnTokenExpire;
 import org.sopt.confeti.global.module.rest_client.builder.ApiRestClientBuilder;
 import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
@@ -45,11 +46,20 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     @PostConstruct
     private void init() {
+        generateToken();
+    }
+
+    private void generateToken() {
         accessToken = tokenGenerator.generateToken();
         headers.put(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
     }
 
+    private void refreshToken() {
+        generateToken();
+    }
+
     @Override
+    @RetryOnTokenExpire
     public List<ConfetiArtist> getArtistsByArtistIds(final Set<String> artistIds) {
         if (artistIds.isEmpty()) {
             return Collections.emptyList();
@@ -81,6 +91,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     @Override
+    @RetryOnTokenExpire
     public Optional<ConfetiArtist> findArtistByKeyword(final String keyword) {
         Map<String, String> params = new HashMap<>();
         params.put("term", keyword);
@@ -99,6 +110,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     @Override
+    @RetryOnTokenExpire
     public Optional<ConfetiArtist> findArtistByArtistId(final String artistId) {
         return convertToConfetiArtist(
                 restClient.request()
@@ -149,7 +161,8 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                 .toList();
     }
 
-    private List<ConfetiAlbum> getAlbumsByAlbumIds(final List<String> albumIds) {
+    @RetryOnTokenExpire
+    protected List<ConfetiAlbum> getAlbumsByAlbumIds(final List<String> albumIds) {
         Map<String, String> params = new HashMap<>();
         params.put("ids", String.join(QUERY_PARAMETER_IDS_DELIMITER, albumIds));
 
@@ -172,6 +185,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     @Override
+    @RetryOnTokenExpire
     public List<ConfetiMusic> getMusicsByMusicIds(final Set<String> musicIds) {
         if (musicIds.isEmpty()) {
             return Collections.emptyList();

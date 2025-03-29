@@ -8,7 +8,6 @@ import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.module.rest_client.builder.step.ConnectStep;
 import org.sopt.confeti.global.module.rest_client.builder.step.ResponseStep;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
 
 @Slf4j
@@ -25,14 +24,12 @@ public class ConnectStepImpl implements ConnectStep {
     @Override
     public ResponseStep connect(Map<String, String> headers) {
         try {
-            this.methodType
-                    .headers(httpHeaders -> httpHeaders.setAll(headers == null || headers.isEmpty() ? new HashMap<>() : headers))
-                    .retrieve()
-                    .onStatus(HttpStatusCode::isError, (clientRequest, clientResponse) -> {
-                        log.error("RestClient HTTP Error with code : {}, url : {}", clientResponse.getStatusCode(), clientRequest.getURI());
-                        throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
-                    });
-            return new ResponseStepImpl(methodType.retrieve());
+            return new ResponseStepImpl(
+                    this.methodType
+                            .headers(httpHeaders -> httpHeaders.setAll(
+                                    headers == null || headers.isEmpty() ? new HashMap<>() : headers))
+                            .retrieve()
+            );
         } catch (Exception e) {
             log.error("Exception: {} | {}", e.getMessage(), e.getStackTrace()[0].toString());
             throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
