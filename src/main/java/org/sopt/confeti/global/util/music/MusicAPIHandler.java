@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 
 public interface MusicAPIHandler {
 
@@ -13,4 +14,6 @@ public interface MusicAPIHandler {
     Optional<ConfetiArtist> findArtistByArtistId(final String artistId);
 
     List<ConfetiAlbum> getAlbumsByAlbumIds(final Set<String> albumIds);
+
+    List<ConfetiMusic> getMusicsByMusicIds(final Set<String> musicIds);
 }
