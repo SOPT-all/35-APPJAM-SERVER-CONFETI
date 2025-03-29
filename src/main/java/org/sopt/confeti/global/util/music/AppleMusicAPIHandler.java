@@ -16,8 +16,10 @@ import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.module.rest_client.builder.ApiRestClientBuilder;
 import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.util.music.dto.album.AppleMusicAlbumsResponse;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistsResponse;
+import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicsResponse;
 import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
@@ -32,6 +34,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     // Fetch Limit 목록
     private static final int ARTISTS_FETCH_LIMIT = 25;
     private static final int ALBUMS_FETCH_LIMIT = 100;
+    private static final int MUSICS_FETCH_LIMIT = 300;
 
     private final AppleMusicAPITokenGenerator tokenGenerator;
     private final AppleMusicAPIURL appleMusicAPIURL;
@@ -47,7 +50,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     @Override
-    public List<ConfetiArtist> getArtistsByArtistIds(Set<String> artistIds) {
+    public List<ConfetiArtist> getArtistsByArtistIds(final Set<String> artistIds) {
         if (artistIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -61,7 +64,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                 .toList();
     }
 
-    private List<ConfetiArtist> getArtistsByArtistIds(List<String> artistIds) {
+    private List<ConfetiArtist> getArtistsByArtistIds(final List<String> artistIds) {
         Map<String, String> params = new HashMap<>();
         params.put("ids", String.join(QUERY_PARAMETER_IDS_DELIMITER, artistIds));
 
@@ -78,7 +81,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     @Override
-    public Optional<ConfetiArtist> findArtistByKeyword(String keyword) {
+    public Optional<ConfetiArtist> findArtistByKeyword(final String keyword) {
         Map<String, String> params = new HashMap<>();
         params.put("term", keyword);
         params.put("types", ARTISTS_TYPE);
@@ -96,7 +99,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     @Override
-    public Optional<ConfetiArtist> findArtistByArtistId(String artistId) {
+    public Optional<ConfetiArtist> findArtistByArtistId(final String artistId) {
         return convertToConfetiArtist(
                 restClient.request()
                 .get()
@@ -108,17 +111,17 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         );
     }
 
-    private List<ConfetiArtist> convertToConfetiArtists(AppleMusicArtistsResponse artists) {
+    private List<ConfetiArtist> convertToConfetiArtists(final AppleMusicArtistsResponse artists) {
         return artists.data().stream()
                 .map(ConfetiArtist::from)
                 .toList();
     }
 
-    private Optional<ConfetiArtist> convertToConfetiArtist(AppleMusicSearchResponse searchResult) {
+    private Optional<ConfetiArtist> convertToConfetiArtist(final AppleMusicSearchResponse searchResult) {
         return convertToConfetiArtist(searchResult.results().artists());
     }
 
-    private Optional<ConfetiArtist> convertToConfetiArtist(AppleMusicArtistsResponse artists) {
+    private Optional<ConfetiArtist> convertToConfetiArtist(final AppleMusicArtistsResponse artists) {
         if (Objects.isNull(artists)) {
             return Optional.of(ConfetiArtist.empty());
         }
@@ -132,7 +135,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     @Override
-    public List<ConfetiAlbum> getAlbumsByAlbumIds(Set<String> albumIds) {
+    public List<ConfetiAlbum> getAlbumsByAlbumIds(final Set<String> albumIds) {
         if (albumIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -146,7 +149,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                 .toList();
     }
 
-    private List<ConfetiAlbum> getAlbumsByAlbumIds(List<String> albumIds) {
+    private List<ConfetiAlbum> getAlbumsByAlbumIds(final List<String> albumIds) {
         Map<String, String> params = new HashMap<>();
         params.put("ids", String.join(QUERY_PARAMETER_IDS_DELIMITER, albumIds));
 
@@ -162,9 +165,46 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         );
     }
 
-    private List<ConfetiAlbum> convertToConfetiAlbums(AppleMusicAlbumsResponse albums) {
+    private List<ConfetiAlbum> convertToConfetiAlbums(final AppleMusicAlbumsResponse albums) {
         return albums.data().stream()
                 .map(ConfetiAlbum::from)
+                .toList();
+    }
+
+    @Override
+    public List<ConfetiMusic> getMusicsByMusicIds(final Set<String> musicIds) {
+        if (musicIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        AtomicInteger counter = new AtomicInteger();
+        return musicIds.stream()
+                .collect(Collectors.groupingBy(musicId -> counter.getAndIncrement() / MUSICS_FETCH_LIMIT))
+                .values().parallelStream()
+                .map(this::getMusicsByMusicIds)
+                .flatMap(List::stream)
+                .toList();
+    }
+
+    private List<ConfetiMusic> getMusicsByMusicIds(final List<String> musicIds) {
+        Map<String, String> params = new HashMap<>();
+        params.put("ids", String.join(QUERY_PARAMETER_IDS_DELIMITER, musicIds));
+
+        return convertToConfetiMusics(
+                restClient.request()
+                        .get()
+                        .baseUrl(appleMusicAPIURL.getBaseUrl())
+                        .path(appleMusicAPIURL.getMultipleSongsUrl())
+                        .params(MultiValueMap.fromSingleValue(params))
+                        .build()
+                        .connect(headers)
+                        .retrieve(AppleMusicMusicsResponse.class)
+        );
+    }
+
+    private List<ConfetiMusic> convertToConfetiMusics(final AppleMusicMusicsResponse musics) {
+        return musics.data().stream()
+                .map(ConfetiMusic::from)
                 .toList();
     }
 }
