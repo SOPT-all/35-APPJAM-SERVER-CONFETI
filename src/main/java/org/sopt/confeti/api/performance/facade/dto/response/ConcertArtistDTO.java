@@ -14,7 +14,7 @@ public record ConcertArtistDTO(
         ConfetiArtist confetiArtist = concertArtist.getArtist();
 
         return new ConcertArtistDTO(
-                confetiArtist.getArtistId(),
+                confetiArtist.getId(),
                 confetiArtist.getName(),
                 confetiArtist.getProfileUrl(),
                 confetiArtist.getLatestReleaseAlbum().getReleaseAt()

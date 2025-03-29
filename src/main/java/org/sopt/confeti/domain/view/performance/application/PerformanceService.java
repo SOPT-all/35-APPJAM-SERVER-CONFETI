@@ -52,7 +52,7 @@ public class PerformanceService {
                         .flatMap(festivalDate -> festivalDate.getStages().stream())
                         .flatMap(festivalStage -> festivalStage.getTimes().stream())
                         .flatMap(festivalTime -> festivalTime.getArtists().stream()
-                                .map(festivalArtist -> Performance.create(festival, festivalArtist.getArtist().getArtistId(), festivalTime.getStartAt()))
+                                .map(festivalArtist -> Performance.create(festival, festivalArtist.getArtist().getId(), festivalTime.getStartAt()))
                         ).toList()
         );
     }
@@ -61,7 +61,7 @@ public class PerformanceService {
     public void create(final Concert concert) {
         performanceRepository.saveAll(
                 concert.getArtists().stream()
-                        .map(concertArtist -> Performance.create(concert, concertArtist.getArtist().getArtistId()))
+                        .map(concertArtist -> Performance.create(concert, concertArtist.getArtist().getId()))
                         .toList()
         );
     }

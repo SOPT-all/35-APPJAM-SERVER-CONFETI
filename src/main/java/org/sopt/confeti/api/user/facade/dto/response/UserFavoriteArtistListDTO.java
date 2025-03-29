@@ -9,7 +9,7 @@ public record UserFavoriteArtistListDTO (
 ){
     public static UserFavoriteArtistListDTO from(final ArtistFavorite artistFavorite){
         return new UserFavoriteArtistListDTO(
-                artistFavorite.getArtist().getArtistId(),
+                artistFavorite.getArtist().getId(),
                 artistFavorite.getArtist().getName(),
                 artistFavorite.getArtist().getProfileUrl()
         );

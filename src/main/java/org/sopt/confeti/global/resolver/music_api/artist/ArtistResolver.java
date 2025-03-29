@@ -92,7 +92,7 @@ public class ArtistResolver implements MusicAPISpecificResolver {
             final List<ConfetiArtist> confetiArtists
     ) {
         confetiArtists.forEach((confetiArtist -> {
-            Queue<ConfetiArtist> mappedConfetiArtists = artistMapper.get(confetiArtist.getArtistId());
+            Queue<ConfetiArtist> mappedConfetiArtists = artistMapper.get(confetiArtist.getId());
 
             while (!mappedConfetiArtists.isEmpty()) {
                 ConfetiArtist mappedConfetiArtist = mappedConfetiArtists.poll();
