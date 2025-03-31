@@ -1,15 +1,15 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
-import org.sopt.confeti.global.common.CursorPage;
+import java.util.List;
 
 public record PerformanceByArtistDTO(
         long totalCount,
-        CursorPage<PerformanceByArtistDetailDTO> performanceCursorPage
+        List<PerformanceByArtistDetailDTO> performances
 ) {
-    public static PerformanceByArtistDTO of(final long totalCount, final CursorPage<PerformanceByArtistDetailDTO> performanceCursorPage) {
+    public static PerformanceByArtistDTO of(final long totalCount, final List<PerformanceByArtistDetailDTO> performances) {
         return new PerformanceByArtistDTO(
                 totalCount,
-                performanceCursorPage
+                performances
         );
     }
 }
