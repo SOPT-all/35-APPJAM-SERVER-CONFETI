@@ -63,7 +63,7 @@ public class PerformanceController {
             @UserId(require = false) Long userId,
             @PathVariable(name="artistId") String artistId
     ){
-        ArtistPerformanceDTO performances = performanceFacade.getPerformanceByArtistId(userId, artistId);
+        ArtistPerformanceDTO performances = performanceFacade.getPerformancesByArtistId(userId, artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, ArtistPerformanceResponse.of(performances, s3FileHandler));
     }
 
