@@ -158,16 +158,16 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public PerformanceByArtistDTO getPerformanceByArtistId(final Long userId, final String artistId) {
+    public ArtistPerformanceDTO getPerformanceByArtistId(final Long userId, final String artistId) {
         long totalCount = performanceService.countAllByArtistId(artistId);
         List<Performance> performances = performanceService.findPerformanceByArtistId(artistId);
-        List<PerformanceByArtistDetailDTO> result = performances.stream()
+        List<ArtistPerformanceDetailDTO> performanceList = performances.stream()
                 .map(performance -> {
                     boolean isFavorite = hasFavoritePerformances(userId, performance.getTypeId(), performance.getType());
-                    return PerformanceByArtistDetailDTO.from(performance, isFavorite);
+                    return ArtistPerformanceDetailDTO.from(performance, isFavorite);
                 })
                 .toList();
-        return PerformanceByArtistDTO.of(totalCount, result);
+        return ArtistPerformanceDTO.of(totalCount, performanceList);
     }
 
     @Transactional(readOnly = true)
