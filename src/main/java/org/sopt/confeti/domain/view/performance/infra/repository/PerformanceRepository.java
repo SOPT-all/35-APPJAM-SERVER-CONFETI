@@ -9,18 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface PerformanceRepository extends JpaRepository<Performance, Long> {
-    @Query(value = "SELECT COUNT(p) " +
-            " FROM Performance p " +
-            " WHERE p.id IN (" +
-            " SELECT MIN(rp.id)" +
-            " FROM Performance rp" +
-            " WHERE rp.artistId = :artistId" +
-            " AND rp.endAt >= CURRENT_DATE" +
-            " GROUP BY rp.typeId" +
-            " )"
-    )
-    long countAllByArtistId(final @Param("artistId") String artistId);
-
     @Query(value = "SELECT p" +
             " FROM Performance p" +
             " WHERE p.id IN (" +

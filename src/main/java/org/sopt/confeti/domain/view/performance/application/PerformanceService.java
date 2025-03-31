@@ -84,9 +84,4 @@ public class PerformanceService {
     public List<Performance> findPerformanceByArtistId(final String artistId) {
         return performanceRepository.findPerformancesByArtistId(artistId);
     }
-
-    @Transactional(readOnly = true)
-    public long countAllByArtistId(final String artistId){
-        return performanceRepository.countAllByArtistId(artistId);
-    }
 }

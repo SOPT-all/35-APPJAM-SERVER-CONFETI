@@ -10,12 +10,11 @@ public record ArtistPerformanceResponse(
         List<ArtistPerformanceDetailResponse> performances
 ) {
     public static ArtistPerformanceResponse of(ArtistPerformanceDTO artistPerformanceDTO, final S3FileHandler s3FileHandler) {
-        return new ArtistPerformanceResponse(
-                artistPerformanceDTO.totalCount(),
-                artistPerformanceDTO.performances()
-                        .stream()
-                        .map(performance -> ArtistPerformanceDetailResponse.of(performance, s3FileHandler))
-                        .toList()
-        );
+        List<ArtistPerformanceDetailResponse> performanceList = artistPerformanceDTO.performances()
+                .stream()
+                .map(performance -> ArtistPerformanceDetailResponse.of(performance, s3FileHandler))
+                .toList();
+
+        return new ArtistPerformanceResponse(performanceList.size(), performanceList);
     }
 }
