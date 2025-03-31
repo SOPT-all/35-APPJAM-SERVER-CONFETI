@@ -10,8 +10,8 @@ public record PerformanceByArtistDetailDTO(
         long typeId,
         PerformanceType type,
         String title,
-        LocalDateTime performanceStartAt,
-        LocalDateTime performanceEndAt,
+        LocalDateTime startAt,
+        LocalDateTime endAt,
         String posterPath,
         String area,
         boolean isFavorite
