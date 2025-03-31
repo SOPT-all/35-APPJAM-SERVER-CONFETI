@@ -36,5 +36,13 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             PageRequest pageRequest
     );
 
-    List<Performance> findPerformancesByArtistId(String artistId);
+    @Query(value = "SELECT p" +
+            " FROM Performance p" +
+            " WHERE p.artistId IN :artistId" +
+            " AND p.endAt >= CURRENT_DATE" +
+            " ORDER BY p.startAt ASC"
+    )
+    List<Performance> findPerformancesByArtistId(
+            final @Param("artistId") String artistId
+    );
 }
