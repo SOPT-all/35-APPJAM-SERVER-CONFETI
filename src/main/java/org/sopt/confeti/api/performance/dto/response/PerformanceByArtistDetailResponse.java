@@ -11,8 +11,8 @@ public record PerformanceByArtistDetailResponse(
         long typeId,
         PerformanceType type,
         String title,
-        String performanceStartAt,
-        String performanceEndAt,
+        String startAt,
+        String endAt,
         String posterUrl,
         String area,
         boolean isFavorite
@@ -25,8 +25,8 @@ public record PerformanceByArtistDetailResponse(
                 performance.typeId(),
                 performance.type(),
                 performance.title(),
-                DateConvertor.convertToDefaultFormat(performance.performanceStartAt()),
-                DateConvertor.convertToDefaultFormat(performance.performanceEndAt()),
+                DateConvertor.convertToDefaultFormat(performance.startAt()),
+                DateConvertor.convertToDefaultFormat(performance.endAt()),
                 s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), performance.posterPath()).toString(),
                 performance.area(),
                 performance.isFavorite()
