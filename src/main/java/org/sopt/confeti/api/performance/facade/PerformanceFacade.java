@@ -158,7 +158,7 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public ArtistPerformanceDTO getPerformanceByArtistId(final Long userId, final String artistId) {
+    public ArtistPerformanceDTO getPerformancesByArtistId(final Long userId, final String artistId) {
         long totalCount = performanceService.countAllByArtistId(artistId);
         List<Performance> performances = performanceService.findPerformanceByArtistId(artistId);
         List<ArtistPerformanceDetailDTO> performanceList = performances.stream()
