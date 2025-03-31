@@ -1,7 +1,11 @@
 package org.sopt.confeti.api.performance.facade;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -160,7 +164,13 @@ public class PerformanceFacade {
     @Transactional(readOnly = true)
     public PerformanceByArtistDTO getPerformanceByArtistId(final Long userId, final String artistId) {
         long totalCount = performanceService.countAllByArtistId(artistId);
-
+        List<Performance> performances = performanceService.findPerformanceByArtistId(artistId);
+        List<PerformanceByArtistDetailDTO> result = performances.stream()
+                .map(performance -> {
+                    boolean isFavorite = hasFavoritePerformances(userId, performance.getTypeId(), performance.getType());
+                    return PerformanceByArtistDetailDTO.from(performance, isFavorite);
+                })
+                .toList();
         return PerformanceByArtistDTO.of(totalCount, result);
     }
 
