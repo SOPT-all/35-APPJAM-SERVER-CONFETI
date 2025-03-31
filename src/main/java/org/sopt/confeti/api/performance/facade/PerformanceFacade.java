@@ -159,7 +159,6 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public ArtistPerformanceDTO getPerformancesByArtistId(final Long userId, final String artistId) {
-        long totalCount = performanceService.countAllByArtistId(artistId);
         List<Performance> performances = performanceService.findPerformanceByArtistId(artistId);
         List<ArtistPerformanceDetailDTO> performanceList = performances.stream()
                 .map(performance -> {
@@ -167,7 +166,7 @@ public class PerformanceFacade {
                     return ArtistPerformanceDetailDTO.from(performance, isFavorite);
                 })
                 .toList();
-        return ArtistPerformanceDTO.of(totalCount, performanceList);
+        return ArtistPerformanceDTO.from(performanceList);
     }
 
     @Transactional(readOnly = true)
