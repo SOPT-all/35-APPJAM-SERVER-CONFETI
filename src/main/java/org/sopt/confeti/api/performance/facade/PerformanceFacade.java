@@ -23,9 +23,7 @@ import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
-import org.sopt.confeti.domain.view.performance.application.dto.PerformanceCursorDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
-import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -160,43 +158,10 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public PerformanceByArtistDTO getPerformanceByArtistId(final Long userId, final String artistId, final Long cursor) {
+    public PerformanceByArtistDTO getPerformanceByArtistId(final Long userId, final String artistId) {
         long totalCount = performanceService.countAllByArtistId(artistId);
-        CursorPage<PerformanceByArtistDetailDTO> cursorPage;
 
-        if (cursor == null) {
-            List<Performance> performances = performanceService.findPerformanceUsingInitCursor(artistId, PERFORMANCE_TO_ADD_SIZE);
-            cursorPage = CursorPage.of(
-                    performances.stream()
-                            .map(performance -> {
-                                        boolean isFavorite = hasFavoritePerformances(userId, performance.getTypeId(), performance.getType());
-                                        return PerformanceByArtistDetailDTO.from(performance, isFavorite);
-                                    })
-                            .toList(),
-                    PERFORMANCE_TO_ADD_SIZE
-          );
-            return PerformanceByArtistDTO.of(totalCount, cursorPage);
-        }
-
-        PerformanceCursorDTO performanceCursor = getPerformanceCursor(cursor);
-
-        List<Performance> performances = performanceService.getPerformanceUsingCursor(artistId, performanceCursor, PERFORMANCE_TO_ADD_SIZE);
-        cursorPage = CursorPage.of(
-                performances.stream()
-                        .map(performance -> {
-                            boolean isFavorite = hasFavoritePerformances(userId, performance.getTypeId(), performance.getType());
-                            return PerformanceByArtistDetailDTO.from(performance, isFavorite);
-                        })
-                        .toList(),
-                PERFORMANCE_TO_ADD_SIZE
-        );
-        return PerformanceByArtistDTO.of(totalCount, cursorPage);
-    }
-
-    @Transactional(readOnly = true)
-    public PerformanceCursorDTO getPerformanceCursor(final long cursor) {
-        return performanceService.findPerformanceCursor(cursor)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+        return PerformanceByArtistDTO.of(totalCount, result);
     }
 
     @Transactional(readOnly = true)

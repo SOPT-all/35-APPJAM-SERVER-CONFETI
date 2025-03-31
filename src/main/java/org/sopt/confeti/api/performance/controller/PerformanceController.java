@@ -61,10 +61,9 @@ public class PerformanceController {
     @GetMapping("/association/{artistId}")
     public ResponseEntity<BaseResponse<?>> getPerformanceByArtist(
             @UserId(require = false) Long userId,
-            @PathVariable(name="artistId") String artistId,
-            @RequestParam(name="cursor", required = false) Long cursor
+            @PathVariable(name="artistId") String artistId
     ){
-        PerformanceByArtistDTO performances = performanceFacade.getPerformanceByArtistId(userId, artistId, cursor);
+        PerformanceByArtistDTO performances = performanceFacade.getPerformanceByArtistId(userId, artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, PerformanceByArtistResponse.of(performances, s3FileHandler));
     }
 
