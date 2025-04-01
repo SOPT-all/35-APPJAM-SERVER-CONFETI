@@ -2,7 +2,6 @@ package org.sopt.confeti.api.performance.facade;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 
@@ -159,19 +158,19 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public ArtistPerformanceDTO getPerformancesByArtistId(final Long userId, final String artistId) {
+    public ArtistPerformancesDTO getPerformancesByArtistId(final Long userId, final String artistId) {
         List<Performance> performances = performanceService.findPerformanceByArtistId(artistId);
 
         Map<String, Boolean> favoriteMap = getFavoriteMap(userId, performances);
-        List<ArtistPerformanceDetailDTO> performanceList = performances.stream()
+        List<ArtistPerformancesDetailDTO> performanceList = performances.stream()
                 .map(performance -> {
                     String key = performance.getTypeId() + "_" + performance.getType();
                     boolean isFavorite = favoriteMap.getOrDefault(key, false);
-                    return ArtistPerformanceDetailDTO.from(performance, isFavorite);
+                    return ArtistPerformancesDetailDTO.from(performance, isFavorite);
                 })
                 .toList();
 
-        return ArtistPerformanceDTO.from(performanceList);
+        return ArtistPerformancesDTO.from(performanceList);
     }
 
     @Transactional(readOnly = true)
