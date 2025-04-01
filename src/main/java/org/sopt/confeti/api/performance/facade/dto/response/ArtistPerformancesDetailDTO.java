@@ -5,7 +5,7 @@ import org.sopt.confeti.global.common.constant.PerformanceType;
 
 import java.time.LocalDateTime;
 
-public record ArtistPerformanceDetailDTO(
+public record ArtistPerformancesDetailDTO(
         long performanceId,
         long typeId,
         PerformanceType type,
@@ -16,8 +16,8 @@ public record ArtistPerformanceDetailDTO(
         String area,
         boolean isFavorite
 ) {
-    public static ArtistPerformanceDetailDTO from(Performance performance, boolean isFavorite) {
-        return new ArtistPerformanceDetailDTO(
+    public static ArtistPerformancesDetailDTO from(Performance performance, boolean isFavorite) {
+        return new ArtistPerformancesDetailDTO(
                 performance.getId(),
                 performance.getTypeId(),
                 performance.getType(),

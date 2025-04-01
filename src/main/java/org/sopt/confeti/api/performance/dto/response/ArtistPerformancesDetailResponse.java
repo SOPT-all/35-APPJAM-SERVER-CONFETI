@@ -1,12 +1,12 @@
 package org.sopt.confeti.api.performance.dto.response;
 
-import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformanceDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.util.DateConvertor;
 import org.sopt.confeti.global.util.S3FileHandler;
 
-public record ArtistPerformanceDetailResponse(
+public record ArtistPerformancesDetailResponse(
         long performanceId,
         long typeId,
         PerformanceType type,
@@ -17,10 +17,10 @@ public record ArtistPerformanceDetailResponse(
         String area,
         boolean isFavorite
 ) {
-    public static ArtistPerformanceDetailResponse of(ArtistPerformanceDetailDTO performance, S3FileHandler s3FileHandler) {
+    public static ArtistPerformancesDetailResponse of(ArtistPerformancesDetailDTO performance, S3FileHandler s3FileHandler) {
         FolderPath topFolder = FolderPath.getFolderPathByPerformanceType(performance.type());
 
-        return new ArtistPerformanceDetailResponse(
+        return new ArtistPerformancesDetailResponse(
                 performance.performanceId(),
                 performance.typeId(),
                 performance.type(),
