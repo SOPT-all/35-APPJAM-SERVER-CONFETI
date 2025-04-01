@@ -1,7 +1,8 @@
 package org.sopt.confeti.api.performance.facade;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 
@@ -160,23 +161,60 @@ public class PerformanceFacade {
     @Transactional(readOnly = true)
     public ArtistPerformanceDTO getPerformancesByArtistId(final Long userId, final String artistId) {
         List<Performance> performances = performanceService.findPerformanceByArtistId(artistId);
+
+        Map<String, Boolean> favoriteMap = getFavoriteMap(userId, performances);
         List<ArtistPerformanceDetailDTO> performanceList = performances.stream()
                 .map(performance -> {
-                    boolean isFavorite = hasFavoritePerformances(userId, performance.getTypeId(), performance.getType());
+                    String key = performance.getTypeId() + "_" + performance.getType();
+                    boolean isFavorite = favoriteMap.getOrDefault(key, false);
                     return ArtistPerformanceDetailDTO.from(performance, isFavorite);
                 })
                 .toList();
+
         return ArtistPerformanceDTO.from(performanceList);
     }
 
     @Transactional(readOnly = true)
-    public boolean hasFavoritePerformances(final Long userId, final Long typeId, final PerformanceType type) {
-        if( userId == null ){
-            return false;
+    public Map<String, Boolean> getFavoriteMap(final Long userId, List<Performance> performances) {
+        if (userId == null || performances.isEmpty()) {
+            return Collections.emptyMap();
         }
-        if( type == PerformanceType.CONCERT ) {
-            return concertFavoriteService.isFavorite(userId, typeId);
-        }
-            return festivalFavoriteService.isFavorite(userId, typeId);
+
+        Map<PerformanceType, Set<Long>> typeToIdsMap = groupPerformancesByType(performances);
+        return fetchFavoriteMap(userId, typeToIdsMap);
     }
+
+    private Map<PerformanceType, Set<Long>> groupPerformancesByType(List<Performance> performances) {
+        Map<PerformanceType, Set<Long>> typeToIdsMap = new HashMap<>();
+
+        for (Performance performance : performances) {
+            if (!typeToIdsMap.containsKey(performance.getType())) {
+                typeToIdsMap.put(performance.getType(), new HashSet<>());
+            }
+            typeToIdsMap.get(performance.getType()).add(performance.getTypeId());
+        }
+
+        return typeToIdsMap;
+    }
+
+    private Map<String, Boolean> fetchFavoriteMap(Long userId, Map<PerformanceType, Set<Long>> typeToIdsMap) {
+        Map<String, Boolean> favoriteMap = new HashMap<>();
+
+        typeToIdsMap.forEach((type, ids) -> {
+            if (!ids.isEmpty()) {
+                List<Long> favoriteIds = findFavoritesByType(userId, type, ids);
+                favoriteIds.forEach(id -> favoriteMap.put(id + "_" + type, true));
+            }
+        });
+
+        return favoriteMap;
+    }
+
+    private List<Long> findFavoritesByType(Long userId, PerformanceType type, Set<Long> ids) {
+        return switch (type) {
+            case CONCERT -> concertFavoriteService.findFavorites(userId, ids);
+            case FESTIVAL -> festivalFavoriteService.findFavorites(userId, ids);
+        };
+    }
+
 }

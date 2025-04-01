@@ -9,6 +9,10 @@ import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -38,5 +42,10 @@ public class FestivalFavoriteService {
 
     public boolean existsByUserId(final Long userId) {
         return festivalFavoriteRepository.existsByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> findFavorites(final long userId, Set<Long> festivalIds) {
+        return festivalFavoriteRepository.findFavoriteFestivalIds(userId, festivalIds);
     }
 }
