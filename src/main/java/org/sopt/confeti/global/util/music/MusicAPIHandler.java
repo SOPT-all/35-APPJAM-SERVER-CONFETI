@@ -3,11 +3,19 @@ package org.sopt.confeti.global.util.music;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
+import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 
 public interface MusicAPIHandler {
 
-    List<ConfetiArtist> findArtistsByArtistIds(final Set<String> artistIds);
+    List<ConfetiArtist> getArtistsByArtistIds(final Set<String> artistIds);
+
     Optional<ConfetiArtist> findArtistByKeyword(final String keyword);
+
     Optional<ConfetiArtist> findArtistByArtistId(final String artistId);
+
+    List<ConfetiAlbum> getAlbumsByAlbumIds(final Set<String> albumIds);
+
+    List<ConfetiMusic> getMusicsByMusicIds(final Set<String> musicIds);
 }

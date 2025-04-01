@@ -1,6 +1,5 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.sopt.confeti.domain.concert.Concert;

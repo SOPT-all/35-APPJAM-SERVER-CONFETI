@@ -9,10 +9,11 @@ public record UserFavoritePerformancesResponse(
         List<UserFavoritePerformanceResponse> performances
 ) {
     public static UserFavoritePerformancesResponse of(final UserFavoritePerformancesDTO performancesDTO, final
-                                                      S3FileHandler s3FileHandler) {
+    S3FileHandler s3FileHandler) {
         return new UserFavoritePerformancesResponse(
                 IntStream.range(0, performancesDTO.performances().size())
-                        .mapToObj(i -> UserFavoritePerformanceResponse.of(performancesDTO.performances().get(i), s3FileHandler, i))
+                        .mapToObj(i -> UserFavoritePerformanceResponse.of(performancesDTO.performances().get(i),
+                                s3FileHandler, i))
                         .toList()
         );
     }

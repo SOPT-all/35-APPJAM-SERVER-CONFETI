@@ -2,7 +2,7 @@ package org.sopt.confeti.api.performance.facade.dto.response;
 
 import java.time.LocalDate;
 import org.sopt.confeti.domain.concert_artist.ConcertArtist;
-import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 
 public record ConcertArtistDTO(
         String artistId,
@@ -14,10 +14,10 @@ public record ConcertArtistDTO(
         ConfetiArtist confetiArtist = concertArtist.getArtist();
 
         return new ConcertArtistDTO(
-                confetiArtist.getArtistId(),
+                confetiArtist.getId(),
                 confetiArtist.getName(),
                 confetiArtist.getProfileUrl(),
-                confetiArtist.getLatestReleaseAt()
+                confetiArtist.getLatestReleaseAlbum().getReleaseAt()
         );
     }
 }

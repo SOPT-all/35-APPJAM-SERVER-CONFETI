@@ -33,7 +33,8 @@ public class ReissueService {
         String newRefreshToken = jwtTokenGenerator.createRefreshToken(userId, role, provider);
 
         refreshTokenRepository.save(RefreshToken.of(newRefreshToken, Long.parseLong(userId)));
-        refreshTokenRepository.deleteAllByRefreshTokenAndUserId(validatedRefreshToken.getRefreshToken(), Long.parseLong(userId));
+        refreshTokenRepository.deleteAllByRefreshTokenAndUserId(validatedRefreshToken.getRefreshToken(),
+                Long.parseLong(userId));
 
         return new Token(newAccessToken, newRefreshToken);
     }

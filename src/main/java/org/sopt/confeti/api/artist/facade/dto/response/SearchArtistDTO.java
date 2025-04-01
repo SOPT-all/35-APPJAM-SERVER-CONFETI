@@ -1,7 +1,7 @@
 package org.sopt.confeti.api.artist.facade.dto.response;
 
 import java.time.LocalDate;
-import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 
 public record SearchArtistDTO(
         String artistId,
@@ -15,10 +15,10 @@ public record SearchArtistDTO(
 
     public static SearchArtistDTO from(final ConfetiArtist confetiArtist, final boolean isFavorite) {
         return new SearchArtistDTO(
-                confetiArtist.getArtistId(),
+                confetiArtist.getId(),
                 confetiArtist.getName(),
                 confetiArtist.getProfileUrl(),
-                confetiArtist.getLatestReleaseAt(),
+                confetiArtist.getLatestReleaseAlbum().getReleaseAt(),
                 isFavorite,
                 fixedIsMultipleArtists
         );

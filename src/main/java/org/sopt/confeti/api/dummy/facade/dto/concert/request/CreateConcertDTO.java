@@ -45,8 +45,9 @@ public record CreateConcertDTO(
                         .map(CreateConcertMusicDTO::from)
                         .toList(),
                 request.getReservationUrls().stream()
-                        .map(reservationUrl -> CreateConcertReservationUrlDTO.of(reservationUrl, filePaths.reservationLogoPaths().get(
-                                atomicInteger.getAndIncrement())))
+                        .map(reservationUrl -> CreateConcertReservationUrlDTO.of(reservationUrl,
+                                filePaths.reservationLogoPaths().get(
+                                        atomicInteger.getAndIncrement())))
                         .toList()
         );
     }

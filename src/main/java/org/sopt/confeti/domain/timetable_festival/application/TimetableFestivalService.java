@@ -1,13 +1,12 @@
 package org.sopt.confeti.domain.timetable_festival.application;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.domain.timetable_festival.infra.repository.TimetableFestivalRepository;
 import org.sopt.confeti.domain.user.User;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -16,7 +15,7 @@ public class TimetableFestivalService {
     private final TimetableFestivalRepository timetableFestivalRepository;
 
     @Transactional(readOnly = true)
-    public List<TimetableFestival> getFetivalList(long userId){
+    public List<TimetableFestival> getFetivalList(long userId) {
         return timetableFestivalRepository.findByUserIdWhereEndAtLENow(userId);
     }
 

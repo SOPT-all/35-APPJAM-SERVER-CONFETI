@@ -1,5 +1,7 @@
 package org.sopt.confeti.domain.concert_favorite.application;
 
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert_favorite.ConcertFavorite;
@@ -7,9 +9,6 @@ import org.sopt.confeti.domain.concert_favorite.infra.repository.ConcertFavorite
 import org.sopt.confeti.domain.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +34,7 @@ public class ConcertFavoriteService {
     }
 
     @Transactional(readOnly = true)
-    public boolean existsByUserId(final Long userId){
+    public boolean existsByUserId(final Long userId) {
         return concertFavoriteRepository.existsByUserId(userId);
     }
 

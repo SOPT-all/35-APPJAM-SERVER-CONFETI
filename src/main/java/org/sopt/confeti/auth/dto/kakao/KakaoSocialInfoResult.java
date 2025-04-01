@@ -6,5 +6,5 @@ public record KakaoSocialInfoResult(
         String id,
         @JsonProperty("kakao_account")
         KakaoAccount kakaoAccount
-){
+) {
 }

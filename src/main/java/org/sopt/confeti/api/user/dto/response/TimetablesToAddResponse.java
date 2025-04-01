@@ -11,7 +11,8 @@ public record TimetablesToAddResponse(
 ) {
     private static final long DEFAULT_NEXT_CURSOR = -1L;
 
-    public static TimetablesToAddResponse of(final CursorPage<TimetableToAddDTO> cursorPage, final S3FileHandler s3FileHandler) {
+    public static TimetablesToAddResponse of(final CursorPage<TimetableToAddDTO> cursorPage,
+                                             final S3FileHandler s3FileHandler) {
         Long nextCursor = DEFAULT_NEXT_CURSOR;
 
         if (!cursorPage.isLast()) {

@@ -17,7 +17,8 @@ public record ArtistPerformancesDetailResponse(
         String area,
         boolean isFavorite
 ) {
-    public static ArtistPerformancesDetailResponse of(ArtistPerformancesDetailDTO performance, S3FileHandler s3FileHandler) {
+    public static ArtistPerformancesDetailResponse of(ArtistPerformancesDetailDTO performance,
+                                                      S3FileHandler s3FileHandler) {
         FolderPath topFolder = FolderPath.getFolderPathByPerformanceType(performance.type());
 
         return new ArtistPerformancesDetailResponse(
@@ -27,7 +28,8 @@ public record ArtistPerformancesDetailResponse(
                 performance.title(),
                 DateConvertor.convertToDefaultFormat(performance.startAt()),
                 DateConvertor.convertToDefaultFormat(performance.endAt()),
-                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), performance.posterPath()).toString(),
+                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), performance.posterPath())
+                        .toString(),
                 performance.area(),
                 performance.isFavorite()
         );

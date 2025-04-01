@@ -17,7 +17,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<BaseResponse<?>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+    public ResponseEntity<BaseResponse<?>> handleMethodArgumentTypeMismatchException(
+            MethodArgumentTypeMismatchException e) {
         return ApiResponseUtil.failure(ErrorMessage.TYPE_MISMATCH);
     }
 
@@ -32,7 +33,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<BaseResponse<?>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+    public ResponseEntity<BaseResponse<?>> handleHttpRequestMethodNotSupportedException(
+            HttpRequestMethodNotSupportedException e) {
         return ApiResponseUtil.failure(ErrorMessage.METHOD_NOT_ALLOWED);
     }
 

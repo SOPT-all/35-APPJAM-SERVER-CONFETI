@@ -5,12 +5,12 @@ import java.util.Queue;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.global.annotation.Strategy;
-import org.sopt.confeti.global.resolver.artist.AbstractArtistStrategy;
-import org.sopt.confeti.global.resolver.artist.ConfetiArtist;
+import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategy;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 
 @Strategy
 @RequiredArgsConstructor
-public class FestivalArtistStrategy extends AbstractArtistStrategy {
+public class FestivalArtistStrategy extends ArtistStrategy {
 
     @Override
     public void collect(HashMap<String, Queue<ConfetiArtist>> artistMapper, Object target) {
@@ -20,7 +20,7 @@ public class FestivalArtistStrategy extends AbstractArtistStrategy {
                 .flatMap(stage -> stage.getTimes().stream())
                 .flatMap(time -> time.getArtists().stream())
                 .forEach(artist -> {
-                    addArtistToMapper(artistMapper, artist.getArtist());
+                    addToMapper(artistMapper, artist.getArtist().getId(), artist.getArtist());
                 });
     }
 

@@ -1,5 +1,8 @@
 package org.sopt.confeti.domain.user_timetable.application;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
@@ -7,10 +10,6 @@ import org.sopt.confeti.domain.user_timetable.UserTimetable;
 import org.sopt.confeti.domain.user_timetable.infra.repository.UserTimetableRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

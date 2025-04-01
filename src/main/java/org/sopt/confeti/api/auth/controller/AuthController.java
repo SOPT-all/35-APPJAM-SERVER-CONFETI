@@ -17,7 +17,12 @@ import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,13 +33,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<?>> login(
-           @Valid @RequestBody LoginRequest request
+            @Valid @RequestBody LoginRequest request
     ) {
         LoginResult result = authFacade.login(LoginCommand.from(request));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, result);
     }
 
-    @Permission(role =  {Role.ONBOARDING, Role.GENERAL})
+    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/reissue")
     public ResponseEntity<BaseResponse<?>> reissue(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String refreshToken
@@ -45,7 +50,7 @@ public class AuthController {
 
     @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/logout")
-    public ResponseEntity<BaseResponse<?>> logout(@UserId Long userId){
+    public ResponseEntity<BaseResponse<?>> logout(@UserId Long userId) {
         authFacade.logout(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }

@@ -18,9 +18,9 @@ public record RecentPerformancesDTO(
         List<RecentPerformanceDTO> performances = Stream.concat(
                 IntStream.range(0, concerts.size())
                         .mapToObj(i -> RecentPerformanceDTO.of(concerts.get(i), i)),
-                        IntStream.range(0, festivals.size())
-                                .mapToObj(i -> RecentPerformanceDTO.of(festivals.get(i), i + concerts.size()))
-                ).toList();
+                IntStream.range(0, festivals.size())
+                        .mapToObj(i -> RecentPerformanceDTO.of(festivals.get(i), i + concerts.size()))
+        ).toList();
 
         if (performances.size() >= recentPerformanceSize) {
             performances = performances.subList(0, recentPerformanceSize);

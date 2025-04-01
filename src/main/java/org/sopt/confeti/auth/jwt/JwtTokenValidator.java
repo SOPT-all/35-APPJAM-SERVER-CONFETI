@@ -5,8 +5,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.sopt.confeti.global.exception.UnauthorizedException;
+import org.springframework.stereotype.Component;
 
 
 @Component

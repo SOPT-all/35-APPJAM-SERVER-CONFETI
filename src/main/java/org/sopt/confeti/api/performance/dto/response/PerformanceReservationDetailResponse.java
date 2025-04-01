@@ -10,7 +10,7 @@ public record PerformanceReservationDetailResponse(
         PerformanceType type,
         String subtitle,
         String reserveAt
-){
+) {
     public static PerformanceReservationDetailResponse from(PerformanceReservationDetailDTO performanceReservation) {
 
         return new PerformanceReservationDetailResponse(

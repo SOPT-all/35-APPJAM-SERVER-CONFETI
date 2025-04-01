@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class WithdrawService {
-
     private final AppleTokenRepository appleTokenRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 

@@ -26,13 +26,17 @@ configurations {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     // psy
 //    implementation 'p6spy:p6spy:3.9.1'
 //    implementation 'com.github.gavlyukovskiy:datasource-decorator-spring-boot-autoconfigure:1.9.0'
+
+    // Thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // AWS S3
     implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.1.1'
@@ -55,6 +59,16 @@ dependencies {
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.6'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.6'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.6'
+
+    // Web Client
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64'
+
+    // HTTP Client
+    implementation 'org.apache.httpcomponents.client5:httpclient5'
+
+    // AOP
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
 
     // Bouncy Castle
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

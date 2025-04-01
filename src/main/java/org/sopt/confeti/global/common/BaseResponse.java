@@ -1,6 +1,6 @@
 package org.sopt.confeti.global.common;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.message.SuccessMessage;
 
@@ -50,7 +50,7 @@ public class BaseResponse<T> {
                 .build();
     }
 
-    public static <T> Builder<T> builder(){
+    public static <T> Builder<T> builder() {
         return new Builder<>();
     }
 

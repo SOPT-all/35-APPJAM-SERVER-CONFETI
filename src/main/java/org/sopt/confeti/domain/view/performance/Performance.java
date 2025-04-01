@@ -61,8 +61,8 @@ public class Performance {
 
     @Builder
     public Performance(long typeId, PerformanceType type, String artistId, String area, String title,
-                       String subtitle, LocalDateTime startAt, LocalDateTime endAt, LocalTime artistStartAt, String posterPath)
-    {
+                       String subtitle, LocalDateTime startAt, LocalDateTime endAt, LocalTime artistStartAt,
+                       String posterPath) {
         this.typeId = typeId;
         this.type = type;
         this.artistId = artistId;

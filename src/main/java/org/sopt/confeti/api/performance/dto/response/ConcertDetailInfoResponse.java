@@ -1,7 +1,5 @@
 package org.sopt.confeti.api.performance.dto.response;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.DateConvertor;
@@ -25,11 +23,14 @@ public record ConcertDetailInfoResponse(
         String infoImgUrl,
         boolean isFavorite
 ) {
-    public static ConcertDetailInfoResponse of(final ConcertDetailDTO concertDetailDTO, final S3FileHandler s3FileHandler) {
+    public static ConcertDetailInfoResponse of(final ConcertDetailDTO concertDetailDTO,
+                                               final S3FileHandler s3FileHandler) {
         return new ConcertDetailInfoResponse(
                 concertDetailDTO.concertId(),
-                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER), concertDetailDTO.posterPath()).toString(),
-                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER_BG), concertDetailDTO.posterBgPath()).toString(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER),
+                        concertDetailDTO.posterPath()).toString(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER_BG),
+                        concertDetailDTO.posterBgPath()).toString(),
                 concertDetailDTO.title(),
                 concertDetailDTO.subtitle(),
                 DateConvertor.convertToDefaultFormat(concertDetailDTO.startAt()),
@@ -41,7 +42,8 @@ public record ConcertDetailInfoResponse(
                 concertDetailDTO.ageRating(),
                 concertDetailDTO.reservationOffice(),
                 concertDetailDTO.price(),
-                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.DETAIL), concertDetailDTO.infoImgPath()).toString(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.DETAIL),
+                        concertDetailDTO.infoImgPath()).toString(),
                 concertDetailDTO.isFavorite()
         );
     }

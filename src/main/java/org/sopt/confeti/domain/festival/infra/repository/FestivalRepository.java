@@ -19,10 +19,10 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
                     " LEFT JOIN FestivalFavorite ff" +
                     " ON f.id = ff.festival.id AND ff.user.id = :userId" +
                     " WHERE f.endAt >= CURRENT_DATE AND f.id NOT IN (" +
-                        " SELECT tf.festival.id" +
-                        " FROM TimetableFestival tf" +
-                        " INNER JOIN tf.user u" +
-                        " WHERE u.id = :userId" +
+                    " SELECT tf.festival.id" +
+                    " FROM TimetableFestival tf" +
+                    " INNER JOIN tf.user u" +
+                    " WHERE u.id = :userId" +
                     " )" +
                     " ORDER BY CASE WHEN ff.id IS NULL THEN 0 ELSE 1 END DESC"
     )
@@ -37,17 +37,18 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
                     " LEFT JOIN FestivalFavorite ff" +
                     " ON f.id = ff.festival.id AND ff.user.id = :userId" +
                     " WHERE f.endAt >= CURRENT_DATE AND f.id NOT IN (" +
-                        " SELECT tf.festival.id" +
-                        " FROM TimetableFestival tf" +
-                        " INNER JOIN tf.user u" +
-                        " WHERE u.id = :userId" +
+                    " SELECT tf.festival.id" +
+                    " FROM TimetableFestival tf" +
+                    " INNER JOIN tf.user u" +
+                    " WHERE u.id = :userId" +
                     " ) AND " +
                     " (" +
-                        " (" +
-                            " ((:cursorIsFavorite = true AND ff.id IS NOT NULL) OR (:cursorIsFavorite = false AND ff.id IS NULL)) AND (:cursorTitle <= f.title)" +
-                        " ) OR (" +
-                            " :cursorIsFavorite = true AND ff.id IS NULL" +
-                        " ) " +
+                    " (" +
+                    " ((:cursorIsFavorite = true AND ff.id IS NOT NULL) OR (:cursorIsFavorite = false AND ff.id IS NULL)) AND (:cursorTitle <= f.title)"
+                    +
+                    " ) OR (" +
+                    " :cursorIsFavorite = true AND ff.id IS NULL" +
+                    " ) " +
                     " )" +
                     " ORDER BY CASE WHEN ff.id IS NULL THEN 0 ELSE 1 END DESC"
     )
@@ -59,14 +60,14 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
     );
 
     @Query(value =
-        "SELECT new org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO(" +
-                " f.title," +
-                " CASE WHEN ff.id IS NULL THEN false ELSE true END" +
-                " )" +
-                " FROM Festival f" +
-                " LEFT JOIN FestivalFavorite ff" +
-                " ON f.id = ff.festival.id AND ff.user.id = :userId" +
-                " WHERE f.id = :festivalId"
+            "SELECT new org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO(" +
+                    " f.title," +
+                    " CASE WHEN ff.id IS NULL THEN false ELSE true END" +
+                    " )" +
+                    " FROM Festival f" +
+                    " LEFT JOIN FestivalFavorite ff" +
+                    " ON f.id = ff.festival.id AND ff.user.id = :userId" +
+                    " WHERE f.id = :festivalId"
     )
     Optional<FestivalCursorDTO> findFestivalCursor(
             final @Param("userId") long userId,

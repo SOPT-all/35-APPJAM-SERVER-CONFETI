@@ -1,6 +1,18 @@
 package org.sopt.confeti.domain.festival_stage;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,11 +22,8 @@ import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalStag
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
-@Table(name="festival_stages")
+@Table(name = "festival_stages")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FestivalStage {
@@ -25,7 +34,7 @@ public class FestivalStage {
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="festival_date_id", nullable = false)
+    @JoinColumn(name = "festival_date_id", nullable = false)
     private FestivalDate festivalDate;
 
     @Column(length = 30, nullable = false)

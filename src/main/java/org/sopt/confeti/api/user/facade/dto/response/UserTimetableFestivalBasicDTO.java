@@ -1,19 +1,18 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
 import java.time.LocalDate;
-import org.sopt.confeti.domain.festival_date.FestivalDate;
-import org.sopt.confeti.domain.user_timetable.UserTimetable;
-
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import org.sopt.confeti.domain.festival_date.FestivalDate;
+import org.sopt.confeti.domain.user_timetable.UserTimetable;
 
 public record UserTimetableFestivalBasicDTO(
         LocalDate festivalDate,
         LocalTime ticketOpenAt,
         List<UserTimetableFestivalStageDTO> stages
 ) {
-    public static UserTimetableFestivalBasicDTO of(FestivalDate festivalDate, Map<Long, UserTimetable> userTimetables  )  {
+    public static UserTimetableFestivalBasicDTO of(FestivalDate festivalDate, Map<Long, UserTimetable> userTimetables) {
         return new UserTimetableFestivalBasicDTO(
                 festivalDate.getFestivalAt(),
                 festivalDate.getOpenAt(),

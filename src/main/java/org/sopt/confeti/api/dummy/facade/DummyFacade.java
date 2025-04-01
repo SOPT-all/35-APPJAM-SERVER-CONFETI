@@ -2,7 +2,6 @@ package org.sopt.confeti.api.dummy.facade;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.dummy.facade.dto.concert.ConcertFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.UploadConcertFilesDTO;
@@ -27,11 +26,15 @@ public class DummyFacade {
     private final ConcertService concertService;
 
     public FestivalFilePathsDTO uploadFestivalFiles(UploadFestivalFilesDTO files) {
-        String posterPath = s3FileHandler.uploadFile(files.poster(), FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER));
-        String posterBgPath = s3FileHandler.uploadFile(files.posterBg(), FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER_BG));
-        String logoPath = s3FileHandler.uploadFile(files.logo(), FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO));
+        String posterPath = s3FileHandler.uploadFile(files.poster(),
+                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER));
+        String posterBgPath = s3FileHandler.uploadFile(files.posterBg(),
+                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER_BG));
+        String logoPath = s3FileHandler.uploadFile(files.logo(),
+                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO));
         List<String> reservationLogoPaths = files.reservationLogos().stream()
-                .map(reservationLogo -> s3FileHandler.uploadFile(reservationLogo, FolderPath.combine(FolderPath.FESTIVAL, FolderPath.RESERVATION, FolderPath.LOGO)))
+                .map(reservationLogo -> s3FileHandler.uploadFile(reservationLogo,
+                        FolderPath.combine(FolderPath.FESTIVAL, FolderPath.RESERVATION, FolderPath.LOGO)))
                 .toList();
 
         return FestivalFilePathsDTO.of(posterPath, posterBgPath, logoPath, reservationLogoPaths);
@@ -43,10 +46,13 @@ public class DummyFacade {
     }
 
     public ConcertFilePathsDTO uploadConcertFiles(UploadConcertFilesDTO files) {
-        String posterPath = s3FileHandler.uploadFile(files.poster(), FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER));
-        String posterBgPath = s3FileHandler.uploadFile(files.posterBg(), FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER_BG));
+        String posterPath = s3FileHandler.uploadFile(files.poster(),
+                FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER));
+        String posterBgPath = s3FileHandler.uploadFile(files.posterBg(),
+                FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER_BG));
         List<String> reservationLogoPaths = files.reservationLogos().stream()
-                .map(reservationLogo -> s3FileHandler.uploadFile(reservationLogo, FolderPath.combine(FolderPath.CONCERT, FolderPath.RESERVATION, FolderPath.LOGO)))
+                .map(reservationLogo -> s3FileHandler.uploadFile(reservationLogo,
+                        FolderPath.combine(FolderPath.CONCERT, FolderPath.RESERVATION, FolderPath.LOGO)))
                 .toList();
 
         return ConcertFilePathsDTO.of(posterPath, posterBgPath, reservationLogoPaths);

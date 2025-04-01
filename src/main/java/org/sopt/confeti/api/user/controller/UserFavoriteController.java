@@ -17,7 +17,12 @@ import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,7 +57,8 @@ public class UserFavoriteController {
             @UserId Long userId
     ) {
         UserFavoriteArtistDTO userFavoriteArtistDTO = userFavoriteFacade.getArtistListPreview(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserFavoriteResponse.from(userFavoriteArtistDTO.artists()));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                UserFavoriteResponse.from(userFavoriteArtistDTO.artists()));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -101,6 +107,7 @@ public class UserFavoriteController {
             @UserId Long userId
     ) {
         UserFavoritePerformancesDTO userFavoritePerformancesDTO = userFavoriteFacade.getFavoritePerformances(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserFavoritePerformancesResponse.of(userFavoritePerformancesDTO, s3FileHandler));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                UserFavoritePerformancesResponse.of(userFavoritePerformancesDTO, s3FileHandler));
     }
 }

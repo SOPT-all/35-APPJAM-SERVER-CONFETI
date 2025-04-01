@@ -7,7 +7,8 @@ import org.sopt.confeti.global.util.S3FileHandler;
 public record RecentPerformancesResponse(
         List<RecentPerformanceResponse> performances
 ) {
-    public static RecentPerformancesResponse of(final RecentPerformancesDTO recentPerformancesDTO, final S3FileHandler s3FileHandler) {
+    public static RecentPerformancesResponse of(final RecentPerformancesDTO recentPerformancesDTO,
+                                                final S3FileHandler s3FileHandler) {
         return new RecentPerformancesResponse(
                 recentPerformancesDTO.performances().stream()
                         .map(recentPerformanceDTO -> RecentPerformanceResponse.of(recentPerformanceDTO, s3FileHandler))

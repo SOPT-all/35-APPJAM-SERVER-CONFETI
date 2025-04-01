@@ -8,7 +8,8 @@ public record FestivalFilePathsDTO(
         String logoPath,
         List<FestivalReservationLogoPathDTO> reservationLogoPaths
 ) {
-    public static FestivalFilePathsDTO of(String posterPath, String posterBgPath, String logoPath, List<String> reservationLogoPaths) {
+    public static FestivalFilePathsDTO of(String posterPath, String posterBgPath, String logoPath,
+                                          List<String> reservationLogoPaths) {
         return new FestivalFilePathsDTO(
                 posterPath, posterBgPath, logoPath,
                 reservationLogoPaths.stream()

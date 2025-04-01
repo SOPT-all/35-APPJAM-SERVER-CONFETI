@@ -10,12 +10,14 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Setter
 public class CreateFestivalStageRequest {
 
     @NotBlank
     private String name;
-    @Min(0) @Max(10)
+    @Min(0)
+    @Max(10)
     private int order;
 
     @Valid

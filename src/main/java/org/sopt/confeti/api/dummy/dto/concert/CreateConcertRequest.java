@@ -10,7 +10,8 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Setter
 public class CreateConcertRequest {
 
     @NotBlank
