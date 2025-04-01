@@ -5,7 +5,7 @@ import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.S3FileHandler;
 
-public record UserInfoResponse (
+public record UserInfoResponse(
         Long userId,
         String profileUrl,
         String name,

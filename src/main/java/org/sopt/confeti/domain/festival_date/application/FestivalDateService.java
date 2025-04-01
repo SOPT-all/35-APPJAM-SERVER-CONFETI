@@ -5,9 +5,9 @@ import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.infra.repository.FestivalDateRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
+import org.sopt.confeti.global.resolver.music_api.MusicAPIResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.sopt.confeti.global.resolver.music_api.MusicAPIResolver;
 
 @Service
 @RequiredArgsConstructor

@@ -14,7 +14,8 @@ public record RecentPerformanceResponse(
         String performanceAt,
         String posterUrl
 ) {
-    public static RecentPerformanceResponse of(final RecentPerformanceDTO recentPerformanceDTO, final S3FileHandler s3FileHandler) {
+    public static RecentPerformanceResponse of(final RecentPerformanceDTO recentPerformanceDTO,
+                                               final S3FileHandler s3FileHandler) {
         FolderPath topFolder = FolderPath.getFolderPathByPerformanceType(recentPerformanceDTO.type());
 
         return new RecentPerformanceResponse(
@@ -24,7 +25,8 @@ public record RecentPerformanceResponse(
                 recentPerformanceDTO.title(),
                 recentPerformanceDTO.subtitle(),
                 DateConvertor.convertToDefaultFormat(recentPerformanceDTO.performanceAt()),
-                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), recentPerformanceDTO.posterPath()).toString()
+                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER),
+                        recentPerformanceDTO.posterPath()).toString()
         );
     }
 }

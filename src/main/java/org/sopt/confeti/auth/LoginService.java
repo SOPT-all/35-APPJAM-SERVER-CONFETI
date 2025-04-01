@@ -82,11 +82,13 @@ public class LoginService {
         );
     }
 
-    private Token createToken(AuthUser authUser){
-         return new Token(
-                 jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId()), authUser.getRole(), authUser.getProvider()),
-                 jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()), authUser.getRole(), authUser.getProvider())
-         );
+    private Token createToken(AuthUser authUser) {
+        return new Token(
+                jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId()), authUser.getRole(),
+                        authUser.getProvider()),
+                jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()), authUser.getRole(),
+                        authUser.getProvider())
+        );
     }
 
     private boolean isAppleLogin(OAuthProvider provider) {

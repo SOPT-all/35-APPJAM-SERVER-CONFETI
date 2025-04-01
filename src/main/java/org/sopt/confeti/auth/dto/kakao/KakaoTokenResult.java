@@ -14,5 +14,5 @@ public record KakaoTokenResult(
 
         @JsonProperty("expires_in")
         Long expiresIn
-){
+) {
 }

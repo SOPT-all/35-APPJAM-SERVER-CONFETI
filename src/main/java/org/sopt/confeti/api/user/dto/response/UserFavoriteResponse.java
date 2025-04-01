@@ -1,8 +1,7 @@
 package org.sopt.confeti.api.user.dto.response;
 
-import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistListDTO;
-
 import java.util.List;
+import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistListDTO;
 
 public record UserFavoriteResponse(
         List<UserFavoriteListResponse> artists

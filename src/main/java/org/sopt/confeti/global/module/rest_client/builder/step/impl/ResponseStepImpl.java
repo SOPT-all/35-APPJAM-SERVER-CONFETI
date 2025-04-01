@@ -18,9 +18,10 @@ public class ResponseStepImpl implements ResponseStep {
 
     /**
      * 전달받은 클래스 타입으로 변환 후 반환
+     *
      * @param responseType
-     * @return
      * @param <T>
+     * @return
      */
     @Override
     public <T> T retrieve(Class<T> responseType) {

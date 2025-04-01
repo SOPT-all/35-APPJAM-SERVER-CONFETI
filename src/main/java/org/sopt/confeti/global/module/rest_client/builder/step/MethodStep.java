@@ -7,9 +7,13 @@ public interface MethodStep<T> {
 
     interface PostRequestBuilder {
         PostRequestBuilder baseUrl(String baseUrl);
+
         PostRequestBuilder path(String path);
+
         PostRequestBuilder params(MultiValueMap<String, String> params);
+
         <T> BodySpec<T> body(T requestBody);
+
         ConnectStep build();
     }
 
@@ -22,8 +26,11 @@ public interface MethodStep<T> {
 
     interface GetRequestBuilder {
         GetRequestBuilder baseUrl(String baseUrl);
+
         GetRequestBuilder path(String path);
+
         GetRequestBuilder params(MultiValueMap<String, String> params);
+
         ConnectStep build();
     }
 }

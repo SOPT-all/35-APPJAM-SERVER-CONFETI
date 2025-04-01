@@ -7,5 +7,6 @@ import org.sopt.confeti.domain.user.OAuthProvider;
 public interface OAuthApiClient {
 
     boolean supports(OAuthProvider provider);
+
     OAuthSocialInfoResult getSocialInfo(LoginCommand command);
 }

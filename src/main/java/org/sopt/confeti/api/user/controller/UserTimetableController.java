@@ -13,7 +13,6 @@ import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -25,7 +24,15 @@ import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Validated
@@ -41,8 +48,9 @@ public class UserTimetableController {
     public ResponseEntity<BaseResponse<?>> getTimetablesListAndDate(
             @UserId Long userId
     ) {
-        UserTimetableDTO userTimetableDTO =  userTimetableFacade.getTimetablesListAndDate(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetableDetailResponse.of(userTimetableDTO, s3FileHandler));
+        UserTimetableDTO userTimetableDTO = userTimetableFacade.getTimetablesListAndDate(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                UserTimetableDetailResponse.of(userTimetableDTO, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -52,7 +60,8 @@ public class UserTimetableController {
             @RequestParam(name = "cursor", required = false) Long cursor
     ) {
         CursorPage<TimetableToAddDTO> timetablesToAdd = userTimetableFacade.getTimetablesToAdd(userId, cursor);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, TimetablesToAddResponse.of(timetablesToAdd, s3FileHandler));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                TimetablesToAddResponse.of(timetablesToAdd, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -80,7 +89,7 @@ public class UserTimetableController {
     public ResponseEntity<BaseResponse<?>> getTimetableFestival(
             @UserId Long userId,
             @PathVariable(name = "festivalDateId") @Min(RequestConstraint.ID) long festivalDateId
-    ){
+    ) {
         UserTimetableFestivalBasicDTO response = userTimetableFacade.getTimetableInfo(userId, festivalDateId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetableFestivalResponse.from(response));
     }
@@ -90,7 +99,7 @@ public class UserTimetableController {
     public ResponseEntity<BaseResponse<?>> updateTimetableFestival(
             @UserId Long userId,
             @RequestBody PatchTimetableRequest patchTimetablerequest
-    ){
+    ) {
         userTimetableFacade.patchTimetableFestivals(userId, PatchTimetableDTO.from(patchTimetablerequest));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }

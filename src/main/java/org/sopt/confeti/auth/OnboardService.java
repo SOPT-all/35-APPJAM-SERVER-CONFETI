@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class OnboardService {
-
     private static final int MINIMUM_ARTIST_COUNT = 3;
 
     public void validateFavoriteArtistCount(OnboardDTO onboardDTO) {

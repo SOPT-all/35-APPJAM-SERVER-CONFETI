@@ -1,18 +1,21 @@
 package org.sopt.confeti.api.performance.facade;
 
 import java.time.LocalDateTime;
-import java.util.*;
-
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
-
-import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
-import org.sopt.confeti.api.performance.facade.dto.response.*;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
@@ -23,6 +26,7 @@ import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -98,17 +102,18 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public PerformanceReservationDTO getPerformReservationInfo(final Long userId){
+    public PerformanceReservationDTO getPerformReservationInfo(final Long userId) {
         boolean isUserExist = userId != null && userService.existsById(userId);
         boolean isCFExist = isUserExist && concertFavoriteService.existsByUserId(userId);
         boolean isFFExist = isUserExist && festivalFavoriteService.existsByUserId(userId);
 
         if (isCFExist || isFFExist) {
-            List<PerformanceTicketDTO> performanceReserve=performanceService.getFavoritePerformancesReservation(userId);
+            List<PerformanceTicketDTO> performanceReserve = performanceService.getFavoritePerformancesReservation(
+                    userId);
             return PerformanceReservationDTO.from(performanceReserve);
         }
 
-        List<PerformanceTicketDTO> performanceReserve=performanceService.getPerformancesReservation();
+        List<PerformanceTicketDTO> performanceReserve = performanceService.getPerformancesReservation();
         return PerformanceReservationDTO.from(performanceReserve);
     }
 

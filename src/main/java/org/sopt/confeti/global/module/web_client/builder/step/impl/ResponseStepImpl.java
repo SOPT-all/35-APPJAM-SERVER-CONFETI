@@ -16,13 +16,11 @@ public class ResponseStepImpl implements ResponseStep {
     private final Object response;
 
     /**
-     * WebClient의 response를 Object로 리턴<br>
-     * 응답값을 response type class로 파싱 후 사용<br>
+     * WebClient의 response를 Object로 리턴<br> 응답값을 response type class로 파싱 후 사용<br>
      * <br>
-     * Example)<br>
-     * TestDto test = (TestDto) webClientConnectorTest.post(url, path, requestBody)
-     *                 .connectBlock(headers, TestDto.class)
-     *                 .toObjectCall();
+     * Example)<br> TestDto test = (TestDto) webClientConnectorTest.post(url, path, requestBody) .connectBlock(headers,
+     * TestDto.class) .toObjectCall();
+     *
      * @return {@link Object}
      */
     @Override
@@ -32,6 +30,7 @@ public class ResponseStepImpl implements ResponseStep {
 
     /**
      * WebClient의 response를 JsonNode로 파싱하여 리턴
+     *
      * @return {@link JsonNode}
      */
     @Override
@@ -50,5 +49,6 @@ public class ResponseStepImpl implements ResponseStep {
      * WebClient의 response를 리턴하지 않음
      */
     @Override
-    public void toVoidCall() {}
+    public void toVoidCall() {
+    }
 }

@@ -9,7 +9,8 @@ public record CreateFestivalReservationUrlDTO(
         String name,
         String logoPath
 ) {
-    public static CreateFestivalReservationUrlDTO of(CreateFestivalReservationUrlRequest request, FestivalReservationLogoPathDTO logoPath) {
+    public static CreateFestivalReservationUrlDTO of(CreateFestivalReservationUrlRequest request,
+                                                     FestivalReservationLogoPathDTO logoPath) {
         return new CreateFestivalReservationUrlDTO(
                 request.getReservationUrl(),
                 request.getName(),

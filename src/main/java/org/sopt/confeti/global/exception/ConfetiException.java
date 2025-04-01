@@ -7,7 +7,7 @@ public class ConfetiException extends RuntimeException {
 
     public ConfetiException(ErrorMessage errorMessage) {
         super(errorMessage.getMessage());
-        this.errorMessage=errorMessage;
+        this.errorMessage = errorMessage;
     }
 
     public ErrorMessage getErrorMessage() {

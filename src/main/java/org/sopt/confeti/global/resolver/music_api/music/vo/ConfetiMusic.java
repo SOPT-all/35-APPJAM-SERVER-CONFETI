@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.sopt.confeti.global.common.constant.ArtistConstant;
 import org.sopt.confeti.global.common.constant.MusicConstant;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicPreviewResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicResponse;

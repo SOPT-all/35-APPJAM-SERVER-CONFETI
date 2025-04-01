@@ -20,7 +20,7 @@ public interface ApiResponseUtil {
     static <T> Mono<ResponseEntity<BaseResponse<?>>> success(SuccessMessage successMessage, Mono<T> data) {
         return data.map(result ->
                 ResponseEntity.status(successMessage.getHttpStatus())
-                .body(BaseResponse.of(successMessage, result))
+                        .body(BaseResponse.of(successMessage, result))
         );
     }
 

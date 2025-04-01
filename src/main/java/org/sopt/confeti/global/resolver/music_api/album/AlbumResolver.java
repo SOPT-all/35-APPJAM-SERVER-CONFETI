@@ -12,7 +12,6 @@ import org.sopt.confeti.global.resolver.music_api.album.strategy.AlbumStrategyRe
 import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
 @Resolver
 @RequiredArgsConstructor

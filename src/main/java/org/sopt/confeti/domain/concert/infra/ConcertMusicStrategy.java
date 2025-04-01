@@ -15,7 +15,7 @@ public class ConcertMusicStrategy extends MusicStrategy {
     @Override
     public void collect(HashMap<String, Queue<ConfetiMusic>> musicMapper, Object target) {
         Concert concert = (Concert) target;
-        concert.getMusics().forEach(music ->  {
+        concert.getMusics().forEach(music -> {
             ConfetiMusic confetiMusic = music.getMusic();
             addToMapper(musicMapper, confetiMusic.getId(), confetiMusic);
         });

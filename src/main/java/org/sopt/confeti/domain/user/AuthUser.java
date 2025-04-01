@@ -13,7 +13,7 @@ public class AuthUser {
     private final String socialProfile;
     private final Role role;
 
-    private AuthUser(OAuthProvider provider,String socialId, String socialNickname, String socialProfile) {
+    private AuthUser(OAuthProvider provider, String socialId, String socialNickname, String socialProfile) {
         this.provider = provider;
         this.socialId = socialId;
         this.socialNickname = socialNickname;
@@ -21,20 +21,23 @@ public class AuthUser {
         this.role = Role.ONBOARDING;
     }
 
-    private AuthUser(Long id, OAuthProvider provider, String socialId, String socialNickname, String socialProfile, Role role) {
-        this.id=id;
-        this.provider=provider;
+    private AuthUser(Long id, OAuthProvider provider, String socialId, String socialNickname, String socialProfile,
+                     Role role) {
+        this.id = id;
+        this.provider = provider;
         this.socialId = socialId;
         this.socialNickname = socialNickname;
-        this.socialProfile=socialProfile;
+        this.socialProfile = socialProfile;
         this.role = role;
     }
 
-    public static AuthUser create(OAuthProvider provider,String socialId, String socialNickname, String socialProfile) {
+    public static AuthUser create(OAuthProvider provider, String socialId, String socialNickname,
+                                  String socialProfile) {
         return new AuthUser(provider, socialId, socialNickname, socialProfile);
     }
 
-    public static AuthUser createWithId(Long id, OAuthProvider provider, String socialId, String socialNickname, String socialProfile, Role role) {
+    public static AuthUser createWithId(Long id, OAuthProvider provider, String socialId, String socialNickname,
+                                        String socialProfile, Role role) {
         return new AuthUser(id, provider, socialId, socialNickname, socialProfile, role);
     }
 

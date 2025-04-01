@@ -1,9 +1,8 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
+import java.time.LocalDateTime;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.global.common.constant.PerformanceType;
-
-import java.time.LocalDateTime;
 
 public record ArtistPerformancesDetailDTO(
         long performanceId,

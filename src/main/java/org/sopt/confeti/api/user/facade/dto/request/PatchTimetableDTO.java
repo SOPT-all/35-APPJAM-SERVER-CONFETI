@@ -1,10 +1,9 @@
 package org.sopt.confeti.api.user.facade.dto.request;
 
+import java.util.List;
 import org.sopt.confeti.api.user.dto.request.PatchTimetableRequest;
 
-import java.util.List;
-
-public record PatchTimetableDTO (
+public record PatchTimetableDTO(
         List<PatchTimetableListDTO> userTimetables
 ) {
     public static PatchTimetableDTO from(PatchTimetableRequest timetableRequest) {

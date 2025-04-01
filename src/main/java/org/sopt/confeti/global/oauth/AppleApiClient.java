@@ -100,7 +100,8 @@ public class AppleApiClient implements OAuthApiClient {
                 .parseSignedClaims(tokenResult.idToken())
                 .getPayload();
 
-        return AppleSocialInfoResult.of(claims, name, tokenResult.accessToken(), tokenResult.refreshToken(), tokenResult.expiresIn());
+        return AppleSocialInfoResult.of(claims, name, tokenResult.accessToken(), tokenResult.refreshToken(),
+                tokenResult.expiresIn());
     }
 
     private String generateClientSecret() {

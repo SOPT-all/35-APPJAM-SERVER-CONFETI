@@ -10,7 +10,9 @@ import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 public interface MusicAPIHandler {
 
     List<ConfetiArtist> getArtistsByArtistIds(final Set<String> artistIds);
+
     Optional<ConfetiArtist> findArtistByKeyword(final String keyword);
+
     Optional<ConfetiArtist> findArtistByArtistId(final String artistId);
 
     List<ConfetiAlbum> getAlbumsByAlbumIds(final Set<String> albumIds);

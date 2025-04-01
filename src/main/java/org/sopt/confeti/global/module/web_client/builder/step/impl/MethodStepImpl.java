@@ -40,7 +40,8 @@ public class MethodStepImpl<T> implements MethodStep<T> {
 
         // memory size 설정
         ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(50 * 1024 * 1024)) // to unlimited memory size
+                .codecs(configurer -> configurer.defaultCodecs()
+                        .maxInMemorySize(50 * 1024 * 1024)) // to unlimited memory size
                 .build();
 
         // timeout 설정
@@ -48,7 +49,6 @@ public class MethodStepImpl<T> implements MethodStep<T> {
                 HttpClient.create()
                         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 120000)
                         .responseTimeout(Duration.ofSeconds(120)));
-
 
         return this.webClientBuilder
                 .exchangeStrategies(exchangeStrategies)

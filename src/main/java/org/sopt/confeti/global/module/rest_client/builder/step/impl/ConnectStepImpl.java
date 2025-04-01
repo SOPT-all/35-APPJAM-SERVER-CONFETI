@@ -18,6 +18,7 @@ public class ConnectStepImpl implements ConnectStep {
 
     /**
      * RestClient header 설정 없이 요청 전송
+     *
      * @return 다음 ResponseStep 반환
      */
     @Override
@@ -35,6 +36,7 @@ public class ConnectStepImpl implements ConnectStep {
 
     /**
      * RestClient header 설정 후 요청 전송
+     *
      * @param headers
      * @return 다음 ResponseStep 반환
      */

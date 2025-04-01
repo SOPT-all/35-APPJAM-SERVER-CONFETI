@@ -1,6 +1,6 @@
 package org.sopt.confeti.auth.dto.kakao;
 
-public record KakaoAccount (
+public record KakaoAccount(
         KakaoProfile profile
-){
+) {
 }

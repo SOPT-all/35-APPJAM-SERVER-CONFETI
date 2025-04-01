@@ -8,7 +8,8 @@ public record CreateConcertReservationUrlDTO(
         String name,
         String logoPath
 ) {
-    public static CreateConcertReservationUrlDTO of(CreateConcertReservationUrlRequest request, ConcertReservationLogoPathDTO logoPath) {
+    public static CreateConcertReservationUrlDTO of(CreateConcertReservationUrlRequest request,
+                                                    ConcertReservationLogoPathDTO logoPath) {
         return new CreateConcertReservationUrlDTO(
                 request.getReservationUrl(),
                 request.getName(),

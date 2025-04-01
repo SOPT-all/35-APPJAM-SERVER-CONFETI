@@ -40,7 +40,7 @@ public class AuthFacade {
     }
 
     @Transactional
-    public void logout(Long userId){
+    public void logout(Long userId) {
         logoutService.logout(userId);
     }
 

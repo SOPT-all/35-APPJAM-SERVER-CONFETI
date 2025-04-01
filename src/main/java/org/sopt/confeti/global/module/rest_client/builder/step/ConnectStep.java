@@ -5,5 +5,6 @@ import java.util.Map;
 public interface ConnectStep {
 
     ResponseStep connect();
+
     ResponseStep connect(Map<String, String> headers);
 }

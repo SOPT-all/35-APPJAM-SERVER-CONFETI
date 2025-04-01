@@ -16,7 +16,6 @@ import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFile
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -58,7 +57,7 @@ public class DummyPageController {
     public String createFestival(
             @Valid @ModelAttribute("festival") CreateFestivalRequest request,
             @RequestParam("posterFile") MultipartFile poster,
-            @RequestParam("posterBgFile")MultipartFile posterBg,
+            @RequestParam("posterBgFile") MultipartFile posterBg,
             @RequestParam("logoFile") MultipartFile logo,
             @RequestParam(value = "reservationLogoFile", required = false) List<MultipartFile> reservationLogos,
             RedirectAttributes redirectAttributes
@@ -85,7 +84,7 @@ public class DummyPageController {
     public String createConcert(
             @Valid @ModelAttribute("concert") CreateConcertRequest request,
             @RequestParam("posterFile") MultipartFile poster,
-            @RequestParam("posterBgFile")MultipartFile posterBg,
+            @RequestParam("posterBgFile") MultipartFile posterBg,
             @RequestParam(value = "reservationLogoFile", required = false) List<MultipartFile> reservationLogos,
             RedirectAttributes redirectAttributes
     ) {

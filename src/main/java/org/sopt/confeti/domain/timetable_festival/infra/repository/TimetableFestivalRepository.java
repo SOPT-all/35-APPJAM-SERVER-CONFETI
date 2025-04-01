@@ -1,9 +1,8 @@
 package org.sopt.confeti.domain.timetable_festival.infra.repository;
 
+import java.util.List;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

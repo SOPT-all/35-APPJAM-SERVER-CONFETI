@@ -2,7 +2,7 @@ package org.sopt.confeti.api.user.dto.response;
 
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistListDTO;
 
-public record UserFavoriteListResponse (
+public record UserFavoriteListResponse(
         String artistId,
         String name,
         String profileUrl

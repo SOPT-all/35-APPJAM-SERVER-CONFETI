@@ -17,9 +17,9 @@ import software.amazon.awssdk.http.HttpStatusCode;
 public class RetryOnTokenExpireAspect {
 
     /**
-     * RetryOnTokenExpire 어노테이션을 등록한 메서드에 자동으로 적용되는 Retry 패턴
-     * 실패 시 메서드의 클래스에 등록된 refreshToken() 함수를 호출해 토큰을 재생성 한 뒤 다시 시도합니다.
-     * 재시도는 어노테이션의 maxRetries 값만큼 시도합니다.
+     * RetryOnTokenExpire 어노테이션을 등록한 메서드에 자동으로 적용되는 Retry 패턴 실패 시 메서드의 클래스에 등록된 refreshToken() 함수를 호출해 토큰을 재생성 한 뒤 다시
+     * 시도합니다. 재시도는 어노테이션의 maxRetries 값만큼 시도합니다.
+     *
      * @param joinPoint 적용 대상
      * @return 성공 결과
      * @throws Throwable 401이 아닌 응답 코드
@@ -55,6 +55,7 @@ public class RetryOnTokenExpireAspect {
 
     /**
      * 401 응답 코드인지 확인하는 함수
+     *
      * @param e Client 오류
      * @return 401 응답 코드 여부
      */
@@ -64,8 +65,8 @@ public class RetryOnTokenExpireAspect {
     }
 
     /**
-     * 어노테이션을 등록한 메서드의 클래스에 구현된 refreshToken() 함수를 호출해 토큰을 재발행하는 함수
-     * 리플렉션을 사용해 호출합니다.
+     * 어노테이션을 등록한 메서드의 클래스에 구현된 refreshToken() 함수를 호출해 토큰을 재발행하는 함수 리플렉션을 사용해 호출합니다.
+     *
      * @param target 어노테이션을 등록한 메서드
      */
     private void invokeRefreshToken(Object target) {

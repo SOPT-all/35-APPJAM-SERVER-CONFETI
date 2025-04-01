@@ -1,7 +1,5 @@
 package org.sopt.confeti.api.performance.dto.response;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.global.util.DateConvertor;
 

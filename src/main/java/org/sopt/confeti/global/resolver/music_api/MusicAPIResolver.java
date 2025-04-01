@@ -18,8 +18,9 @@ public class MusicAPIResolver {
 
     /**
      * Apple Music API를 사용해 아티스트, 앨범, 음악 정보를 요청하는 엔트리 포인트
+     *
      * @param target target 정보를 로드할 대상 객체
-     * @param <T> 대상 객체 타입
+     * @param <T>    대상 객체 타입
      * @return 비동기 작업 완료 상태의 Mono
      */
     @Transactional

@@ -9,6 +9,7 @@ public record FestivalDetailResponse(
         List<FestivalDetailDateResponse> festivalDates
 ) {
     private static final int SPACE_BETWEEN_DATE_AND_IDX = 1;
+
     public static FestivalDetailResponse from(final FestivalDetailDTO festival) {
         return new FestivalDetailResponse(
                 FestivalDetailInfoResponse.from(festival),

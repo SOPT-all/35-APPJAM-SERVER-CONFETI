@@ -80,13 +80,13 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
         return convertToConfetiArtists(
                 restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getMultipleArtistsUrl())
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(AppleMusicArtistsResponse.class)
+                        .get()
+                        .baseUrl(appleMusicAPIURL.getBaseUrl())
+                        .path(appleMusicAPIURL.getMultipleArtistsUrl())
+                        .params(MultiValueMap.fromSingleValue(params))
+                        .build()
+                        .connect(headers)
+                        .retrieve(AppleMusicArtistsResponse.class)
         );
     }
 
@@ -99,13 +99,13 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
         return convertToConfetiArtist(
                 restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getSingleSearchUrl())
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(AppleMusicSearchResponse.class)
+                        .get()
+                        .baseUrl(appleMusicAPIURL.getBaseUrl())
+                        .path(appleMusicAPIURL.getSingleSearchUrl())
+                        .params(MultiValueMap.fromSingleValue(params))
+                        .build()
+                        .connect(headers)
+                        .retrieve(AppleMusicSearchResponse.class)
         );
     }
 
@@ -114,12 +114,12 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     public Optional<ConfetiArtist> findArtistByArtistId(final String artistId) {
         return convertToConfetiArtist(
                 restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getSingleArtistPath(artistId))
-                .build()
-                .connect(headers)
-                .retrieve(AppleMusicArtistsResponse.class)
+                        .get()
+                        .baseUrl(appleMusicAPIURL.getBaseUrl())
+                        .path(appleMusicAPIURL.getSingleArtistPath(artistId))
+                        .build()
+                        .connect(headers)
+                        .retrieve(AppleMusicArtistsResponse.class)
         );
     }
 

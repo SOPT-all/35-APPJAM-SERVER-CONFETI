@@ -11,7 +11,7 @@ public class UserRepositoryAdapter implements AllUserRepository {
     private final UserRepository userRepository;
 
     @Override
-    public AuthUser save(AuthUser authUser){
+    public AuthUser save(AuthUser authUser) {
         return userRepository.save(User.create(authUser)).toAuthUser();
     }
 }

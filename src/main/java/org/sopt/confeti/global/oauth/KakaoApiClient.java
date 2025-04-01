@@ -5,18 +5,15 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.OAuthSocialInfoResult;
+import org.sopt.confeti.auth.dto.kakao.KakaoLoginParams;
+import org.sopt.confeti.auth.dto.kakao.KakaoSocialInfoResult;
+import org.sopt.confeti.auth.dto.kakao.KakaoTokenResult;
 import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.global.annotation.OAuthClient;
 import org.sopt.confeti.global.module.rest_client.builder.ApiRestClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
-import org.sopt.confeti.auth.dto.kakao.KakaoSocialInfoResult;
-import org.sopt.confeti.auth.dto.kakao.KakaoLoginParams;
-import org.sopt.confeti.auth.dto.kakao.KakaoTokenResult;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClient;
 
 @OAuthClient
 @RequiredArgsConstructor

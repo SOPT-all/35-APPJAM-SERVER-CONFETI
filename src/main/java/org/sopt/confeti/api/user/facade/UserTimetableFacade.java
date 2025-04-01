@@ -1,23 +1,24 @@
 package org.sopt.confeti.api.user.facade;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
-import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalArtiestDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
+import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
+import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.application.FestivalDateService;
-import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
@@ -25,15 +26,13 @@ import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.user_timetable.UserTimetable;
 import org.sopt.confeti.domain.user_timetable.application.UserTimetableService;
+import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Facade
 @RequiredArgsConstructor
@@ -53,7 +52,7 @@ public class UserTimetableFacade {
     public UserTimetableDTO getTimetablesListAndDate(long userId) {
         validateExistUser(userId);
 
-        List<TimetableFestival> festivalList =  timetableFestivalService.getFetivalList(userId);
+        List<TimetableFestival> festivalList = timetableFestivalService.getFetivalList(userId);
         return UserTimetableDTO.from(festivalList);
     }
 
@@ -88,7 +87,8 @@ public class UserTimetableFacade {
     }
 
     @Transactional
-    protected void validateDuplicateTimetableFestival(final List<Festival> currentFestivals, final List<Festival> addFestivals) {
+    protected void validateDuplicateTimetableFestival(final List<Festival> currentFestivals,
+                                                      final List<Festival> addFestivals) {
         if (
                 currentFestivals.stream()
                         .anyMatch(currentFestival -> addFestivals.stream()
@@ -129,7 +129,8 @@ public class UserTimetableFacade {
     @Transactional(readOnly = true)
     public CursorPage<TimetableToAddDTO> getTimetablesToAdd(final long userId, final Long cursor) {
         if (cursor == null) {
-            List<Festival> festivals = festivalService.findFestivalsUsingInitCursor(userId, TIMETABLE_FESTIVALS_TO_ADD_SIZE);
+            List<Festival> festivals = festivalService.findFestivalsUsingInitCursor(userId,
+                    TIMETABLE_FESTIVALS_TO_ADD_SIZE);
             return CursorPage.of(
                     festivals.stream()
                             .map(TimetableToAddDTO::from)
@@ -141,7 +142,8 @@ public class UserTimetableFacade {
         // 커서 값 조회
         FestivalCursorDTO festivalCursorDTO = getFestivalCursor(userId, cursor);
 
-        List<Festival> festivals = festivalService.findFestivalsUsingCursor(userId, festivalCursorDTO.cursorTitle(), festivalCursorDTO.cursorIsFavorite(), TIMETABLE_FESTIVALS_TO_ADD_SIZE);
+        List<Festival> festivals = festivalService.findFestivalsUsingCursor(userId, festivalCursorDTO.cursorTitle(),
+                festivalCursorDTO.cursorIsFavorite(), TIMETABLE_FESTIVALS_TO_ADD_SIZE);
         return CursorPage.of(
                 festivals.stream()
                         .map(TimetableToAddDTO::from)
@@ -162,7 +164,8 @@ public class UserTimetableFacade {
                 .toList();
         validateExistFestivalTimeIds(festivalTimeIds);
 
-        List<UserTimetable> userTimetables = userTimetableService.getUserTimetablesByFestivalTimeId(userId, festivalTimeIds);
+        List<UserTimetable> userTimetables = userTimetableService.getUserTimetablesByFestivalTimeId(userId,
+                festivalTimeIds);
         validateExistUserTimetables(userTimetables);
 
         Map<Long, UserTimetable> userTimetableMapper = createUserTimetableMapper(userTimetables);
@@ -190,7 +193,7 @@ public class UserTimetableFacade {
     public void patchTimetableFestivals(final long userId, final PatchTimetableDTO timetableDTO) {
         validateUserExists(userId);
 
-        List<UserTimetable> userTimetables= userTimetableService.getUserTimeTables(userId);
+        List<UserTimetable> userTimetables = userTimetableService.getUserTimeTables(userId);
         validateExistUserTimetables(userTimetables);
         validateExistTimetableIds(userTimetables, timetableDTO);
 
@@ -198,7 +201,7 @@ public class UserTimetableFacade {
     }
 
     @Transactional(readOnly = true)
-    protected void validateExistFestivalTimeIds(final List<Long> festivalTimeIds){
+    protected void validateExistFestivalTimeIds(final List<Long> festivalTimeIds) {
         if (festivalTimeIds == null || festivalTimeIds.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
@@ -212,7 +215,7 @@ public class UserTimetableFacade {
     }
 
     @Transactional(readOnly = true)
-    protected void validateExistUserTimetableMapper( Map<Long, UserTimetable> userTimetables) {
+    protected void validateExistUserTimetableMapper(Map<Long, UserTimetable> userTimetables) {
         if (userTimetables.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }

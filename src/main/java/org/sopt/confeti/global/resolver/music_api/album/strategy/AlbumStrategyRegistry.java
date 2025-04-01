@@ -3,7 +3,6 @@ package org.sopt.confeti.global.resolver.music_api.album.strategy;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Registry;
-import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategy;
 
 @Registry
 @RequiredArgsConstructor

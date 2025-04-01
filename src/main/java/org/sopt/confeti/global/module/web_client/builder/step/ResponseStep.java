@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public interface ResponseStep {
     Object toObjectCall();
+
     JsonNode toJsonNodeCall();
+
     void toVoidCall();
 }

@@ -1,6 +1,5 @@
 package org.sopt.confeti.api.artist.dto.response;
 
-import java.time.LocalDate;
 import org.sopt.confeti.api.artist.facade.dto.response.SearchArtistDTO;
 import org.sopt.confeti.global.util.DateConvertor;
 

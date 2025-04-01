@@ -2,9 +2,15 @@ package org.sopt.confeti.api.performance.controller;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.performance.dto.response.*;
+import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
+import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
+import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
+import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
+import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
-import org.sopt.confeti.api.performance.facade.dto.response.*;
+import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -17,7 +23,10 @@ import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,7 +44,8 @@ public class PerformanceController {
             @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId
     ) {
         ConcertDetailDTO concertDetailDTO = performanceFacade.getConcertDetailInfo(userId, concertId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, ConcertDetailResponse.of(concertDetailDTO, s3FileHandler));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                ConcertDetailResponse.of(concertDetailDTO, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -54,17 +64,19 @@ public class PerformanceController {
             @UserId(require = false) Long userId
     ) {
         PerformanceReservationDTO performanceReservationDTO = performanceFacade.getPerformReservationInfo(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, PerformanceReservationResponse.from(performanceReservationDTO));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                PerformanceReservationResponse.from(performanceReservationDTO));
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/association/{artistId}")
     public ResponseEntity<BaseResponse<?>> getPerformanceByArtist(
             @UserId(require = false) Long userId,
-            @PathVariable(name="artistId") String artistId
-    ){
+            @PathVariable(name = "artistId") String artistId
+    ) {
         ArtistPerformancesDTO performances = performanceFacade.getPerformancesByArtistId(userId, artistId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, ArtistPerformancesResponse.of(performances, s3FileHandler));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                ArtistPerformancesResponse.of(performances, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -73,6 +85,7 @@ public class PerformanceController {
             @UserId(require = false) Long userId
     ) {
         RecentPerformancesDTO recentPerformances = performanceFacade.getRecentPerformances(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, RecentPerformancesResponse.of(recentPerformances, s3FileHandler));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                RecentPerformancesResponse.of(recentPerformances, s3FileHandler));
     }
 }
