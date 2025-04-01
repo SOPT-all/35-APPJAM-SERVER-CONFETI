@@ -68,11 +68,11 @@ jobs:
             mkdir -p ./src/main/resources/openapi
           fi
 
-      # application-spotify.yml 파일 생성
-      - name: make application-spotify.yml
+      # application-apple-music.yml 파일 생성
+      - name: make application-apple-music.yml
         run: |
-          touch ./src/main/resources/openapi/application-spotify.yml
-          echo "${{ secrets.APPLICATION_SPOTIFY_YML }}" > ./src/main/resources/openapi/application-spotify.yml
+          touch ./src/main/resources/openapi/application-apple-music.yml
+          echo "${{ secrets.APPLICATION_APPLE_MUSIC_YML }}" > ./src/main/resources/openapi/application-apple-music.yml
         shell: bash
 
       # oauth 폴더 생성
