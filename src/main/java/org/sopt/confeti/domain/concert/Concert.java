@@ -21,6 +21,8 @@ import org.sopt.confeti.domain.concert_artist.ConcertArtist;
 import org.sopt.confeti.domain.concert_music.ConcertMusic;
 import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
 import org.sopt.confeti.global.common.constant.Default;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 @Table(name = "concerts")
@@ -78,6 +80,13 @@ public class Concert {
 
     @Column(length = 100, nullable = false)
     private String address;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "concert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConcertArtist> artists = new ArrayList<>();
