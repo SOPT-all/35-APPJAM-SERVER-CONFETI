@@ -9,13 +9,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.sopt.confeti.domain.concert.Concert;
-import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 @Entity
@@ -53,15 +51,12 @@ public class Performance {
     @Column(nullable = false)
     private LocalDateTime endAt;
 
-    @Column
-    private LocalTime artistStartAt;
-
     @Column(length = 250, nullable = false)
     private String posterPath;
 
     @Builder
     public Performance(long typeId, PerformanceType type, String artistId, String area, String title,
-                       String subtitle, LocalDateTime startAt, LocalDateTime endAt, LocalTime artistStartAt,
+                       String subtitle, LocalDateTime startAt, LocalDateTime endAt,
                        String posterPath) {
         this.typeId = typeId;
         this.type = type;
@@ -71,37 +66,21 @@ public class Performance {
         this.subtitle = subtitle;
         this.startAt = startAt;
         this.endAt = endAt;
-        this.artistStartAt = artistStartAt;
         this.posterPath = posterPath;
     }
 
-    public static Performance create(final Festival festival, final String artistId, final LocalTime artistStartAt) {
+    public static Performance create(final long festivalId, final CreateFestivalDTO festivalDTO,
+                                     final String artistId) {
         return Performance.builder()
-                .typeId(festival.getId())
+                .typeId(festivalId)
                 .type(PerformanceType.FESTIVAL)
                 .artistId(artistId)
-                .area(festival.getArea())
-                .title(festival.getTitle())
-                .subtitle(festival.getSubtitle())
-                .startAt(festival.getStartAt())
-                .endAt(festival.getEndAt())
-                .artistStartAt(artistStartAt)
-                .posterPath(festival.getPosterPath())
-                .build();
-    }
-
-    public static Performance create(final Concert concert, final String artistId) {
-        return Performance.builder()
-                .typeId(concert.getId())
-                .type(PerformanceType.CONCERT)
-                .artistId(artistId)
-                .area(concert.getArea())
-                .title(concert.getTitle())
-                .subtitle(concert.getSubtitle())
-                .startAt(concert.getStartAt())
-                .endAt(concert.getEndAt())
-                .artistStartAt(null)
-                .posterPath(concert.getPosterPath())
+                .area(festivalDTO.area())
+                .title(festivalDTO.title())
+                .subtitle(festivalDTO.subtitle())
+                .startAt(festivalDTO.startAt())
+                .endAt(festivalDTO.endAt())
+                .posterPath(festivalDTO.posterPath())
                 .build();
     }
 }
