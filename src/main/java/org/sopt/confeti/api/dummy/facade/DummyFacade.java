@@ -3,6 +3,7 @@ package org.sopt.confeti.api.dummy.facade;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.dummy.facade.dto.concert.ConcertFilePathsDTO;
+import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertArtistDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.UploadConcertFilesDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
@@ -80,6 +81,19 @@ public class DummyFacade {
 
     @Transactional
     public void createConcert(CreateConcertDTO concertDTO) {
-        concertService.create(Concert.create(concertDTO));
+        long concertId = concertService.create(Concert.create(concertDTO));
+        performanceService.create(createPerformances(concertId, concertDTO));
+    }
+
+    private List<Performance> createPerformances(long concertId, CreateConcertDTO concertDTO) {
+        return getArtistIds(concertDTO).stream()
+                .map(artistId -> Performance.create(concertId, concertDTO, artistId))
+                .toList();
+    }
+
+    private List<String> getArtistIds(CreateConcertDTO concertDTO) {
+        return concertDTO.artists().stream()
+                .map(CreateConcertArtistDTO::artistId)
+                .toList();
     }
 }
