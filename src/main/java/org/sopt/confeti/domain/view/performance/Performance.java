@@ -16,6 +16,8 @@ import lombok.NoArgsConstructor;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 @Table(name = "performances")
@@ -54,6 +56,13 @@ public class Performance {
 
     @Column(length = 250, nullable = false)
     private String posterPath;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     @Builder
     public Performance(long typeId, PerformanceType type, String artistId, String area, String title,

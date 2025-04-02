@@ -23,6 +23,8 @@ import org.sopt.confeti.domain.festival_music.FestivalMusic;
 import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.global.common.constant.Default;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 @Table(name = "festivals")
@@ -85,6 +87,13 @@ public class Festival {
 
     @Column(length = 100, nullable = false)
     private String address;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FestivalDate> dates = new ArrayList<>();
