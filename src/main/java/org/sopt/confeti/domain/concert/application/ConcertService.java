@@ -73,7 +73,7 @@ public class ConcertService {
     }
 
     @Transactional
-    public void create(Concert concert) {
-        concertRepository.save(concert);
+    public long create(Concert concert) {
+        return concertRepository.save(concert).getId();
     }
 }
