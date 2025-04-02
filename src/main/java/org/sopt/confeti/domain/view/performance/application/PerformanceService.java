@@ -2,7 +2,6 @@ package org.sopt.confeti.domain.view.performance.application;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
@@ -42,15 +41,6 @@ public class PerformanceService {
     @Transactional
     public void create(final List<Performance> performances) {
         performanceRepository.saveAll(performances);
-    }
-
-    @Transactional
-    public void create(final Concert concert) {
-        performanceRepository.saveAll(
-                concert.getArtists().stream()
-                        .map(concertArtist -> Performance.create(concert, concertArtist.getArtist().getId()))
-                        .toList()
-        );
     }
 
     @Transactional(readOnly = true)
