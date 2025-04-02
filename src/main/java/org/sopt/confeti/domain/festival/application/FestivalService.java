@@ -116,7 +116,7 @@ public class FestivalService {
     }
 
     @Transactional
-    public void create(Festival festival) {
-        festivalRepository.save(festival);
+    public long create(Festival festival) {
+        return festivalRepository.save(festival).getId();
     }
 }
