@@ -76,35 +76,35 @@ public class AppleMusicAPIURL {
                 .toUriString();
     }
 
-    public String getMultipleArtistsUrl() {
+    public String getMultipleArtistsPath() {
         return getArtistsBasePath() + artistsPathMultiple;
     }
 
-    public String getSingleAlbumUrl(String id) {
+    public String getSingleAlbumPath(String id) {
         return UriComponentsBuilder.fromUriString(getAlbumsBasePath() + albumsPathSingle)
                 .buildAndExpand(id)
                 .toUriString();
     }
 
-    public String getMultipleAlbumsUrl() {
+    public String getMultipleAlbumsPath() {
         return getAlbumsBasePath() + albumsPathMultiple;
     }
 
-    public String getSingleSongUrl(String id) {
+    public String getSingleSongPath(String id) {
         return UriComponentsBuilder.fromUriString(getSongsBasePath() + songsPathSingle)
                 .buildAndExpand(id)
                 .toUriString();
     }
 
-    public String getMultipleSongsUrl() {
+    public String getMultipleSongsPath() {
         return getSongsBasePath() + songsPathMultiple;
     }
 
-    public String getSingleSearchUrl() {
+    public String getSingleSearchPath() {
         return getSearchBasePath() + searchPathSingle;
     }
 
-    public String getHintsSearchUrl() {
+    public String getHintsSearchPath() {
         return getSearchBasePath() + searchPathHints;
     }
 }
