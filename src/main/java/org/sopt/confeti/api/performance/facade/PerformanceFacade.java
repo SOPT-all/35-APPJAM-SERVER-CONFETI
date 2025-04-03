@@ -38,9 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class PerformanceFacade {
 
     private static final int RECENT_PERFORMANCES_SIZE = 7;
-
-    private static final int NEXT_CURSOR_SIZE = 1;
-    private static final int PERFORMANCE_TO_ADD_SIZE = 2 + NEXT_CURSOR_SIZE;
+    private static final boolean PERSONALIZED = true;
+    private static final boolean UNPERSONALIZED = false;
 
     private final ConcertService concertService;
     private final FestivalService festivalService;
@@ -137,6 +136,7 @@ public class PerformanceFacade {
         List<ArtistFavorite> artistFavorites = artistFavoriteService.getArtistIdsByUserId(userId);
 
         return RecentPerformancesDTO.from(
+                PERSONALIZED,
                 performanceService.getPerformancesByArtistIds(
                         artistFavorites.stream()
                                 .map(artistFavorite -> artistFavorite.getArtist().getId())
@@ -154,7 +154,7 @@ public class PerformanceFacade {
         // 최신 페스티벌 조회
         List<Festival> festivals = festivalService.getRecentFestivals(RECENT_PERFORMANCES_SIZE);
 
-        return RecentPerformancesDTO.of(concerts, festivals, RECENT_PERFORMANCES_SIZE);
+        return RecentPerformancesDTO.of(UNPERSONALIZED, concerts, festivals, RECENT_PERFORMANCES_SIZE);
     }
 
     @Transactional(readOnly = true)

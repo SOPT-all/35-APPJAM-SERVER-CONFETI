@@ -8,9 +8,11 @@ import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.view.performance.Performance;
 
 public record RecentPerformancesDTO(
+        boolean isPersonalized,
         List<RecentPerformanceDTO> performances
 ) {
     public static RecentPerformancesDTO of(
+            boolean isPersonalized,
             List<Concert> concerts,
             List<Festival> festivals,
             int recentPerformanceSize
@@ -26,11 +28,12 @@ public record RecentPerformancesDTO(
             performances = performances.subList(0, recentPerformanceSize);
         }
 
-        return new RecentPerformancesDTO(performances);
+        return new RecentPerformancesDTO(isPersonalized, performances);
     }
 
-    public static RecentPerformancesDTO from(final List<Performance> performances) {
+    public static RecentPerformancesDTO from(boolean isPersonalized, List<Performance> performances) {
         return new RecentPerformancesDTO(
+                isPersonalized,
                 performances.stream()
                         .map(RecentPerformanceDTO::from)
                         .toList()
