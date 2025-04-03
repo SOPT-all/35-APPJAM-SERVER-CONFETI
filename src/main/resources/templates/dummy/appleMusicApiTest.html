@@ -264,7 +264,23 @@
 
     const artistIncludeOptions = ["albums", "songs", "music-videos", "playlists", "station", "genres", "appears-on-albums", "compilation-albums", "featured-albums", "featured-music-videos", "featured-playlists", "full-albums", "latest-release", "live-albums", "similar-artists", "singles", "top-music-videos", "top-songs", "collaborations", "catalog"];
 
-    const includeLabel = " (선택 안해도 됨, 여러 개 선택하려면 / Mac은 Command + 선택 / 윈도우는 Ctrl + 선택)";
+    const includeLabel = "「include」 - 포함시킬 관련 정보 (선택 안해도 됨, 여러 개 선택하려면 / Mac은 Command + 선택 / 윈도우는 Ctrl + 선택)";
+
+    const albumInclude = {
+        name: "include",
+        label: includeLabel,
+        type: "select",
+        multiple: true,
+        options: albumIncludeOptions
+    };
+
+    const artistInclude = {
+        name: "include",
+        label: includeLabel,
+        type: "select",
+        multiple: true,
+        options: artistIncludeOptions
+    }
 
     // API Configuration
     const apiConfig = {
@@ -284,13 +300,7 @@
                             type: "select",
                             options: ["appears-on", "other-versions", "related-albums", "related-videos"]
                         },
-                        {
-                            name: "include",
-                            label: "「include」 - 포함시킬 관련 정보" + includeLabel,
-                            type: "select",
-                            multiple: true,
-                            options: albumIncludeOptions
-                        }
+                        albumInclude
                     ]
                 },
                 {
@@ -345,13 +355,7 @@
                             required: true,
                             placeholder: "e.g., 1234567890,0987654321"
                         },
-                        {
-                            name: "include",
-                            label: "「include」 - 포함시킬 관련 정보" + includeLabel,
-                            type: "select",
-                            multiple: true,
-                            options: albumIncludeOptions
-                        }
+                        albumInclude
                     ]
                 }
             ]
@@ -372,13 +376,7 @@
                             type: "select",
                             options: ["appears-on-albums", "compilation-albums", "featured-albums", "featured-music-videos", "featured-playlists", "full-albums", "latest-release", "live-albums", "similar-artists", "singles", "top-music-videos", "top-songs"]
                         },
-                        {
-                            name: "include",
-                            label: "「include」 - 포함시킬 관련 정보" + includeLabel,
-                            type: "select",
-                            multiple: true,
-                            options: artistIncludeOptions
-                        }
+                        artistInclude
                     ]
                 },
                 {
@@ -423,22 +421,17 @@
                 {
                     id: "multiple-catalog-artists",
                     name: "Get Multiple Catalog Artists",
-                    description: "Fetch multiple artists by their catalog IDs.",
+                    description: "여러 개의 아티스트 ID로 다수의 아티스트 조회" + artistIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-multiple-catalog-artists",
                     params: [
                         {
                             name: "ids",
-                            label: "Artist IDs (comma-separated)",
+                            label: "여러 개의 아티스트 ID (','로 구분) - 최대 25개 가능",
                             type: "text",
                             required: true,
                             placeholder: "e.g., 1234567890,0987654321"
                         },
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
-                        {
-                            name: "include",
-                            label: "Include Relationships",
-                            type: "text",
-                            placeholder: "e.g., albums,songs"
-                        }
+                        artistInclude
                     ]
                 }
             ]

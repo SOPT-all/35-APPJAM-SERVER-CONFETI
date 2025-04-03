@@ -38,13 +38,23 @@ public class AppleMusicAPITestFacade {
         generateToken();
     }
 
+    private void putIfNotEmpty(Map<String, String> params, String name, String target) {
+        if (target != null && !target.isBlank()) {
+            params.put(name, target);
+        }
+    }
+
+    private void putIfNotEmpty(Map<String, String> params, String name, List<String> target) {
+        if (target != null && !target.isEmpty()) {
+            params.put(name, String.join(",", target));
+        }
+    }
+
     @RetryOnTokenExpire
     public Object requestCatalogAlbum(String id, String views, List<String> include) {
         Map<String, String> params = new HashMap<>();
-        if (views != null) {
-            params.put("views", views);
-        }
-        params.put("include", String.join(",", include));
+        putIfNotEmpty(params, "views", views);
+        putIfNotEmpty(params, "include", include);
 
         return restClient.request()
                 .get()
@@ -59,8 +69,8 @@ public class AppleMusicAPITestFacade {
     @RetryOnTokenExpire
     public Object requestMultipleCatalogAlbums(String ids, List<String> include) {
         Map<String, String> params = new HashMap<>();
-        params.put("ids", ids);
-        params.put("include", String.join(",", include));
+        putIfNotEmpty(params, "ids", ids);
+        putIfNotEmpty(params, "include", include);
 
         return restClient.request()
                 .get()
@@ -75,15 +85,29 @@ public class AppleMusicAPITestFacade {
     @RetryOnTokenExpire
     public Object requestCatalogArtist(String id, String views, List<String> include) {
         Map<String, String> params = new HashMap<>();
-        if (views != null) {
-            params.put("views", views);
-        }
-        params.put("include", String.join(",", include));
+        putIfNotEmpty(params, "views", views);
+        putIfNotEmpty(params, "include", include);
 
         return restClient.request()
                 .get()
                 .baseUrl(appleMusicAPIURL.getBaseUrl())
                 .path(appleMusicAPIURL.getSingleArtistPath(id))
+                .params(MultiValueMap.fromSingleValue(params))
+                .build()
+                .connect(headers)
+                .retrieve(Object.class);
+    }
+
+    @RetryOnTokenExpire
+    public Object requestMultipleCatalogArtists(String ids, List<String> include) {
+        Map<String, String> params = new HashMap<>();
+        putIfNotEmpty(params, "ids", ids);
+        putIfNotEmpty(params, "include", include);
+
+        return restClient.request()
+                .get()
+                .baseUrl(appleMusicAPIURL.getBaseUrl())
+                .path(appleMusicAPIURL.getMultipleArtistsUrl())
                 .params(MultiValueMap.fromSingleValue(params))
                 .build()
                 .connect(headers)
