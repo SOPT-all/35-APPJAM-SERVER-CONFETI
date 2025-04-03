@@ -85,4 +85,13 @@ public class AppleMusicAPITestController {
         Object response = appleMusicAPITestFacade.requestSearch(term, types, limit, offset);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, response);
     }
+
+    @GetMapping("${api.endpoints.dummy.catalog-search-hints}")
+    public ResponseEntity<BaseResponse<?>> getSearchHintsResult(
+            @RequestParam String term,
+            @RequestParam(required = false) Integer limit
+    ) {
+        Object response = appleMusicAPITestFacade.requestSearchHints(term, limit);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, response);
+    }
 }
