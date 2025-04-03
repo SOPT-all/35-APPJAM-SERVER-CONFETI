@@ -698,7 +698,7 @@
                 })
                 .then(data => {
                     // Format and display the response
-                    jsonResponse.textContent = JSON.stringify(data, null, 2);
+                    jsonResponse.textContent = JSON.stringify(data.data, null, 2);
                     loadingSpinner.style.display = 'none';
                     jsonResponse.style.display = 'block';
 
