@@ -98,7 +98,7 @@ public class Performance {
                                      final String artistId) {
         return Performance.builder()
                 .typeId(concertId)
-                .type(PerformanceType.FESTIVAL)
+                .type(PerformanceType.CONCERT)
                 .artistId(artistId)
                 .area(concertDTO.area())
                 .title(concertDTO.title())
