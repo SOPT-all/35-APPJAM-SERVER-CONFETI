@@ -71,4 +71,21 @@ public class AppleMusicAPITestFacade {
                 .connect(headers)
                 .retrieve(Object.class);
     }
+
+    @RetryOnTokenExpire
+    public Object requestCatalogArtist(String id, String views) {
+        Map<String, String> params = new HashMap<>();
+        if (views != null) {
+            params.put("views", views);
+        }
+
+        return restClient.request()
+                .get()
+                .baseUrl(appleMusicAPIURL.getBaseUrl())
+                .path(appleMusicAPIURL.getSingleArtistPath(id))
+                .params(MultiValueMap.fromSingleValue(params))
+                .build()
+                .connect(headers)
+                .retrieve(Object.class);
+    }
 }
