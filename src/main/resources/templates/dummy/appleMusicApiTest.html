@@ -220,15 +220,15 @@
                 {
                     id: "catalog-album",
                     name: "Get a Catalog Album",
-                    description: "Fetch an album by using its catalog ID.",
+                    description: "앨범 ID로 앨범 조회",
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-a-catalog-album",
                     params: [
                         {name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
                         {
-                            name: "include",
-                            label: "Include Relationships",
+                            name: "views",
+                            label: "대상 앨범의 어떤 것을 볼건지 / 가능한 값 : appears-on, other-versions, related-albums, related-videos",
                             type: "text",
-                            placeholder: "e.g., artists,tracks"
+                            placeholder: "appears-on, other-versions, related-albums, related-videos"
                         }
                     ]
                 },
@@ -582,6 +582,7 @@
                         <div class="mb-4">
                             <h4 class="api-name">${endpoint.name}</h4>
                             <p>${endpoint.description}</p>
+                            <a target="_blank" href="${endpoint.reference}">Apple Music API 문서 바로가기</a>
                         </div>
                     `;
 

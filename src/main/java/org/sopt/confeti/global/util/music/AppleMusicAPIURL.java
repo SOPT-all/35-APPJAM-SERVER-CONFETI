@@ -30,6 +30,9 @@ public class AppleMusicAPIURL {
     @Value("${apple-music.api.endpoints.albums-path.base}")
     private String albumsPathBase;
 
+    @Value("${apple-music.api.endpoints.albums-path.single}")
+    private String albumsPathSingle;
+
     @Value("${apple-music.api.endpoints.albums-path.multiple}")
     private String albumsPathMultiple;
 
@@ -75,6 +78,12 @@ public class AppleMusicAPIURL {
 
     public String getMultipleArtistsUrl() {
         return getArtistsBasePath() + artistsPathMultiple;
+    }
+
+    public String getSingleAlbumUrl(String id) {
+        return UriComponentsBuilder.fromUriString(getAlbumsBasePath() + albumsPathSingle)
+                .buildAndExpand(id)
+                .toUriString();
     }
 
     public String getMultipleAlbumsUrl() {
