@@ -11,9 +11,11 @@
             padding-top: 20px;
             background-color: #f8f9fa;
         }
+
         .container {
             max-width: 1200px;
         }
+
         .api-card {
             transition: all 0.3s;
             height: 100%;
@@ -21,39 +23,48 @@
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .api-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
+
         .api-header {
             background-color: #f2f2f2;
             padding: 15px;
             border-radius: 10px 10px 0 0;
         }
+
         .category-icon {
             font-size: 2.5rem;
             margin-bottom: 10px;
         }
+
         .api-body {
             padding: 20px;
             background-color: white;
         }
+
         .nav-pills .nav-link.active {
             background-color: #dc3545; /* Apple Red */
         }
+
         .nav-pills .nav-link {
             color: #212529;
         }
+
         .btn-apple {
             background-color: #dc3545; /* Apple Red */
             border-color: #dc3545;
             color: white;
         }
+
         .btn-apple:hover {
             background-color: #c82333;
             border-color: #bd2130;
             color: white;
         }
+
         #responseContainer {
             max-height: 600px;
             overflow-y: auto;
@@ -61,32 +72,39 @@
             background-color: #f8f9fa;
             border: 1px solid #dee2e6;
         }
+
         #jsonResponse {
             padding: 20px;
             white-space: pre-wrap;
         }
+
         .param-container {
             margin-bottom: 15px;
             background-color: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
         }
+
         .loading-spinner {
             display: none;
             margin: 20px auto;
             text-align: center;
         }
+
         .api-name {
             font-weight: bold;
             margin-bottom: 10px;
         }
+
         .required-param {
             font-weight: bold;
         }
+
         .required-param::after {
             content: " *";
             color: #dc3545;
         }
+
         .tab-content {
             padding-top: 20px;
         }
@@ -190,6 +208,7 @@
         </div>
     </div>
 </div>
+<div id="api-base-url" th:data-api-base-url="${actionUrl}"></div>
 
 <!-- API Configuration -->
 <script th:inline="javascript">
@@ -199,44 +218,78 @@
             title: "Albums API",
             endpoints: [
                 {
-                    id: "getCatalogAlbum",
+                    id: "catalog-album",
                     name: "Get a Catalog Album",
                     description: "Fetch an album by using its catalog ID.",
                     params: [
-                        { name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., artists,tracks" }
+                        {name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
+                        {
+                            name: "include",
+                            label: "Include Relationships",
+                            type: "text",
+                            placeholder: "e.g., artists,tracks"
+                        }
                     ]
                 },
                 {
-                    id: "getCatalogAlbumRelationship",
+                    id: "catalog-album-relationship",
                     name: "Get a Catalog Album's Relationship Directly by Name",
                     description: "Fetch an album's relationship data directly by relationship name.",
                     params: [
-                        { name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["artists", "tracks", "genres", "record-labels"] },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                        {name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {
+                            name: "relationship",
+                            label: "Relationship Name",
+                            type: "select",
+                            required: true,
+                            options: ["artists", "tracks", "genres", "record-labels"]
+                        },
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"}
                     ]
                 },
                 {
-                    id: "getCatalogAlbumRelationshipView",
+                    id: "catalog-album-relationship-view",
                     name: "Get a Catalog Album's Relationship View Directly by Name",
                     description: "Fetch a view of an album's relationship data.",
                     params: [
-                        { name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["artists", "tracks"] },
-                        { name: "view", label: "View", type: "select", required: true, options: ["appears-on", "featured-on", "more-by-artist", "more-in-genre", "related"] },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                        {name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {
+                            name: "relationship",
+                            label: "Relationship Name",
+                            type: "select",
+                            required: true,
+                            options: ["artists", "tracks"]
+                        },
+                        {
+                            name: "view",
+                            label: "View",
+                            type: "select",
+                            required: true,
+                            options: ["appears-on", "featured-on", "more-by-artist", "more-in-genre", "related"]
+                        },
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"}
                     ]
                 },
                 {
-                    id: "getMultipleCatalogAlbums",
+                    id: "multiple-catalog-albums",
                     name: "Get Multiple Catalog Albums",
                     description: "Fetch multiple albums by their catalog IDs.",
                     params: [
-                        { name: "ids", label: "Album IDs (comma-separated)", type: "text", required: true, placeholder: "e.g., 1234567890,0987654321" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., artists,tracks" }
+                        {
+                            name: "ids",
+                            label: "Album IDs (comma-separated)",
+                            type: "text",
+                            required: true,
+                            placeholder: "e.g., 1234567890,0987654321"
+                        },
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
+                        {
+                            name: "include",
+                            label: "Include Relationships",
+                            type: "text",
+                            placeholder: "e.g., artists,tracks"
+                        }
                     ]
                 }
             ]
@@ -245,44 +298,78 @@
             title: "Artists API",
             endpoints: [
                 {
-                    id: "getCatalogArtist",
+                    id: "catalog-artist",
                     name: "Get a Catalog Artist",
                     description: "Fetch an artist by using their catalog ID.",
                     params: [
-                        { name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., albums,songs" }
+                        {name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
+                        {
+                            name: "include",
+                            label: "Include Relationships",
+                            type: "text",
+                            placeholder: "e.g., albums,songs"
+                        }
                     ]
                 },
                 {
-                    id: "getCatalogArtistRelationship",
+                    id: "catalog-artist-relationship",
                     name: "Get a Catalog Artist's Relationship Directly by Name",
                     description: "Fetch an artist's relationship data directly by relationship name.",
                     params: [
-                        { name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["albums", "songs", "music-videos", "playlists", "station"] },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                        {name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {
+                            name: "relationship",
+                            label: "Relationship Name",
+                            type: "select",
+                            required: true,
+                            options: ["albums", "songs", "music-videos", "playlists", "station"]
+                        },
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"}
                     ]
                 },
                 {
-                    id: "getCatalogArtistRelationshipView",
+                    id: "catalog-artist-relationship-view",
                     name: "Get a Catalog Artist's Relationship View Directly by Name",
                     description: "Fetch a view of an artist's relationship data.",
                     params: [
-                        { name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["albums", "songs", "music-videos", "playlists"] },
-                        { name: "view", label: "View", type: "select", required: true, options: ["appears-on", "featured-on", "more-by-artist", "more-in-genre", "related"] },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                        {name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {
+                            name: "relationship",
+                            label: "Relationship Name",
+                            type: "select",
+                            required: true,
+                            options: ["albums", "songs", "music-videos", "playlists"]
+                        },
+                        {
+                            name: "view",
+                            label: "View",
+                            type: "select",
+                            required: true,
+                            options: ["appears-on", "featured-on", "more-by-artist", "more-in-genre", "related"]
+                        },
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"}
                     ]
                 },
                 {
-                    id: "getMultipleCatalogArtists",
+                    id: "multiple-catalog-artists",
                     name: "Get Multiple Catalog Artists",
                     description: "Fetch multiple artists by their catalog IDs.",
                     params: [
-                        { name: "ids", label: "Artist IDs (comma-separated)", type: "text", required: true, placeholder: "e.g., 1234567890,0987654321" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., albums,songs" }
+                        {
+                            name: "ids",
+                            label: "Artist IDs (comma-separated)",
+                            type: "text",
+                            required: true,
+                            placeholder: "e.g., 1234567890,0987654321"
+                        },
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
+                        {
+                            name: "include",
+                            label: "Include Relationships",
+                            type: "text",
+                            placeholder: "e.g., albums,songs"
+                        }
                     ]
                 }
             ]
@@ -291,42 +378,70 @@
             title: "Songs API",
             endpoints: [
                 {
-                    id: "getCatalogSong",
+                    id: "catalog-song",
                     name: "Get a Catalog Song",
                     description: "Fetch a song by using its catalog ID.",
                     params: [
-                        { name: "id", label: "Song ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., artists,albums" }
+                        {name: "id", label: "Song ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
+                        {
+                            name: "include",
+                            label: "Include Relationships",
+                            type: "text",
+                            placeholder: "e.g., artists,albums"
+                        }
                     ]
                 },
                 {
-                    id: "getCatalogSongRelationship",
+                    id: "catalog-song-relationship",
                     name: "Get a Catalog Song's Relationship Directly by Name",
                     description: "Fetch a song's relationship data directly by relationship name.",
                     params: [
-                        { name: "id", label: "Song ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["artists", "albums", "music-videos", "genres", "station"] },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                        {name: "id", label: "Song ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {
+                            name: "relationship",
+                            label: "Relationship Name",
+                            type: "select",
+                            required: true,
+                            options: ["artists", "albums", "music-videos", "genres", "station"]
+                        },
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"}
                     ]
                 },
                 {
-                    id: "getMultipleCatalogSongs",
+                    id: "multiple-catalog-songs",
                     name: "Get Multiple Catalog Songs by ID",
                     description: "Fetch multiple songs by their catalog IDs.",
                     params: [
-                        { name: "ids", label: "Song IDs (comma-separated)", type: "text", required: true, placeholder: "e.g., 1234567890,0987654321" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., artists,albums" }
+                        {
+                            name: "ids",
+                            label: "Song IDs (comma-separated)",
+                            type: "text",
+                            required: true,
+                            placeholder: "e.g., 1234567890,0987654321"
+                        },
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
+                        {
+                            name: "include",
+                            label: "Include Relationships",
+                            type: "text",
+                            placeholder: "e.g., artists,albums"
+                        }
                     ]
                 },
                 {
-                    id: "getEquivalentCatalogSongs",
+                    id: "equivalent-catalog-songs",
                     name: "Get Equivalent Catalog Songs by ID",
                     description: "Fetch equivalent songs across different Apple Music storefronts.",
                     params: [
-                        { name: "ids", label: "Song IDs (comma-separated)", type: "text", required: true, placeholder: "e.g., 1234567890,0987654321" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                        {
+                            name: "ids",
+                            label: "Song IDs (comma-separated)",
+                            type: "text",
+                            required: true,
+                            placeholder: "e.g., 1234567890,0987654321"
+                        },
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"}
                     ]
                 }
             ]
@@ -335,48 +450,62 @@
             title: "Search API",
             endpoints: [
                 {
-                    id: "searchCatalogResources",
+                    id: "search-catalog-resources",
                     name: "Search for Catalog Resources",
                     description: "Search for resources in the Apple Music catalog.",
                     params: [
-                        { name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor swift" },
-                        { name: "types", label: "Resource Types", type: "text", required: true, placeholder: "e.g., albums,artists,songs" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25 }
+                        {
+                            name: "term",
+                            label: "Search Term",
+                            type: "text",
+                            required: true,
+                            placeholder: "e.g., taylor swift"
+                        },
+                        {
+                            name: "types",
+                            label: "Resource Types",
+                            type: "text",
+                            required: true,
+                            placeholder: "e.g., albums,artists,songs"
+                        },
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
+                        {name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25}
                     ]
                 },
                 {
-                    id: "getCatalogSearchHints",
+                    id: "catalog-search-hints",
                     name: "Get Catalog Search Hints",
                     description: "Fetch search hint results based on a search term.",
                     params: [
-                        { name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25 }
+                        {name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor"},
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
+                        {name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25}
                     ]
                 },
                 {
-                    id: "getCatalogSearchSuggestions",
+                    id: "catalog-search-suggestions",
                     name: "Get Catalog Search Suggestions",
                     description: "Fetch search suggestions based on a search term.",
                     params: [
-                        { name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25 },
-                        { name: "types", label: "Resource Types", type: "text", placeholder: "e.g., albums,artists,songs" }
+                        {name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor"},
+                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
+                        {name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25},
+                        {
+                            name: "types",
+                            label: "Resource Types",
+                            type: "text",
+                            placeholder: "e.g., albums,artists,songs"
+                        }
                     ]
                 }
             ]
         }
     };
-
-    // Base URL for API calls - Replace with your server endpoint
-    const API_BASE_URL = "/api/apple-music";
 </script>
 
 <!-- Main JavaScript Logic -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // DOM elements
         const apiDetails = document.getElementById('apiDetails');
         const categoryTitle = document.getElementById('categoryTitle');
@@ -387,16 +516,19 @@
         const loadingSpinner = document.getElementById('loadingSpinner');
         const copyResponseBtn = document.getElementById('copyResponseBtn');
 
+        // Base URL for API calls - Replace with your server endpoint
+        const API_BASE_URL = document.getElementById("api-base-url").getAttribute("data-api-base-url");
+
         // Category selection
         document.querySelectorAll('.select-category').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const category = this.getAttribute('data-category');
                 showCategoryDetails(category);
             });
         });
 
         // Copy response to clipboard
-        copyResponseBtn.addEventListener('click', function() {
+        copyResponseBtn.addEventListener('click', function () {
             const responseText = jsonResponse.textContent;
             navigator.clipboard.writeText(responseText).then(() => {
                 const originalText = this.innerHTML;
@@ -520,7 +652,7 @@
                 form.appendChild(submitBtn);
 
                 // Submit event handler
-                form.addEventListener('submit', function(event) {
+                form.addEventListener('submit', function (event) {
                     event.preventDefault();
                     executeRequest(endpoint.id, category, this);
                 });
@@ -570,7 +702,7 @@
                     jsonResponse.style.display = 'block';
 
                     // Scroll to response
-                    responseSection.scrollIntoView({ behavior: 'smooth' });
+                    responseSection.scrollIntoView({behavior: 'smooth'});
                 })
                 .catch(error => {
                     // Display error
