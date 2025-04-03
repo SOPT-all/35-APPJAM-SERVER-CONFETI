@@ -216,6 +216,56 @@
 
 <!-- API Configuration -->
 <script th:inline="javascript">
+    const albumIncludeDescription = "\n\n「include」 파라미터에 포함시킬 수 있는 값 (','로 구분 - 여러 개 가능):\n\n" +
+        "• artists - 앨범과 관련된 아티스트 정보\n" +
+        "• tracks - 앨범에 포함된 트랙 목록\n" +
+        "• genres - 앨범의 장르 정보\n" +
+        "• record-labels - 앨범의 레코드 레이블 정보\n" +
+        "• music-videos - 앨범과 관련된 뮤직 비디오\n" +
+        "• albums - 관련 앨범(아티스트의 다른 앨범 등)\n" +
+        "• songs - 앨범의 노래들 (tracks와 유사하지만 다른 정보 포함)\n" +
+        "• composers - 작곡가 정보\n" +
+        "• station - 관련 라디오 스테이션\n" +
+        "• curator - 큐레이터 정보 (Apple Music 큐레이션 관련)\n" +
+        "• playlists - 앨범과 관련된 플레이리스트\n" +
+        "• library - 사용자 라이브러리 정보 (사용자 인증 필요)\n" +
+        "• recommendations - 추천 정보\n" +
+        "• reviews - 앨범 리뷰\n" +
+        "• ratings - 앨범 평점\n" +
+        "• activities - 앨범과 관련된 활동\n" +
+        "• artist-notes - 아티스트 노트\n" +
+        "• content-ratings - 콘텐츠 등급 정보\n" +
+        "• collaborations - 콜라보레이션 정보\n" +
+        "• appears-on - 아티스트가 참여한 다른 앨범/트랙";
+
+    const albumIncludeOptions = ["artists", "tracks", "genres", "record-labels", "music-videos", "albums", "songs", "composers", "station", "curator", "playlists", "library", "recommendations", "reviews", "ratings", "activities", "artist-notes", "content-ratings", "collaborations", "appears-on"];
+
+    const artistIncludeDescription = "\n\n「include」 파라미터에 포함시킬 수 있는 값 (','로 구분 - 여러 개 가능):\n\n" +
+        "• albums - 아티스트의 앨범 목록\n" +
+        "• songs - 아티스트의 노래 목록\n" +
+        "• music-videos - 아티스트의 뮤직 비디오\n" +
+        "• playlists - 아티스트와 관련된 플레이리스트\n" +
+        "• station - 아티스트 라디오 스테이션\n" +
+        "• genres - 아티스트의 장르 정보\n" +
+        "• appears-on-albums - 아티스트가 참여한 다른 앨범\n" +
+        "• compilation-albums - 아티스트의 컴필레이션 앨범\n" +
+        "• featured-albums - 아티스트의 주요 앨범\n" +
+        "• featured-music-videos - 아티스트의 주요 뮤직비디오\n" +
+        "• featured-playlists - 아티스트가 포함된 주요 플레이리스트\n" +
+        "• full-albums - 아티스트의 정규 앨범\n" +
+        "• latest-release - 아티스트의 최신 발매작\n" +
+        "• live-albums - 아티스트의 라이브 앨범\n" +
+        "• similar-artists - 유사한 아티스트\n" +
+        "• singles - 아티스트의 싱글\n" +
+        "• top-music-videos - 아티스트의 인기 뮤직비디오\n" +
+        "• top-songs - 아티스트의 인기 노래\n" +
+        "• collaborations - 아티스트의 콜라보레이션\n" +
+        "• catalog - 카탈로그 정보";
+
+    const artistIncludeOptions = ["albums", "songs", "music-videos", "playlists", "station", "genres", "appears-on-albums", "compilation-albums", "featured-albums", "featured-music-videos", "featured-playlists", "full-albums", "latest-release", "live-albums", "similar-artists", "singles", "top-music-videos", "top-songs", "collaborations", "catalog"];
+
+    const includeLabel = " (선택 안해도 됨, 여러 개 선택하려면 / Mac은 Command + 선택 / 윈도우는 Ctrl + 선택)";
+
     // API Configuration
     const apiConfig = {
         albums: {
@@ -224,7 +274,7 @@
                 {
                     id: "catalog-album",
                     name: "Get a Catalog Album",
-                    description: "앨범 ID로 앨범 조회",
+                    description: "앨범 ID로 앨범 조회" + albumIncludeDescription,
                     reference: "https://developer.apple.com/documentation/applemusicapi/get-a-catalog-album",
                     params: [
                         {name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
@@ -233,6 +283,13 @@
                             label: "앨범 활동 중 어떤 것을 볼건지 (선택 안해도 됨)",
                             type: "select",
                             options: ["appears-on", "other-versions", "related-albums", "related-videos"]
+                        },
+                        {
+                            name: "include",
+                            label: "「include」 - 포함시킬 관련 정보" + includeLabel,
+                            type: "select",
+                            multiple: true,
+                            options: albumIncludeOptions
                         }
                     ]
                 },
@@ -278,28 +335,7 @@
                 {
                     id: "multiple-catalog-albums",
                     name: "Get Multiple Catalog Albums",
-                    description: "여러 개의 앨범 ID로 다수의 앨범 조회\n\n" +
-                        "「include」 파라미터에 포함시킬 수 있는 값 (','로 구분 - 여러 개 가능):\n\n" +
-                        "• artists - 앨범과 관련된 아티스트 정보\n" +
-                        "• tracks - 앨범에 포함된 트랙 목록\n" +
-                        "• genres - 앨범의 장르 정보\n" +
-                        "• record-labels - 앨범의 레코드 레이블 정보\n" +
-                        "• music-videos - 앨범과 관련된 뮤직 비디오\n" +
-                        "• albums - 관련 앨범(아티스트의 다른 앨범 등)\n" +
-                        "• songs - 앨범의 노래들 (tracks와 유사하지만 다른 정보 포함)\n" +
-                        "• composers - 작곡가 정보\n" +
-                        "• station - 관련 라디오 스테이션\n" +
-                        "• curator - 큐레이터 정보 (Apple Music 큐레이션 관련)\n" +
-                        "• playlists - 앨범과 관련된 플레이리스트\n" +
-                        "• library - 사용자 라이브러리 정보 (사용자 인증 필요)\n" +
-                        "• recommendations - 추천 정보\n" +
-                        "• reviews - 앨범 리뷰\n" +
-                        "• ratings - 앨범 평점\n" +
-                        "• activities - 앨범과 관련된 활동\n" +
-                        "• artist-notes - 아티스트 노트\n" +
-                        "• content-ratings - 콘텐츠 등급 정보\n" +
-                        "• collaborations - 콜라보레이션 정보\n" +
-                        "• appears-on - 아티스트가 참여한 다른 앨범/트랙",
+                    description: "여러 개의 앨범 ID로 다수의 앨범 조회" + albumIncludeDescription,
                     reference: "https://developer.apple.com/documentation/applemusicapi/get-multiple-catalog-albums",
                     params: [
                         {
@@ -311,9 +347,10 @@
                         },
                         {
                             name: "include",
-                            label: "「include」 - 포함시킬 관련 정보 (선택 안해도 됨)",
+                            label: "「include」 - 포함시킬 관련 정보" + includeLabel,
                             type: "select",
-                            options: ["artists", "tracks", "genres", "record-labels", "music-videos", "albums", "songs", "composers", "station", "curator", "playlists", "library", "recommendations", "reviews", "ratings", "activities", "artist-notes", "content-ratings", "collaborations", "appears-on"]
+                            multiple: true,
+                            options: albumIncludeOptions
                         }
                     ]
                 }
@@ -325,7 +362,7 @@
                 {
                     id: "catalog-artist",
                     name: "Get a Catalog Artist",
-                    description: "아티스트 ID로 아티스트 조회",
+                    description: "아티스트 ID로 아티스트 조회" + artistIncludeDescription,
                     reference: "https://developer.apple.com/documentation/applemusicapi/get-a-catalog-artist",
                     params: [
                         {name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
@@ -334,6 +371,13 @@
                             label: "아티스트 활동 중 어떤 것을 볼건지 (선택 안해도 됨)",
                             type: "select",
                             options: ["appears-on-albums", "compilation-albums", "featured-albums", "featured-music-videos", "featured-playlists", "full-albums", "latest-release", "live-albums", "similar-artists", "singles", "top-music-videos", "top-songs"]
+                        },
+                        {
+                            name: "include",
+                            label: "「include」 - 포함시킬 관련 정보" + includeLabel,
+                            type: "select",
+                            multiple: true,
+                            options: artistIncludeOptions
                         }
                     ]
                 },
@@ -636,6 +680,7 @@
                         select.id = `${endpoint.id}-${param.name}`;
                         select.name = param.name;
                         if (param.required) select.required = true;
+                        if (param.multiple) select.multiple = true;
 
                         // Add empty option
                         const emptyOption = document.createElement('option');
