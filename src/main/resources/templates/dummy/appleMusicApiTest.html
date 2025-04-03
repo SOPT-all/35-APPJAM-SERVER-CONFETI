@@ -498,37 +498,17 @@
                 {
                     id: "multiple-catalog-songs",
                     name: "Get Multiple Catalog Songs by ID",
-                    description: "Fetch multiple songs by their catalog IDs.",
+                    description: "여러 개의 음악 ID로 다수의 음악 조회",
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-multiple-catalog-songs-by-id",
                     params: [
                         {
                             name: "ids",
-                            label: "Song IDs (comma-separated)",
+                            label: "여러 개의 음악 ID (','로 구) - 최대 300개 가능",
                             type: "text",
                             required: true,
                             placeholder: "e.g., 1234567890,0987654321"
                         },
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
-                        {
-                            name: "include",
-                            label: "Include Relationships",
-                            type: "text",
-                            placeholder: "e.g., artists,albums"
-                        }
-                    ]
-                },
-                {
-                    id: "equivalent-catalog-songs",
-                    name: "Get Equivalent Catalog Songs by ID",
-                    description: "Fetch equivalent songs across different Apple Music storefronts.",
-                    params: [
-                        {
-                            name: "ids",
-                            label: "Song IDs (comma-separated)",
-                            type: "text",
-                            required: true,
-                            placeholder: "e.g., 1234567890,0987654321"
-                        },
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"}
+                        songInclude
                     ]
                 }
             ]

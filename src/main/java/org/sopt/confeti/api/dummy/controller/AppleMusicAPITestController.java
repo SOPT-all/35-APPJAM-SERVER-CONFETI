@@ -65,4 +65,13 @@ public class AppleMusicAPITestController {
         Object response = appleMusicAPITestFacade.requestCatalogSong(id, include);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, response);
     }
+
+    @GetMapping("${api.endpoints.dummy.multiple-catalog-songs}")
+    public ResponseEntity<BaseResponse<?>> getMultipleCatalogSongs(
+            @RequestParam String ids,
+            @RequestParam(required = false) List<String> include
+    ) {
+        Object response = appleMusicAPITestFacade.requestMultipleCatalogSongs(ids, include);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, response);
+    }
 }
