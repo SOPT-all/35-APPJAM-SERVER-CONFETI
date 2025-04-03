@@ -555,11 +555,11 @@
                 {
                     id: "catalog-search-hints",
                     name: "Get Catalog Search Hints",
-                    description: "Fetch search hint results based on a search term.",
+                    description: "검색어 힌트 기능",
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-catalog-search-hints",
                     params: [
-                        {name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor"},
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
-                        {name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25}
+                        {name: "term", label: "검색어", type: "text", required: true, placeholder: "e.g., taylor"},
+                        {name: "limit", label: "Limit (기본 값 : 5)", type: "number", placeholder: "1-25", min: 1, max: 25}
                     ]
                 },
                 {

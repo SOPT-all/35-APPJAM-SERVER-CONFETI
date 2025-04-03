@@ -168,4 +168,20 @@ public class AppleMusicAPITestFacade {
                 .connect(headers)
                 .retrieve(Object.class);
     }
+
+    @RetryOnTokenExpire
+    public Object requestSearchHints(String term, Integer limit) {
+        Map<String, String> params = new HashMap<>();
+        putIfNotEmpty(params, "term", term);
+        putIfNotEmpty(params, "limit", limit);
+
+        return restClient.request()
+                .get()
+                .baseUrl(appleMusicAPIURL.getBaseUrl())
+                .path(appleMusicAPIURL.getHintsSearchPath())
+                .params(MultiValueMap.fromSingleValue(params))
+                .build()
+                .connect(headers)
+                .retrieve(Object.class);
+    }
 }
