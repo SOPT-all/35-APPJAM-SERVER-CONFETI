@@ -178,7 +178,30 @@ public class AppleMusicAPITestFacade {
         return restClient.request()
                 .get()
                 .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getHintsSearchPath())
+                .path(appleMusicAPIURL.getSearchHintsPath())
+                .params(MultiValueMap.fromSingleValue(params))
+                .build()
+                .connect(headers)
+                .retrieve(Object.class);
+    }
+
+    @RetryOnTokenExpire
+    public Object requestSearchSuggestions(
+            List<String> kinds,
+            Integer limit,
+            String term,
+            List<String> types
+    ) {
+        Map<String, String> params = new HashMap<>();
+        putIfNotEmpty(params, "kinds", kinds);
+        putIfNotEmpty(params, "limit", limit);
+        putIfNotEmpty(params, "term", term);
+        putIfNotEmpty(params, "types", types);
+
+        return restClient.request()
+                .get()
+                .baseUrl(appleMusicAPIURL.getBaseUrl())
+                .path(appleMusicAPIURL.getSearchSuggestionsPath())
                 .params(MultiValueMap.fromSingleValue(params))
                 .build()
                 .connect(headers)

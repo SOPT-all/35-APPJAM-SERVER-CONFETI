@@ -312,6 +312,8 @@
         options: songIncludeOptions
     }
 
+    const searchTypeOptions = ["activities", "albums", "apple-curators", "artists", "curators", "music-videos", "playlists", "record-labels", "songs", "stations"];
+
     // API Configuration
     const apiConfig = {
         albums: {
@@ -535,7 +537,7 @@
                             type: "select",
                             multiple: true,
                             required: true,
-                            options: ["activities", "albums", "apple-curators", "artists", "curators", "music-videos", "playlists", "record-labels", "songs", "stations"]
+                            options: searchTypeOptions
                         },
                         {
                             name: "limit",
@@ -565,16 +567,32 @@
                 {
                     id: "catalog-search-suggestions",
                     name: "Get Catalog Search Suggestions",
-                    description: "Fetch search suggestions based on a search term.",
+                    description: "검색어 제안 기능",
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-catalog-search-suggesions",
                     params: [
-                        {name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor"},
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
-                        {name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25},
+                        {
+                            name: "kinds",
+                            label: "제안 종류",
+                            type: "select",
+                            multiple: true,
+                            required: true,
+                            options: ["terms", "topResults"]
+                        },
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값 : 5)",
+                            type: "number",
+                            placeholder: "1-25",
+                            min: 1,
+                            max: 10
+                        },
+                        {name: "term", label: "검색어", type: "text", required: true, placeholder: "e.g., taylor"},
                         {
                             name: "types",
                             label: "Resource Types",
-                            type: "text",
-                            placeholder: "e.g., albums,artists,songs"
+                            type: "select",
+                            multiple: true,
+                            options: searchTypeOptions
                         }
                     ]
                 }
@@ -692,12 +710,6 @@
                         select.name = param.name;
                         if (param.required) select.required = true;
                         if (param.multiple) select.multiple = true;
-
-                        // Add empty option
-                        const emptyOption = document.createElement('option');
-                        emptyOption.value = '';
-                        emptyOption.textContent = 'Select an option';
-                        select.appendChild(emptyOption);
 
                         // Add options
                         param.options.forEach(option => {
