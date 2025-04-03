@@ -54,6 +54,10 @@ public class AppleMusicAPIURL {
     @Value("${apple-music.api.endpoints.search-path.hints}")
     private String searchPathHints;
 
+    @Value("${apple-music.api.endpoints.search-path.suggestions}")
+    private String searchPathSuggestions;
+
+
     private String getArtistsBasePath() {
         return pathPrefix + artistsPathBase;
     }
@@ -104,7 +108,11 @@ public class AppleMusicAPIURL {
         return getSearchBasePath() + searchPathSingle;
     }
 
-    public String getHintsSearchPath() {
+    public String getSearchHintsPath() {
         return getSearchBasePath() + searchPathHints;
+    }
+
+    public String getSearchSuggestionsPath() {
+        return getSearchBasePath() + searchPathSuggestions;
     }
 }
