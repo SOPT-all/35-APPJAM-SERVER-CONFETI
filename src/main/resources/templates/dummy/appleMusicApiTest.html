@@ -230,9 +230,9 @@
                         {name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
                         {
                             name: "views",
-                            label: "대상 앨범의 어떤 것을 볼건지 / 가능한 값 : appears-on, other-versions, related-albums, related-videos",
-                            type: "text",
-                            placeholder: "appears-on, other-versions, related-albums, related-videos"
+                            label: "앨범 활동 중 어떤 것을 볼건지 (선택 안해도 됨)",
+                            type: "select",
+                            options: ["appears-on", "other-versions", "related-albums", "related-videos"]
                         }
                     ]
                 },
@@ -311,9 +311,9 @@
                         },
                         {
                             name: "include",
-                            label: "「include」 - 포함시킬 관련 정보",
-                            type: "text",
-                            placeholder: "e.g., artists,tracks"
+                            label: "「include」 - 포함시킬 관련 정보 (선택 안해도 됨)",
+                            type: "select",
+                            options: ["artists", "tracks", "genres", "record-labels", "music-videos", "albums", "songs", "composers", "station", "curator", "playlists", "library", "recommendations", "reviews", "ratings", "activities", "artist-notes", "content-ratings", "collaborations", "appears-on"]
                         }
                     ]
                 }
@@ -325,15 +325,15 @@
                 {
                     id: "catalog-artist",
                     name: "Get a Catalog Artist",
-                    description: "Fetch an artist by using their catalog ID.",
+                    description: "아티스트 ID로 아티스트 조회",
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-a-catalog-artist",
                     params: [
                         {name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
                         {
-                            name: "include",
-                            label: "Include Relationships",
-                            type: "text",
-                            placeholder: "e.g., albums,songs"
+                            name: "views",
+                            label: "아티스트 활동 중 어떤 것을 볼건지 (선택 안해도 됨)",
+                            type: "select",
+                            options: ["appears-on-albums", "compilation-albums", "featured-albums", "featured-music-videos", "featured-playlists", "full-albums", "latest-release", "live-albums", "similar-artists", "singles", "top-music-videos", "top-songs"]
                         }
                     ]
                 },
