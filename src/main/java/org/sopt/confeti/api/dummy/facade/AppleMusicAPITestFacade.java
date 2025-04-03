@@ -53,4 +53,22 @@ public class AppleMusicAPITestFacade {
                 .connect(headers)
                 .retrieve(Object.class);
     }
+
+    @RetryOnTokenExpire
+    public Object requestMultipleCatalogAlbums(String ids, String include) {
+        Map<String, String> params = new HashMap<>();
+        params.put("ids", ids);
+        if (include != null) {
+            params.put("include", include);
+        }
+
+        return restClient.request()
+                .get()
+                .baseUrl(appleMusicAPIURL.getBaseUrl())
+                .path(appleMusicAPIURL.getMultipleAlbumsUrl())
+                .params(MultiValueMap.fromSingleValue(params))
+                .build()
+                .connect(headers)
+                .retrieve(Object.class);
+    }
 }

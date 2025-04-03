@@ -12,6 +12,10 @@
             background-color: #f8f9fa;
         }
 
+        p {
+            white-space: pre-wrap;
+        }
+
         .container {
             max-width: 1200px;
         }
@@ -274,19 +278,40 @@
                 {
                     id: "multiple-catalog-albums",
                     name: "Get Multiple Catalog Albums",
-                    description: "Fetch multiple albums by their catalog IDs.",
+                    description: "여러 개의 앨범 ID로 다수의 앨범 조회\n\n" +
+                        "「include」 파라미터에 포함시킬 수 있는 값 (','로 구분 - 여러 개 가능):\n\n" +
+                        "• artists - 앨범과 관련된 아티스트 정보\n" +
+                        "• tracks - 앨범에 포함된 트랙 목록\n" +
+                        "• genres - 앨범의 장르 정보\n" +
+                        "• record-labels - 앨범의 레코드 레이블 정보\n" +
+                        "• music-videos - 앨범과 관련된 뮤직 비디오\n" +
+                        "• albums - 관련 앨범(아티스트의 다른 앨범 등)\n" +
+                        "• songs - 앨범의 노래들 (tracks와 유사하지만 다른 정보 포함)\n" +
+                        "• composers - 작곡가 정보\n" +
+                        "• station - 관련 라디오 스테이션\n" +
+                        "• curator - 큐레이터 정보 (Apple Music 큐레이션 관련)\n" +
+                        "• playlists - 앨범과 관련된 플레이리스트\n" +
+                        "• library - 사용자 라이브러리 정보 (사용자 인증 필요)\n" +
+                        "• recommendations - 추천 정보\n" +
+                        "• reviews - 앨범 리뷰\n" +
+                        "• ratings - 앨범 평점\n" +
+                        "• activities - 앨범과 관련된 활동\n" +
+                        "• artist-notes - 아티스트 노트\n" +
+                        "• content-ratings - 콘텐츠 등급 정보\n" +
+                        "• collaborations - 콜라보레이션 정보\n" +
+                        "• appears-on - 아티스트가 참여한 다른 앨범/트랙",
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-multiple-catalog-albums",
                     params: [
                         {
                             name: "ids",
-                            label: "Album IDs (comma-separated)",
+                            label: "여러 개의 앨범 ID (','로 구분) - 최대 100개 가능",
                             type: "text",
                             required: true,
                             placeholder: "e.g., 1234567890,0987654321"
                         },
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
                         {
                             name: "include",
-                            label: "Include Relationships",
+                            label: "「include」 - 포함시킬 관련 정보",
                             type: "text",
                             placeholder: "e.g., artists,tracks"
                         }
