@@ -355,12 +355,6 @@
                             label: "Limit (기본 값, 최소 값, 최대 값이 안 쓰여있음..)",
                             type: "number",
                             placeholder: "결과 개수"
-                        },
-                        {
-                            name: "with",
-                            label: "추가 정보를 포함할지",
-                            type: "select",
-                            options: ["attributes"]
                         }
                     ]
                 },
@@ -384,6 +378,12 @@
                             label: "Limit (기본 값, 최소 값, 최대 값이 안 쓰여있음..)",
                             type: "number",
                             placeholder: "결과 개수"
+                        },
+                        {
+                            name: "with",
+                            label: "추가 정보를 포함할지",
+                            type: "select",
+                            options: ["attributes"]
                         }
                     ]
                 },
@@ -427,7 +427,8 @@
                 {
                     id: "catalog-artist-relationship",
                     name: "Get a Catalog Artist's Relationship Directly by Name",
-                    description: "Fetch an artist's relationship data directly by relationship name.",
+                    description: "아티스트와 관련한 특정 정보 조회" + artistIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/fetch-a-relationship-on-this-resource-by-name-5akdm",
                     params: [
                         {name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
                         {
@@ -435,9 +436,15 @@
                             label: "Relationship Name",
                             type: "select",
                             required: true,
-                            options: ["albums", "songs", "music-videos", "playlists", "station"]
+                            options: ["albums", "genres", "music-videos", "playlists", "station"]
                         },
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"}
+                        artistInclude,
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값, 최소 값, 최대 값이 안 쓰여있음..)",
+                            type: "number",
+                            placeholder: "결과 개수"
+                        }
                     ]
                 },
                 {

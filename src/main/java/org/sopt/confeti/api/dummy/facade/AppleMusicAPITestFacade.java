@@ -155,6 +155,23 @@ public class AppleMusicAPITestFacade {
     }
 
     @RetryOnTokenExpire
+    public Object requestCatalogArtistRelationship(String id, String relationship, List<String> include,
+                                                   Integer limit) {
+        Map<String, String> params = new HashMap<>();
+        putIfNotEmpty(params, "include", include);
+        putIfNotEmpty(params, "limit", limit);
+
+        return restClient.request()
+                .get()
+                .baseUrl(appleMusicAPIURL.getBaseUrl())
+                .path(appleMusicAPIURL.getArtistRelationshipByNamePath(id, relationship))
+                .params(MultiValueMap.fromSingleValue(params))
+                .build()
+                .connect(headers)
+                .retrieve(Object.class);
+    }
+
+    @RetryOnTokenExpire
     public Object requestCatalogSong(String id, List<String> include) {
         Map<String, String> params = new HashMap<>();
         putIfNotEmpty(params, "include", include);
