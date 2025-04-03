@@ -355,30 +355,36 @@
                             label: "Limit (기본 값, 최소 값, 최대 값이 안 쓰여있음..)",
                             type: "number",
                             placeholder: "결과 개수"
+                        },
+                        {
+                            name: "with",
+                            label: "추가 정보를 포함할지",
+                            type: "select",
+                            options: ["attributes"]
                         }
                     ]
                 },
                 {
                     id: "catalog-album-relationship-view",
                     name: "Get a Catalog Album's Relationship View Directly by Name",
-                    description: "Fetch a view of an album's relationship data.",
+                    description: "앨범과 관련한 특정 정보의 뷰를 조회 ex) 앨범 아티스트의 다른 작품 조회" + albumIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/fetch-a-view-on-this-resource-by-name-2we6l",
                     params: [
                         {name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
                         {
-                            name: "relationship",
-                            label: "Relationship Name",
-                            type: "select",
-                            required: true,
-                            options: ["artists", "tracks"]
-                        },
-                        {
                             name: "view",
-                            label: "View",
+                            label: "view",
                             type: "select",
                             required: true,
-                            options: ["appears-on", "featured-on", "more-by-artist", "more-in-genre", "related"]
+                            options: ["appears-on", "other-versions", "related-albums", "related-videos"]
                         },
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"}
+                        albumInclude,
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값, 최소 값, 최대 값이 안 쓰여있음..)",
+                            type: "number",
+                            placeholder: "결과 개수"
+                        }
                     ]
                 },
                 {

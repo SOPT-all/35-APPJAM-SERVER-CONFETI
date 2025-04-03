@@ -49,6 +49,18 @@ public class AppleMusicAPITestController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, response);
     }
 
+    @GetMapping("${api.endpoints.dummy.catalog-album-relationship-view}")
+    public ResponseEntity<BaseResponse<?>> getCatalogAlbumRelationshipView(
+            @RequestParam String id,
+            @RequestParam String view,
+            @RequestParam(required = false) List<String> include,
+            @RequestParam(required = false) Integer limit,
+            @RequestParam(required = false) String with
+    ) {
+        Object response = appleMusicAPITestFacade.requestCatalogAlbumRelationshipView(id, view, include, limit, with);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, response);
+    }
+
     @GetMapping("${api.endpoints.dummy.catalog-artist}")
     public ResponseEntity<BaseResponse<?>> getCatalogArtist(
             @RequestParam String id,
