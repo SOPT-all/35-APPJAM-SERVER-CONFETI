@@ -510,7 +510,8 @@
                 {
                     id: "catalog-song-relationship",
                     name: "Get a Catalog Song's Relationship Directly by Name",
-                    description: "Fetch a song's relationship data directly by relationship name.",
+                    description: "음악과 관련한 특정 정보 조회" + songIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/fetch-a-relationship-on-this-resource-by-name-56rq7",
                     params: [
                         {name: "id", label: "Song ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
                         {
@@ -518,9 +519,15 @@
                             label: "Relationship Name",
                             type: "select",
                             required: true,
-                            options: ["artists", "albums", "music-videos", "genres", "station"]
+                            options: ["albums", "artists", "composers", "genres", "library", "music-videos", "station"]
                         },
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"}
+                        songInclude,
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값, 최소 값, 최대 값이 안 쓰여있음..)",
+                            type: "number",
+                            placeholder: "결과 개수"
+                        }
                     ]
                 },
                 {
