@@ -450,24 +450,30 @@
                 {
                     id: "catalog-artist-relationship-view",
                     name: "Get a Catalog Artist's Relationship View Directly by Name",
-                    description: "Fetch a view of an artist's relationship data.",
+                    description: "아티스트와 관련한 특정 정보의 뷰를 조회 ex 아티스트와 비슷한 아티스트" + artistIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/fetch-a-view-on-this-resource-by-name-4kow5",
                     params: [
                         {name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
                         {
-                            name: "relationship",
-                            label: "Relationship Name",
+                            name: "view",
+                            label: "view",
                             type: "select",
                             required: true,
-                            options: ["albums", "songs", "music-videos", "playlists"]
+                            options: ["appears-on-albums", "compilation-albums", "featured-albums", "featured-music-videos", "featured-playlists", "full-albums", "latest-release", "live-albums", "similar-artists", "singles", "top-music-videos", "top-songs"]
+                        },
+                        artistInclude,
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값, 최소 값, 최대 값이 안 쓰여있음..)",
+                            type: "number",
+                            placeholder: "결과 개수"
                         },
                         {
-                            name: "view",
-                            label: "View",
+                            name: "with",
+                            label: "추가 정보를 포함할지",
                             type: "select",
-                            required: true,
-                            options: ["appears-on", "featured-on", "more-by-artist", "more-in-genre", "related"]
-                        },
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"}
+                            options: ["attributes"]
+                        }
                     ]
                 },
                 {
