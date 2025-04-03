@@ -2,6 +2,7 @@ package org.sopt.confeti.api.dummy.facade;
 
 import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Facade;
@@ -38,11 +39,12 @@ public class AppleMusicAPITestFacade {
     }
 
     @RetryOnTokenExpire
-    public Object requestCatalogAlbum(String id, String views) {
+    public Object requestCatalogAlbum(String id, String views, List<String> include) {
         Map<String, String> params = new HashMap<>();
         if (views != null) {
             params.put("views", views);
         }
+        params.put("include", String.join(",", include));
 
         return restClient.request()
                 .get()
@@ -55,12 +57,10 @@ public class AppleMusicAPITestFacade {
     }
 
     @RetryOnTokenExpire
-    public Object requestMultipleCatalogAlbums(String ids, String include) {
+    public Object requestMultipleCatalogAlbums(String ids, List<String> include) {
         Map<String, String> params = new HashMap<>();
         params.put("ids", ids);
-        if (include != null) {
-            params.put("include", include);
-        }
+        params.put("include", String.join(",", include));
 
         return restClient.request()
                 .get()
@@ -73,11 +73,12 @@ public class AppleMusicAPITestFacade {
     }
 
     @RetryOnTokenExpire
-    public Object requestCatalogArtist(String id, String views) {
+    public Object requestCatalogArtist(String id, String views, List<String> include) {
         Map<String, String> params = new HashMap<>();
         if (views != null) {
             params.put("views", views);
         }
+        params.put("include", String.join(",", include));
 
         return restClient.request()
                 .get()
