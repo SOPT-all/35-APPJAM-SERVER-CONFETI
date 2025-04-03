@@ -59,7 +59,7 @@ public class AppleMusicAPITestFacade {
         return restClient.request()
                 .get()
                 .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getSingleAlbumUrl(id))
+                .path(appleMusicAPIURL.getSingleAlbumPath(id))
                 .params(MultiValueMap.fromSingleValue(params))
                 .build()
                 .connect(headers)
@@ -75,7 +75,7 @@ public class AppleMusicAPITestFacade {
         return restClient.request()
                 .get()
                 .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getMultipleAlbumsUrl())
+                .path(appleMusicAPIURL.getMultipleAlbumsPath())
                 .params(MultiValueMap.fromSingleValue(params))
                 .build()
                 .connect(headers)
@@ -107,7 +107,22 @@ public class AppleMusicAPITestFacade {
         return restClient.request()
                 .get()
                 .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getMultipleArtistsUrl())
+                .path(appleMusicAPIURL.getMultipleArtistsPath())
+                .params(MultiValueMap.fromSingleValue(params))
+                .build()
+                .connect(headers)
+                .retrieve(Object.class);
+    }
+
+    @RetryOnTokenExpire
+    public Object requestCatalogSong(String id, List<String> include) {
+        Map<String, String> params = new HashMap<>();
+        putIfNotEmpty(params, "include", include);
+
+        return restClient.request()
+                .get()
+                .baseUrl(appleMusicAPIURL.getBaseUrl())
+                .path(appleMusicAPIURL.getSingleSongPath(id))
                 .params(MultiValueMap.fromSingleValue(params))
                 .build()
                 .connect(headers)
