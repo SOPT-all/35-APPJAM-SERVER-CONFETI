@@ -44,6 +44,12 @@ public class AppleMusicAPITestFacade {
         }
     }
 
+    private void putIfNotEmpty(Map<String, String> params, String name, Integer target) {
+        if (target != null) {
+            params.put(name, target.toString());
+        }
+    }
+
     private void putIfNotEmpty(Map<String, String> params, String name, List<String> target) {
         if (target != null && !target.isEmpty()) {
             params.put(name, String.join(",", target));
@@ -139,6 +145,24 @@ public class AppleMusicAPITestFacade {
                 .get()
                 .baseUrl(appleMusicAPIURL.getBaseUrl())
                 .path(appleMusicAPIURL.getMultipleSongsPath())
+                .params(MultiValueMap.fromSingleValue(params))
+                .build()
+                .connect(headers)
+                .retrieve(Object.class);
+    }
+
+    @RetryOnTokenExpire
+    public Object requestSearch(String term, List<String> types, Integer limit, String offset) {
+        Map<String, String> params = new HashMap<>();
+        putIfNotEmpty(params, "term", term);
+        putIfNotEmpty(params, "types", types);
+        putIfNotEmpty(params, "limit", limit);
+        putIfNotEmpty(params, "offset", offset);
+
+        return restClient.request()
+                .get()
+                .baseUrl(appleMusicAPIURL.getBaseUrl())
+                .path(appleMusicAPIURL.getSingleSearchPath())
                 .params(MultiValueMap.fromSingleValue(params))
                 .build()
                 .connect(headers)

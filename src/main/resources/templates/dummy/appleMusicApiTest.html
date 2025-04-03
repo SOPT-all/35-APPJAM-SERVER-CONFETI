@@ -519,11 +519,12 @@
                 {
                     id: "search-catalog-resources",
                     name: "Search for Catalog Resources",
-                    description: "Search for resources in the Apple Music catalog.",
+                    description: "검색 기능",
+                    reference: "https://developer.apple.com/documentation/applemusicapi/search-for-catalog-resources-(by-type)",
                     params: [
                         {
                             name: "term",
-                            label: "Search Term",
+                            label: "검색어",
                             type: "text",
                             required: true,
                             placeholder: "e.g., taylor swift"
@@ -531,12 +532,24 @@
                         {
                             name: "types",
                             label: "Resource Types",
-                            type: "text",
+                            type: "select",
+                            multiple: true,
                             required: true,
-                            placeholder: "e.g., albums,artists,songs"
+                            options: ["activities", "albums", "apple-curators", "artists", "curators", "music-videos", "playlists", "record-labels", "songs", "stations"]
                         },
-                        {name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US"},
-                        {name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25}
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값 : 5)",
+                            type: "number",
+                            placeholder: "1-25",
+                            min: 1,
+                            max: 25
+                        },
+                        {
+                            name: "offset",
+                            label: "오프셋",
+                            type: "text"
+                        }
                     ]
                 },
                 {
