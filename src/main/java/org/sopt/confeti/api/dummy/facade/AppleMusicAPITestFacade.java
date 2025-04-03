@@ -128,4 +128,20 @@ public class AppleMusicAPITestFacade {
                 .connect(headers)
                 .retrieve(Object.class);
     }
+
+    @RetryOnTokenExpire
+    public Object requestMultipleCatalogSongs(String ids, List<String> include) {
+        Map<String, String> params = new HashMap<>();
+        putIfNotEmpty(params, "ids", ids);
+        putIfNotEmpty(params, "include", include);
+
+        return restClient.request()
+                .get()
+                .baseUrl(appleMusicAPIURL.getBaseUrl())
+                .path(appleMusicAPIURL.getMultipleSongsPath())
+                .params(MultiValueMap.fromSingleValue(params))
+                .build()
+                .connect(headers)
+                .retrieve(Object.class);
+    }
 }
