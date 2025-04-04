@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.view.performance;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,8 +8,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,9 +40,6 @@ public class Performance {
     @Enumerated(value = EnumType.STRING)
     private PerformanceType type;
 
-    @Column(length = 50, nullable = false)
-    private String artistId;
-
     @Column(length = 100, nullable = false)
     private String area;
 
@@ -64,48 +65,62 @@ public class Performance {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "performance", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PerformanceArtist> artists = new ArrayList<>();
+
     @Builder
-    public Performance(long typeId, PerformanceType type, String artistId, String area, String title,
-                       String subtitle, LocalDateTime startAt, LocalDateTime endAt,
-                       String posterPath) {
+    private Performance(long typeId, PerformanceType type, String area, String title,
+                        String subtitle, LocalDateTime startAt, LocalDateTime endAt,
+                        String posterPath, List<PerformanceArtist> artists) {
         this.typeId = typeId;
         this.type = type;
-        this.artistId = artistId;
         this.area = area;
         this.title = title;
         this.subtitle = subtitle;
         this.startAt = startAt;
         this.endAt = endAt;
         this.posterPath = posterPath;
+        this.artists = artists;
+
+        this.artists.forEach(artist -> artist.setPerformance(this));
     }
 
-    public static Performance create(final long festivalId, final CreateFestivalDTO festivalDTO,
-                                     final String artistId) {
+    public static Performance create(final long festivalId, final CreateFestivalDTO festivalDTO) {
         return Performance.builder()
                 .typeId(festivalId)
                 .type(PerformanceType.FESTIVAL)
-                .artistId(artistId)
                 .area(festivalDTO.area())
                 .title(festivalDTO.title())
                 .subtitle(festivalDTO.subtitle())
                 .startAt(festivalDTO.startAt())
                 .endAt(festivalDTO.endAt())
                 .posterPath(festivalDTO.posterPath())
+                .artists(
+                        festivalDTO.dates().stream()
+                                .flatMap(date -> date.stages().stream())
+                                .flatMap(stage -> stage.times().stream())
+                                .flatMap(time -> time.artists().stream())
+                                .map(PerformanceArtist::create)
+                                .toList()
+                )
                 .build();
     }
 
-    public static Performance create(final long concertId, final CreateConcertDTO concertDTO,
-                                     final String artistId) {
+    public static Performance create(final long concertId, final CreateConcertDTO concertDTO) {
         return Performance.builder()
                 .typeId(concertId)
                 .type(PerformanceType.CONCERT)
-                .artistId(artistId)
                 .area(concertDTO.area())
                 .title(concertDTO.title())
                 .subtitle(concertDTO.subtitle())
                 .startAt(concertDTO.startAt())
                 .endAt(concertDTO.endAt())
                 .posterPath(concertDTO.posterPath())
+                .artists(
+                        concertDTO.artists().stream()
+                                .map(PerformanceArtist::create)
+                                .toList()
+                )
                 .build();
     }
 }

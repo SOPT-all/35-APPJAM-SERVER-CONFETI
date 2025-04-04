@@ -39,8 +39,8 @@ public class PerformanceService {
     }
 
     @Transactional
-    public void create(final List<Performance> performances) {
-        performanceRepository.saveAll(performances);
+    public void create(final Performance performances) {
+        performanceRepository.save(performances);
     }
 
     @Transactional(readOnly = true)
