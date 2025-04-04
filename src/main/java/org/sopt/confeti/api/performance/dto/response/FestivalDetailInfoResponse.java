@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.performance.dto.response;
 
+import java.util.List;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.global.util.DateConvertor;
 
@@ -13,32 +14,32 @@ public record FestivalDetailInfoResponse(
         String endAt,
         String area,
         String reserveAt,
-        String reservationUrl,
         String time,
         String ageRating,
-        String reservationOffice,
         String price,
-        String infoImgUrl,
-        boolean isFavorite
+        boolean isFavorite,
+        String address,
+        List<FestivalReservationResponse> reservations
 ) {
     public static FestivalDetailInfoResponse from(final FestivalDetailDTO festival) {
         return new FestivalDetailInfoResponse(
                 festival.festivalId(),
-                festival.festivalPosterUrl(),
-                festival.festivalPosterBgUrl(),
-                festival.festivalTitle(),
-                festival.festivalSubtitle(),
-                DateConvertor.convertToDefaultFormat(festival.festivalStartAt()),
-                DateConvertor.convertToDefaultFormat(festival.festivalEndAt()),
-                festival.festivalArea(),
+                festival.posterUrl(),
+                festival.posterBgUrl(),
+                festival.title(),
+                festival.subtitle(),
+                DateConvertor.convertToDefaultFormat(festival.startAt()),
+                DateConvertor.convertToDefaultFormat(festival.endAt()),
+                festival.area(),
                 DateConvertor.convertToDefaultFormat(festival.reserveAt()),
-                festival.reservationUrl(),
                 festival.time(),
                 festival.ageRating(),
-                festival.reservationOffice(),
                 festival.price(),
-                festival.festivalInfoImgUrl(),
-                festival.isFavorite()
+                festival.isFavorite(),
+                festival.address(),
+                festival.reservations().stream()
+                        .map(FestivalReservationResponse::from)
+                        .toList()
         );
     }
 }
