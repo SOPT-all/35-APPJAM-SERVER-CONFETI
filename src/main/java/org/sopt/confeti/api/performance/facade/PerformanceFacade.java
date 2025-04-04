@@ -148,13 +148,11 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public RecentPerformancesDTO getRecentPerformancesWithoutFavorites() {
-        // 최신 콘서트 조회
-        List<Concert> concerts = concertService.getRecentConcerts(RECENT_PERFORMANCES_SIZE);
-
-        // 최신 페스티벌 조회
-        List<Festival> festivals = festivalService.getRecentFestivals(RECENT_PERFORMANCES_SIZE);
-
-        return RecentPerformancesDTO.of(UNPERSONALIZED, concerts, festivals, RECENT_PERFORMANCES_SIZE);
+        List<Performance> performances = performanceService.getRecentPerformances(RECENT_PERFORMANCES_SIZE);
+        return RecentPerformancesDTO.from(
+                UNPERSONALIZED,
+                performances
+        );
     }
 
     @Transactional(readOnly = true)

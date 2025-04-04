@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PerformanceService {
 
     private static final int INIT_PAGE = 0;
-    private static final String START_AT_COLUMN = "startAt";
+    private static final String CREATED_AT_COLUMN = "createdAt";
 
     private final PerformanceDTORepository performanceDTORepository;
     private final PerformanceRepository performanceRepository;
@@ -57,12 +57,19 @@ public class PerformanceService {
 
     private Sort getRecentPerformancesSort() {
         return Sort.by(
-                Order.asc(START_AT_COLUMN)
+                Order.desc(CREATED_AT_COLUMN)
         );
     }
 
     @Transactional(readOnly = true)
     public List<Performance> findPerformanceByArtistId(final String artistId) {
         return performanceRepository.findPerformancesByArtistId(artistId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getRecentPerformances(final int recentPerformancesSize) {
+        return performanceRepository.findAll(
+                getPageRequest(recentPerformancesSize, getRecentPerformancesSort())
+        ).stream().toList();
     }
 }
