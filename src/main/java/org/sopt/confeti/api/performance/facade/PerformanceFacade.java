@@ -30,7 +30,6 @@ import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
@@ -46,7 +45,6 @@ public class PerformanceFacade {
     private final FestivalService festivalService;
     private final UserService userService;
     private final FestivalFavoriteService festivalFavoriteService;
-    private final S3FileHandler s3FileHandler;
     private final PerformanceService performanceService;
     private final ConcertFavoriteService concertFavoriteService;
     private final ArtistFavoriteService artistFavoriteService;
@@ -82,7 +80,7 @@ public class PerformanceFacade {
         Festival festival = festivalService.getFestivalDetailByFestivalId(festivalId);
         validateFestivalNotPassed(festival);
 
-        return FestivalDetailDTO.of(festival, isFavorite, s3FileHandler);
+        return FestivalDetailDTO.of(festival, isFavorite);
     }
 
     @Transactional(readOnly = true)
