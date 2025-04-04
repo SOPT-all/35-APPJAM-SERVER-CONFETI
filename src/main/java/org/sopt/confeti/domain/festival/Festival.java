@@ -111,11 +111,11 @@ public class Festival {
     private List<TimetableFestival> timetableFestivals = new ArrayList<>();
 
     @Builder
-    public Festival(String title, String subtitle, LocalDateTime startAt, LocalDateTime endAt, String area,
-                    String posterPath, String posterBgPath, String festivalInfoImgPath,
-                    String logoPath, LocalDateTime reserveAt, String reservationUrl, String reservationOffice,
-                    String ageRating, String time, String price, String address,
-                    List<FestivalDate> dates, List<FestivalMusic> musics, List<FestivalReservationUrl> reservationUrls
+    private Festival(String title, String subtitle, LocalDateTime startAt, LocalDateTime endAt, String area,
+                     String posterPath, String posterBgPath, String festivalInfoImgPath,
+                     String logoPath, LocalDateTime reserveAt, String reservationUrl, String reservationOffice,
+                     String ageRating, String time, String price, String address,
+                     List<FestivalDate> dates, List<FestivalMusic> musics, List<FestivalReservationUrl> reservationUrls
     ) {
         this.title = title;
         this.subtitle = subtitle;
