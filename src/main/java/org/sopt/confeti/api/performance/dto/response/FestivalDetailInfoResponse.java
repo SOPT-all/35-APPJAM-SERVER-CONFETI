@@ -2,7 +2,9 @@ package org.sopt.confeti.api.performance.dto.response;
 
 import java.util.List;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
+import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.DateConvertor;
+import org.sopt.confeti.global.util.S3FileHandler;
 
 public record FestivalDetailInfoResponse(
         long festivalId,
@@ -21,11 +23,13 @@ public record FestivalDetailInfoResponse(
         String address,
         List<FestivalReservationResponse> reservations
 ) {
-    public static FestivalDetailInfoResponse from(final FestivalDetailDTO festival) {
+    public static FestivalDetailInfoResponse of(final FestivalDetailDTO festival, final S3FileHandler s3FileHandler) {
         return new FestivalDetailInfoResponse(
                 festival.festivalId(),
-                festival.posterUrl(),
-                festival.posterBgUrl(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER),
+                        festival.posterPath()).toString(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER_BG),
+                        festival.posterBgPath()).toString(),
                 festival.title(),
                 festival.subtitle(),
                 DateConvertor.convertToDefaultFormat(festival.startAt()),
@@ -38,7 +42,7 @@ public record FestivalDetailInfoResponse(
                 festival.isFavorite(),
                 festival.address(),
                 festival.reservations().stream()
-                        .map(FestivalReservationResponse::from)
+                        .map(reservation -> FestivalReservationResponse.of(reservation, s3FileHandler))
                         .toList()
         );
     }
