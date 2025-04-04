@@ -55,7 +55,8 @@ public class PerformanceController {
             @PathVariable("festivalId") @Min(RequestConstraint.ID) Long festivalId
     ) {
         FestivalDetailDTO festivalDetailDTO = performanceFacade.getFestivalDetailInfo(userId, festivalId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, FestivalDetailResponse.from(festivalDetailDTO));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                FestivalDetailResponse.of(festivalDetailDTO, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
