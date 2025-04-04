@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +41,10 @@ public class Concert {
     private String subtitle;
 
     @Column(nullable = false)
-    private LocalDateTime startAt;
+    private LocalDate startAt;
 
     @Column(nullable = false)
-    private LocalDateTime endAt;
+    private LocalDate endAt;
 
     @Column(length = 100, nullable = false)
     private String area;
@@ -98,7 +99,7 @@ public class Concert {
     private List<ConcertReservationUrl> reservationUrls = new ArrayList<>();
 
     @Builder
-    private Concert(String title, String subtitle, LocalDateTime startAt, LocalDateTime endAt, String area,
+    private Concert(String title, String subtitle, LocalDate startAt, LocalDate endAt, String area,
                     String posterPath, String posterBgPath, String concertInfoImgPath,
                     LocalDateTime reserveAt, String reservationUrl, String reservationOffice, String ageRating,
                     String time, String price, String address,

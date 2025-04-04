@@ -1,6 +1,6 @@
 package org.sopt.confeti.api.performance.facade;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,7 +67,7 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     protected void validateConcertNotPassed(final Concert concert) {
-        if (LocalDateTime.now().isAfter(concert.getEndAt())) {
+        if (LocalDate.now().isAfter(concert.getEndAt())) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
@@ -93,7 +93,7 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     protected void validateFestivalNotPassed(final Festival festival) {
-        if (LocalDateTime.now().isAfter(festival.getEndAt())) {
+        if (LocalDate.now().isAfter(festival.getEndAt())) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }

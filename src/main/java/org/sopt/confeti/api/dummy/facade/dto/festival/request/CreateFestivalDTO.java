@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.dummy.facade.dto.festival.request;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -9,8 +10,8 @@ import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
 public record CreateFestivalDTO(
         String title,
         String subtitle,
-        LocalDateTime startAt,
-        LocalDateTime endAt,
+        LocalDate startAt,
+        LocalDate endAt,
         String area,
         String posterPath,
         String posterBgPath,
@@ -29,8 +30,8 @@ public record CreateFestivalDTO(
         return new CreateFestivalDTO(
                 request.getTitle(),
                 request.getSubtitle(),
-                request.getStartAt(),
-                request.getEndAt(),
+                request.getStartAt().toLocalDate(),
+                request.getEndAt().toLocalDate(),
                 request.getArea(),
                 filePaths.posterPath(),
                 filePaths.posterBgPath(),

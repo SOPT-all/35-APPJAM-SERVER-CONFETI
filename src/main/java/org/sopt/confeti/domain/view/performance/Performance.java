@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,10 +51,10 @@ public class Performance {
     private String subtitle;
 
     @Column(nullable = false)
-    private LocalDateTime startAt;
+    private LocalDate startAt;
 
     @Column(nullable = false)
-    private LocalDateTime endAt;
+    private LocalDate endAt;
 
     @Column(length = 250, nullable = false)
     private String posterPath;
@@ -70,7 +71,7 @@ public class Performance {
 
     @Builder
     private Performance(long typeId, PerformanceType type, String area, String title,
-                        String subtitle, LocalDateTime startAt, LocalDateTime endAt,
+                        String subtitle, LocalDate startAt, LocalDate endAt,
                         String posterPath, List<PerformanceArtist> artists) {
         this.typeId = typeId;
         this.type = type;
