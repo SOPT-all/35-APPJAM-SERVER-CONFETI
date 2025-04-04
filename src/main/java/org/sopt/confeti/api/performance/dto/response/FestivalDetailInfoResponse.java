@@ -1,7 +1,10 @@
 package org.sopt.confeti.api.performance.dto.response;
 
+import java.util.List;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
+import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.DateConvertor;
+import org.sopt.confeti.global.util.S3FileHandler;
 
 public record FestivalDetailInfoResponse(
         long festivalId,
@@ -13,32 +16,34 @@ public record FestivalDetailInfoResponse(
         String endAt,
         String area,
         String reserveAt,
-        String reservationUrl,
         String time,
         String ageRating,
-        String reservationOffice,
         String price,
-        String infoImgUrl,
-        boolean isFavorite
+        boolean isFavorite,
+        String address,
+        List<FestivalReservationResponse> reservations
 ) {
-    public static FestivalDetailInfoResponse from(final FestivalDetailDTO festival) {
+    public static FestivalDetailInfoResponse of(final FestivalDetailDTO festival, final S3FileHandler s3FileHandler) {
         return new FestivalDetailInfoResponse(
                 festival.festivalId(),
-                festival.festivalPosterUrl(),
-                festival.festivalPosterBgUrl(),
-                festival.festivalTitle(),
-                festival.festivalSubtitle(),
-                DateConvertor.convertToDefaultFormat(festival.festivalStartAt()),
-                DateConvertor.convertToDefaultFormat(festival.festivalEndAt()),
-                festival.festivalArea(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER),
+                        festival.posterPath()).toString(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER_BG),
+                        festival.posterBgPath()).toString(),
+                festival.title(),
+                festival.subtitle(),
+                DateConvertor.convertToDefaultFormat(festival.startAt()),
+                DateConvertor.convertToDefaultFormat(festival.endAt()),
+                festival.area(),
                 DateConvertor.convertToDefaultFormat(festival.reserveAt()),
-                festival.reservationUrl(),
                 festival.time(),
                 festival.ageRating(),
-                festival.reservationOffice(),
                 festival.price(),
-                festival.festivalInfoImgUrl(),
-                festival.isFavorite()
+                festival.isFavorite(),
+                festival.address(),
+                festival.reservations().stream()
+                        .map(reservation -> FestivalReservationResponse.of(reservation, s3FileHandler))
+                        .toList()
         );
     }
 }

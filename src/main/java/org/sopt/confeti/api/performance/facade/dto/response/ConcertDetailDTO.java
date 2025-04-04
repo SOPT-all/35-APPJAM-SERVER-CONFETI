@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.sopt.confeti.domain.concert.Concert;
@@ -8,8 +9,8 @@ public record ConcertDetailDTO(
         long concertId,
         String title,
         String subtitle,
-        LocalDateTime startAt,
-        LocalDateTime endAt,
+        LocalDate startAt,
+        LocalDate endAt,
         String area,
         String posterPath,
         String posterBgPath,

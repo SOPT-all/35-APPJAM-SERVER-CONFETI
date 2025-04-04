@@ -1,6 +1,6 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.view.performance.Performance;
@@ -11,7 +11,7 @@ public record RecentPerformanceDTO(
         long typeId,
         PerformanceType type,
         String title,
-        LocalDateTime startAt,
+        LocalDate startAt,
         String posterPath
 ) {
     public static RecentPerformanceDTO of(final Concert concert, final long performanceId) {
