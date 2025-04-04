@@ -100,7 +100,8 @@ public class DummyPageController {
     }
 
     @GetMapping("${api.endpoints.dummy.apple-music-api-page}")
-    public String getAppleMusicApiPage() {
+    public String getAppleMusicApiPage(Model model) {
+        model.addAttribute("actionUrl", dummyPageBase + appleMusicAPIPage);
         return "dummy/appleMusicApiTest";
     }
 }

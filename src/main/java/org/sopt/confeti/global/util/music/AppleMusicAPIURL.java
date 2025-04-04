@@ -27,11 +27,26 @@ public class AppleMusicAPIURL {
     @Value("${apple-music.api.endpoints.artists-path.multiple}")
     private String artistsPathMultiple;
 
+    @Value("${apple-music.api.endpoints.artists-path.relationship-by-name}")
+    private String artistsPathRelationshipByName;
+
+    @Value("${apple-music.api.endpoints.artists-path.relationship-view-by-name}")
+    private String artistsPathRelationshipViewByName;
+
     @Value("${apple-music.api.endpoints.albums-path.base}")
     private String albumsPathBase;
 
+    @Value("${apple-music.api.endpoints.albums-path.single}")
+    private String albumsPathSingle;
+
     @Value("${apple-music.api.endpoints.albums-path.multiple}")
     private String albumsPathMultiple;
+
+    @Value("${apple-music.api.endpoints.albums-path.relationship-by-name}")
+    private String albumsPathRelationshipByName;
+
+    @Value("${apple-music.api.endpoints.albums-path.relationship-view-by-name}")
+    private String albumsPathRelationshipViewByName;
 
     @Value("${apple-music.api.endpoints.songs-path.base}")
     private String songsPathBase;
@@ -42,6 +57,9 @@ public class AppleMusicAPIURL {
     @Value("${apple-music.api.endpoints.songs-path.multiple}")
     private String songsPathMultiple;
 
+    @Value("${apple-music.api.endpoints.songs-path.relationship-by-name}")
+    private String songsPathRelationshipByName;
+
     @Value("${apple-music.api.endpoints.search-path.base}")
     private String searchPathBase;
 
@@ -50,6 +68,10 @@ public class AppleMusicAPIURL {
 
     @Value("${apple-music.api.endpoints.search-path.hints}")
     private String searchPathHints;
+
+    @Value("${apple-music.api.endpoints.search-path.suggestions}")
+    private String searchPathSuggestions;
+
 
     private String getArtistsBasePath() {
         return pathPrefix + artistsPathBase;
@@ -73,29 +95,69 @@ public class AppleMusicAPIURL {
                 .toUriString();
     }
 
-    public String getMultipleArtistsUrl() {
+    public String getMultipleArtistsPath() {
         return getArtistsBasePath() + artistsPathMultiple;
     }
 
-    public String getMultipleAlbumsUrl() {
+    public String getArtistRelationshipByNamePath(String id, String relationship) {
+        return UriComponentsBuilder.fromUriString(getArtistsBasePath() + artistsPathRelationshipByName)
+                .buildAndExpand(id, relationship)
+                .toUriString();
+    }
+
+    public String getArtistRelationshipViewByNamePath(String id, String view) {
+        return UriComponentsBuilder.fromUriString(getArtistsBasePath() + artistsPathRelationshipViewByName)
+                .buildAndExpand(id, view)
+                .toUriString();
+    }
+
+    public String getSingleAlbumPath(String id) {
+        return UriComponentsBuilder.fromUriString(getAlbumsBasePath() + albumsPathSingle)
+                .buildAndExpand(id)
+                .toUriString();
+    }
+
+    public String getMultipleAlbumsPath() {
         return getAlbumsBasePath() + albumsPathMultiple;
     }
 
-    public String getSingleSongUrl(String id) {
+    public String getAlbumRelationshipByNamePath(String id, String relationship) {
+        return UriComponentsBuilder.fromUriString(getAlbumsBasePath() + albumsPathRelationshipByName)
+                .buildAndExpand(id, relationship)
+                .toUriString();
+    }
+
+    public String getAlbumRelationshipViewByNamePath(String id, String view) {
+        return UriComponentsBuilder.fromUriString(getAlbumsBasePath() + albumsPathRelationshipViewByName)
+                .buildAndExpand(id, view)
+                .toUriString();
+    }
+
+    public String getSingleSongPath(String id) {
         return UriComponentsBuilder.fromUriString(getSongsBasePath() + songsPathSingle)
                 .buildAndExpand(id)
                 .toUriString();
     }
 
-    public String getMultipleSongsUrl() {
+    public String getMultipleSongsPath() {
         return getSongsBasePath() + songsPathMultiple;
     }
 
-    public String getSingleSearchUrl() {
+    public String getSongRelationshipByNamePath(String id, String relationship) {
+        return UriComponentsBuilder.fromUriString(getSongsBasePath() + songsPathRelationshipByName)
+                .buildAndExpand(id, relationship)
+                .toUriString();
+    }
+
+    public String getSingleSearchPath() {
         return getSearchBasePath() + searchPathSingle;
     }
 
-    public String getHintsSearchUrl() {
+    public String getSearchHintsPath() {
         return getSearchBasePath() + searchPathHints;
+    }
+
+    public String getSearchSuggestionsPath() {
+        return getSearchBasePath() + searchPathSuggestions;
     }
 }

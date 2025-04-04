@@ -11,9 +11,15 @@
             padding-top: 20px;
             background-color: #f8f9fa;
         }
+
+        p {
+            white-space: pre-wrap;
+        }
+
         .container {
             max-width: 1200px;
         }
+
         .api-card {
             transition: all 0.3s;
             height: 100%;
@@ -21,39 +27,48 @@
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .api-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
+
         .api-header {
             background-color: #f2f2f2;
             padding: 15px;
             border-radius: 10px 10px 0 0;
         }
+
         .category-icon {
             font-size: 2.5rem;
             margin-bottom: 10px;
         }
+
         .api-body {
             padding: 20px;
             background-color: white;
         }
+
         .nav-pills .nav-link.active {
             background-color: #dc3545; /* Apple Red */
         }
+
         .nav-pills .nav-link {
             color: #212529;
         }
+
         .btn-apple {
             background-color: #dc3545; /* Apple Red */
             border-color: #dc3545;
             color: white;
         }
+
         .btn-apple:hover {
             background-color: #c82333;
             border-color: #bd2130;
             color: white;
         }
+
         #responseContainer {
             max-height: 600px;
             overflow-y: auto;
@@ -61,32 +76,39 @@
             background-color: #f8f9fa;
             border: 1px solid #dee2e6;
         }
+
         #jsonResponse {
             padding: 20px;
             white-space: pre-wrap;
         }
+
         .param-container {
             margin-bottom: 15px;
             background-color: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
         }
+
         .loading-spinner {
             display: none;
             margin: 20px auto;
             text-align: center;
         }
+
         .api-name {
             font-weight: bold;
             margin-bottom: 10px;
         }
+
         .required-param {
             font-weight: bold;
         }
+
         .required-param::after {
             content: " *";
             color: #dc3545;
         }
+
         .tab-content {
             padding-top: 20px;
         }
@@ -96,7 +118,7 @@
 <div class="container">
     <div class="text-center mb-5">
         <h1 class="display-4 mb-3">Apple Music API 테스터</h1>
-        <p class="lead">아직 Apple Music API 교체 작업이 완료되지 않아 해당 페이지 이용 불가합니다.</p>
+        <p class="lead">마음껏 꿈을 펼치세요.</p>
     </div>
 
     <!-- Main Category Selection -->
@@ -190,53 +212,195 @@
         </div>
     </div>
 </div>
+<div id="api-base-url" th:data-api-base-url="${actionUrl}"></div>
 
 <!-- API Configuration -->
 <script th:inline="javascript">
+    const albumIncludeDescription = "\n\n「include」 파라미터에 포함시킬 수 있는 값 (','로 구분 - 여러 개 가능):\n\n" +
+        "• artists - 앨범과 관련된 아티스트 정보\n" +
+        "• tracks - 앨범에 포함된 트랙 목록\n" +
+        "• genres - 앨범의 장르 정보\n" +
+        "• record-labels - 앨범의 레코드 레이블 정보\n" +
+        "• music-videos - 앨범과 관련된 뮤직 비디오\n" +
+        "• albums - 관련 앨범(아티스트의 다른 앨범 등)\n" +
+        "• songs - 앨범의 노래들 (tracks와 유사하지만 다른 정보 포함)\n" +
+        "• composers - 작곡가 정보\n" +
+        "• station - 관련 라디오 스테이션\n" +
+        "• curator - 큐레이터 정보 (Apple Music 큐레이션 관련)\n" +
+        "• playlists - 앨범과 관련된 플레이리스트\n" +
+        "• library - 사용자 라이브러리 정보 (사용자 인증 필요)\n" +
+        "• recommendations - 추천 정보\n" +
+        "• reviews - 앨범 리뷰\n" +
+        "• ratings - 앨범 평점\n" +
+        "• activities - 앨범과 관련된 활동\n" +
+        "• artist-notes - 아티스트 노트\n" +
+        "• content-ratings - 콘텐츠 등급 정보\n" +
+        "• collaborations - 콜라보레이션 정보\n" +
+        "• appears-on - 아티스트가 참여한 다른 앨범/트랙";
+
+    const albumIncludeOptions = ["artists", "tracks", "genres", "record-labels", "music-videos", "albums", "songs", "composers", "station", "curator", "playlists", "library", "recommendations", "reviews", "ratings", "activities", "artist-notes", "content-ratings", "collaborations", "appears-on"];
+
+    const artistIncludeDescription = "\n\n「include」 파라미터에 포함시킬 수 있는 값 (','로 구분 - 여러 개 가능):\n\n" +
+        "• albums - 아티스트의 앨범 목록\n" +
+        "• songs - 아티스트의 노래 목록\n" +
+        "• music-videos - 아티스트의 뮤직 비디오\n" +
+        "• playlists - 아티스트와 관련된 플레이리스트\n" +
+        "• station - 아티스트 라디오 스테이션\n" +
+        "• genres - 아티스트의 장르 정보\n" +
+        "• appears-on-albums - 아티스트가 참여한 다른 앨범\n" +
+        "• compilation-albums - 아티스트의 컴필레이션 앨범\n" +
+        "• featured-albums - 아티스트의 주요 앨범\n" +
+        "• featured-music-videos - 아티스트의 주요 뮤직비디오\n" +
+        "• featured-playlists - 아티스트가 포함된 주요 플레이리스트\n" +
+        "• full-albums - 아티스트의 정규 앨범\n" +
+        "• latest-release - 아티스트의 최신 발매작\n" +
+        "• live-albums - 아티스트의 라이브 앨범\n" +
+        "• similar-artists - 유사한 아티스트\n" +
+        "• singles - 아티스트의 싱글\n" +
+        "• top-music-videos - 아티스트의 인기 뮤직비디오\n" +
+        "• top-songs - 아티스트의 인기 노래\n" +
+        "• collaborations - 아티스트의 콜라보레이션\n" +
+        "• catalog - 카탈로그 정보";
+
+    const artistIncludeOptions = ["albums", "songs", "music-videos", "playlists", "station", "genres", "appears-on-albums", "compilation-albums", "featured-albums", "featured-music-videos", "featured-playlists", "full-albums", "latest-release", "live-albums", "similar-artists", "singles", "top-music-videos", "top-songs", "collaborations", "catalog"];
+
+    const songIncludeDescription = "\n\n「include」 파라미터에 포함시킬 수 있는 값 (','로 구분 - 여러 개 가능):\n\n" +
+        "• artists - 노래를 부른 아티스트 정보\n" +
+        "• albums - 노래가 포함된 앨범 정보\n" +
+        "• genres - 노래의 장르 정보\n" +
+        "• composers - 작곡가 정보\n" +
+        "• music-videos - 노래와 관련된 뮤직 비디오\n" +
+        "• station - 노래 기반 라디오 스테이션\n" +
+        "• ratings - 노래 평점 정보\n" +
+        "• record-labels - 노래의 레코드 레이블 정보\n" +
+        "• related-songs - 관련 노래 추천\n" +
+        "• lyrics - 노래 가사 정보\n" +
+        "• catalog - 카탈로그 정보\n" +
+        "• playlists - 노래가 포함된 플레이리스트\n" +
+        "• songwriter-albums - 작곡가의 다른 앨범\n" +
+        "• songwriter-songs - 작곡가의 다른 노래\n" +
+        "• similar-songs - 유사한 노래\n" +
+        "• audio-analysis - 오디오 분석 정보\n" +
+        "• isrc - 국제 표준 녹음 코드\n" +
+        "• origin - 노래의 원본 정보";
+
+    const songIncludeOptions = ["artists", "albums", "genres", "composers", "music-videos", "station", "ratings", "record-labels", "related-songs", "lyrics", "catalog", "playlists", "songwriter-albums", "songwriter-songs", "similar-songs", "audio-analysis", "isrc", "origin"];
+
+    const includeLabel = "「include」 - 포함시킬 관련 정보 (선택 안해도 됨, 여러 개 선택하려면 / Mac은 Command + 선택 / 윈도우는 Ctrl + 선택)";
+
+    const albumInclude = {
+        name: "include",
+        label: includeLabel,
+        type: "select",
+        multiple: true,
+        options: albumIncludeOptions
+    };
+
+    const artistInclude = {
+        name: "include",
+        label: includeLabel,
+        type: "select",
+        multiple: true,
+        options: artistIncludeOptions
+    }
+
+    const songInclude = {
+        name: "include",
+        label: includeLabel,
+        type: "select",
+        multiple: true,
+        options: songIncludeOptions
+    }
+
+    const searchTypeOptions = ["activities", "albums", "apple-curators", "artists", "curators", "music-videos", "playlists", "record-labels", "songs", "stations"];
+
     // API Configuration
     const apiConfig = {
         albums: {
             title: "Albums API",
             endpoints: [
                 {
-                    id: "getCatalogAlbum",
+                    id: "catalog-album",
                     name: "Get a Catalog Album",
-                    description: "Fetch an album by using its catalog ID.",
+                    description: "앨범 ID로 앨범 조회" + albumIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-a-catalog-album",
                     params: [
-                        { name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., artists,tracks" }
+                        {name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {
+                            name: "views",
+                            label: "앨범 활동 중 어떤 것을 볼건지 (선택 안해도 됨)",
+                            type: "select",
+                            options: ["appears-on", "other-versions", "related-albums", "related-videos"]
+                        },
+                        albumInclude
                     ]
                 },
                 {
-                    id: "getCatalogAlbumRelationship",
+                    id: "catalog-album-relationship",
                     name: "Get a Catalog Album's Relationship Directly by Name",
-                    description: "Fetch an album's relationship data directly by relationship name.",
+                    description: "앨범과 관련한 특정 정보 조회" + albumIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/fetch-a-relationship-on-this-resource-by-name-4hthr",
                     params: [
-                        { name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["artists", "tracks", "genres", "record-labels"] },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                        {name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {
+                            name: "relationship",
+                            label: "Relationship Name",
+                            type: "select",
+                            required: true,
+                            options: ["artists", "tracks", "genres", "record-labels", "library"]
+                        },
+                        albumInclude,
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값, 최소 값, 최대 값이 안 쓰여있음..)",
+                            type: "number",
+                            placeholder: "결과 개수"
+                        }
                     ]
                 },
                 {
-                    id: "getCatalogAlbumRelationshipView",
+                    id: "catalog-album-relationship-view",
                     name: "Get a Catalog Album's Relationship View Directly by Name",
-                    description: "Fetch a view of an album's relationship data.",
+                    description: "앨범과 관련한 특정 정보의 뷰를 조회 ex) 앨범 아티스트의 다른 작품 조회" + albumIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/fetch-a-view-on-this-resource-by-name-2we6l",
                     params: [
-                        { name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["artists", "tracks"] },
-                        { name: "view", label: "View", type: "select", required: true, options: ["appears-on", "featured-on", "more-by-artist", "more-in-genre", "related"] },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                        {name: "id", label: "Album ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {
+                            name: "view",
+                            label: "view",
+                            type: "select",
+                            required: true,
+                            options: ["appears-on", "other-versions", "related-albums", "related-videos"]
+                        },
+                        albumInclude,
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값, 최소 값, 최대 값이 안 쓰여있음..)",
+                            type: "number",
+                            placeholder: "결과 개수"
+                        },
+                        {
+                            name: "with",
+                            label: "추가 정보를 포함할지",
+                            type: "select",
+                            options: ["attributes"]
+                        }
                     ]
                 },
                 {
-                    id: "getMultipleCatalogAlbums",
+                    id: "multiple-catalog-albums",
                     name: "Get Multiple Catalog Albums",
-                    description: "Fetch multiple albums by their catalog IDs.",
+                    description: "여러 개의 앨범 ID로 다수의 앨범 조회" + albumIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-multiple-catalog-albums",
                     params: [
-                        { name: "ids", label: "Album IDs (comma-separated)", type: "text", required: true, placeholder: "e.g., 1234567890,0987654321" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., artists,tracks" }
+                        {
+                            name: "ids",
+                            label: "여러 개의 앨범 ID (','로 구분) - 최대 100개 가능",
+                            type: "text",
+                            required: true,
+                            placeholder: "e.g., 1234567890,0987654321"
+                        },
+                        albumInclude
                     ]
                 }
             ]
@@ -245,44 +409,87 @@
             title: "Artists API",
             endpoints: [
                 {
-                    id: "getCatalogArtist",
+                    id: "catalog-artist",
                     name: "Get a Catalog Artist",
-                    description: "Fetch an artist by using their catalog ID.",
+                    description: "아티스트 ID로 아티스트 조회" + artistIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-a-catalog-artist",
                     params: [
-                        { name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., albums,songs" }
+                        {name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {
+                            name: "views",
+                            label: "아티스트 활동 중 어떤 것을 볼건지 (선택 안해도 됨)",
+                            type: "select",
+                            options: ["appears-on-albums", "compilation-albums", "featured-albums", "featured-music-videos", "featured-playlists", "full-albums", "latest-release", "live-albums", "similar-artists", "singles", "top-music-videos", "top-songs"]
+                        },
+                        artistInclude
                     ]
                 },
                 {
-                    id: "getCatalogArtistRelationship",
+                    id: "catalog-artist-relationship",
                     name: "Get a Catalog Artist's Relationship Directly by Name",
-                    description: "Fetch an artist's relationship data directly by relationship name.",
+                    description: "아티스트와 관련한 특정 정보 조회" + artistIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/fetch-a-relationship-on-this-resource-by-name-5akdm",
                     params: [
-                        { name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["albums", "songs", "music-videos", "playlists", "station"] },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                        {name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {
+                            name: "relationship",
+                            label: "Relationship Name",
+                            type: "select",
+                            required: true,
+                            options: ["albums", "genres", "music-videos", "playlists", "station"]
+                        },
+                        artistInclude,
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값, 최소 값, 최대 값이 안 쓰여있음..)",
+                            type: "number",
+                            placeholder: "결과 개수"
+                        }
                     ]
                 },
                 {
-                    id: "getCatalogArtistRelationshipView",
+                    id: "catalog-artist-relationship-view",
                     name: "Get a Catalog Artist's Relationship View Directly by Name",
-                    description: "Fetch a view of an artist's relationship data.",
+                    description: "아티스트와 관련한 특정 정보의 뷰를 조회 ex 아티스트와 비슷한 아티스트" + artistIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/fetch-a-view-on-this-resource-by-name-4kow5",
                     params: [
-                        { name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["albums", "songs", "music-videos", "playlists"] },
-                        { name: "view", label: "View", type: "select", required: true, options: ["appears-on", "featured-on", "more-by-artist", "more-in-genre", "related"] },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                        {name: "id", label: "Artist ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {
+                            name: "view",
+                            label: "view",
+                            type: "select",
+                            required: true,
+                            options: ["appears-on-albums", "compilation-albums", "featured-albums", "featured-music-videos", "featured-playlists", "full-albums", "latest-release", "live-albums", "similar-artists", "singles", "top-music-videos", "top-songs"]
+                        },
+                        artistInclude,
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값, 최소 값, 최대 값이 안 쓰여있음..)",
+                            type: "number",
+                            placeholder: "결과 개수"
+                        },
+                        {
+                            name: "with",
+                            label: "추가 정보를 포함할지",
+                            type: "select",
+                            options: ["attributes"]
+                        }
                     ]
                 },
                 {
-                    id: "getMultipleCatalogArtists",
+                    id: "multiple-catalog-artists",
                     name: "Get Multiple Catalog Artists",
-                    description: "Fetch multiple artists by their catalog IDs.",
+                    description: "여러 개의 아티스트 ID로 다수의 아티스트 조회" + artistIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-multiple-catalog-artists",
                     params: [
-                        { name: "ids", label: "Artist IDs (comma-separated)", type: "text", required: true, placeholder: "e.g., 1234567890,0987654321" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., albums,songs" }
+                        {
+                            name: "ids",
+                            label: "여러 개의 아티스트 ID (','로 구분) - 최대 25개 가능",
+                            type: "text",
+                            required: true,
+                            placeholder: "e.g., 1234567890,0987654321"
+                        },
+                        artistInclude
                     ]
                 }
             ]
@@ -291,42 +498,52 @@
             title: "Songs API",
             endpoints: [
                 {
-                    id: "getCatalogSong",
+                    id: "catalog-song",
                     name: "Get a Catalog Song",
-                    description: "Fetch a song by using its catalog ID.",
+                    description: "음악 ID로 음악 조회" + songIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-a-catalog-song",
                     params: [
-                        { name: "id", label: "Song ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., artists,albums" }
+                        {name: "id", label: "Song ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        songInclude
                     ]
                 },
                 {
-                    id: "getCatalogSongRelationship",
+                    id: "catalog-song-relationship",
                     name: "Get a Catalog Song's Relationship Directly by Name",
-                    description: "Fetch a song's relationship data directly by relationship name.",
+                    description: "음악과 관련한 특정 정보 조회" + songIncludeDescription,
+                    reference: "https://developer.apple.com/documentation/applemusicapi/fetch-a-relationship-on-this-resource-by-name-56rq7",
                     params: [
-                        { name: "id", label: "Song ID", type: "text", required: true, placeholder: "e.g., 1234567890" },
-                        { name: "relationship", label: "Relationship Name", type: "select", required: true, options: ["artists", "albums", "music-videos", "genres", "station"] },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                        {name: "id", label: "Song ID", type: "text", required: true, placeholder: "e.g., 1234567890"},
+                        {
+                            name: "relationship",
+                            label: "Relationship Name",
+                            type: "select",
+                            required: true,
+                            options: ["albums", "artists", "composers", "genres", "library", "music-videos", "station"]
+                        },
+                        songInclude,
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값, 최소 값, 최대 값이 안 쓰여있음..)",
+                            type: "number",
+                            placeholder: "결과 개수"
+                        }
                     ]
                 },
                 {
-                    id: "getMultipleCatalogSongs",
+                    id: "multiple-catalog-songs",
                     name: "Get Multiple Catalog Songs by ID",
-                    description: "Fetch multiple songs by their catalog IDs.",
+                    description: "여러 개의 음악 ID로 다수의 음악 조회",
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-multiple-catalog-songs-by-id",
                     params: [
-                        { name: "ids", label: "Song IDs (comma-separated)", type: "text", required: true, placeholder: "e.g., 1234567890,0987654321" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "include", label: "Include Relationships", type: "text", placeholder: "e.g., artists,albums" }
-                    ]
-                },
-                {
-                    id: "getEquivalentCatalogSongs",
-                    name: "Get Equivalent Catalog Songs by ID",
-                    description: "Fetch equivalent songs across different Apple Music storefronts.",
-                    params: [
-                        { name: "ids", label: "Song IDs (comma-separated)", type: "text", required: true, placeholder: "e.g., 1234567890,0987654321" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" }
+                        {
+                            name: "ids",
+                            label: "여러 개의 음악 ID (','로 구) - 최대 300개 가능",
+                            type: "text",
+                            required: true,
+                            placeholder: "e.g., 1234567890,0987654321"
+                        },
+                        songInclude
                     ]
                 }
             ]
@@ -335,48 +552,91 @@
             title: "Search API",
             endpoints: [
                 {
-                    id: "searchCatalogResources",
+                    id: "search-catalog-resources",
                     name: "Search for Catalog Resources",
-                    description: "Search for resources in the Apple Music catalog.",
+                    description: "검색 기능",
+                    reference: "https://developer.apple.com/documentation/applemusicapi/search-for-catalog-resources-(by-type)",
                     params: [
-                        { name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor swift" },
-                        { name: "types", label: "Resource Types", type: "text", required: true, placeholder: "e.g., albums,artists,songs" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25 }
+                        {
+                            name: "term",
+                            label: "검색어",
+                            type: "text",
+                            required: true,
+                            placeholder: "e.g., taylor swift"
+                        },
+                        {
+                            name: "types",
+                            label: "Resource Types",
+                            type: "select",
+                            multiple: true,
+                            required: true,
+                            options: searchTypeOptions
+                        },
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값 : 5)",
+                            type: "number",
+                            placeholder: "1-25",
+                            min: 1,
+                            max: 25
+                        },
+                        {
+                            name: "offset",
+                            label: "오프셋",
+                            type: "text"
+                        }
                     ]
                 },
                 {
-                    id: "getCatalogSearchHints",
+                    id: "catalog-search-hints",
                     name: "Get Catalog Search Hints",
-                    description: "Fetch search hint results based on a search term.",
+                    description: "검색어 힌트 기능",
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-catalog-search-hints",
                     params: [
-                        { name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25 }
+                        {name: "term", label: "검색어", type: "text", required: true, placeholder: "e.g., taylor"},
+                        {name: "limit", label: "Limit (기본 값 : 5)", type: "number", placeholder: "1-25", min: 1, max: 25}
                     ]
                 },
                 {
-                    id: "getCatalogSearchSuggestions",
+                    id: "catalog-search-suggestions",
                     name: "Get Catalog Search Suggestions",
-                    description: "Fetch search suggestions based on a search term.",
+                    description: "검색어 제안 기능",
+                    reference: "https://developer.apple.com/documentation/applemusicapi/get-catalog-search-suggesions",
                     params: [
-                        { name: "term", label: "Search Term", type: "text", required: true, placeholder: "e.g., taylor" },
-                        { name: "l", label: "Language Tag", type: "text", placeholder: "e.g., en-US" },
-                        { name: "limit", label: "Limit", type: "number", placeholder: "1-25", min: 1, max: 25 },
-                        { name: "types", label: "Resource Types", type: "text", placeholder: "e.g., albums,artists,songs" }
+                        {
+                            name: "kinds",
+                            label: "제안 종류",
+                            type: "select",
+                            multiple: true,
+                            required: true,
+                            options: ["terms", "topResults"]
+                        },
+                        {
+                            name: "limit",
+                            label: "Limit (기본 값 : 5)",
+                            type: "number",
+                            placeholder: "1-25",
+                            min: 1,
+                            max: 10
+                        },
+                        {name: "term", label: "검색어", type: "text", required: true, placeholder: "e.g., taylor"},
+                        {
+                            name: "types",
+                            label: "Resource Types",
+                            type: "select",
+                            multiple: true,
+                            options: searchTypeOptions
+                        }
                     ]
                 }
             ]
         }
     };
-
-    // Base URL for API calls - Replace with your server endpoint
-    const API_BASE_URL = "/api/apple-music";
 </script>
 
 <!-- Main JavaScript Logic -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // DOM elements
         const apiDetails = document.getElementById('apiDetails');
         const categoryTitle = document.getElementById('categoryTitle');
@@ -387,16 +647,19 @@
         const loadingSpinner = document.getElementById('loadingSpinner');
         const copyResponseBtn = document.getElementById('copyResponseBtn');
 
+        // Base URL for API calls - Replace with your server endpoint
+        const API_BASE_URL = document.getElementById("api-base-url").getAttribute("data-api-base-url");
+
         // Category selection
         document.querySelectorAll('.select-category').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const category = this.getAttribute('data-category');
                 showCategoryDetails(category);
             });
         });
 
         // Copy response to clipboard
-        copyResponseBtn.addEventListener('click', function() {
+        copyResponseBtn.addEventListener('click', function () {
             const responseText = jsonResponse.textContent;
             navigator.clipboard.writeText(responseText).then(() => {
                 const originalText = this.innerHTML;
@@ -450,6 +713,7 @@
                         <div class="mb-4">
                             <h4 class="api-name">${endpoint.name}</h4>
                             <p>${endpoint.description}</p>
+                            <a target="_blank" href="${endpoint.reference}">Apple Music API 문서 바로가기</a>
                         </div>
                     `;
 
@@ -478,12 +742,7 @@
                         select.id = `${endpoint.id}-${param.name}`;
                         select.name = param.name;
                         if (param.required) select.required = true;
-
-                        // Add empty option
-                        const emptyOption = document.createElement('option');
-                        emptyOption.value = '';
-                        emptyOption.textContent = 'Select an option';
-                        select.appendChild(emptyOption);
+                        if (param.multiple) select.multiple = true;
 
                         // Add options
                         param.options.forEach(option => {
@@ -520,7 +779,7 @@
                 form.appendChild(submitBtn);
 
                 // Submit event handler
-                form.addEventListener('submit', function(event) {
+                form.addEventListener('submit', function (event) {
                     event.preventDefault();
                     executeRequest(endpoint.id, category, this);
                 });
@@ -565,12 +824,12 @@
                 })
                 .then(data => {
                     // Format and display the response
-                    jsonResponse.textContent = JSON.stringify(data, null, 2);
+                    jsonResponse.textContent = JSON.stringify(data.data, null, 2);
                     loadingSpinner.style.display = 'none';
                     jsonResponse.style.display = 'block';
 
                     // Scroll to response
-                    responseSection.scrollIntoView({ behavior: 'smooth' });
+                    responseSection.scrollIntoView({behavior: 'smooth'});
                 })
                 .catch(error => {
                     // Display error
