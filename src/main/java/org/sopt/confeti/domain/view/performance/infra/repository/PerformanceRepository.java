@@ -9,14 +9,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface PerformanceRepository extends JpaRepository<Performance, Long> {
     @Query(value = "SELECT p" +
-            " FROM Performance p" +
-            " WHERE p.id IN (" +
-            " SELECT MIN(rp.id)" +
-            " FROM Performance rp" +
-            " WHERE rp.artistId IN :artistIds" +
-            " AND rp.endAt >= CURRENT_DATE" +
-            " GROUP BY rp.typeId" +
-            " )"
+            " FROM Performance p LEFT JOIN p.artists pa" +
+            " ON p.id = pa.performance.id" +
+            " WHERE pa.artistId IN :artistIds" +
+            " AND p.endAt >= CURRENT_DATE" +
+            " GROUP BY p.id"
     )
     List<Performance> findPerformancesByArtistIds(
             final @Param("artistIds") List<String> artistIds,
@@ -24,8 +21,9 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     );
 
     @Query(value = "SELECT p" +
-            " FROM Performance p" +
-            " WHERE p.artistId IN :artistId" +
+            " FROM Performance p " +
+            " JOIN FETCH p.artists pa" +
+            " WHERE pa.artistId = :artistId" +
             " AND p.endAt >= CURRENT_DATE" +
             " ORDER BY p.startAt ASC"
     )
