@@ -10,8 +10,7 @@ public record RecentPerformanceResponse(
         long typeId,
         String type,
         String title,
-        String subtitle,
-        String performanceAt,
+        String startAt,
         String posterUrl
 ) {
     public static RecentPerformanceResponse of(final RecentPerformanceDTO recentPerformanceDTO,
@@ -23,8 +22,7 @@ public record RecentPerformanceResponse(
                 recentPerformanceDTO.typeId(),
                 recentPerformanceDTO.type().getType(),
                 recentPerformanceDTO.title(),
-                recentPerformanceDTO.subtitle(),
-                DateConvertor.convertToDefaultFormat(recentPerformanceDTO.performanceAt()),
+                DateConvertor.convertToDefaultFormat(recentPerformanceDTO.startAt()),
                 s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER),
                         recentPerformanceDTO.posterPath()).toString()
         );

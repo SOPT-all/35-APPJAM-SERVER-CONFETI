@@ -98,11 +98,11 @@ public class Concert {
     private List<ConcertReservationUrl> reservationUrls = new ArrayList<>();
 
     @Builder
-    public Concert(String title, String subtitle, LocalDateTime startAt, LocalDateTime endAt, String area,
-                   String posterPath, String posterBgPath, String concertInfoImgPath,
-                   LocalDateTime reserveAt, String reservationUrl, String reservationOffice, String ageRating,
-                   String time, String price, String address,
-                   List<ConcertArtist> artists, List<ConcertMusic> musics, List<ConcertReservationUrl> reservationUrls
+    private Concert(String title, String subtitle, LocalDateTime startAt, LocalDateTime endAt, String area,
+                    String posterPath, String posterBgPath, String concertInfoImgPath,
+                    LocalDateTime reserveAt, String reservationUrl, String reservationOffice, String ageRating,
+                    String time, String price, String address,
+                    List<ConcertArtist> artists, List<ConcertMusic> musics, List<ConcertReservationUrl> reservationUrls
     ) {
         this.title = title;
         this.subtitle = subtitle;

@@ -3,11 +3,9 @@ package org.sopt.confeti.api.dummy.facade;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.dummy.facade.dto.concert.ConcertFilePathsDTO;
-import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertArtistDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.UploadConcertFilesDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
-import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalArtistDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFilesDTO;
 import org.sopt.confeti.domain.concert.Concert;
@@ -48,22 +46,7 @@ public class DummyFacade {
     @Transactional
     public void createFestival(CreateFestivalDTO festivalDTO) {
         long festivalId = festivalService.create(Festival.create(festivalDTO));
-        performanceService.create(createPerformances(festivalId, festivalDTO));
-    }
-
-    private List<Performance> createPerformances(long festivalId, CreateFestivalDTO festivalDTO) {
-        return getArtistIds(festivalDTO).stream()
-                .map(artistId -> Performance.create(festivalId, festivalDTO, artistId))
-                .toList();
-    }
-
-    private List<String> getArtistIds(CreateFestivalDTO festivalDTO) {
-        return festivalDTO.dates().stream()
-                .flatMap(date -> date.stages().stream())
-                .flatMap(stage -> stage.times().stream())
-                .flatMap(time -> time.artists().stream())
-                .map(CreateFestivalArtistDTO::artistId)
-                .toList();
+        performanceService.create(Performance.create(festivalId, festivalDTO));
     }
 
     public ConcertFilePathsDTO uploadConcertFiles(UploadConcertFilesDTO files) {
@@ -82,18 +65,6 @@ public class DummyFacade {
     @Transactional
     public void createConcert(CreateConcertDTO concertDTO) {
         long concertId = concertService.create(Concert.create(concertDTO));
-        performanceService.create(createPerformances(concertId, concertDTO));
-    }
-
-    private List<Performance> createPerformances(long concertId, CreateConcertDTO concertDTO) {
-        return getArtistIds(concertDTO).stream()
-                .map(artistId -> Performance.create(concertId, concertDTO, artistId))
-                .toList();
-    }
-
-    private List<String> getArtistIds(CreateConcertDTO concertDTO) {
-        return concertDTO.artists().stream()
-                .map(CreateConcertArtistDTO::artistId)
-                .toList();
+        performanceService.create(Performance.create(concertId, concertDTO));
     }
 }
