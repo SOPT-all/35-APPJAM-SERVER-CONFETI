@@ -13,15 +13,14 @@ public record ConcertDetailDTO(
         String area,
         String posterPath,
         String posterBgPath,
-        String infoImgPath,
         LocalDateTime reserveAt,
-        String reservationUrl,
-        String reservationOffice,
         String ageRating,
         String time,
         String price,
-        List<ConcertArtistDTO> artists,
-        boolean isFavorite
+        String address,
+        boolean isFavorite,
+        List<ConcertReservationDTO> reservations,
+        List<ConcertArtistDTO> artists
 ) {
     public static ConcertDetailDTO of(final Concert concert, final boolean isFavorite) {
         return new ConcertDetailDTO(
@@ -33,17 +32,18 @@ public record ConcertDetailDTO(
                 concert.getArea(),
                 concert.getPosterPath(),
                 concert.getPosterBgPath(),
-                concert.getConcertInfoImgPath(),
                 concert.getReserveAt(),
-                concert.getReservationUrl(),
-                concert.getReservationOffice(),
                 concert.getAgeRating(),
                 concert.getTime(),
                 concert.getPrice(),
+                concert.getAddress(),
+                isFavorite,
+                concert.getReservationUrls().stream()
+                        .map(ConcertReservationDTO::from)
+                        .toList(),
                 concert.getArtists().stream()
                         .map(ConcertArtistDTO::of)
-                        .toList(),
-                isFavorite
+                        .toList()
         );
     }
 }

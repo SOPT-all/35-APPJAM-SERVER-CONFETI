@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.performance.dto.response;
 
+import java.util.List;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.DateConvertor;
@@ -15,13 +16,11 @@ public record ConcertDetailInfoResponse(
         String endAt,
         String area,
         String reserveAt,
-        String reservationUrl,
         String time,
         String ageRating,
-        String reservationOffice,
         String price,
-        String infoImgUrl,
-        boolean isFavorite
+        boolean isFavorite,
+        List<ConcertReservationResponse> reservations
 ) {
     public static ConcertDetailInfoResponse of(final ConcertDetailDTO concertDetailDTO,
                                                final S3FileHandler s3FileHandler) {
@@ -37,14 +36,13 @@ public record ConcertDetailInfoResponse(
                 DateConvertor.convertToDefaultFormat(concertDetailDTO.endAt()),
                 concertDetailDTO.area(),
                 DateConvertor.convertToDefaultFormat(concertDetailDTO.reserveAt()),
-                concertDetailDTO.reservationUrl(),
                 concertDetailDTO.time(),
                 concertDetailDTO.ageRating(),
-                concertDetailDTO.reservationOffice(),
                 concertDetailDTO.price(),
-                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.DETAIL),
-                        concertDetailDTO.infoImgPath()).toString(),
-                concertDetailDTO.isFavorite()
+                concertDetailDTO.isFavorite(),
+                concertDetailDTO.reservations().stream()
+                        .map(reservation -> ConcertReservationResponse.of(reservation, s3FileHandler))
+                        .toList()
         );
     }
 }
