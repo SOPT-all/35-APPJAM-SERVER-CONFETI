@@ -135,7 +135,7 @@ public class PerformanceFacade {
     public RecentPerformancesDTO getRecentPerformancesWithFavorites(final long userId) {
         List<ArtistFavorite> artistFavorites = artistFavoriteService.getArtistIdsByUserId(userId);
 
-        return RecentPerformancesDTO.from(
+        return RecentPerformancesDTO.of(
                 PERSONALIZED,
                 performanceService.getPerformancesByArtistIds(
                         artistFavorites.stream()
@@ -149,7 +149,7 @@ public class PerformanceFacade {
     @Transactional(readOnly = true)
     public RecentPerformancesDTO getRecentPerformancesWithoutFavorites() {
         List<Performance> performances = performanceService.getRecentPerformances(RECENT_PERFORMANCES_SIZE);
-        return RecentPerformancesDTO.from(
+        return RecentPerformancesDTO.of(
                 UNPERSONALIZED,
                 performances
         );
