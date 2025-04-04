@@ -36,7 +36,7 @@ public class PerformanceArtist {
     private Performance performance;
 
     @Builder
-    public PerformanceArtist(String artistId) {
+    private PerformanceArtist(String artistId) {
         this.artistId = artistId;
     }
 
