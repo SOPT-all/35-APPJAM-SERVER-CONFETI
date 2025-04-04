@@ -8,22 +8,21 @@ import org.sopt.confeti.global.util.S3FileHandler;
 
 public record FestivalDetailDTO(
         long festivalId,
-        String festivalTitle,
-        String festivalSubtitle,
-        LocalDateTime festivalStartAt,
-        LocalDateTime festivalEndAt,
-        String festivalArea,
-        String festivalPosterUrl,
-        String festivalPosterBgUrl,
-        String festivalInfoImgUrl,
-        String festivalLogoUrl,
+        String title,
+        String subtitle,
+        LocalDateTime startAt,
+        LocalDateTime endAt,
+        String area,
+        String posterUrl,
+        String posterBgUrl,
+        String logoUrl,
         LocalDateTime reserveAt,
-        String reservationUrl,
-        String reservationOffice,
         String ageRating,
         String time,
         String price,
         boolean isFavorite,
+        String address,
+        List<FestivalReservationDTO> reservations,
         List<FestivalDetailDateDTO> dates
 ) {
     public static FestivalDetailDTO of(final Festival festival, boolean isFavorite, final S3FileHandler s3FileHandler) {
@@ -38,17 +37,17 @@ public record FestivalDetailDTO(
                         festival.getPosterPath()).toString(),
                 s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER_BG),
                         festival.getPosterBgPath()).toString(),
-                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.DETAIL),
-                        festival.getFestivalInfoImgPath()).toString(),
                 s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO),
                         festival.getLogoPath()).toString(),
                 festival.getReserveAt(),
-                festival.getReservationUrl(),
-                festival.getReservationOffice(),
                 festival.getAgeRating(),
                 festival.getTime(),
                 festival.getPrice(),
                 isFavorite,
+                festival.getAddress(),
+                festival.getReservationUrls().stream()
+                        .map(reservation -> FestivalReservationDTO.of(reservation, s3FileHandler))
+                        .toList(),
                 festival.getDates().stream()
                         .map(FestivalDetailDateDTO::from)
                         .toList()
