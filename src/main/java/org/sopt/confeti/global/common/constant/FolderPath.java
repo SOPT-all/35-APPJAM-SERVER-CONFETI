@@ -7,7 +7,7 @@ import org.sopt.confeti.global.message.ErrorMessage;
 public enum FolderPath {
     FESTIVAL("festival"), CONCERT("concert"), USER("user"),
     DETAIL("detail"), LOGO("logo"), MAIN_BANNER("main-banner"),
-    POSTER_BG("poster-bg"), POSTER("poster"), RESERVATION("reservation");
+    POSTER_BG("poster-bg"), POSTER("poster"), RESERVATION("reservation"), PROFILE("profile");
 
     private static final String PATH_DELIMITER = "/";
     private final String path;

@@ -14,7 +14,8 @@ public record UserInfoResponse(
     public static UserInfoResponse of(final UserInfoDTO userInfoDTO, final S3FileHandler s3FileHandler) {
         return new UserInfoResponse(
                 userInfoDTO.userId(),
-                s3FileHandler.getFileUrl(FolderPath.USER.getSingle(), userInfoDTO.profilePath()).toString(),
+                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.USER, FolderPath.PROFILE),
+                        userInfoDTO.profilePath()).toString(),
                 userInfoDTO.name(),
                 userInfoDTO.provider()
         );
