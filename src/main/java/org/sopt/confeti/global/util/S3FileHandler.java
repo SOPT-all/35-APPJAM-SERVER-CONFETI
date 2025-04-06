@@ -15,6 +15,7 @@ import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
@@ -91,13 +92,15 @@ public class S3FileHandler {
                 .build();
     }
 
-    private void upload(String fullPath, InputStream is, ObjectMetadata metadata) {
+    @Async
+    protected void upload(String fullPath, InputStream is, ObjectMetadata metadata) {
         s3Operations.upload(bucket, fullPath, is, metadata);
     }
 
     /**
      * 파일 삭제
      */
+    @Async
     public void deleteFile(String folderPath, String key) {
         checkFileExist(folderPath, key);
 
@@ -138,7 +141,7 @@ public class S3FileHandler {
         checkFileExist(originFolderPath, originKey);
         checkFileNotExist(targetFolderPath, targetKey);
 
-        String targetFileName = fileNameGenerator.generate(targetKey + originKey);
+        String targetFileName = fileNameGenerator.generate(targetKey);
 
         CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
                 .sourceBucket(bucket)
@@ -147,14 +150,20 @@ public class S3FileHandler {
                 .destinationKey(targetFolderPath + targetFileName)
                 .build();
 
-        s3Client.copyObject(copyObjectRequest);
+        copyFileAsync(copyObjectRequest);
 
         return targetFileName;
+    }
+
+    @Async
+    protected void copyFileAsync(CopyObjectRequest copyObjectRequest) {
+        s3Client.copyObject(copyObjectRequest);
     }
 
     /**
      * 파일 수정 (삭제 -> 업로드)
      */
+    @Async
     public void updateFile(MultipartFile file, String folderPath, String key) throws IOException {
         checkFileExist(folderPath, key);
 

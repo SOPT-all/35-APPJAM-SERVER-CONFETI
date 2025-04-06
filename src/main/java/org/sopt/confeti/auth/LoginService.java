@@ -64,7 +64,7 @@ public class LoginService {
                 FolderPath.combine(FolderPath.USER, FolderPath.DEFAULT),
                 Default.PROFILE_IMG_NAME,
                 FolderPath.combine(FolderPath.USER, FolderPath.PROFILE),
-                socialName
+                socialName + Default.PROFILE_IMG_NAME
         );
     }
 
