@@ -2,13 +2,17 @@ package org.sopt.confeti.global.util;
 
 import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Operations;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,10 +48,41 @@ public class S3FileHandler {
         return fileName;
     }
 
+    public String uploadFile(File file, String folderPath) {
+        final String fileName = fileNameGenerator.generate(file.getName());
+        final ObjectMetadata metadata = getMetadata(file);
+
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            upload(
+                    folderPath + fileName,
+                    inputStream, metadata
+            );
+        } catch (IOException e) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
+
+        return fileName;
+    }
+
     private ObjectMetadata getMetadata(MultipartFile file) {
         return new ObjectMetadata.Builder()
                 .contentLength(file.getSize())
                 .contentType(file.getContentType())
+                .build();
+    }
+
+    private ObjectMetadata getMetadata(File file) {
+        String contentType;
+
+        try {
+            contentType = Files.probeContentType(file.toPath());
+        } catch (IOException e) {
+            contentType = "application/octet-stream";
+        }
+
+        return new ObjectMetadata.Builder()
+                .contentLength(file.length())
+                .contentType(contentType)
                 .build();
     }
 
@@ -59,6 +94,8 @@ public class S3FileHandler {
      * 파일 삭제
      */
     public void deleteFile(String folderPath, String key) {
+        checkFileExist(folderPath, key);
+
         s3Operations.deleteObject(bucket, folderPath + key);
     }
 
@@ -66,16 +103,25 @@ public class S3FileHandler {
      * 파일 조회 URL 생성
      */
     public URL getFileUrl(String folderPath, String key) {
+        checkFileExist(folderPath, key);
+
         return s3Operations.createSignedGetURL(bucket, folderPath + key, urlDuration);
+    }
+
+    /**
+     * 파일이 존재하는지 확인
+     */
+    private void checkFileExist(String folderPath, String key) {
+        if (!s3Operations.objectExists(bucket, folderPath + key)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
     }
 
     /**
      * 파일 수정 (삭제 -> 업로드)
      */
     public void updateFile(MultipartFile file, String folderPath, String key) throws IOException {
-        if (!s3Operations.objectExists(bucket, folderPath + key)) {
-            throw new ConfetiException(ErrorMessage.FORBIDDEN);
-        }
+        checkFileExist(folderPath, key);
 
         deleteFile(folderPath, key);
         upload(folderPath + key, file.getInputStream(), getMetadata(file));
