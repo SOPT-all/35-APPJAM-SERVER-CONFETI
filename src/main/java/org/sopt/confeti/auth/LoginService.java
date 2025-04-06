@@ -53,10 +53,12 @@ public class LoginService {
 
     private String downloadProfileImg(String profileImgUrl) {
         Path profileImg = fileDownloader.downloadFile(profileImgUrl);
-        String s3ProfileImgUrl = s3FileHandler.uploadFile(profileImg.toFile(),
-                FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
-        fileDownloader.deleteTempFile(profileImg);
-        return s3ProfileImgUrl;
+        try {
+            return s3FileHandler.uploadFile(profileImg.toFile(),
+                    FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
+        } finally {
+            fileDownloader.deleteTempFile(profileImg);
+        }
     }
 
     @Transactional
