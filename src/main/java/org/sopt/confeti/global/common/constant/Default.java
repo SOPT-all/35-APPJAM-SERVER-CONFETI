@@ -9,4 +9,5 @@ public class Default {
     public static String IMG_PATH = "default/img_logo_3d.svg";
     public static String URL = "https://www.naver.com/";
     public static String TEXT = "CONFETI";
+    public static String PROFILE_IMG_NAME = "user-profile.svg";
 }
