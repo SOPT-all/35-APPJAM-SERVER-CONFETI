@@ -7,7 +7,7 @@ public record LoginResult(
         String refreshToken,
         boolean isOnboarding
 ) {
-    public static LoginResult from(Token token, boolean isOnboarding) {
+    public static LoginResult of(Token token, boolean isOnboarding) {
         return new LoginResult(token.accessToken(), token.refreshToken(), isOnboarding);
     }
 }

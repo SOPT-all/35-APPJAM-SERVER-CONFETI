@@ -13,7 +13,6 @@ import org.sopt.confeti.domain.token.infra.AppleTokenRepository;
 import org.sopt.confeti.domain.token.infra.RefreshTokenRepository;
 import org.sopt.confeti.domain.user.AuthUser;
 import org.sopt.confeti.domain.user.OAuthProvider;
-import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.domain.user.infra.repository.AllUserRepository;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
@@ -38,18 +37,41 @@ public class LoginService {
     private final FileDownloader fileDownloader;
     private final S3FileHandler s3FileHandler;
 
+    public OAuthSocialInfoResult getSocialInfo(LoginCommand command) {
+        OAuthApiClient oAuthApiClient = oAuthApiClientRegistry.getOAuthApiClientByProvider(command.provider());
+        return oAuthApiClient.getSocialInfo(command);
+    }
+
+    public CreateUserDTO getCreateUserDTO(OAuthProvider provider, OAuthSocialInfoResult socialInfo) {
+        if (provider == OAuthProvider.KAKAO) {
+            String profileImgUrl = downloadProfileImg(socialInfo.profileImgUrl());
+            return CreateUserDTO.of(provider, socialInfo, profileImgUrl);
+        }
+
+        return CreateUserDTO.of(provider, socialInfo);
+    }
+
+    private String downloadProfileImg(String profileImgUrl) {
+        Path profileImg = fileDownloader.downloadFile(profileImgUrl);
+        String s3ProfileImgUrl = s3FileHandler.uploadFile(profileImg.toFile(),
+                FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
+        fileDownloader.deleteTempFile(profileImg);
+        return s3ProfileImgUrl;
+    }
 
     @Transactional
-    public LoginResult login(LoginCommand command) {
-        OAuthApiClient oAuthApiClient = oAuthApiClientRegistry.getOAuthApiClientByProvider(command.provider());
-        OAuthSocialInfoResult socialInfo = oAuthApiClient.getSocialInfo(command);
+    public Token createToken(AuthUser authUser, OAuthSocialInfoResult socialInfo) {
+        Token token = new Token(
+                jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId()), authUser.getRole(),
+                        authUser.getProvider()),
+                jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()), authUser.getRole(),
+                        authUser.getProvider())
+        );
 
-        AuthUser authUser = loadOrCreateUser(command, socialInfo);
-        Token token = createToken(authUser);
         saveRefreshToken(token.refreshToken(), authUser.getId());
-        saveSocialTokenIfAppleLogin(command.provider(), authUser.getId(), socialInfo);
+        saveSocialTokenIfAppleLogin(authUser.getProvider(), authUser.getId(), socialInfo);
 
-        return LoginResult.from(token, isOnboarding(authUser.getRole()));
+        return token;
     }
 
     private void saveRefreshToken(String refreshToken, long userId) {
@@ -68,58 +90,12 @@ public class LoginService {
         }
     }
 
-    private AuthUser loadOrCreateUser(LoginCommand command, OAuthSocialInfoResult socialInfo) {
-        AuthUser retrievedAuthUser = userRepository.findBySocialIdAndProvider(
-                        socialInfo.id(),
-                        command.provider()
-                )
-                .map(User::toAuthUser)
-                .orElse(null);
-
-        if (retrievedAuthUser != null) {
-            return retrievedAuthUser;
-        }
-
-        CreateUserDTO createUserDTO = getCreateUserDTO(command.provider(), socialInfo);
-
-        return allUserRepository.save(
-                AuthUser.create(
-                        command.provider(),
-                        createUserDTO.id(),
-                        createUserDTO.name(),
-                        createUserDTO.profileImgUrl()
-                )
-        );
-    }
-
-    private CreateUserDTO getCreateUserDTO(OAuthProvider provider, OAuthSocialInfoResult socialInfo) {
-        if (provider == OAuthProvider.KAKAO) {
-            String profileImgUrl = downloadProfileImg(socialInfo.profileImgUrl());
-            return CreateUserDTO.of(socialInfo, profileImgUrl);
-        }
-
-        return CreateUserDTO.from(socialInfo);
-    }
-
-    private String downloadProfileImg(String profileImgUrl) {
-        Path profileImg = fileDownloader.downloadFile(profileImgUrl);
-        String s3ProfileImgUrl = s3FileHandler.uploadFile(profileImg.toFile(),
-                FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
-        fileDownloader.deleteTempFile(profileImg);
-        return s3ProfileImgUrl;
-    }
-
-    private Token createToken(AuthUser authUser) {
-        return new Token(
-                jwtTokenGenerator.createAccessToken(String.valueOf(authUser.getId()), authUser.getRole(),
-                        authUser.getProvider()),
-                jwtTokenGenerator.createRefreshToken(String.valueOf(authUser.getId()), authUser.getRole(),
-                        authUser.getProvider())
-        );
-    }
-
     private boolean isAppleLogin(OAuthProvider provider) {
         return provider.equals(OAuthProvider.APPLE);
+    }
+
+    public LoginResult getLoginResult(Token token, Role role) {
+        return LoginResult.of(token, isOnboarding(role));
     }
 
     private boolean isOnboarding(Role role) {

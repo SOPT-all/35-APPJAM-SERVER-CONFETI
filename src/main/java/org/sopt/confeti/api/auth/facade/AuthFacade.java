@@ -10,7 +10,9 @@ import org.sopt.confeti.auth.Token;
 import org.sopt.confeti.auth.WithdrawService;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
+import org.sopt.confeti.auth.dto.OAuthSocialInfoResult;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
+import org.sopt.confeti.domain.user.AuthUser;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -29,9 +31,17 @@ public class AuthFacade {
     private final OnboardService onboardService;
     private final WithdrawService withdrawService;
 
-    @Transactional
     public LoginResult login(LoginCommand loginCommand) {
-        return loginService.login(loginCommand);
+        OAuthSocialInfoResult socialInfo = loginService.getSocialInfo(loginCommand);
+
+        if (userService.notExist(socialInfo.id(), loginCommand.provider())) {
+            userService.create(loginService.getCreateUserDTO(loginCommand.provider(), socialInfo));
+        }
+
+        AuthUser authUser = userService.getAuthUser(socialInfo.id(), loginCommand.provider());
+        Token token = loginService.createToken(authUser, socialInfo);
+
+        return loginService.getLoginResult(token, authUser.getRole());
     }
 
     @Transactional

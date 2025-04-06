@@ -1,7 +1,11 @@
 package org.sopt.confeti.domain.user.application;
 
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.auth.dto.CreateUserDTO;
+import org.sopt.confeti.domain.user.AuthUser;
+import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.domain.user.infra.repository.AllUserRepository;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
@@ -12,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
+    private final AllUserRepository allUserRepository;
 
     @Transactional(readOnly = true)
     public User findById(Long userId) {
@@ -39,5 +45,31 @@ public class UserService {
     @Transactional
     public void deleteUser(User user) {
         userRepository.delete(user);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean notExist(String socialId, OAuthProvider provider) {
+        return !userRepository.existsBySocialIdAndProvider(socialId, provider);
+    }
+
+    @Transactional
+    public void create(CreateUserDTO createUserDTO) {
+        allUserRepository.save(
+                AuthUser.create(
+                        createUserDTO.provider(),
+                        createUserDTO.id(),
+                        createUserDTO.name(),
+                        createUserDTO.profileImgUrl()
+                )
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public AuthUser getAuthUser(String socialId, OAuthProvider provider) {
+        return userRepository.findBySocialIdAndProvider(socialId, provider)
+                .map(AuthUser::toAuthUser)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
     }
 }
