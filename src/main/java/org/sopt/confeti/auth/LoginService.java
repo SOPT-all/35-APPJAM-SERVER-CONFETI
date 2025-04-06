@@ -1,7 +1,9 @@
 package org.sopt.confeti.auth;
 
+import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.auth.command.LoginCommand;
+import org.sopt.confeti.auth.dto.CreateUserDTO;
 import org.sopt.confeti.auth.dto.LoginResult;
 import org.sopt.confeti.auth.dto.OAuthSocialInfoResult;
 import org.sopt.confeti.auth.jwt.JwtTokenGenerator;
@@ -15,8 +17,11 @@ import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.domain.user.infra.repository.AllUserRepository;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
+import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.oauth.OAuthApiClient;
 import org.sopt.confeti.global.oauth.OAuthApiClientRegistry;
+import org.sopt.confeti.global.util.FileDownloader;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,12 +35,15 @@ public class LoginService {
     private final JwtTokenGenerator jwtTokenGenerator;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AppleTokenRepository appleTokenRepository;
+    private final FileDownloader fileDownloader;
+    private final S3FileHandler s3FileHandler;
 
 
     @Transactional
     public LoginResult login(LoginCommand command) {
         OAuthApiClient oAuthApiClient = oAuthApiClientRegistry.getOAuthApiClientByProvider(command.provider());
         OAuthSocialInfoResult socialInfo = oAuthApiClient.getSocialInfo(command);
+
         AuthUser authUser = loadOrCreateUser(command, socialInfo);
         Token token = createToken(authUser);
         saveRefreshToken(token.refreshToken(), authUser.getId());
@@ -72,14 +80,33 @@ public class LoginService {
             return retrievedAuthUser;
         }
 
+        CreateUserDTO createUserDTO = getCreateUserDTO(command.provider(), socialInfo);
+
         return allUserRepository.save(
                 AuthUser.create(
                         command.provider(),
-                        socialInfo.id(),
-                        socialInfo.name(),
-                        socialInfo.profileImgUrl()
+                        createUserDTO.id(),
+                        createUserDTO.name(),
+                        createUserDTO.profileImgUrl()
                 )
         );
+    }
+
+    private CreateUserDTO getCreateUserDTO(OAuthProvider provider, OAuthSocialInfoResult socialInfo) {
+        if (provider == OAuthProvider.KAKAO) {
+            String profileImgUrl = downloadProfileImg(socialInfo.profileImgUrl());
+            return CreateUserDTO.of(socialInfo, profileImgUrl);
+        }
+
+        return CreateUserDTO.from(socialInfo);
+    }
+
+    private String downloadProfileImg(String profileImgUrl) {
+        Path profileImg = fileDownloader.downloadFile(profileImgUrl);
+        String s3ProfileImgUrl = s3FileHandler.uploadFile(profileImg.toFile(),
+                FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
+        fileDownloader.deleteTempFile(profileImg);
+        return s3ProfileImgUrl;
     }
 
     private Token createToken(AuthUser authUser) {
