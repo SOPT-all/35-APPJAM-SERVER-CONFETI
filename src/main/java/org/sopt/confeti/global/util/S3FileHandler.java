@@ -2,9 +2,12 @@ package org.sopt.confeti.global.util;
 
 import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Operations;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
@@ -44,10 +47,41 @@ public class S3FileHandler {
         return fileName;
     }
 
+    public String uploadFile(File file, String folderPath) {
+        final String fileName = fileNameGenerator.generate(file.getName());
+        final ObjectMetadata metadata = getMetadata(file);
+
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            upload(
+                    folderPath + fileName,
+                    inputStream, metadata
+            );
+        } catch (IOException e) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
+
+        return fileName;
+    }
+
     private ObjectMetadata getMetadata(MultipartFile file) {
         return new ObjectMetadata.Builder()
                 .contentLength(file.getSize())
                 .contentType(file.getContentType())
+                .build();
+    }
+
+    private ObjectMetadata getMetadata(File file) {
+        String contentType;
+
+        try {
+            contentType = Files.probeContentType(file.toPath());
+        } catch (IOException e) {
+            contentType = "application/octet-stream";
+        }
+
+        return new ObjectMetadata.Builder()
+                .contentLength(file.length())
+                .contentType(contentType)
                 .build();
     }
 
