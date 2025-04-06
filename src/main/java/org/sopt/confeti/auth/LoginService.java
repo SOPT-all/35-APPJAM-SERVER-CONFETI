@@ -14,8 +14,7 @@ import org.sopt.confeti.domain.token.infra.RefreshTokenRepository;
 import org.sopt.confeti.domain.user.AuthUser;
 import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.constant.Role;
-import org.sopt.confeti.domain.user.infra.repository.AllUserRepository;
-import org.sopt.confeti.domain.user.infra.repository.UserRepository;
+import org.sopt.confeti.global.common.constant.Default;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.oauth.OAuthApiClient;
 import org.sopt.confeti.global.oauth.OAuthApiClientRegistry;
@@ -29,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class LoginService {
 
     private final OAuthApiClientRegistry oAuthApiClientRegistry;
-    private final UserRepository userRepository;
-    private final AllUserRepository allUserRepository;
     private final JwtTokenGenerator jwtTokenGenerator;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AppleTokenRepository appleTokenRepository;
@@ -48,7 +45,8 @@ public class LoginService {
             return CreateUserDTO.of(provider, socialInfo, profileImgUrl);
         }
 
-        return CreateUserDTO.of(provider, socialInfo);
+        String defaultProfileImgName = getDefaultProfileImgName(socialInfo.name());
+        return CreateUserDTO.of(provider, socialInfo, defaultProfileImgName);
     }
 
     private String downloadProfileImg(String profileImgUrl) {
@@ -59,6 +57,15 @@ public class LoginService {
         } finally {
             fileDownloader.deleteTempFile(profileImg);
         }
+    }
+
+    private String getDefaultProfileImgName(String socialName) {
+        return s3FileHandler.copyFile(
+                FolderPath.combine(FolderPath.USER, FolderPath.DEFAULT),
+                Default.PROFILE_IMG_NAME,
+                FolderPath.combine(FolderPath.USER, FolderPath.PROFILE),
+                socialName
+        );
     }
 
     @Transactional
