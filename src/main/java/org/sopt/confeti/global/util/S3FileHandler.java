@@ -12,6 +12,7 @@ import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
@@ -93,6 +94,8 @@ public class S3FileHandler {
      * 파일 삭제
      */
     public void deleteFile(String folderPath, String key) {
+        checkFileExist(folderPath, key);
+
         s3Operations.deleteObject(bucket, folderPath + key);
     }
 
@@ -100,16 +103,25 @@ public class S3FileHandler {
      * 파일 조회 URL 생성
      */
     public URL getFileUrl(String folderPath, String key) {
+        checkFileExist(folderPath, key);
+
         return s3Operations.createSignedGetURL(bucket, folderPath + key, urlDuration);
+    }
+
+    /**
+     * 파일이 존재하는지 확인
+     */
+    private void checkFileExist(String folderPath, String key) {
+        if (!s3Operations.objectExists(bucket, folderPath + key)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
     }
 
     /**
      * 파일 수정 (삭제 -> 업로드)
      */
     public void updateFile(MultipartFile file, String folderPath, String key) throws IOException {
-        if (!s3Operations.objectExists(bucket, folderPath + key)) {
-            throw new ConfetiException(ErrorMessage.FORBIDDEN);
-        }
+        checkFileExist(folderPath, key);
 
         deleteFile(folderPath, key);
         upload(folderPath + key, file.getInputStream(), getMetadata(file));
