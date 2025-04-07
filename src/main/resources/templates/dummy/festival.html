@@ -1093,19 +1093,11 @@
                 // DOM에서 요소 제거
                 container.removeChild(item);
 
-                // 바로 인덱스 재정리
-                const dateItems = container.querySelectorAll('.nested-item');
-                dateItems.forEach((dateItem, newIndex) => {
-                    // 날짜 헤더 업데이트
-                    const header = dateItem.querySelector('.date-header');
-                    if (header) {
-                        const dateSpan = header.querySelector('span:last-child');
-                        header.innerHTML = `날짜 #${newIndex + 1} ${dateSpan ? dateSpan.outerHTML : ''}`;
-                    }
-                });
+                // 날짜 인덱스 재정렬
+                reindexDateItems();
 
                 // 날짜 카운터 업데이트
-                dateCounter = dateItems.length;
+                dateCounter = container.querySelectorAll('.nested-item').length;
 
                 // 스케줄 미리보기 업데이트
                 updateSchedulePreview();
@@ -1122,6 +1114,231 @@
             // 스케줄 미리보기 업데이트
             updateSchedulePreview();
         }
+    }
+
+    function reindexDateItems() {
+        const container = document.getElementById('festivalDateContainer');
+        const dateItems = container.querySelectorAll('.nested-item');
+
+        dateItems.forEach((dateItem, newIndex) => {
+            // 모든 입력 필드의 name과 id 업데이트
+            dateItem.querySelectorAll('input, select').forEach(input => {
+                // name 속성 업데이트
+                if (input.name) {
+                    input.name = input.name.replace(/dates\[\d+\]/, `dates[${newIndex}]`);
+                }
+
+                // id 속성 업데이트
+                if (input.id) {
+                    input.id = input.id.replace(/dates\[\d+\]/, `dates[${newIndex}]`);
+                }
+            });
+
+            // 날짜 헤더 업데이트
+            const dateHeader = dateItem.querySelector('.date-header');
+            if (dateHeader) {
+                const dateSpan = dateHeader.querySelector('span');
+                dateHeader.innerHTML = `날짜 #${newIndex + 1} ${dateSpan ? dateSpan.outerHTML : ''}`;
+            }
+
+            // 스테이지 탭 ID 업데이트
+            dateItem.querySelectorAll('.stage-tab-link').forEach(tab => {
+                const currentDataTab = tab.getAttribute('data-stage-tab');
+                if (currentDataTab) {
+                    const updatedDataTab = currentDataTab.replace(/stage-tab-\d+/, `stage-tab-${newIndex}`);
+                    tab.setAttribute('data-stage-tab', updatedDataTab);
+                }
+            });
+
+            // 스테이지 컨텐츠 ID 업데이트
+            dateItem.querySelectorAll('.stage-content').forEach(content => {
+                const currentId = content.id;
+                if (currentId) {
+                    const updatedId = currentId.replace(/stage-tab-\d+/, `stage-tab-${newIndex}`);
+                    content.id = updatedId;
+                }
+            });
+
+            // 이벤트 핸들러 업데이트
+            dateItem.querySelectorAll('[onclick]').forEach(element => {
+                const onclick = element.getAttribute('onclick');
+                if (onclick) {
+                    const updatedOnclick = onclick.replace(/\((\d+),/, `(${newIndex},`);
+                    element.setAttribute('onclick', updatedOnclick);
+                }
+            });
+        });
+    }
+
+    function updateDateIndice() {
+        const container = document.getElementById('festivalDateContainer');
+        const dateItems = container.querySelectorAll('.nested-item');
+
+        console.log(`날짜 인덱스 재정렬 시작: ${dateItems.length}개 항목`);
+
+        // 각 날짜 항목 순회하며 인덱스 업데이트
+        dateItems.forEach((dateItem, newIndex) => {
+            // 현재 인덱스 찾기
+            const oldIndex = getDateItemIndex(dateItem);
+
+            if (oldIndex === null || oldIndex === newIndex) {
+                return; // 인덱스 변경 불필요
+            }
+
+            console.log(`날짜 항목 인덱스 변경: ${oldIndex} -> ${newIndex}`);
+
+            // 1. 날짜 헤더 업데이트
+            updateDateHeaders(dateItem, newIndex);
+
+            // 2. 입력 필드 업데이트
+            updateDateInputs(dateItem, oldIndex, newIndex);
+
+            // 3. 스테이지 탭 업데이트
+            updateDateStageTabs(dateItem, oldIndex, newIndex);
+
+            // 4. 스테이지 컨텐츠 업데이트
+            updateDateStageContents(dateItem, oldIndex, newIndex);
+
+            // 5. 이벤트 핸들러 업데이트
+            updateDateEventHandlers(dateItem, oldIndex, newIndex);
+        });
+    }
+
+    // 날짜 항목의 현재 인덱스 찾기
+    function getDateItemIndex(dateItem) {
+        // festivalAt 필드에서 인덱스 추출
+        const festivalAtInput = dateItem.querySelector('input[name$="].festivalAt"]');
+        if (festivalAtInput) {
+            const match = festivalAtInput.name.match(/dates\[(\d+)\]/);
+            return match ? parseInt(match[1]) : null;
+        }
+        return null;
+    }
+
+    // 날짜 헤더 업데이트
+    function updateDateHeaders(dateItem, newIndex) {
+        const dateHeader = dateItem.querySelector('.date-header');
+        if (dateHeader) {
+            // 날짜 값 찾기
+            const dateInput = dateItem.querySelector('input[name$="].festivalAt"]');
+            const dateValue = dateInput ? dateInput.value : '';
+
+            // 헤더 텍스트 업데이트
+            dateHeader.textContent = `날짜 #${newIndex + 1}`;
+            if (dateValue) {
+                const dateSpan = document.createElement('span');
+                dateSpan.textContent = dateValue.includes('T') ? dateValue.split('T')[0] : dateValue;
+                dateHeader.appendChild(dateSpan);
+            }
+        }
+    }
+
+    // 날짜 입력 필드 업데이트
+    function updateDateInputs(dateItem, oldIndex, newIndex) {
+        // 모든 입력 필드 순회
+        dateItem.querySelectorAll('input').forEach(input => {
+            if (input.name) {
+                // name 속성 업데이트
+                input.name = input.name.replace(
+                    new RegExp(`dates\\[${oldIndex}\\]`),
+                    `dates[${newIndex}]`
+                );
+            }
+
+            if (input.id) {
+                // id 속성 업데이트
+                input.id = input.id.replace(
+                    new RegExp(`dates\\[${oldIndex}\\]`),
+                    `dates[${newIndex}]`
+                );
+            }
+        });
+    }
+
+    // 스테이지 탭 업데이트
+    function updateDateStageTabs(dateItem, oldIndex, newIndex) {
+        // 스테이지 탭 컨테이너 ID 업데이트
+        const tabsContainer = dateItem.querySelector(`[id^="stageTabs-"]`);
+        if (tabsContainer) {
+            tabsContainer.id = `stageTabs-${newIndex}`;
+
+            // 각 탭 버튼 업데이트
+            tabsContainer.querySelectorAll('.stage-tab-link').forEach(tabBtn => {
+                const dataTab = tabBtn.getAttribute('data-stage-tab');
+                if (dataTab) {
+                    tabBtn.setAttribute('data-stage-tab',
+                        dataTab.replace(
+                            new RegExp(`stage-tab-${oldIndex}-`),
+                            `stage-tab-${newIndex}-`
+                        )
+                    );
+                }
+            });
+        }
+    }
+
+    // 스테이지 컨텐츠 업데이트
+    function updateDateStageContents(dateItem, oldIndex, newIndex) {
+        // 모든 스테이지 컨텐츠 ID 업데이트
+        dateItem.querySelectorAll(`[id^="stage-tab-${oldIndex}-"]`).forEach(content => {
+            content.id = content.id.replace(
+                new RegExp(`stage-tab-${oldIndex}-`),
+                `stage-tab-${newIndex}-`
+            );
+
+            // 컨테이너 ID 업데이트
+            const timeContainer = content.querySelector(`[id^="stageTimeContainer-"]`);
+            if (timeContainer) {
+                timeContainer.id = timeContainer.id.replace(
+                    new RegExp(`stageTimeContainer-${oldIndex}-`),
+                    `stageTimeContainer-${newIndex}-`
+                );
+            }
+
+            // 시간대 입력 업데이트
+            content.querySelectorAll(`[id^="timeStartAt-"], [id^="timeEndAt-"]`).forEach(timeInput => {
+                timeInput.id = timeInput.id.replace(
+                    new RegExp(`-${oldIndex}-`),
+                    `-${newIndex}-`
+                );
+            });
+
+            // 아티스트 컨테이너 업데이트
+            content.querySelectorAll(`[id^="artistContainer-"]`).forEach(container => {
+                container.id = container.id.replace(
+                    new RegExp(`artistContainer-${oldIndex}-`),
+                    `artistContainer-${newIndex}-`
+                );
+            });
+        });
+    }
+
+    // 이벤트 핸들러 속성 업데이트
+    function updateDateEventHandlers(dateItem, oldIndex, newIndex) {
+        // onclick 속성을 가진 모든 요소 업데이트
+        dateItem.querySelectorAll('[onclick]').forEach(element => {
+            const onclick = element.getAttribute('onclick');
+            if (onclick) {
+                // addTimeSlot, addArtist 등의 함수 호출에서 인덱스 업데이트
+                const updatedOnclick = onclick.replace(
+                    new RegExp(`\\(${oldIndex},`),
+                    `(${newIndex},`
+                );
+                element.setAttribute('onclick', updatedOnclick);
+            }
+        });
+
+        // onchange 속성을 가진 요소 업데이트
+        dateItem.querySelectorAll('[onchange]').forEach(element => {
+            const onchange = element.getAttribute('onchange');
+            if (onchange) {
+                const updatedOnchange = onchange.replace(
+                    new RegExp(`\\(this, ${oldIndex},`),
+                    `(this, ${newIndex},`
+                );
+                element.setAttribute('onchange', updatedOnchange);
+            }
+        });
     }
 
     function updateInputIndices(dateItem, newIndex) {
@@ -1681,22 +1898,6 @@
         let isValid = true;
         const errors = [];
 
-        // 기본 필수 필드 검사
-        document.querySelectorAll('input[required]:not([type="file"]):not([name^="dates["])').forEach(field => {
-            if (!field.value.trim()) {
-                errors.push(`${field.previousElementSibling.textContent} 필드를 입력해주세요.`);
-                isValid = false;
-            }
-        });
-
-        // 파일 필드 검사
-        document.querySelectorAll('input[type="file"][required]').forEach(field => {
-            if (field.files.length === 0) {
-                errors.push(`${field.previousElementSibling.textContent} 파일을 선택해주세요.`);
-                isValid = false;
-            }
-        });
-
         // 날짜 항목 검사
         const dateItems = document.querySelectorAll('#festivalDateContainer > .nested-item');
         if (dateItems.length === 0) {
@@ -1704,17 +1905,17 @@
             isValid = false;
         } else {
             // 각 날짜 항목 검사
-            dateItems.forEach((item, index) => {
-                const festivalDate = item.querySelector(`input[name="dates[${index}].festivalAt"]`);
-                const openAt = item.querySelector(`input[name="dates[${index}].openAt"]`);
+            dateItems.forEach((item) => {
+                const festivalDate = item.querySelector('input[name$=".festivalAt"]');
+                const openAt = item.querySelector('input[name$=".openAt"]');
 
                 if (!festivalDate || !festivalDate.value) {
-                    errors.push(`날짜 #${index+1}의 페스티벌 날짜를 입력해주세요.`);
+                    errors.push(`날짜의 페스티벌 날짜를 입력해주세요.`);
                     isValid = false;
                 }
 
                 if (!openAt || !openAt.value) {
-                    errors.push(`날짜 #${index+1}의 티켓 오픈 시간을 입력해주세요.`);
+                    errors.push(`날짜의 티켓 오픈 시간을 입력해주세요.`);
                     isValid = false;
                 }
 
@@ -1727,7 +1928,7 @@
                 });
 
                 if (!hasTimeWithArtists) {
-                    errors.push(`날짜 #${index+1}에 최소 하나의 시간대와 아티스트를 추가해주세요.`);
+                    errors.push(`날짜에 최소 하나의 시간대와 아티스트를 추가해주세요.`);
                     isValid = false;
                 }
             });
@@ -1745,92 +1946,69 @@
         const result = {};
 
         console.group('날짜 데이터 수집');
-        console.log('페스티벌 날짜 항목 수:', document.querySelectorAll('#festivalDateContainer > .nested-item').length);
 
-        // 모든 날짜 요소 순회
-        document.querySelectorAll('#festivalDateContainer > .nested-item').forEach((dateItem, dateIndex) => {
-            console.log(`날짜 항목 #${dateIndex} 처리 중...`);
-
-            // 수정: CSS 선택자 수정
-            const festivalAtInput = dateItem.querySelector(`input[name="dates[${dateIndex}].festivalAt"]`);
-            const openAtInput = dateItem.querySelector(`input[name="dates[${dateIndex}].openAt"]`);
-
-            console.log(`  페스티벌 날짜 입력 요소:`, festivalAtInput);
-            console.log(`  티켓 오픈 시간 입력 요소:`, openAtInput);
+        // 실제 존재하는 날짜 요소만 선택
+        document.querySelectorAll('#festivalDateContainer > .nested-item').forEach((dateItem) => {
+            // 해당 날짜의 festivalAt 입력 필드 찾기
+            const festivalAtInput = dateItem.querySelector('input[name$=".festivalAt"]');
+            const openAtInput = dateItem.querySelector('input[name$=".openAt"]');
 
             if (festivalAtInput && festivalAtInput.value) {
                 const festivalAt = festivalAtInput.value;
-                console.log(`  페스티벌 날짜 값: ${festivalAt}`);
-                const dateOnly = festivalAt.split('T')[0]; // 날짜 부분만 추출
+                const dateOnly = festivalAt.split('T')[0];
 
                 // 해당 날짜의 데이터 준비
                 if (!result[dateOnly]) {
                     result[dateOnly] = {
-                        indices: [],
                         festivalAt: festivalAt,
                         openAt: openAtInput ? openAtInput.value : '',
                         stages: {}
                     };
                 }
 
-                result[dateOnly].indices.push(dateIndex);
-
                 // 해당 날짜의 모든 스테이지 순회
-                dateItem.querySelectorAll(`[id^="stage-tab-${dateIndex}-"]`).forEach(stageTab => {
-                    const stageMatch = stageTab.id.match(/stage-tab-(\d+)-(\d+)/);
-                    if (stageMatch && stageMatch[1] == dateIndex) {
-                        const stageIndex = stageMatch[2];
+                dateItem.querySelectorAll('.stage-content').forEach((stageTab, stageLocalIndex) => {
+                    // 스테이지 이름과 순서 추출
+                    const stageNameInput = stageTab.querySelector('input[name$=".name"]');
+                    const stageOrderInput = stageTab.querySelector('input[name$=".order"]');
 
-                        // 수정: CSS 선택자 수정
-                        const stageNameInput = stageTab.querySelector(`input[name="dates[${dateIndex}].stages[${stageIndex}].name"]`);
-                        const stageOrderInput = stageTab.querySelector(`input[name="dates[${dateIndex}].stages[${stageIndex}].order"]`);
+                    const stageName = stageNameInput ? stageNameInput.value : `스테이지 ${stageLocalIndex + 1}`;
+                    const stageOrder = stageOrderInput ? stageOrderInput.value : stageLocalIndex + 1;
 
-                        const stageName = stageNameInput ? stageNameInput.value : `스테이지 ${stageIndex}`;
-                        const stageOrder = stageOrderInput ? stageOrderInput.value : stageIndex;
+                    // 스테이지 정보 기록
+                    result[dateOnly].stages[stageLocalIndex] = {
+                        name: stageName,
+                        order: stageOrder,
+                        times: {}
+                    };
 
-                        // 스테이지 정보 기록
-                        if (!result[dateOnly].stages[stageIndex]) {
-                            result[dateOnly].stages[stageIndex] = {
-                                name: stageName,
-                                order: stageOrder,
-                                times: {}
-                            };
-                        }
+                    // 해당 스테이지의 모든 시간대 수집
+                    stageTab.querySelectorAll('.time-section').forEach((timeItem, timeLocalIndex) => {
+                        const startAtInput = timeItem.querySelector('input[name$=".startAt"]');
+                        const endAtInput = timeItem.querySelector('input[name$=".endAt"]');
 
-                        // 해당 스테이지의 모든 시간대 수집
-                        stageTab.querySelectorAll(`.time-section`).forEach((timeItem, timeLocalIndex) => {
-                            // 수정: CSS 선택자 수정
-                            const startAtInput = timeItem.querySelector(`input[name="dates[${dateIndex}].stages[${stageIndex}].times[${timeLocalIndex}].startAt"]`);
-                            const endAtInput = timeItem.querySelector(`input[name="dates[${dateIndex}].stages[${stageIndex}].times[${timeLocalIndex}].endAt"]`);
-
-                            if (startAtInput && startAtInput.value && endAtInput && endAtInput.value) {
-                                // 아티스트 정보 수집
-                                const artists = [];
-                                timeItem.querySelectorAll(`input[name*="artists"][name$="].artistId"]`).forEach(artistInput => {
-                                    if (artistInput.value) {
-                                        const artistMatch = artistInput.name.match(/\.artists\[(\d+)\]/);
-                                        const artistIndex = artistMatch ? artistMatch[1] : '0';
-                                        artists.push({
-                                            index: artistIndex,
-                                            artistId: artistInput.value
-                                        });
-                                    }
-                                });
-
-                                // 아티스트가 있는 경우에만 시간대 정보 기록
-                                if (artists.length > 0) {
-                                    result[dateOnly].stages[stageIndex].times[timeLocalIndex] = {
-                                        startAt: startAtInput.value,
-                                        endAt: endAtInput.value,
-                                        artists: artists
-                                    };
+                        if (startAtInput && startAtInput.value && endAtInput && endAtInput.value) {
+                            // 아티스트 정보 수집
+                            const artists = [];
+                            timeItem.querySelectorAll('input[name$=".artistId"]').forEach(artistInput => {
+                                if (artistInput.value) {
+                                    artists.push({
+                                        artistId: artistInput.value
+                                    });
                                 }
+                            });
+
+                            // 아티스트가 있는 경우에만 시간대 정보 기록
+                            if (artists.length > 0) {
+                                result[dateOnly].stages[stageLocalIndex].times[timeLocalIndex] = {
+                                    startAt: startAtInput.value,
+                                    endAt: endAtInput.value,
+                                    artists: artists
+                                };
                             }
-                        });
-                    }
+                        }
+                    });
                 });
-            } else {
-                console.warn(`  페스티벌 날짜 값이 없음!`);
             }
         });
 
