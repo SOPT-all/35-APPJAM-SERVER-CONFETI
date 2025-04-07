@@ -3,7 +3,7 @@ package org.sopt.confeti.api.dummy.dto.festival;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -14,9 +14,9 @@ import lombok.Setter;
 public class CreateFestivalTimeRequest {
 
     @NotNull
-    private LocalDateTime startAt;
+    private LocalTime startAt;
     @NotNull
-    private LocalDateTime endAt;
+    private LocalTime endAt;
 
     @Valid
     @Size(min = 1)

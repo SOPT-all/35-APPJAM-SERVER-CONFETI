@@ -30,8 +30,8 @@ public record CreateFestivalDTO(
         return new CreateFestivalDTO(
                 request.getTitle(),
                 request.getSubtitle(),
-                request.getStartAt().toLocalDate(),
-                request.getEndAt().toLocalDate(),
+                request.getStartAt(),
+                request.getEndAt(),
                 request.getArea(),
                 filePaths.posterPath(),
                 filePaths.posterBgPath(),
