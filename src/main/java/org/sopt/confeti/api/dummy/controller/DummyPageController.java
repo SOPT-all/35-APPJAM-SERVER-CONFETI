@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.dummy.dto.concert.CreateConcertRequest;
 import org.sopt.confeti.api.dummy.dto.festival.CreateFestivalRequest;
+import org.sopt.confeti.api.dummy.dto.festival.FestivalStagesDTO;
 import org.sopt.confeti.api.dummy.facade.DummyFacade;
 import org.sopt.confeti.api.dummy.facade.dto.concert.ConcertFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
@@ -19,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -71,6 +73,17 @@ public class DummyPageController {
         redirectAttributes.addFlashAttribute("message", "서버에 정상적으로 저장되었습니다.");
 
         return "redirect:" + dummyPageBase + festivalDummyPage;
+    }
+
+    @GetMapping("${api.endpoints.dummy.festival-fix-page}")
+    public String getFixFestivalPage(
+            @PathVariable Long festivalId,
+            Model model
+    ) {
+        FestivalStagesDTO stagesDTO = dummyFacade.getFestivalStages(festivalId);
+        model.addAttribute("stages", stagesDTO.stages());
+        model.addAttribute("festivalId", festivalId);
+        return "dummy/fix-festival";
     }
 
     @GetMapping("${api.endpoints.dummy.concert-page}")
