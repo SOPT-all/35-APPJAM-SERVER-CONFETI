@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.dummy.dto.concert.CreateConcertRequest;
 import org.sopt.confeti.api.dummy.dto.festival.CreateFestivalRequest;
+import org.sopt.confeti.api.dummy.dto.festival.DummyFestivalPreviewResponse;
 import org.sopt.confeti.api.dummy.dto.festival.FestivalStagesDTO;
 import org.sopt.confeti.api.dummy.dto.festival.FixFestivalRequest;
 import org.sopt.confeti.api.dummy.facade.DummyFacade;
@@ -16,6 +17,8 @@ import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalMusicDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFilesDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.response.DummyFestivalPreviewDTO;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Controller
 @Validated
@@ -36,6 +40,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class DummyPageController {
 
     private final DummyFacade dummyFacade;
+    private final S3FileHandler s3FileHandler;
 
     @Value("${api.endpoints.dummy.base}")
     private String dummyPageBase;
@@ -48,6 +53,12 @@ public class DummyPageController {
 
     @Value("${api.endpoints.dummy.apple-music-api-page}")
     private String appleMusicAPIPage;
+
+    @Value("${api.endpoints.dummy.festival-fix-page}")
+    private String fixFestivalPage;
+
+    @Value("${api.endpoints.dummy.festival-list-page}")
+    private String festivalListPage;
 
     @GetMapping("${api.endpoints.dummy.festival-page}")
     public String getAddFestivalPage(Model model) {
@@ -102,7 +113,7 @@ public class DummyPageController {
                         .toList()
         );
 
-        return "redirect: somewhere...";
+        return "redirect:" + dummyPageBase + festivalListPage;
     }
 
     @GetMapping("${api.endpoints.dummy.concert-page}")
@@ -135,5 +146,26 @@ public class DummyPageController {
     public String getAppleMusicApiPage(Model model) {
         model.addAttribute("actionUrl", dummyPageBase + appleMusicAPIPage);
         return "dummy/appleMusicApiTest";
+    }
+
+    @GetMapping("${api.endpoints.dummy.festival-list-page}")
+    public String getFestivalListPage(
+            Model model
+    ) {
+        List<DummyFestivalPreviewDTO> festivalPreviews = dummyFacade.getFestivalsPreview();
+        List<DummyFestivalPreviewResponse> festivalPreviewResponses = festivalPreviews.stream()
+                .map(festivalPreview -> {
+                    String fixPageUrl = UriComponentsBuilder.fromUriString(dummyPageBase + fixFestivalPage)
+                            .buildAndExpand(festivalPreview.festivalId())
+                            .toUriString();
+
+                    return DummyFestivalPreviewResponse.of(festivalPreview, fixPageUrl, s3FileHandler);
+                })
+                .toList();
+
+        model.addAttribute("addFestivalUrl", dummyPageBase + festivalDummyPage);
+        model.addAttribute("festivals", festivalPreviewResponses);
+
+        return "dummy/festival-list";
     }
 }

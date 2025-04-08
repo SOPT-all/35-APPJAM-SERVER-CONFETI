@@ -11,6 +11,7 @@ import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalMusicDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFilesDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.response.DummyFestivalPreviewDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.festival.Festival;
@@ -96,5 +97,12 @@ public class DummyFacade {
     public void fixFestival(long festivalId, List<CreateFestivalDateDTO> dates, List<CreateFestivalMusicDTO> musics) {
         festivalService.addDates(festivalId, dates);
         festivalService.addMusics(festivalId, musics);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DummyFestivalPreviewDTO> getFestivalsPreview() {
+        return festivalService.getAll().stream()
+                .map(DummyFestivalPreviewDTO::from)
+                .toList();
     }
 }

@@ -145,4 +145,9 @@ public class FestivalService {
                         .toList()
         );
     }
+
+    @Transactional(readOnly = true)
+    public List<Festival> getAll() {
+        return festivalRepository.findAll();
+    }
 }
