@@ -15,7 +15,10 @@ import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
 
 @Handler
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class S3FileHandler {
     private static final Duration urlDuration = Duration.ofMinutes(10L);
 
     private final S3Operations s3Operations;
+    private final S3Client s3Client;
     private final FileNameGenerator fileNameGenerator;
 
     @Value("${spring.cloud.aws.s3.bucket-name}")
@@ -34,6 +38,8 @@ public class S3FileHandler {
      */
     public String uploadFile(MultipartFile file, String folderPath) {
         final String fileName = fileNameGenerator.generate(file.getOriginalFilename());
+        checkFileNotExist(folderPath, fileName);
+
         final ObjectMetadata metadata = getMetadata(file);
 
         try {
@@ -86,13 +92,15 @@ public class S3FileHandler {
                 .build();
     }
 
-    private void upload(String fullPath, InputStream is, ObjectMetadata metadata) {
+    @Async
+    protected void upload(String fullPath, InputStream is, ObjectMetadata metadata) {
         s3Operations.upload(bucket, fullPath, is, metadata);
     }
 
     /**
      * 파일 삭제
      */
+    @Async
     public void deleteFile(String folderPath, String key) {
         checkFileExist(folderPath, key);
 
@@ -118,8 +126,44 @@ public class S3FileHandler {
     }
 
     /**
+     * 파일이 존재하지 않는지 확인
+     */
+    private void checkFileNotExist(String folderPath, String key) {
+        if (s3Operations.objectExists(bucket, folderPath + key)) {
+            throw new ConfetiException(ErrorMessage.CONFLICT);
+        }
+    }
+
+    /**
+     * 파일 복사
+     */
+    public String copyFile(String originFolderPath, String originKey, String targetFolderPath, String targetKey) {
+        checkFileExist(originFolderPath, originKey);
+        checkFileNotExist(targetFolderPath, targetKey);
+
+        String targetFileName = fileNameGenerator.generate(targetKey);
+
+        CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
+                .sourceBucket(bucket)
+                .sourceKey(originFolderPath + originKey)
+                .destinationBucket(bucket)
+                .destinationKey(targetFolderPath + targetFileName)
+                .build();
+
+        copyFileAsync(copyObjectRequest);
+
+        return targetFileName;
+    }
+
+    @Async
+    protected void copyFileAsync(CopyObjectRequest copyObjectRequest) {
+        s3Client.copyObject(copyObjectRequest);
+    }
+
+    /**
      * 파일 수정 (삭제 -> 업로드)
      */
+    @Async
     public void updateFile(MultipartFile file, String folderPath, String key) throws IOException {
         checkFileExist(folderPath, key);
 
