@@ -2,7 +2,7 @@ package org.sopt.confeti.api.dummy.facade;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.dummy.dto.festival.FestivalStagesDTO;
+import org.sopt.confeti.api.dummy.dto.festival.FixDummyFestivalDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.ConcertFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.UploadConcertFilesDTO;
@@ -75,11 +75,12 @@ public class DummyFacade {
     }
 
     @Transactional(readOnly = true)
-    public FestivalStagesDTO getFestivalStages(long festivalId) {
+    public FixDummyFestivalDTO getFestivalInfoToFix(long festivalId) {
         Festival festival = festivalService.findById(festivalId);
 
         validateFestivalFirstDateExist(festival);
-        return FestivalStagesDTO.from(
+        return FixDummyFestivalDTO.of(
+                festival.getTitle(),
                 festival.getDates()
                         .getFirst()
                         .getStages()

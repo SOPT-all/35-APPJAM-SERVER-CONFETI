@@ -286,7 +286,7 @@
 </head>
 <body>
 <div class="container">
-    <h1>페스티벌 날짜 및 음악 등록</h1>
+    <h1 th:text="${festivalTitle} + ' - 날짜 및 음악 추가'">페스티벌 날짜 및 음악 등록</h1>
 
     <form th:action="${actionUrl}" method="post" th:object="${festival}">
         <!-- 탭 네비게이션 -->

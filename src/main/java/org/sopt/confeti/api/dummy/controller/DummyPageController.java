@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.dummy.dto.concert.CreateConcertRequest;
 import org.sopt.confeti.api.dummy.dto.festival.CreateFestivalRequest;
 import org.sopt.confeti.api.dummy.dto.festival.DummyFestivalPreviewResponse;
-import org.sopt.confeti.api.dummy.dto.festival.FestivalStagesDTO;
+import org.sopt.confeti.api.dummy.dto.festival.FixDummyFestivalDTO;
 import org.sopt.confeti.api.dummy.dto.festival.FixFestivalRequest;
 import org.sopt.confeti.api.dummy.facade.DummyFacade;
 import org.sopt.confeti.api.dummy.facade.dto.concert.ConcertFilePathsDTO;
@@ -84,7 +84,7 @@ public class DummyPageController {
 
         redirectAttributes.addFlashAttribute("message", "서버에 정상적으로 저장되었습니다.");
 
-        return "redirect:" + dummyPageBase + festivalDummyPage;
+        return "redirect:" + dummyPageBase + festivalListPage;
     }
 
     @GetMapping("${api.endpoints.dummy.festival-fix-page}")
@@ -92,9 +92,14 @@ public class DummyPageController {
             @PathVariable Long festivalId,
             Model model
     ) {
-        FestivalStagesDTO stagesDTO = dummyFacade.getFestivalStages(festivalId);
-        model.addAttribute("stages", stagesDTO.stages());
+        String fixPageUrl = UriComponentsBuilder.fromUriString(dummyPageBase + fixFestivalPage)
+                .buildAndExpand(festivalId)
+                .toUriString();
+        FixDummyFestivalDTO fixDummyFestivalDTO = dummyFacade.getFestivalInfoToFix(festivalId);
+        model.addAttribute("festivalTitle", fixDummyFestivalDTO.title());
+        model.addAttribute("stages", fixDummyFestivalDTO.stages());
         model.addAttribute("festivalId", festivalId);
+        model.addAttribute("actionUrl", fixPageUrl);
         return "dummy/fix-festival";
     }
 
