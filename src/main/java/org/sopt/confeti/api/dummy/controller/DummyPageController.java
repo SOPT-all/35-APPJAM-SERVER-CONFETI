@@ -3,16 +3,18 @@ package org.sopt.confeti.api.dummy.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.dummy.dto.concert.CreateConcertRequest;
 import org.sopt.confeti.api.dummy.dto.festival.CreateFestivalRequest;
 import org.sopt.confeti.api.dummy.dto.festival.FestivalStagesDTO;
+import org.sopt.confeti.api.dummy.dto.festival.FixFestivalRequest;
 import org.sopt.confeti.api.dummy.facade.DummyFacade;
 import org.sopt.confeti.api.dummy.facade.dto.concert.ConcertFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.UploadConcertFilesDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalMusicDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFilesDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -27,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@Slf4j
 @Controller
 @Validated
 @RequiredArgsConstructor
@@ -84,6 +85,24 @@ public class DummyPageController {
         model.addAttribute("stages", stagesDTO.stages());
         model.addAttribute("festivalId", festivalId);
         return "dummy/fix-festival";
+    }
+
+    @PostMapping("${api.endpoints.dummy.festival-fix-page}")
+    public String fixFestivalDatesAndMusics(
+            @PathVariable Long festivalId,
+            @Valid @ModelAttribute FixFestivalRequest request
+    ) {
+        dummyFacade.fixFestival(
+                festivalId,
+                request.getDates().stream()
+                        .map(CreateFestivalDateDTO::from)
+                        .toList(),
+                request.getMusics().stream()
+                        .map(CreateFestivalMusicDTO::from)
+                        .toList()
+        );
+
+        return "redirect: somewhere...";
     }
 
     @GetMapping("${api.endpoints.dummy.concert-page}")

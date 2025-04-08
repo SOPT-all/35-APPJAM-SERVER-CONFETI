@@ -8,6 +8,8 @@ import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.UploadConcertFilesDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalMusicDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFilesDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
@@ -88,5 +90,11 @@ public class DummyFacade {
             // 있어서는 안되는 페스티벌 엔티티
             throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Transactional
+    public void fixFestival(long festivalId, List<CreateFestivalDateDTO> dates, List<CreateFestivalMusicDTO> musics) {
+        festivalService.addDates(festivalId, dates);
+        festivalService.addMusics(festivalId, musics);
     }
 }

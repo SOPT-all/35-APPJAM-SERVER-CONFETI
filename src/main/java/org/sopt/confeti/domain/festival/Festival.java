@@ -181,5 +181,15 @@ public class Festival {
                 )
                 .build();
     }
+
+    public void addDates(List<FestivalDate> dates) {
+        this.dates.addAll(dates);
+        dates.forEach(date -> date.setFestival(this));
+    }
+
+    public void addMusics(List<FestivalMusic> musics) {
+        this.musics.addAll(musics);
+        musics.forEach(music -> music.setFestival(this));
+    }
 }
 
