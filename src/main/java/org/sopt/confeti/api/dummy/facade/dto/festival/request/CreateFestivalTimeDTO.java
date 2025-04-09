@@ -11,8 +11,8 @@ public record CreateFestivalTimeDTO(
 ) {
     public static CreateFestivalTimeDTO from(CreateFestivalTimeRequest request) {
         return new CreateFestivalTimeDTO(
-                request.getStartAt().toLocalTime(),
-                request.getEndAt().toLocalTime(),
+                request.getStartAt(),
+                request.getEndAt(),
                 request.getArtists().stream()
                         .map(CreateFestivalArtistDTO::from)
                         .toList()

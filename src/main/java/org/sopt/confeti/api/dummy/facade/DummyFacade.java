@@ -2,12 +2,16 @@ package org.sopt.confeti.api.dummy.facade;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.dummy.dto.festival.FixDummyFestivalDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.ConcertFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.UploadConcertFilesDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalMusicDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFilesDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.response.DummyFestivalPreviewDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.festival.Festival;
@@ -16,6 +20,8 @@ import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.FolderPath;
+import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,5 +72,38 @@ public class DummyFacade {
     public void createConcert(CreateConcertDTO concertDTO) {
         long concertId = concertService.create(Concert.create(concertDTO));
         performanceService.create(Performance.create(concertId, concertDTO));
+    }
+
+    @Transactional(readOnly = true)
+    public FixDummyFestivalDTO getFestivalInfoToFix(long festivalId) {
+        Festival festival = festivalService.findById(festivalId);
+
+        validateFestivalFirstDateExist(festival);
+        return FixDummyFestivalDTO.of(
+                festival.getTitle(),
+                festival.getDates()
+                        .getFirst()
+                        .getStages()
+        );
+    }
+
+    private void validateFestivalFirstDateExist(Festival festival) {
+        if (festival.getDates().isEmpty()) {
+            // 있어서는 안되는 페스티벌 엔티티
+            throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Transactional
+    public void fixFestival(long festivalId, List<CreateFestivalDateDTO> dates, List<CreateFestivalMusicDTO> musics) {
+        festivalService.addDates(festivalId, dates);
+        festivalService.addMusics(festivalId, musics);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DummyFestivalPreviewDTO> getFestivalsPreview() {
+        return festivalService.getAll().stream()
+                .map(DummyFestivalPreviewDTO::from)
+                .toList();
     }
 }

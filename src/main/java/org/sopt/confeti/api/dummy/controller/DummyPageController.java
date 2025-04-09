@@ -3,29 +3,36 @@ package org.sopt.confeti.api.dummy.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.dummy.dto.concert.CreateConcertRequest;
 import org.sopt.confeti.api.dummy.dto.festival.CreateFestivalRequest;
+import org.sopt.confeti.api.dummy.dto.festival.DummyFestivalPreviewResponse;
+import org.sopt.confeti.api.dummy.dto.festival.FixDummyFestivalDTO;
+import org.sopt.confeti.api.dummy.dto.festival.FixFestivalRequest;
 import org.sopt.confeti.api.dummy.facade.DummyFacade;
 import org.sopt.confeti.api.dummy.facade.dto.concert.ConcertFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.UploadConcertFilesDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalMusicDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFilesDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.response.DummyFestivalPreviewDTO;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
-@Slf4j
 @Controller
 @Validated
 @RequiredArgsConstructor
@@ -33,6 +40,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class DummyPageController {
 
     private final DummyFacade dummyFacade;
+    private final S3FileHandler s3FileHandler;
 
     @Value("${api.endpoints.dummy.base}")
     private String dummyPageBase;
@@ -45,6 +53,12 @@ public class DummyPageController {
 
     @Value("${api.endpoints.dummy.apple-music-api-page}")
     private String appleMusicAPIPage;
+
+    @Value("${api.endpoints.dummy.festival-fix-page}")
+    private String fixFestivalPage;
+
+    @Value("${api.endpoints.dummy.festival-list-page}")
+    private String festivalListPage;
 
     @GetMapping("${api.endpoints.dummy.festival-page}")
     public String getAddFestivalPage(Model model) {
@@ -70,7 +84,41 @@ public class DummyPageController {
 
         redirectAttributes.addFlashAttribute("message", "서버에 정상적으로 저장되었습니다.");
 
-        return "redirect:" + dummyPageBase + festivalDummyPage;
+        return "redirect:" + dummyPageBase + festivalListPage;
+    }
+
+    @GetMapping("${api.endpoints.dummy.festival-fix-page}")
+    public String getFixFestivalPage(
+            @PathVariable Long festivalId,
+            Model model
+    ) {
+        String fixPageUrl = UriComponentsBuilder.fromUriString(dummyPageBase + fixFestivalPage)
+                .buildAndExpand(festivalId)
+                .toUriString();
+        FixDummyFestivalDTO fixDummyFestivalDTO = dummyFacade.getFestivalInfoToFix(festivalId);
+        model.addAttribute("festivalTitle", fixDummyFestivalDTO.title());
+        model.addAttribute("stages", fixDummyFestivalDTO.stages());
+        model.addAttribute("festivalId", festivalId);
+        model.addAttribute("actionUrl", fixPageUrl);
+        return "dummy/fix-festival";
+    }
+
+    @PostMapping("${api.endpoints.dummy.festival-fix-page}")
+    public String fixFestivalDatesAndMusics(
+            @PathVariable Long festivalId,
+            @Valid @ModelAttribute FixFestivalRequest request
+    ) {
+        dummyFacade.fixFestival(
+                festivalId,
+                request.getDates().stream()
+                        .map(CreateFestivalDateDTO::from)
+                        .toList(),
+                request.getMusics().stream()
+                        .map(CreateFestivalMusicDTO::from)
+                        .toList()
+        );
+
+        return "redirect:" + dummyPageBase + festivalListPage;
     }
 
     @GetMapping("${api.endpoints.dummy.concert-page}")
@@ -103,5 +151,26 @@ public class DummyPageController {
     public String getAppleMusicApiPage(Model model) {
         model.addAttribute("actionUrl", dummyPageBase + appleMusicAPIPage);
         return "dummy/appleMusicApiTest";
+    }
+
+    @GetMapping("${api.endpoints.dummy.festival-list-page}")
+    public String getFestivalListPage(
+            Model model
+    ) {
+        List<DummyFestivalPreviewDTO> festivalPreviews = dummyFacade.getFestivalsPreview();
+        List<DummyFestivalPreviewResponse> festivalPreviewResponses = festivalPreviews.stream()
+                .map(festivalPreview -> {
+                    String fixPageUrl = UriComponentsBuilder.fromUriString(dummyPageBase + fixFestivalPage)
+                            .buildAndExpand(festivalPreview.festivalId())
+                            .toUriString();
+
+                    return DummyFestivalPreviewResponse.of(festivalPreview, fixPageUrl, s3FileHandler);
+                })
+                .toList();
+
+        model.addAttribute("addFestivalUrl", dummyPageBase + festivalDummyPage);
+        model.addAttribute("festivals", festivalPreviewResponses);
+
+        return "dummy/festival-list";
     }
 }

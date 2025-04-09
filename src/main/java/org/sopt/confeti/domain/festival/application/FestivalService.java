@@ -4,9 +4,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
+import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalMusicDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
+import org.sopt.confeti.domain.festival_date.FestivalDate;
+import org.sopt.confeti.domain.festival_music.FestivalMusic;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.MusicAPIResolver;
@@ -118,5 +122,32 @@ public class FestivalService {
     @Transactional
     public long create(Festival festival) {
         return festivalRepository.save(festival).getId();
+    }
+
+    @Transactional
+    public void addDates(long festivalId, List<CreateFestivalDateDTO> dates) {
+        Festival festival = findById(festivalId);
+
+        festival.addDates(
+                dates.stream()
+                        .map(FestivalDate::create)
+                        .toList()
+        );
+    }
+
+    @Transactional
+    public void addMusics(long festivalId, List<CreateFestivalMusicDTO> musics) {
+        Festival festival = findById(festivalId);
+
+        festival.addMusics(
+                musics.stream()
+                        .map(FestivalMusic::create)
+                        .toList()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<Festival> getAll() {
+        return festivalRepository.findAll();
     }
 }
