@@ -3,10 +3,14 @@ package org.sopt.confeti.domain.view.performance.application;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.domain.view.performance.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceDTORepository;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceRepository;
+import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.exception.NotFoundException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -71,5 +75,16 @@ public class PerformanceService {
         return performanceRepository.findAll(
                 getPageRequest(recentPerformancesSize, getRecentPerformancesSort())
         ).stream().toList();
+    }
+
+    @Transactional
+    public void addPerformanceArtists(PerformanceType performanceType, long festivalId,
+                                      List<PerformanceArtist> performanceArtists) {
+        Performance performance = performanceRepository.findPerformancesByTypeAndTypeId(performanceType, festivalId)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
+
+        performance.addArtists(performanceArtists);
     }
 }

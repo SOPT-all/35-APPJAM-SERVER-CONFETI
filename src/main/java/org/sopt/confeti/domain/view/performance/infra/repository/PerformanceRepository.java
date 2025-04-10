@@ -1,7 +1,9 @@
 package org.sopt.confeti.domain.view.performance.infra.repository;
 
 import java.util.List;
+import java.util.Optional;
 import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,4 +32,6 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     List<Performance> findPerformancesByArtistId(
             final @Param("artistId") String artistId
     );
+
+    Optional<Performance> findPerformancesByTypeAndTypeId(PerformanceType type, long typeId);
 }
