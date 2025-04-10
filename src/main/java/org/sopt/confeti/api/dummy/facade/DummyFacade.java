@@ -17,9 +17,11 @@ import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.FolderPath;
+import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -98,6 +100,16 @@ public class DummyFacade {
     public void fixFestival(long festivalId, List<CreateFestivalDateDTO> dates, List<CreateFestivalMusicDTO> musics) {
         festivalService.addDates(festivalId, dates);
         festivalService.addMusics(festivalId, musics);
+        performanceService.addPerformanceArtists(PerformanceType.FESTIVAL, festivalId, getPerformanceArtists(dates));
+    }
+
+    private List<PerformanceArtist> getPerformanceArtists(List<CreateFestivalDateDTO> dates) {
+        return dates.stream()
+                .flatMap(date -> date.stages().stream())
+                .flatMap(stage -> stage.times().stream())
+                .flatMap(time -> time.artists().stream())
+                .map(PerformanceArtist::create)
+                .toList();
     }
 
     @Transactional(readOnly = true)
