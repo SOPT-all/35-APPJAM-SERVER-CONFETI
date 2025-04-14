@@ -17,7 +17,7 @@ public class ArtistFavoriteService {
 
     @Transactional(readOnly = true)
     public List<ArtistFavorite> getArtistListPreview(Long userId) {
-        List<ArtistFavorite> artistList = artistFavoriteRepository.findTop3ByUserIdOrderByRand(userId);
+        List<ArtistFavorite> artistList = artistFavoriteRepository.findTop4ByUserIdOrderByRand(userId);
         musicAPIResolver.load(artistList);
 
         return artistList;

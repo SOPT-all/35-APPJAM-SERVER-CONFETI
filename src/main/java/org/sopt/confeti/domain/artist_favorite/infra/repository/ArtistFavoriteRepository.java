@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ArtistFavoriteRepository extends JpaRepository<ArtistFavorite, Long> {
-    @Query(value = "select * from artist_favorites where user_id = :userId order by rand() limit 3", nativeQuery = true)
-    List<ArtistFavorite> findTop3ByUserIdOrderByRand(@Param("userId") Long userId);
+    @Query(value = "select * from artist_favorites where user_id = :userId order by rand() limit 4", nativeQuery = true)
+    List<ArtistFavorite> findTop4ByUserIdOrderByRand(@Param("userId") Long userId);
 
     boolean existsByUserIdAndArtist_id(long userId, String artistId);
 
