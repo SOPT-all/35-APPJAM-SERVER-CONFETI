@@ -4,17 +4,16 @@ import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformanceAllD
 
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.util. DateConvertor;
 import org.sopt.confeti.global.util.S3FileHandler;
-
-import java.time.LocalDate;
 
 public record UserFavoritePerformanceAllResponse (
         long typeId,
         PerformanceType type,
         String title,
         String posterPath,
-        LocalDate startAt,
-        LocalDate endAt,
+        String startAt,
+        String endAt,
         String area
 ){
     public static UserFavoritePerformanceAllResponse of(
@@ -27,8 +26,8 @@ public record UserFavoritePerformanceAllResponse (
                 userFavoritePerformanceAllDTO.title(),
                 s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), userFavoritePerformanceAllDTO.posterPath())
                         .toString(),
-                userFavoritePerformanceAllDTO.startAt(),
-                userFavoritePerformanceAllDTO.endAt(),
+                DateConvertor.convertToDefaultFormat(userFavoritePerformanceAllDTO.startAt()),
+                DateConvertor.convertToDefaultFormat(userFavoritePerformanceAllDTO.endAt()),
                 userFavoritePerformanceAllDTO.area()
         );
     }
