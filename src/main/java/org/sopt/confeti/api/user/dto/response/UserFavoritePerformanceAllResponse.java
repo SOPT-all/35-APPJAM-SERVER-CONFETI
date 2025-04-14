@@ -1,0 +1,37 @@
+package org.sopt.confeti.api.user.dto.response;
+
+import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformanceAllDTO;
+
+import org.sopt.confeti.global.common.constant.FolderPath;
+import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.util.S3FileHandler;
+
+import java.time.LocalDate;
+
+public record UserFavoritePerformanceAllResponse (
+        long typeId,
+        PerformanceType type,
+        String title,
+        String posterPath,
+        LocalDate startAt,
+        LocalDate endAt,
+        String area
+){
+    public static UserFavoritePerformanceAllResponse of(
+            final UserFavoritePerformanceAllDTO userFavoritePerformanceAllDTO, final S3FileHandler s3FileHandler) {
+        FolderPath topFolder = FolderPath.getFolderPathByPerformanceType(userFavoritePerformanceAllDTO.type());
+
+        return new UserFavoritePerformanceAllResponse(
+                userFavoritePerformanceAllDTO.typeId(),
+                userFavoritePerformanceAllDTO.type(),
+                userFavoritePerformanceAllDTO.title(),
+                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), userFavoritePerformanceAllDTO.posterPath())
+                        .toString(),
+                userFavoritePerformanceAllDTO.startAt(),
+                userFavoritePerformanceAllDTO.endAt(),
+                userFavoritePerformanceAllDTO.area()
+        );
+    }
+}
+
+

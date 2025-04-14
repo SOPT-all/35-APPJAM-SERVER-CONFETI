@@ -4,11 +4,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.view.performance.PerformanceDTO;
+import org.sopt.confeti.domain.view.performance.PerformanceFavoriteListDTO;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.springframework.stereotype.Repository;
@@ -116,6 +118,41 @@ public class PerformanceDTORepository {
                         (String) row[2],
                         (String) row[3],
                         LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) row[4]).getTime()), ZoneId.of("UTC"))
+                ))
+                .toList();
+    }
+
+
+    public List<PerformanceFavoriteListDTO> findFavoritePerformancesAll(final Long userId) {
+        String sql =
+                "SELECT c.id id, :concertType type, c.title title, c.poster_path posterPath, c.start_at startAt, c.end_at endAt, c.area area" +
+                        " FROM concert_favorites cf INNER JOIN concerts c ON cf.concert_id = c.id" +
+                        " WHERE cf.user_id = :userId AND c.end_at >= CURRENT_DATE" +
+                        " UNION" +
+                        " SELECT f.id id, :festivalType type, f.title title, f.poster_path posterPath, f.start_at startAt, f.end_at endAt, f.area area" +
+                        " FROM festival_favorites ff INNER JOIN festivals f ON ff.festival_id = f.id" +
+                        " WHERE ff.user_id = :userId AND f.end_at >= CURRENT_DATE" +
+                        " ORDER BY startAt ASC";
+
+        Query query = em.createNativeQuery(sql);
+        query.setParameter("userId", userId);
+        query.setParameter("concertType", PerformanceType.CONCERT.getType());
+        query.setParameter("festivalType", PerformanceType.FESTIVAL.getType());
+
+        List<Object[]> results = query.getResultList();
+        return convertToPerformanceAllDTOs(results);
+    }
+
+    private List<PerformanceFavoriteListDTO> convertToPerformanceAllDTOs(final List<Object[]> results) {
+        return results.stream()
+                .map(result -> PerformanceFavoriteListDTO.of(
+                        ((Number) result[0]).longValue(),
+                        (String) result[1],
+                        (String) result[2],
+                        (String) result[3],
+                        ((java.sql.Date) result[4]).toLocalDate(),
+                        ((java.sql.Date) result[5]).toLocalDate(),
+                        (String) result[6]
                 ))
                 .toList();
     }

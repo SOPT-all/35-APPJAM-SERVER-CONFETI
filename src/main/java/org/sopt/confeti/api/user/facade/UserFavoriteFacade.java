@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesAllDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
@@ -15,7 +16,9 @@ import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
+import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceDTO;
+import org.sopt.confeti.domain.view.performance.PerformanceFavoriteListDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.exception.ConflictException;
@@ -142,6 +145,14 @@ public class UserFavoriteFacade {
 
         List<PerformanceDTO> performances = performanceService.getFavoritePerformancesPreview(userId);
         return UserFavoritePerformancesDTO.from(performances);
+    }
+
+    @Transactional(readOnly = true)
+    public UserFavoritePerformancesAllDTO getFavoritePerformancesAll(final long userId) {
+        validateExistUser(userId);
+
+        List<PerformanceFavoriteListDTO> performances = performanceService.getFavoritePerformancesAll(userId);
+        return UserFavoritePerformancesAllDTO.from(performances);
     }
 
     @Transactional(readOnly = true)
