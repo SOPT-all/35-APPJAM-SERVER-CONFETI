@@ -123,22 +123,44 @@ public class PerformanceDTORepository {
     }
 
 
-    public List<PerformanceFavoriteListDTO> findFavoritePerformancesAll(final Long userId) {
-        String sql =
-                "SELECT c.id id, :concertType type, c.title title, c.poster_path posterPath, c.start_at startAt, c.end_at endAt, c.area area" +
-                        " FROM concert_favorites cf INNER JOIN concerts c ON cf.concert_id = c.id" +
-                        " WHERE cf.user_id = :userId AND c.end_at >= CURRENT_DATE" +
-                        " UNION" +
-                        " SELECT f.id id, :festivalType type, f.title title, f.poster_path posterPath, f.start_at startAt, f.end_at endAt, f.area area" +
-                        " FROM festival_favorites ff INNER JOIN festivals f ON ff.festival_id = f.id" +
-                        " WHERE ff.user_id = :userId AND f.end_at >= CURRENT_DATE" +
-                        " ORDER BY startAt ASC";
+    public List<PerformanceFavoriteListDTO> findFavoritePerformancesAll(final Long userId, final String type) {
+        String sql;
+
+        if ("CONCERT".equalsIgnoreCase(type)) {
+            sql = "SELECT c.id, :concertType, c.title, c.poster_path, c.start_at, c.end_at, c.area " +
+                    "FROM concert_favorites cf " +
+                    "INNER JOIN concerts c ON cf.concert_id = c.id " +
+                    "WHERE cf.user_id = :userId AND c.end_at >= CURRENT_DATE " +
+                    "ORDER BY c.start_at ASC";
+        } else if ("FESTIVAL".equalsIgnoreCase(type)) {
+            sql = "SELECT f.id, :festivalType, f.title, f.poster_path, f.start_at, f.end_at, f.area " +
+                    "FROM festival_favorites ff " +
+                    "INNER JOIN festivals f ON ff.festival_id = f.id " +
+                    "WHERE ff.user_id = :userId AND f.end_at >= CURRENT_DATE " +
+                    "ORDER BY f.start_at ASC";
+        } else { // ALL
+            sql = "SELECT c.id, :concertType, c.title, c.poster_path, c.start_at, c.end_at, c.area " +
+                    "FROM concert_favorites cf " +
+                    "INNER JOIN concerts c ON cf.concert_id = c.id " +
+                    "WHERE cf.user_id = :userId AND c.end_at >= CURRENT_DATE " +
+                    "UNION " +
+                    "SELECT f.id, :festivalType, f.title, f.poster_path, f.start_at, f.end_at, f.area " +
+                    "FROM festival_favorites ff " +
+                    "INNER JOIN festivals f ON ff.festival_id = f.id " +
+                    "WHERE ff.user_id = :userId AND f.end_at >= CURRENT_DATE " +
+                    "ORDER BY start_at ASC";
+        }
 
         Query query = em.createNativeQuery(sql);
         query.setParameter("userId", userId);
-        query.setParameter("concertType", PerformanceType.CONCERT.getType());
-        query.setParameter("festivalType", PerformanceType.FESTIVAL.getType());
-
+        if ("CONCERT".equalsIgnoreCase(type)) {
+            query.setParameter("concertType", PerformanceType.CONCERT.getType());
+        } else if ("FESTIVAL".equalsIgnoreCase(type)) {
+            query.setParameter("festivalType", PerformanceType.FESTIVAL.getType());
+        } else { // ALL
+            query.setParameter("concertType", PerformanceType.CONCERT.getType());
+            query.setParameter("festivalType", PerformanceType.FESTIVAL.getType());
+        }
         List<Object[]> results = query.getResultList();
         return convertToPerformanceAllDTOs(results);
     }

@@ -13,6 +13,7 @@ import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -111,9 +112,10 @@ public class UserFavoriteController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/performances/all")
     public ResponseEntity<BaseResponse<?>> getFavoritePerformancesAll(
+            @RequestParam (value = "type") String type,
             @UserId Long userId
     ) {
-        UserFavoritePerformancesAllDTO userFavoritePerformancesAllDTO = userFavoriteFacade.getFavoritePerformancesAll(userId);
+        UserFavoritePerformancesAllDTO userFavoritePerformancesAllDTO = userFavoriteFacade.getFavoritePerformancesAll(userId, type);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 UserFavoritePerformancesAllResponse.of(userFavoritePerformancesAllDTO, s3FileHandler));
     }

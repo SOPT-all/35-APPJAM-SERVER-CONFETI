@@ -30,8 +30,8 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceFavoriteListDTO> getFavoritePerformancesAll(final long userId) {
-        return performanceDTORepository.findFavoritePerformancesAll(userId);
+    public List<PerformanceFavoriteListDTO> getFavoritePerformancesAll(final long userId, final String type) {
+        return performanceDTORepository.findFavoritePerformancesAll(userId, type);
     }
 
     @Transactional(readOnly = true)
