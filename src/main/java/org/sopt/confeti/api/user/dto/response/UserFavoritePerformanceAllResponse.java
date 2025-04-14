@@ -14,7 +14,8 @@ public record UserFavoritePerformanceAllResponse (
         String posterPath,
         String startAt,
         String endAt,
-        String area
+        String area,
+        boolean isFavorite
 ){
     public static UserFavoritePerformanceAllResponse of(
             final UserFavoritePerformanceAllDTO userFavoritePerformanceAllDTO, final S3FileHandler s3FileHandler) {
@@ -28,7 +29,8 @@ public record UserFavoritePerformanceAllResponse (
                         .toString(),
                 DateConvertor.convertToDefaultFormat(userFavoritePerformanceAllDTO.startAt()),
                 DateConvertor.convertToDefaultFormat(userFavoritePerformanceAllDTO.endAt()),
-                userFavoritePerformanceAllDTO.area()
+                userFavoritePerformanceAllDTO.area(),
+                true
         );
     }
 }
