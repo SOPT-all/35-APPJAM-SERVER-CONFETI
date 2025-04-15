@@ -34,4 +34,10 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     );
 
     Optional<Performance> findPerformancesByTypeAndTypeId(PerformanceType type, long typeId);
+
+    @Query("SELECT p FROM Performance p " +
+            "JOIN ConcertFavorite cf ON p.id = cf.concert.id " +
+            "WHERE cf.user.id = :userId AND p.type = :type " +
+            "AND p.endAt >= CURRENT_DATE ORDER BY p.startAt ASC")
+    List<Performance> findPerformancesByUserFavorites(@Param("userId") Long userId, @Param("type") PerformanceType type);
 }

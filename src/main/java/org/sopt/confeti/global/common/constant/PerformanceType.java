@@ -15,7 +15,7 @@ public enum PerformanceType {
 
     public static PerformanceType convert(final String input) {
         return Arrays.stream(PerformanceType.values())
-                .filter(performanceType -> performanceType.getType().equals(input))
+                .filter(performanceType -> performanceType.getType().equalsIgnoreCase(input))
                 .findFirst()
                 .orElseThrow(
                         () -> new ConfetiException(ErrorMessage.BAD_REQUEST)
