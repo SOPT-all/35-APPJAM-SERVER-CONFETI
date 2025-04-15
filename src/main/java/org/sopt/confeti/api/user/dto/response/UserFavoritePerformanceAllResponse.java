@@ -11,7 +11,7 @@ public record UserFavoritePerformanceAllResponse (
         long typeId,
         PerformanceType type,
         String title,
-        String posterPath,
+        String posterUrl,
         String startAt,
         String endAt,
         String area,
