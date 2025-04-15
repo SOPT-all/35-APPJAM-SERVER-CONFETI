@@ -4,13 +4,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.view.performance.PerformanceDTO;
-import org.sopt.confeti.domain.view.performance.PerformanceFavoriteListDTO;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.springframework.stereotype.Repository;
@@ -118,63 +116,6 @@ public class PerformanceDTORepository {
                         (String) row[2],
                         (String) row[3],
                         LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) row[4]).getTime()), ZoneId.of("UTC"))
-                ))
-                .toList();
-    }
-
-
-    public List<PerformanceFavoriteListDTO> findFavoritePerformancesAll(final Long userId, final String type) {
-        String sql;
-
-        if ("CONCERT".equalsIgnoreCase(type)) {
-            sql = "SELECT c.id, :concertType, c.title, c.poster_path, c.start_at, c.end_at, c.area " +
-                    "FROM concert_favorites cf " +
-                    "INNER JOIN concerts c ON cf.concert_id = c.id " +
-                    "WHERE cf.user_id = :userId AND c.end_at >= CURRENT_DATE " +
-                    "ORDER BY c.start_at ASC";
-        } else if ("FESTIVAL".equalsIgnoreCase(type)) {
-            sql = "SELECT f.id, :festivalType, f.title, f.poster_path, f.start_at, f.end_at, f.area " +
-                    "FROM festival_favorites ff " +
-                    "INNER JOIN festivals f ON ff.festival_id = f.id " +
-                    "WHERE ff.user_id = :userId AND f.end_at >= CURRENT_DATE " +
-                    "ORDER BY f.start_at ASC";
-        } else { // ALL
-            sql = "SELECT c.id, :concertType, c.title, c.poster_path, c.start_at, c.end_at, c.area " +
-                    "FROM concert_favorites cf " +
-                    "INNER JOIN concerts c ON cf.concert_id = c.id " +
-                    "WHERE cf.user_id = :userId AND c.end_at >= CURRENT_DATE " +
-                    "UNION " +
-                    "SELECT f.id, :festivalType, f.title, f.poster_path, f.start_at, f.end_at, f.area " +
-                    "FROM festival_favorites ff " +
-                    "INNER JOIN festivals f ON ff.festival_id = f.id " +
-                    "WHERE ff.user_id = :userId AND f.end_at >= CURRENT_DATE " +
-                    "ORDER BY start_at ASC";
-        }
-
-        Query query = em.createNativeQuery(sql);
-        query.setParameter("userId", userId);
-        if ("CONCERT".equalsIgnoreCase(type)) {
-            query.setParameter("concertType", PerformanceType.CONCERT.getType());
-        } else if ("FESTIVAL".equalsIgnoreCase(type)) {
-            query.setParameter("festivalType", PerformanceType.FESTIVAL.getType());
-        } else { // ALL
-            query.setParameter("concertType", PerformanceType.CONCERT.getType());
-            query.setParameter("festivalType", PerformanceType.FESTIVAL.getType());
-        }
-        List<Object[]> results = query.getResultList();
-        return convertToPerformanceAllDTOs(results);
-    }
-
-    private List<PerformanceFavoriteListDTO> convertToPerformanceAllDTOs(final List<Object[]> results) {
-        return results.stream()
-                .map(result -> PerformanceFavoriteListDTO.of(
-                        ((Number) result[0]).longValue(),
-                        (String) result[1],
-                        (String) result[2],
-                        (String) result[3],
-                        ((java.sql.Date) result[4]).toLocalDate(),
-                        ((java.sql.Date) result[5]).toLocalDate(),
-                        (String) result[6]
                 ))
                 .toList();
     }

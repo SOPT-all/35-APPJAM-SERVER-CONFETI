@@ -1,5 +1,7 @@
 package org.sopt.confeti.domain.view.performance.application;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.view.performance.*;
@@ -30,9 +32,22 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceFavoriteListDTO> getFavoritePerformancesAll(final long userId, final String type) {
-        return performanceDTORepository.findFavoritePerformancesAll(userId, type);
+    public List<Performance> getFavoritePerformancesAll(final long userId, final String type) {
+        if (type.equalsIgnoreCase("FESTIVAL")) {
+            return performanceRepository.findPerformancesByUserFavorites(userId, PerformanceType.FESTIVAL);
+        }
+        if (type.equalsIgnoreCase("CONCERT")) {
+            return performanceRepository.findPerformancesByUserFavorites(userId, PerformanceType.CONCERT);
+        }
+        // 'ALL' 경우, 두 가지 데이터를 합침
+        List<Performance> allFavorites = new ArrayList<>();
+        allFavorites.addAll(performanceRepository.findPerformancesByUserFavorites(userId, PerformanceType.CONCERT));
+        allFavorites.addAll(performanceRepository.findPerformancesByUserFavorites(userId, PerformanceType.FESTIVAL));
+        allFavorites.sort(Comparator.comparing(Performance::getStartAt));
+
+        return allFavorites;
     }
+
 
     @Transactional(readOnly = true)
     public List<PerformanceTicketDTO> getFavoritePerformancesReservation(final Long userId) {
