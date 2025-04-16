@@ -20,6 +20,8 @@ import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -39,6 +41,8 @@ public class UserFavoriteFacade {
     private final ConcertService concertService;
     private final MusicAPIHandler musicAPIHandler;
     private final PerformanceService performanceService;
+
+    private static final String TYPE_ALL = "ALL";
 
     @Transactional
     public void addFestivalFavorite(long userId, long festivalId) {
@@ -149,6 +153,7 @@ public class UserFavoriteFacade {
     @Transactional(readOnly = true)
     public UserFavoritePerformancesAllDTO getFavoritePerformancesAll(final long userId, final String type) {
         validateExistUser(userId);
+        validateType(type);
 
         List<Performance> performances = performanceService.getFavoritePerformancesAll(userId, type);
         return UserFavoritePerformancesAllDTO.from(performances);
@@ -179,6 +184,13 @@ public class UserFavoriteFacade {
     protected void validateExistConcert(final long concertId) {
         if (!concertService.existsById(concertId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    protected void validateType(final String type) {
+        if (!type.equalsIgnoreCase(PerformanceType.FESTIVAL.getType()) && !type.equalsIgnoreCase(PerformanceType.CONCERT.getType()) && !type.equalsIgnoreCase(TYPE_ALL)) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
 }
