@@ -110,7 +110,7 @@ public class UserFavoriteController {
     }
 
     @Permission(role = {Role.GENERAL})
-    @GetMapping("/performances/all")
+    @GetMapping("/performances")
     public ResponseEntity<BaseResponse<?>> getFavoritePerformancesAll(
             @RequestParam (value = "type") String type,
             @UserId Long userId
