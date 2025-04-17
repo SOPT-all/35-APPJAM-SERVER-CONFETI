@@ -14,12 +14,17 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.annotation.RetryOnTokenExpire;
+import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.module.rest_client.builder.ApiRestClientBuilder;
 import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.util.music.dto.album.AppleMusicAlbumsResponse;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistsResponse;
+import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartSongResponse;
+import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartsResponse;
+import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicsResponse;
 import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
 import org.springframework.http.HttpHeaders;
@@ -31,11 +36,13 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     private static final String QUERY_PARAMETER_IDS_DELIMITER = ",";
     private static final String ARTISTS_TYPE = "artists";
+    private static final String SONGS_TYPE = "songs";
 
     // Fetch Limit 목록
     private static final int ARTISTS_FETCH_LIMIT = 25;
     private static final int ALBUMS_FETCH_LIMIT = 100;
     private static final int MUSICS_FETCH_LIMIT = 300;
+    private static final int CHARTS_FETCH_LIMIT = 200;
 
     private final AppleMusicAPITokenGenerator tokenGenerator;
     private final AppleMusicAPIURL appleMusicAPIURL;
@@ -220,5 +227,43 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         return musics.data().stream()
                 .map(ConfetiMusic::from)
                 .toList();
+    }
+
+    @Override
+    @RetryOnTokenExpire
+    public List<ConfetiMusic> getTopMusics(final int fetchSize) {
+        validateFetchSize(fetchSize);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("types", SONGS_TYPE);
+        params.put("limit", String.valueOf(fetchSize));
+
+        return convertToConfetiMusics(
+                restClient.request()
+                        .get()
+                        .baseUrl(appleMusicAPIURL.getBaseUrl())
+                        .path(appleMusicAPIURL.getChartsPath())
+                        .params(MultiValueMap.fromSingleValue(params))
+                        .build()
+                        .connect(headers)
+                        .retrieve(AppleMusicChartsResponse.class)
+        );
+    }
+
+    private List<ConfetiMusic> convertToConfetiMusics(final AppleMusicChartsResponse charts) {
+        List<AppleMusicMusicResponse> musics = charts.results().songs().stream()
+                .findFirst()
+                .map(AppleMusicChartSongResponse::data)
+                .orElseGet(List::of);
+
+        return musics.stream()
+                .map(ConfetiMusic::from)
+                .toList();
+    }
+
+    private void validateFetchSize(int fetchSize) {
+        if (fetchSize > CHARTS_FETCH_LIMIT) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
     }
 }
