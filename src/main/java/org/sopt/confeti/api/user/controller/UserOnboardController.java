@@ -1,5 +1,7 @@
 package org.sopt.confeti.api.user.controller;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.response.UserOnboardTopArtistsResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardRelatedArtistsResponse;
@@ -15,6 +17,7 @@ import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user/onboard")
+@Validated
 public class UserOnboardController {
 
     private final UserOnboardFacade userOnboardFacade;
@@ -33,7 +37,7 @@ public class UserOnboardController {
     public ResponseEntity<BaseResponse<?>> getArtistsRelatedTerm(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
             @RequestParam String term,
-            @RequestParam(defaultValue = "1") Integer limit
+            @RequestParam(defaultValue = "1") @Min(1) @Max(25) Integer limit
     ) {
         UserOnboardRelatedArtistsDTO relatedArtistsDTO = userOnboardFacade.getArtistsRelatedTerm(term, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
