@@ -11,7 +11,7 @@ public interface MusicAPIHandler {
 
     List<ConfetiArtist> getArtistsByArtistIds(final Set<String> artistIds);
 
-    List<ConfetiArtist> findArtistByKeyword(final String keyword, final int limit);
+    List<ConfetiArtist> findArtistsByKeyword(final String keyword, final int limit);
 
     Optional<ConfetiArtist> findArtistByArtistId(final String artistId);
 
