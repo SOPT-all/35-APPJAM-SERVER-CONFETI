@@ -28,11 +28,6 @@ public class ArtistResolver implements MusicAPISpecificResolver {
             return;
         }
 
-        if (target instanceof List<?> list) {
-            list.forEach(this::load);
-            return;
-        }
-
         final ArtistStrategy strategy = getStrategy(target);
         if (notSupports(strategy)) {
             return;
