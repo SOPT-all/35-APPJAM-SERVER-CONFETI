@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.annotation.Resolver;
-import org.sopt.confeti.global.resolver.music_api.MusicAPISpecificResolver;
+import org.sopt.confeti.global.resolver.music_api.AbstractMusicAPISpecificResolver;
 import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategy;
 import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategyRegistry;
@@ -14,9 +15,10 @@ import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Resolver
 @RequiredArgsConstructor
-public class ArtistResolver implements MusicAPISpecificResolver {
+public class ArtistResolver extends AbstractMusicAPISpecificResolver {
 
     private final MusicAPIHandler musicAPIHandler;
     private final ArtistStrategyRegistry artistStrategyRegistry;
@@ -40,16 +42,8 @@ public class ArtistResolver implements MusicAPISpecificResolver {
         );
     }
 
-    private <T> boolean isEmpty(T target) {
-        return target == null;
-    }
-
     private <T> ArtistStrategy getStrategy(T target) {
-        return artistStrategyRegistry.getArtistStrategyByClass(target.getClass());
-    }
-
-    private boolean notSupports(ArtistStrategy strategy) {
-        return strategy == null;
+        return artistStrategyRegistry.getArtistStrategyByClass(getTargetClass(target));
     }
 
     private <T> void collect(
@@ -81,10 +75,6 @@ public class ArtistResolver implements MusicAPISpecificResolver {
             final T target
     ) {
         strategy.collect(artistMapper, target);
-    }
-
-    private <T> boolean isListType(final T target) {
-        return target instanceof List<?>;
     }
 
     private void injection(
