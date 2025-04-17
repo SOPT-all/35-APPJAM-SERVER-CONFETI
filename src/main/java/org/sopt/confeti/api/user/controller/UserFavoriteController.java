@@ -2,10 +2,12 @@ package org.sopt.confeti.api.user.controller;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.user.dto.response.UpcomingPerformanceResponse;
 import org.sopt.confeti.api.user.dto.response.UserFavoritePerformancesAllResponse;
 import org.sopt.confeti.api.user.dto.response.UserFavoritePerformancesResponse;
 import org.sopt.confeti.api.user.dto.response.UserFavoriteResponse;
 import org.sopt.confeti.api.user.facade.UserFavoriteFacade;
+import org.sopt.confeti.api.user.facade.dto.response.UpcomingPerformanceDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesAllDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
@@ -13,7 +15,6 @@ import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
-import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -118,5 +119,15 @@ public class UserFavoriteController {
         UserFavoritePerformancesAllDTO userFavoritePerformancesAllDTO = userFavoriteFacade.getFavoritePerformancesAll(userId, type);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 UserFavoritePerformancesAllResponse.of(userFavoritePerformancesAllDTO, s3FileHandler));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/performance")
+    public ResponseEntity<BaseResponse<?>> getUpcomingPerformance(
+            @UserId Long userId
+    ) {
+        UpcomingPerformanceDTO upcomingPerformanceDTO = userFavoriteFacade.getUpcomingPerformance(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                UpcomingPerformanceResponse.of(upcomingPerformanceDTO, s3FileHandler));
     }
 }

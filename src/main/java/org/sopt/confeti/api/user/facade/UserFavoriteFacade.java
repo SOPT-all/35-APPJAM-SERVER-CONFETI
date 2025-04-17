@@ -3,6 +3,7 @@ package org.sopt.confeti.api.user.facade;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.user.facade.dto.response.UpcomingPerformanceDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesAllDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
@@ -192,5 +193,13 @@ public class UserFavoriteFacade {
         if (!type.equalsIgnoreCase(PerformanceType.FESTIVAL.getType()) && !type.equalsIgnoreCase(PerformanceType.CONCERT.getType()) && !type.equalsIgnoreCase(TYPE_ALL)) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public UpcomingPerformanceDTO getUpcomingPerformance(final long userId) {
+        validateExistUser(userId);
+
+        Performance performance = performanceService.getUpcomingPerformance(userId);
+        return UpcomingPerformanceDTO.from(performance);
     }
 }
