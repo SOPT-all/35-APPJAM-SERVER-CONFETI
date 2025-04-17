@@ -2,6 +2,7 @@ package org.sopt.confeti.global.resolver.music_api.album;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -40,11 +41,23 @@ public class AlbumResolver implements MusicAPISpecificResolver {
     }
 
     private <T> boolean isEmpty(T target) {
-        return target == null;
+        return target == null || isListType(target) && ((List<?>) target).isEmpty();
     }
 
     private <T> AlbumStrategy getStrategy(T target) {
-        return albumStrategyRegistry.getAlbumStrategyByClass(target.getClass());
+        Class<?> targetClass = target.getClass();
+
+        if (isListType(target)) {
+            Optional<Class<?>> firstItem = ((List<?>) target).stream()
+                    .findFirst()
+                    .map(Object::getClass);
+
+            if (firstItem.isPresent()) {
+                targetClass = firstItem.get();
+            }
+        }
+
+        return albumStrategyRegistry.getAlbumStrategyByClass(targetClass);
     }
 
     private boolean notSupports(AlbumStrategy strategy) {
