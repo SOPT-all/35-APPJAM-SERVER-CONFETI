@@ -2,10 +2,12 @@ package org.sopt.confeti.api.user.controller;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.user.dto.response.UpcomingPerformanceResponse;
 import org.sopt.confeti.api.user.dto.response.UserFavoritePerformancesAllResponse;
 import org.sopt.confeti.api.user.dto.response.UserFavoritePerformancesResponse;
 import org.sopt.confeti.api.user.dto.response.UserFavoriteResponse;
 import org.sopt.confeti.api.user.facade.UserFavoriteFacade;
+import org.sopt.confeti.api.user.facade.dto.response.UpcomingPerformanceDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesAllDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
@@ -124,5 +126,15 @@ public class UserFavoriteController {
                 userId, type);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 UserFavoritePerformancesAllResponse.of(userFavoritePerformancesAllDTO, s3FileHandler));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/performance")
+    public ResponseEntity<BaseResponse<?>> getUpcomingPerformance(
+            @UserId Long userId
+    ) {
+        UpcomingPerformanceDTO upcomingPerformanceDTO = userFavoriteFacade.getUpcomingPerformance(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                UpcomingPerformanceResponse.of(upcomingPerformanceDTO, s3FileHandler));
     }
 }

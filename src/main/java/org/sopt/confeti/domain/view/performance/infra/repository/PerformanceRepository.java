@@ -53,4 +53,14 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             @Param("userId") Long userId,
             @Param("type") String type
     );
+
+    @Query(value = "SELECT p FROM Performance p " +
+            "WHERE ((p.type = org.sopt.confeti.global.common.constant.PerformanceType.CONCERT " +
+            "        AND p.typeId IN (SELECT cf.concert.id FROM ConcertFavorite cf WHERE cf.user.id = :userId)) " +
+            "    OR (p.type = org.sopt.confeti.global.common.constant.PerformanceType.FESTIVAL " +
+            "        AND p.typeId IN (SELECT tf.festival.id FROM TimetableFestival tf WHERE tf.user.id = :userId))) " +
+            "AND p.endAt >= CURRENT_DATE " +
+            "ORDER BY p.startAt ASC LIMIT 1 ")
+    Optional<Performance> upcomingPerformance(final @Param("userId") long userId);
+
 }
