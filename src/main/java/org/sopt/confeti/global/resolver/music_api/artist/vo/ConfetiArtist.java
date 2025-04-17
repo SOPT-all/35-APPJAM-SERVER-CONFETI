@@ -3,6 +3,7 @@ package org.sopt.confeti.global.resolver.music_api.artist.vo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Transient;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -41,18 +42,27 @@ public class ConfetiArtist {
     }
 
     public static ConfetiArtist from(final AppleMusicArtistResponse artist) {
-        Optional<AppleMusicArtistAlbumResponse> album = artist
-                .relationships()
-                .albums()
-                .data()
-                .stream().findFirst();
+        Optional<AppleMusicArtistAlbumResponse> album = Optional.empty();
+
+        if (Objects.nonNull(artist.relationships())) {
+            album = artist.relationships()
+                    .albums()
+                    .data()
+                    .stream().findFirst();
+        }
+
+        String profileUrl = null;
+
+        if (Objects.nonNull(artist.attributes().artwork())) {
+            profileUrl = UriComponentsBuilder.fromUriString(artist.attributes().artwork().url())
+                    .buildAndExpand(ArtistConstant.PROFILE_IMG_SIZE)
+                    .toUriString();
+        }
 
         return new ConfetiArtist(
                 artist.id(),
                 artist.attributes().name(),
-                UriComponentsBuilder.fromUriString(artist.attributes().artwork().url())
-                        .buildAndExpand(ArtistConstant.PROFILE_IMG_SIZE)
-                        .toUriString(),
+                profileUrl,
                 album.map(ConfetiAlbum::from).orElse(null)
         );
     }

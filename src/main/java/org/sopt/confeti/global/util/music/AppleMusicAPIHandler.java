@@ -99,11 +99,12 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     @Override
     @RetryOnTokenExpire
-    public List<ConfetiArtist> findArtistByKeyword(final String keyword, final int limit) {
+    public List<ConfetiArtist> findArtistsByKeyword(final String keyword, final int limit) {
         Map<String, String> params = new HashMap<>();
         params.put("term", keyword);
         params.put("types", ARTISTS_TYPE);
         params.put("limit", String.valueOf(limit));
+        params.put("with", "topResults");
 
         return convertToConfetiArtists(
                 restClient.request()

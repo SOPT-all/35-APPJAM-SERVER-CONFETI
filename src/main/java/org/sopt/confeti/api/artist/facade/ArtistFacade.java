@@ -21,7 +21,7 @@ public class ArtistFacade {
 
     @Transactional(readOnly = true)
     public SearchArtistDTO searchByKeyword(final Long userId, final String keyword) {
-        List<ConfetiArtist> confetiArtists = musicAPIHandler.findArtistByKeyword(keyword, ARTISTS_SEARCH_COUNT);
+        List<ConfetiArtist> confetiArtists = musicAPIHandler.findArtistsByKeyword(keyword, ARTISTS_SEARCH_COUNT);
         Optional<ConfetiArtist> confetiArtist = confetiArtists.stream().findFirst();
 
         boolean isFavorite = false;
