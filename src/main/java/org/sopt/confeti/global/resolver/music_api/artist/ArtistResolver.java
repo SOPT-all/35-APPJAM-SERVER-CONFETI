@@ -2,13 +2,12 @@ package org.sopt.confeti.global.resolver.music_api.artist;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.annotation.Resolver;
-import org.sopt.confeti.global.resolver.music_api.MusicAPISpecificResolver;
+import org.sopt.confeti.global.resolver.music_api.AbstractMusicAPISpecificResolver;
 import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategy;
 import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategyRegistry;
@@ -19,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Resolver
 @RequiredArgsConstructor
-public class ArtistResolver implements MusicAPISpecificResolver {
+public class ArtistResolver extends AbstractMusicAPISpecificResolver {
 
     private final MusicAPIHandler musicAPIHandler;
     private final ArtistStrategyRegistry artistStrategyRegistry;
@@ -43,28 +42,8 @@ public class ArtistResolver implements MusicAPISpecificResolver {
         );
     }
 
-    private <T> boolean isEmpty(T target) {
-        return target == null || isListType(target) && ((List<?>) target).isEmpty();
-    }
-
     private <T> ArtistStrategy getStrategy(T target) {
-        Class<?> targetClass = target.getClass();
-
-        if (isListType(target)) {
-            Optional<Class<?>> firstItem = ((List<?>) target).stream()
-                    .findFirst()
-                    .map(Object::getClass);
-
-            if (firstItem.isPresent()) {
-                targetClass = firstItem.get();
-            }
-        }
-
-        return artistStrategyRegistry.getArtistStrategyByClass(targetClass);
-    }
-
-    private boolean notSupports(ArtistStrategy strategy) {
-        return strategy == null;
+        return artistStrategyRegistry.getArtistStrategyByClass(getTargetClass(target));
     }
 
     private <T> void collect(
@@ -96,10 +75,6 @@ public class ArtistResolver implements MusicAPISpecificResolver {
             final T target
     ) {
         strategy.collect(artistMapper, target);
-    }
-
-    private <T> boolean isListType(final T target) {
-        return target instanceof List<?>;
     }
 
     private void injection(
