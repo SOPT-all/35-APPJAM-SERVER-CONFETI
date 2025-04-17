@@ -92,12 +92,13 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     @Override
     @RetryOnTokenExpire
-    public Optional<ConfetiArtist> findArtistByKeyword(final String keyword) {
+    public List<ConfetiArtist> findArtistByKeyword(final String keyword, final int limit) {
         Map<String, String> params = new HashMap<>();
         params.put("term", keyword);
         params.put("types", ARTISTS_TYPE);
+        params.put("limit", String.valueOf(limit));
 
-        return convertToConfetiArtist(
+        return convertToConfetiArtists(
                 restClient.request()
                         .get()
                         .baseUrl(appleMusicAPIURL.getBaseUrl())
@@ -129,8 +130,8 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                 .toList();
     }
 
-    private Optional<ConfetiArtist> convertToConfetiArtist(final AppleMusicSearchResponse searchResult) {
-        return convertToConfetiArtist(searchResult.results().artists());
+    private List<ConfetiArtist> convertToConfetiArtists(final AppleMusicSearchResponse searchResult) {
+        return convertToConfetiArtists(searchResult.results().artists());
     }
 
     private Optional<ConfetiArtist> convertToConfetiArtist(final AppleMusicArtistsResponse artists) {
