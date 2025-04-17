@@ -3,6 +3,8 @@ package org.sopt.confeti.global.resolver.music_api.music.vo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Transient;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,6 +40,9 @@ public class ConfetiMusic {
     @Transient
     private String previewUrl;
 
+    @Transient
+    private List<ConfetiMusicArtist> artists = new ArrayList<>();
+
     private ConfetiMusic(String musicId) {
         this.id = musicId;
     }
@@ -57,7 +62,10 @@ public class ConfetiMusic {
                 music.attributes().previews().stream()
                         .findFirst()
                         .map(AppleMusicMusicPreviewResponse::url)
-                        .orElse(null)
+                        .orElse(null),
+                music.relationships().artists().data().stream()
+                        .map(ConfetiMusicArtist::from)
+                        .toList()
         );
     }
 
