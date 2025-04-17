@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.artist.facade;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.artist.facade.dto.response.SearchArtistDTO;
@@ -13,12 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ArtistFacade {
 
+    private static final int ARTISTS_SEARCH_COUNT = 5;
+
     private final ArtistFavoriteService artistFavoriteService;
     private final MusicAPIHandler musicAPIHandler;
 
     @Transactional(readOnly = true)
     public SearchArtistDTO searchByKeyword(final Long userId, final String keyword) {
-        Optional<ConfetiArtist> confetiArtist = musicAPIHandler.findArtistByKeyword(keyword);
+        List<ConfetiArtist> confetiArtists = musicAPIHandler.findArtistByKeyword(keyword, ARTISTS_SEARCH_COUNT);
+        Optional<ConfetiArtist> confetiArtist = confetiArtists.stream().findFirst();
 
         boolean isFavorite = false;
 
