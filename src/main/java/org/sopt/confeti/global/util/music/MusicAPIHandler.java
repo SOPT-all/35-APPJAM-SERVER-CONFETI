@@ -18,4 +18,6 @@ public interface MusicAPIHandler {
     List<ConfetiAlbum> getAlbumsByAlbumIds(final Set<String> albumIds);
 
     List<ConfetiMusic> getMusicsByMusicIds(final Set<String> musicIds);
+
+    List<ConfetiMusic> getTopMusics(final int fetchSize);
 }
