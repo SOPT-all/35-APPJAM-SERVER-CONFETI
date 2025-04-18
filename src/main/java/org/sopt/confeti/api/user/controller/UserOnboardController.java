@@ -11,8 +11,6 @@ import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedA
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
-import org.sopt.confeti.global.annotation.UserId;
-import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
