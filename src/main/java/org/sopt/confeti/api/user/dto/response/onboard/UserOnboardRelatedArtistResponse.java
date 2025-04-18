@@ -7,11 +7,11 @@ public record UserOnboardRelatedArtistResponse(
         String profileUrl,
         String name
 ) {
-    public static UserOnboardRelatedArtistResponse from(UserOnboardRelatedArtistDTO relatedArtistDTO) {
+    public static UserOnboardRelatedArtistResponse from(UserOnboardRelatedArtistDTO artistDTO) {
         return new UserOnboardRelatedArtistResponse(
-                relatedArtistDTO.artistId(),
-                relatedArtistDTO.profileUrl(),
-                relatedArtistDTO.name()
+                artistDTO.id(),
+                artistDTO.profileUrl(),
+                artistDTO.name()
         );
     }
 }

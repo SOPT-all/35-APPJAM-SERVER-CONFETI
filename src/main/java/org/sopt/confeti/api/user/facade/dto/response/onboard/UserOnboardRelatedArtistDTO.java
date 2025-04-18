@@ -3,7 +3,7 @@ package org.sopt.confeti.api.user.facade.dto.response.onboard;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 
 public record UserOnboardRelatedArtistDTO(
-        String artistId,
+        String id,
         String profileUrl,
         String name
 ) {

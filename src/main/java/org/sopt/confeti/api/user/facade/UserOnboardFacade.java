@@ -39,4 +39,10 @@ public class UserOnboardFacade {
         List<ConfetiArtist> topArtists = musicAPIHandler.getArtistsByArtistIds(topArtistIds);
         return UserOnboardTopArtistsDTO.from(topArtists);
     }
+
+    public UserOnboardRelatedArtistsDTO getRelatedArtists(String artistId, int limit) {
+        return UserOnboardRelatedArtistsDTO.from(
+                musicAPIHandler.getRelatedArtists(artistId, limit)
+        );
+    }
 }

@@ -17,6 +17,7 @@ import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +31,17 @@ public class UserOnboardController {
     private final UserOnboardFacade userOnboardFacade;
 
     @Permission(role = {Role.ONBOARDING})
+
+    @GetMapping("/artists/{artistId}/related")
+    public ResponseEntity<BaseResponse<?>> getRelatedArtists(
+            @UserId Long userId,
+            @PathVariable String artistId,
+            @RequestParam(defaultValue = "1") @Min(1) @Max(30) Integer limit
+    ) {
+        UserOnboardRelatedArtistsDTO relatedArtists = userOnboardFacade.getRelatedArtists(artistId, limit);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserOnboardRelatedArtistsResponse.from(relatedArtists));
+    }
+  
     @GetMapping("/artists/search")
     public ResponseEntity<BaseResponse<?>> getArtistsRelatedTerm(
             @UserId Long userId,

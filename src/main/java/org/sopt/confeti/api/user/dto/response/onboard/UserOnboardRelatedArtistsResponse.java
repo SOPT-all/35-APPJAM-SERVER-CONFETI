@@ -6,9 +6,9 @@ import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedA
 public record UserOnboardRelatedArtistsResponse(
         List<UserOnboardRelatedArtistResponse> artists
 ) {
-    public static UserOnboardRelatedArtistsResponse from(UserOnboardRelatedArtistsDTO relatedArtistsDTO) {
+    public static UserOnboardRelatedArtistsResponse from(UserOnboardRelatedArtistsDTO artistsDTO) {
         return new UserOnboardRelatedArtistsResponse(
-                relatedArtistsDTO.artists().stream()
+                artistsDTO.artists().stream()
                         .map(UserOnboardRelatedArtistResponse::from)
                         .toList()
         );
