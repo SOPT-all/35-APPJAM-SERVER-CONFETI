@@ -2,7 +2,10 @@ package org.sopt.confeti.domain.view.performance.application;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.domain.view.performance.*;
+import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.PerformanceArtist;
+import org.sopt.confeti.domain.view.performance.PerformanceDTO;
+import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceDTORepository;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceRepository;
 import org.sopt.confeti.global.common.constant.PerformanceType;

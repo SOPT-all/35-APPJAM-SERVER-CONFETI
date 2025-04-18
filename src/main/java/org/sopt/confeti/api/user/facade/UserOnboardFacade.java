@@ -3,20 +3,13 @@ package org.sopt.confeti.api.user.facade;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedArtistsDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
-import org.sopt.confeti.global.util.music.MusicAPIHandler;
-import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
-import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusicArtist;
-import org.sopt.confeti.global.util.music.AppleMusicAPIHandler;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 
 @Facade

@@ -127,7 +127,7 @@ public class Performance {
                 )
                 .build();
     }
-    
+
     public void addArtists(List<PerformanceArtist> artists) {
         this.artists.addAll(artists);
         artists.forEach(artist -> artist.setPerformance(this));

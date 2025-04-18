@@ -13,14 +13,19 @@ import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
-import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -112,10 +117,11 @@ public class UserFavoriteController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/performances")
     public ResponseEntity<BaseResponse<?>> getFavoritePerformancesAll(
-            @RequestParam (value = "type") String type,
+            @RequestParam(value = "type") String type,
             @UserId Long userId
     ) {
-        UserFavoritePerformancesAllDTO userFavoritePerformancesAllDTO = userFavoriteFacade.getFavoritePerformancesAll(userId, type);
+        UserFavoritePerformancesAllDTO userFavoritePerformancesAllDTO = userFavoriteFacade.getFavoritePerformancesAll(
+                userId, type);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 UserFavoritePerformancesAllResponse.of(userFavoritePerformancesAllDTO, s3FileHandler));
     }

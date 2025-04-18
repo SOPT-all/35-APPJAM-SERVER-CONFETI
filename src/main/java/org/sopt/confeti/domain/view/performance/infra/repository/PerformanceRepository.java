@@ -41,9 +41,11 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     Optional<Performance> findPerformancesByTypeAndTypeId(PerformanceType type, long typeId);
 
     @Query("SELECT p FROM Performance p " +
-            "WHERE ((:type = '" + TYPE_CONCERT + "' OR :type = '" + TYPE_ALL + "') AND p.type = org.sopt.confeti.global.common.constant.PerformanceType.CONCERT " +
+            "WHERE ((:type = '" + TYPE_CONCERT + "' OR :type = '" + TYPE_ALL
+            + "') AND p.type = org.sopt.confeti.global.common.constant.PerformanceType.CONCERT " +
             "       AND p.typeId IN (SELECT cf.concert.id FROM ConcertFavorite cf WHERE cf.user.id = :userId)) " +
-            "OR ((:type = '" + TYPE_FESTIVAL + "' OR :type = '" + TYPE_ALL + "') AND p.type = org.sopt.confeti.global.common.constant.PerformanceType.FESTIVAL " +
+            "OR ((:type = '" + TYPE_FESTIVAL + "' OR :type = '" + TYPE_ALL
+            + "') AND p.type = org.sopt.confeti.global.common.constant.PerformanceType.FESTIVAL " +
             "    AND p.typeId IN (SELECT ff.festival.id FROM FestivalFavorite ff WHERE ff.user.id = :userId)) " +
             "AND p.endAt >= CURRENT_DATE " +
             "ORDER BY p.startAt ASC")
