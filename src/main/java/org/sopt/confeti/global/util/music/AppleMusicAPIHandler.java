@@ -40,6 +40,8 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     private static final String ARTISTS_RELATIONSHIP_SIMILAR_VIEW = "similar-artists";
 
+    private static final String ARTISTS_RELATIONSHIP_SIMILAR_VIEW = "similar-artists";
+
     // Fetch Limit 목록
     private static final int ARTISTS_FETCH_LIMIT = 25;
     private static final int ALBUMS_FETCH_LIMIT = 100;
@@ -287,4 +289,6 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
+
+
 }
