@@ -1,8 +1,7 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
-import org.sopt.confeti.domain.view.performance.Performance;
-
 import java.util.List;
+import org.sopt.confeti.domain.view.performance.Performance;
 
 public record UserFavoritePerformancesAllDTO(
         List<UserFavoritePerformanceAllDTO> performances
