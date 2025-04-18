@@ -40,6 +40,7 @@ public class UserOnboardController {
     ) {
         UserOnboardRelatedArtistsDTO relatedArtists = userOnboardFacade.getRelatedArtists(artistId, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserOnboardRelatedArtistsResponse.from(relatedArtists));
+    }
   
     @GetMapping("/artists/search")
     public ResponseEntity<BaseResponse<?>> getArtistsRelatedTerm(
