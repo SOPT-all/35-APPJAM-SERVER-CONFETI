@@ -32,6 +32,8 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     private static final String QUERY_PARAMETER_IDS_DELIMITER = ",";
     private static final String ARTISTS_TYPE = "artists";
 
+    private static final String ARTISTS_RELATIONSHIP_SIMILAR_VIEW = "similar-artists";
+
     // Fetch Limit 목록
     private static final int ARTISTS_FETCH_LIMIT = 25;
     private static final int ALBUMS_FETCH_LIMIT = 100;
@@ -83,6 +85,25 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                         .get()
                         .baseUrl(appleMusicAPIURL.getBaseUrl())
                         .path(appleMusicAPIURL.getMultipleArtistsPath())
+                        .params(MultiValueMap.fromSingleValue(params))
+                        .build()
+                        .connect(headers)
+                        .retrieve(AppleMusicArtistsResponse.class)
+        );
+    }
+
+    @Override
+    @RetryOnTokenExpire
+    public List<ConfetiArtist> getRelatedArtists(final String artistId, final int limit) {
+        Map<String, String> params = new HashMap<>();
+        params.put("limit", String.valueOf(limit));
+
+        return convertToConfetiArtists(
+                restClient.request()
+                        .get()
+                        .baseUrl(appleMusicAPIURL.getBaseUrl())
+                        .path(appleMusicAPIURL.getArtistRelationshipViewByNamePath(artistId,
+                                ARTISTS_RELATIONSHIP_SIMILAR_VIEW))
                         .params(MultiValueMap.fromSingleValue(params))
                         .build()
                         .connect(headers)
@@ -221,4 +242,6 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                 .map(ConfetiMusic::from)
                 .toList();
     }
+
+
 }
