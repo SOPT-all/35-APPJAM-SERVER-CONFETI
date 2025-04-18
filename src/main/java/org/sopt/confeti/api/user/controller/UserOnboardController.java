@@ -31,7 +31,7 @@ public class UserOnboardController {
     @Permission(role = {Role.ONBOARDING})
     @GetMapping("/artists/{artistId}/related")
     public ResponseEntity<BaseResponse<?>> getRelatedArtists(
-            @UserId String userId,
+            @UserId Long userId,
             @PathVariable String artistId,
             @RequestParam(defaultValue = "1") @Min(1) @Max(30) Integer limit
     ) {
