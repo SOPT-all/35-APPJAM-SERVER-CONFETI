@@ -20,6 +20,10 @@ public class UserOnboardFacade {
 
     private final MusicAPIHandler musicAPIHandler;
 
+    public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(String term, int limit) {
+        return UserOnboardRelatedArtistsDTO.from(musicAPIHandler.findArtistsByKeyword(term, limit));
+    }
+
     public UserOnboardTopArtistsDTO getTopArtists() {
         List<ConfetiMusic> topMusics = musicAPIHandler.getTopMusics(TOP_MUSICS_COUNT);
         Set<String> topMusicIds = topMusics.stream()

@@ -13,7 +13,7 @@ public interface MusicAPIHandler {
 
     List<ConfetiArtist> getRelatedArtists(final String artistId, final int limit);
 
-    Optional<ConfetiArtist> findArtistByKeyword(final String keyword);
+    List<ConfetiArtist> findArtistsByKeyword(final String keyword, final int limit);
 
     Optional<ConfetiArtist> findArtistByArtistId(final String artistId);
 
