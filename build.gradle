@@ -70,6 +70,9 @@ dependencies {
     // AOP
     implementation 'org.springframework.boot:spring-boot-starter-aop'
 
+    // Elastic Search
+    implementation 'org.springframework.data:spring-data-elasticsearch'
+
     // Bouncy Castle
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
