@@ -1,8 +1,8 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
+import java.time.LocalDate;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.global.common.constant.PerformanceType;
-import java.time.LocalDate;
 
 public record UserFavoritePerformanceAllDTO(
         long typeId,
@@ -12,7 +12,7 @@ public record UserFavoritePerformanceAllDTO(
         LocalDate startAt,
         LocalDate endAt,
         String area
-        ) {
+) {
     public static UserFavoritePerformanceAllDTO from(Performance performance) {
         return new UserFavoritePerformanceAllDTO(
                 performance.getTypeId(),

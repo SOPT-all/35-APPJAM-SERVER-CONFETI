@@ -5,11 +5,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
+import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedArtistsDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusicArtist;
-import org.sopt.confeti.global.util.music.AppleMusicAPIHandler;
+import org.sopt.confeti.global.util.music.MusicAPIHandler;
 
 @Facade
 @RequiredArgsConstructor
@@ -17,21 +18,25 @@ public class UserOnboardFacade {
 
     private static final int TOP_MUSICS_COUNT = 200;
 
-    private final AppleMusicAPIHandler appleMusicAPIHandler;
+    private final MusicAPIHandler musicAPIHandler;
+
+    public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(String term, int limit) {
+        return UserOnboardRelatedArtistsDTO.from(musicAPIHandler.findArtistsByKeyword(term, limit));
+    }
 
     public UserOnboardTopArtistsDTO getTopArtists() {
-        List<ConfetiMusic> topMusics = appleMusicAPIHandler.getTopMusics(TOP_MUSICS_COUNT);
+        List<ConfetiMusic> topMusics = musicAPIHandler.getTopMusics(TOP_MUSICS_COUNT);
         Set<String> topMusicIds = topMusics.stream()
                 .map(ConfetiMusic::getId)
                 .collect(Collectors.toSet());
 
-        List<ConfetiMusic> topMusicsWithArtists = appleMusicAPIHandler.getMusicsByMusicIds(topMusicIds);
+        List<ConfetiMusic> topMusicsWithArtists = musicAPIHandler.getMusicsByMusicIds(topMusicIds);
         Set<String> topArtistIds = topMusicsWithArtists.stream()
                 .flatMap(music -> music.getArtists().stream())
                 .map(ConfetiMusicArtist::getId)
                 .collect(Collectors.toSet());
 
-        List<ConfetiArtist> topArtists = appleMusicAPIHandler.getArtistsByArtistIds(topArtistIds);
+        List<ConfetiArtist> topArtists = musicAPIHandler.getArtistsByArtistIds(topArtistIds);
         return UserOnboardTopArtistsDTO.from(topArtists);
     }
 }

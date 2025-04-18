@@ -189,7 +189,8 @@ public class UserFavoriteFacade {
 
     @Transactional(readOnly = true)
     protected void validateType(final String type) {
-        if (!type.equalsIgnoreCase(PerformanceType.FESTIVAL.getType()) && !type.equalsIgnoreCase(PerformanceType.CONCERT.getType()) && !type.equalsIgnoreCase(TYPE_ALL)) {
+        if (!type.equalsIgnoreCase(PerformanceType.FESTIVAL.getType()) && !type.equalsIgnoreCase(
+                PerformanceType.CONCERT.getType()) && !type.equalsIgnoreCase(TYPE_ALL)) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
