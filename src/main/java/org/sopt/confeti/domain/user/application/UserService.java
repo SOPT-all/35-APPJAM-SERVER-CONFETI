@@ -1,17 +1,22 @@
 package org.sopt.confeti.domain.user.application;
 
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.user.dto.request.PatchUserInfoRequest;
 import org.sopt.confeti.auth.dto.CreateUserDTO;
 import org.sopt.confeti.domain.user.AuthUser;
 import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.infra.repository.AllUserRepository;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
+import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
+import org.sopt.confeti.global.util.FileDownloader;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.nio.file.Path;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +24,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final AllUserRepository allUserRepository;
+    private final S3FileHandler s3FileHandler;
+    private final FileDownloader fileDownloader;
 
     @Transactional(readOnly = true)
     public User findById(Long userId) {
@@ -71,5 +78,26 @@ public class UserService {
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
+    }
+
+    @Transactional
+    public void patchUserInfo(long userId, PatchUserInfoRequest patchUserInfoRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+
+        String fileName = uploadProfile(patchUserInfoRequest.profileUrl());
+
+        user.setProfilePath(fileName);
+        user.setName(patchUserInfoRequest.name());
+    }
+
+    public String uploadProfile(String profileImgUrl) {
+        Path profileImg = fileDownloader.downloadFile(profileImgUrl);
+        try {
+            return s3FileHandler.uploadFile(profileImg.toFile(),
+                    FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
+        } finally {
+            fileDownloader.deleteTempFile(profileImg);
+        }
     }
 }
