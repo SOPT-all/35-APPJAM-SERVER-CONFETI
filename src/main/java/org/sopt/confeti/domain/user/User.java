@@ -40,9 +40,11 @@ public class User {
     @Column(length = 100, nullable = false)
     private String socialId;
 
+    @Setter
     @Column(length = 30, nullable = false)
     private String name;
 
+    @Setter
     @Column(length = 250)
     private String profilePath;
 
