@@ -11,11 +11,15 @@ public interface MusicAPIHandler {
 
     List<ConfetiArtist> getArtistsByArtistIds(final Set<String> artistIds);
 
-    Optional<ConfetiArtist> findArtistByKeyword(final String keyword);
+    List<ConfetiArtist> getRelatedArtists(final String artistId, final int limit);
+
+    List<ConfetiArtist> findArtistsByKeyword(final String keyword, final int limit);
 
     Optional<ConfetiArtist> findArtistByArtistId(final String artistId);
 
     List<ConfetiAlbum> getAlbumsByAlbumIds(final Set<String> albumIds);
 
     List<ConfetiMusic> getMusicsByMusicIds(final Set<String> musicIds);
+
+    List<ConfetiMusic> getTopMusics(final int fetchSize);
 }

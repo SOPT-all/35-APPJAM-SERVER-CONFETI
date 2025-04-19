@@ -72,6 +72,9 @@ public class AppleMusicAPIURL {
     @Value("${apple-music.api.endpoints.search-path.suggestions}")
     private String searchPathSuggestions;
 
+    @Value("${apple-music.api.endpoints.charts-path.base}")
+    private String chartsPathBase;
+
 
     private String getArtistsBasePath() {
         return pathPrefix + artistsPathBase;
@@ -87,6 +90,10 @@ public class AppleMusicAPIURL {
 
     private String getSearchBasePath() {
         return pathPrefix + searchPathBase;
+    }
+
+    private String getChartsPathBase() {
+        return pathPrefix + chartsPathBase;
     }
 
     public String getSingleArtistPath(String id) {
@@ -159,5 +166,9 @@ public class AppleMusicAPIURL {
 
     public String getSearchSuggestionsPath() {
         return getSearchBasePath() + searchPathSuggestions;
+    }
+
+    public String getChartsPath() {
+        return getChartsPathBase();
     }
 }
