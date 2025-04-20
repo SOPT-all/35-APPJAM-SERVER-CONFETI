@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.artist_favorite.application;
 
+import java.util.Comparator;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
@@ -48,5 +49,19 @@ public class ArtistFavoriteService {
     @Transactional(readOnly = true)
     public List<ArtistFavorite> getArtistIdsByUserId(final long userId) {
         return artistFavoriteRepository.findArtistFavoritesByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ArtistFavorite> getFavoriteArtists(Long userId, String sortBy) {
+        List<ArtistFavorite> artistList = artistFavoriteRepository.findArtistFavoritesByUserId(userId);
+        musicAPIResolver.load(artistList);
+
+        if ("createdAt".equalsIgnoreCase(sortBy)) {
+            artistList.sort(Comparator.comparing(ArtistFavorite::getCreatedAt).reversed());
+        } else if ("alphabetically".equalsIgnoreCase(sortBy)) {
+            artistList.sort(Comparator.comparing(artist -> artist.getArtist().getName()));
+        }
+
+        return artistList;
     }
 }

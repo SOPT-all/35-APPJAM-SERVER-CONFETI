@@ -3,10 +3,7 @@ package org.sopt.confeti.api.user.facade;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.user.facade.dto.response.UpcomingPerformanceDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistsPreviewDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesAllDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
+import org.sopt.confeti.api.user.facade.dto.response.*;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
@@ -202,5 +199,21 @@ public class UserFavoriteFacade {
 
         Performance performance = performanceService.getUpcomingPerformance(userId);
         return UpcomingPerformanceDTO.from(performance);
+    }
+
+    @Transactional(readOnly = true)
+    public UserFavoriteArtistsDTO getFavoriteArtists(long userId, String sortBy) {
+        validateExistUser(userId);
+        validateSortType(sortBy);
+
+        List<ArtistFavorite> artists = artistFavoriteService.getFavoriteArtists(userId, sortBy);
+        return UserFavoriteArtistsDTO.from(artists);
+    }
+
+    @Transactional(readOnly = true)
+    protected void validateSortType(final String sortBy) {
+        if (!sortBy.equalsIgnoreCase("createdAt") && !sortBy.equalsIgnoreCase("alphabetically")) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
     }
 }

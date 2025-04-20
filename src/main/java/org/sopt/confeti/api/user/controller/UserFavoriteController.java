@@ -2,15 +2,9 @@ package org.sopt.confeti.api.user.controller;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.user.dto.response.UpcomingPerformanceResponse;
-import org.sopt.confeti.api.user.dto.response.UserFavoritePerformancesAllResponse;
-import org.sopt.confeti.api.user.dto.response.UserFavoritePerformancesResponse;
-import org.sopt.confeti.api.user.dto.response.UserFavoriteArtistsPreviewResponse;
+import org.sopt.confeti.api.user.dto.response.*;
 import org.sopt.confeti.api.user.facade.UserFavoriteFacade;
-import org.sopt.confeti.api.user.facade.dto.response.UpcomingPerformanceDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistsPreviewDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesAllDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
+import org.sopt.confeti.api.user.facade.dto.response.*;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -136,5 +130,16 @@ public class UserFavoriteController {
         UpcomingPerformanceDTO upcomingPerformanceDTO = userFavoriteFacade.getUpcomingPerformance(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 UpcomingPerformanceResponse.of(upcomingPerformanceDTO, s3FileHandler));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/artists")
+    public ResponseEntity<BaseResponse<?>> getFavoriteArtists(
+            @UserId Long userId,
+            @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy
+    ) {
+        UserFavoriteArtistsDTO userFavoriteArtistsDTO = userFavoriteFacade.getFavoriteArtists(userId, sortBy);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                UserFavoriteArtistsResponse.from(userFavoriteArtistsDTO.artists()));
     }
 }
