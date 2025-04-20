@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.domain.view.performance.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.springframework.stereotype.Repository;
 
@@ -22,7 +22,7 @@ public class PerformanceDTORepository {
     private static final int PREVIEW_FAVORITE_PERFORMANCE_COUNT = 4;
     private static final int RESERVE_FAVORITE_PERFORMANCE_COUNT = 5;
 
-    public List<PerformanceDTO> findFavoritePerformancesPreview(final Long userId) {
+    public List<PerformancePreviewDTO> findFavoritePerformancesPreview(final Long userId) {
         String sql =
                 "SELECT c.id id, :concertType type, c.title title, c.poster_path posterPath, c.start_at startAt" +
                         " FROM concert_favorites cf INNER JOIN concerts c ON cf.concert_id = c.id" +
@@ -44,9 +44,9 @@ public class PerformanceDTORepository {
         return convertToPerformanceDTOs(query.getResultList());
     }
 
-    private List<PerformanceDTO> convertToPerformanceDTOs(final List<Object[]> results) {
+    private List<PerformancePreviewDTO> convertToPerformanceDTOs(final List<Object[]> results) {
         return results.stream()
-                .map(result -> PerformanceDTO.of(
+                .map(result -> PerformancePreviewDTO.of(
                         ((Number) result[0]).longValue(),
                         (String) result[1],
                         (String) result[2],

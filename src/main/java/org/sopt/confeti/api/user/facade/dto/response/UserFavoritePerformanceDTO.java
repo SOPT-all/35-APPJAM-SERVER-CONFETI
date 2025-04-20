@@ -1,6 +1,6 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
-import org.sopt.confeti.domain.view.performance.PerformanceDTO;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record UserFavoritePerformanceDTO(
@@ -9,7 +9,7 @@ public record UserFavoritePerformanceDTO(
         String title,
         String posterPath
 ) {
-    public static UserFavoritePerformanceDTO from(final PerformanceDTO performance) {
+    public static UserFavoritePerformanceDTO from(final PerformancePreviewDTO performance) {
         return new UserFavoritePerformanceDTO(
                 performance.typeId(),
                 performance.type(),
