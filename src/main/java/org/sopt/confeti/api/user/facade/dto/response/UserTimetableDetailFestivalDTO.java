@@ -3,14 +3,14 @@ package org.sopt.confeti.api.user.facade.dto.response;
 import java.util.List;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 
-public record UserTimetableFestivalDTO(
+public record UserTimetableDetailFestivalDTO(
         long festivalId,
         String title,
         String logoPath,
         List<UserTimetableDatesDTO> festivalDates
 ) {
-    public static UserTimetableFestivalDTO from(TimetableFestival timetableFestival) {
-        return new UserTimetableFestivalDTO(
+    public static UserTimetableDetailFestivalDTO from(TimetableFestival timetableFestival) {
+        return new UserTimetableDetailFestivalDTO(
                 timetableFestival.getFestival().getId(),
                 timetableFestival.getFestival().getTitle(),
                 timetableFestival.getFestival().getLogoPath(),

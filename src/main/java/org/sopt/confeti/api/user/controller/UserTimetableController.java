@@ -5,13 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.request.AddTimetableFestivalRequest;
 import org.sopt.confeti.api.user.dto.request.PatchTimetableRequest;
 import org.sopt.confeti.api.user.dto.response.TimetablesToAddResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetableDetailResponse;
+import org.sopt.confeti.api.user.dto.response.UserTimetableDetailFestivalsResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetableFestivalResponse;
 import org.sopt.confeti.api.user.facade.UserTimetableFacade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDetailFestivalsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
@@ -48,9 +48,9 @@ public class UserTimetableController {
     public ResponseEntity<BaseResponse<?>> getTimetablesListAndDate(
             @UserId Long userId
     ) {
-        UserTimetableDTO userTimetableDTO = userTimetableFacade.getTimetablesListAndDate(userId);
+        UserTimetableDetailFestivalsDTO userTimetableDetailFestivalsDTO = userTimetableFacade.getTimetablesListAndDate(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                UserTimetableDetailResponse.of(userTimetableDTO, s3FileHandler));
+                UserTimetableDetailFestivalsResponse.of(userTimetableDetailFestivalsDTO, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
