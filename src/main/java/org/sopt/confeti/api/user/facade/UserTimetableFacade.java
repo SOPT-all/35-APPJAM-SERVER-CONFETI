@@ -12,7 +12,7 @@ import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDetailFestivalsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
@@ -49,11 +49,11 @@ public class UserTimetableFacade {
     private final UserTimetableService userTimetableService;
 
     @Transactional(readOnly = true)
-    public UserTimetableDTO getTimetablesListAndDate(long userId) {
+    public UserTimetableDetailFestivalsDTO getTimetablesListAndDate(long userId) {
         validateExistUser(userId);
 
         List<TimetableFestival> festivalList = timetableFestivalService.getFetivalList(userId);
-        return UserTimetableDTO.from(festivalList);
+        return UserTimetableDetailFestivalsDTO.from(festivalList);
     }
 
     @Transactional
