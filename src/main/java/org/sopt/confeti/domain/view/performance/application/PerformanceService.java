@@ -4,8 +4,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
-import org.sopt.confeti.domain.view.performance.PerformanceDTO;
+import org.sopt.confeti.domain.view.performance.PerformancePreviewDTO;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceDTORepository;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceRepository;
 import org.sopt.confeti.global.common.constant.PerformanceType;
@@ -28,7 +29,7 @@ public class PerformanceService {
     private final PerformanceRepository performanceRepository;
 
     @Transactional(readOnly = true)
-    public List<PerformanceDTO> getFavoritePerformancesPreview(final long userId) {
+    public List<PerformancePreviewDTO> getFavoritePerformancesPreview(final long userId) {
         return performanceDTORepository.findFavoritePerformancesPreview(userId);
     }
 
@@ -97,5 +98,12 @@ public class PerformanceService {
     public Performance getUpcomingPerformance(final Long userId){
         return performanceRepository.upcomingPerformance(userId)
                 .orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PerformanceDTO> getAllPerformances() {
+        return performanceRepository.findAll().stream()
+                .map(org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO::from)
+                .toList();
     }
 }
