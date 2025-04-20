@@ -17,8 +17,8 @@ import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteSer
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.view.performance.Performance;
-import org.sopt.confeti.domain.view.performance.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.ConfetiException;
@@ -146,7 +146,7 @@ public class UserFavoriteFacade {
     public UserFavoritePerformancesDTO getFavoritePerformances(final long userId) {
         validateExistUser(userId);
 
-        List<PerformanceDTO> performances = performanceService.getFavoritePerformancesPreview(userId);
+        List<PerformancePreviewDTO> performances = performanceService.getFavoritePerformancesPreview(userId);
         return UserFavoritePerformancesDTO.from(performances);
     }
 
