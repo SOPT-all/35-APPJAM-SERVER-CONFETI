@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.facade.dto.response.UpcomingPerformanceDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistsPreviewDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesAllDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
@@ -79,11 +79,11 @@ public class UserFavoriteFacade {
     }
 
     @Transactional(readOnly = true)
-    public UserFavoriteArtistDTO getArtistListPreview(long userId) {
+    public UserFavoriteArtistsPreviewDTO getFavoriteArtistsPreview(long userId) {
         validateExistUser(userId);
 
-        List<ArtistFavorite> artists = artistFavoriteService.getArtistListPreview(userId);
-        return UserFavoriteArtistDTO.from(artists);
+        List<ArtistFavorite> artists = artistFavoriteService.getFavoriteArtistsPreview(userId);
+        return UserFavoriteArtistsPreviewDTO.from(artists);
     }
 
     @Transactional
