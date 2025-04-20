@@ -37,14 +37,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Validated
 @RequiredArgsConstructor
-@RequestMapping("/user/timetables/festivals")
+@RequestMapping("/user/timetables")
 public class UserTimetableController {
 
     private final UserTimetableFacade userTimetableFacade;
     private final S3FileHandler s3FileHandler;
 
     @Permission(role = {Role.GENERAL})
-    @GetMapping
+    @GetMapping("/festivals")
     public ResponseEntity<BaseResponse<?>> getTimetablesListAndDate(
             @UserId Long userId
     ) {
@@ -54,7 +54,7 @@ public class UserTimetableController {
     }
 
     @Permission(role = {Role.GENERAL})
-    @GetMapping("/add")
+    @GetMapping("/festivals/add")
     public ResponseEntity<BaseResponse<?>> getTimetablesToAdd(
             @UserId Long userId,
             @RequestParam(name = "cursor", required = false) Long cursor
@@ -65,7 +65,7 @@ public class UserTimetableController {
     }
 
     @Permission(role = {Role.GENERAL})
-    @PostMapping
+    @PostMapping("/festivals")
     public ResponseEntity<BaseResponse<?>> addTimetableFestival(
             @UserId Long userId,
             @RequestBody AddTimetableFestivalRequest addTimetableFestivalRequest
@@ -75,7 +75,7 @@ public class UserTimetableController {
     }
 
     @Permission(role = {Role.GENERAL})
-    @DeleteMapping("/{festivalId}")
+    @DeleteMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<?>> removeTimetableFestival(
             @UserId Long userId,
             @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) long festivalId
@@ -85,7 +85,7 @@ public class UserTimetableController {
     }
 
     @Permission(role = {Role.GENERAL})
-    @GetMapping("/{festivalDateId}")
+    @GetMapping("/festivals/{festivalDateId}")
     public ResponseEntity<BaseResponse<?>> getTimetableFestival(
             @UserId Long userId,
             @PathVariable(name = "festivalDateId") @Min(RequestConstraint.ID) long festivalDateId
@@ -95,7 +95,7 @@ public class UserTimetableController {
     }
 
     @Permission(role = {Role.GENERAL})
-    @PatchMapping
+    @PatchMapping("/festivals")
     public ResponseEntity<BaseResponse<?>> updateTimetableFestival(
             @UserId Long userId,
             @RequestBody PatchTimetableRequest patchTimetablerequest
