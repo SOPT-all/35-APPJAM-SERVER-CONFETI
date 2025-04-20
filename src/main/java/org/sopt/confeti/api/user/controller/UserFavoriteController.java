@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.response.UpcomingPerformanceResponse;
 import org.sopt.confeti.api.user.dto.response.UserFavoritePerformancesAllResponse;
 import org.sopt.confeti.api.user.dto.response.UserFavoritePerformancesResponse;
-import org.sopt.confeti.api.user.dto.response.UserFavoriteResponse;
+import org.sopt.confeti.api.user.dto.response.UserFavoriteArtistsPreviewResponse;
 import org.sopt.confeti.api.user.facade.UserFavoriteFacade;
 import org.sopt.confeti.api.user.facade.dto.response.UpcomingPerformanceDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistsPreviewDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesAllDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -58,12 +58,12 @@ public class UserFavoriteController {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/artists/preview")
-    public ResponseEntity<BaseResponse<?>> getFavoriteArtists(
+    public ResponseEntity<BaseResponse<?>> getFavoriteArtistsPreview(
             @UserId Long userId
     ) {
-        UserFavoriteArtistDTO userFavoriteArtistDTO = userFavoriteFacade.getArtistListPreview(userId);
+        UserFavoriteArtistsPreviewDTO userFavoriteArtistsPreviewDTO = userFavoriteFacade.getFavoriteArtistsPreview(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                UserFavoriteResponse.from(userFavoriteArtistDTO.artists()));
+                UserFavoriteArtistsPreviewResponse.from(userFavoriteArtistsPreviewDTO.artists()));
     }
 
     @Permission(role = {Role.GENERAL})
