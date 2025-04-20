@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,6 +19,7 @@ import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user_timetable.UserTimetable;
+import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Table(name = "timetable_festivals")
@@ -40,10 +42,14 @@ public class TimetableFestival {
     @OneToMany(mappedBy = "timetableFestival", cascade = CascadeType.ALL)
     private List<UserTimetable> userTimetables;
 
+    @CreatedDate
+    private LocalDateTime createdAt;
+
     @Builder
     public TimetableFestival(User user, Festival festival) {
         this.user = user;
         this.festival = festival;
+        this.createdAt = LocalDateTime.now();
 
         this.userTimetables = festival.getDates().stream()
                 .flatMap(festivalDate -> festivalDate.getStages().stream())
