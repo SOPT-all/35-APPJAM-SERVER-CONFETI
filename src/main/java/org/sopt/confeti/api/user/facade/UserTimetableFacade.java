@@ -14,6 +14,7 @@ import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDetailFestivalsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetablesDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
@@ -28,6 +29,7 @@ import org.sopt.confeti.domain.user_timetable.UserTimetable;
 import org.sopt.confeti.domain.user_timetable.application.UserTimetableService;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.CursorPage;
+import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
@@ -201,6 +203,16 @@ public class UserTimetableFacade {
     }
 
     @Transactional(readOnly = true)
+    public UserTimetablesDTO getTimetables(final long userId, final String sortBy) {
+        validateUserExists(userId);
+        validateSortType(sortBy);
+
+        List<TimetableFestival> userTimetables = timetableFestivalService.getTimetables(userId, sortBy);
+
+        return UserTimetablesDTO.from(userTimetables);
+    }
+
+    @Transactional(readOnly = true)
     protected void validateExistFestivalTimeIds(final List<Long> festivalTimeIds) {
         if (festivalTimeIds == null || festivalTimeIds.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
@@ -238,6 +250,13 @@ public class UserTimetableFacade {
             if (!existingIds.contains(timetableListDTO.userTimetableId())) {
                 throw new NotFoundException(ErrorMessage.NOT_FOUND);
             }
+        }
+    }
+
+    @Transactional(readOnly = true)
+    protected void validateSortType(final String sortBy) {
+        if (!sortBy.equalsIgnoreCase("createdAt") && !sortBy.equalsIgnoreCase("oldestFirst")) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
 }

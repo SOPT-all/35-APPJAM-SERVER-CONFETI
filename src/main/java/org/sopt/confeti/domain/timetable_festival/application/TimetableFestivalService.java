@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.timetable_festival.application;
 
+import java.util.Comparator;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.sopt.confeti.domain.festival.Festival;
@@ -36,5 +37,18 @@ public class TimetableFestivalService {
                         .map(festival -> TimetableFestival.create(user, festival))
                         .toList()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<TimetableFestival> getTimetables(final long userId, final String sortBy) {
+        List<TimetableFestival> festivals= timetableFestivalRepository.findByUserId(userId);
+
+        if ("createdAt".equalsIgnoreCase(sortBy)) {
+            festivals.sort(Comparator.comparing(TimetableFestival::getCreatedAt).reversed());
+        } else if ("oldestFirst".equalsIgnoreCase(sortBy)) {
+            festivals.sort(Comparator.comparing(TimetableFestival::getCreatedAt));
+        }
+
+        return festivals;
     }
 }

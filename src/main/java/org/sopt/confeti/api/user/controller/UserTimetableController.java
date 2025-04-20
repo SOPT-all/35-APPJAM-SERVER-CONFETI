@@ -7,12 +7,14 @@ import org.sopt.confeti.api.user.dto.request.PatchTimetableRequest;
 import org.sopt.confeti.api.user.dto.response.TimetablesToAddResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetableDetailFestivalsResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetableFestivalResponse;
+import org.sopt.confeti.api.user.dto.response.UserTimetablesResponse;
 import org.sopt.confeti.api.user.facade.UserTimetableFacade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDetailFestivalsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetablesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -102,5 +104,14 @@ public class UserTimetableController {
     ) {
         userTimetableFacade.patchTimetableFestivals(userId, PatchTimetableDTO.from(patchTimetablerequest));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @GetMapping
+    public ResponseEntity<BaseResponse<?>> getTimetables(
+            @UserId Long userId,
+            @RequestParam(value="sortBy", defaultValue = "createdAt") String sortBy
+    ) {
+        UserTimetablesDTO timetables = userTimetableFacade.getTimetables(userId, sortBy);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetablesResponse.of(timetables, s3FileHandler));
     }
 }
