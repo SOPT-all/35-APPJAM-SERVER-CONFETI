@@ -213,6 +213,14 @@ public class UserTimetableFacade {
     }
 
     @Transactional(readOnly = true)
+    public UserTimetablesDTO getTimetablesPreview(final long userId) {
+        validateUserExists(userId);
+
+        List<TimetableFestival> userTimetables = timetableFestivalService.getTimetablesPreview(userId);
+        return UserTimetablesDTO.from(userTimetables);
+    }
+
+    @Transactional(readOnly = true)
     protected void validateExistFestivalTimeIds(final List<Long> festivalTimeIds) {
         if (festivalTimeIds == null || festivalTimeIds.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);

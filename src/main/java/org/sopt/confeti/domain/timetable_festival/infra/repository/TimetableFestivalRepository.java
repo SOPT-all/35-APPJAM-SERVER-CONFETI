@@ -15,4 +15,6 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
     boolean existsByUserIdAndFestivalId(final long userId, final long festivalId);
 
     void deleteByUserIdAndFestivalId(final long userId, final long festivalId);
+
+    List<TimetableFestival> findTop4ByUserIdOrderByCreatedAt(long userId);
 }

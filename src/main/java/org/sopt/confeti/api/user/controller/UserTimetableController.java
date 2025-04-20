@@ -4,10 +4,7 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.request.AddTimetableFestivalRequest;
 import org.sopt.confeti.api.user.dto.request.PatchTimetableRequest;
-import org.sopt.confeti.api.user.dto.response.TimetablesToAddResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetableDetailFestivalsResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetableFestivalResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetablesResponse;
+import org.sopt.confeti.api.user.dto.response.*;
 import org.sopt.confeti.api.user.facade.UserTimetableFacade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
@@ -113,5 +110,13 @@ public class UserTimetableController {
     ) {
         UserTimetablesDTO timetables = userTimetableFacade.getTimetables(userId, sortBy);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetablesResponse.of(timetables, s3FileHandler));
+    }
+
+    @GetMapping("/preview")
+    public ResponseEntity<BaseResponse<?>> getTimetablesPreview(
+            @UserId Long userId
+    ) {
+        UserTimetablesDTO timetables = userTimetableFacade.getTimetablesPreview(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetablesPreviewResponse.of(timetables, s3FileHandler));
     }
 }
