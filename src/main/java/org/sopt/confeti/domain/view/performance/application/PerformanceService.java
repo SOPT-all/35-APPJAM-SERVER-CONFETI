@@ -4,8 +4,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
-import org.sopt.confeti.domain.view.performance.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceDTORepository;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceRepository;
 import org.sopt.confeti.global.common.constant.PerformanceType;
@@ -91,5 +91,12 @@ public class PerformanceService {
                 );
 
         performance.addArtists(performanceArtists);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PerformanceDTO> getAllPerformances() {
+        return performanceRepository.findAll().stream()
+                .map(PerformanceDTO::from)
+                .toList();
     }
 }
