@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
+
 @RestController
 @RequiredArgsConstructor
 @Validated
@@ -128,6 +130,9 @@ public class UserFavoriteController {
             @UserId Long userId
     ) {
         UpcomingPerformanceDTO upcomingPerformanceDTO = userFavoriteFacade.getUpcomingPerformance(userId);
+        if (upcomingPerformanceDTO == null) {
+            return ApiResponseUtil.success(SuccessMessage.SUCCESS, Collections.emptyMap());
+        }
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 UpcomingPerformanceResponse.of(upcomingPerformanceDTO, s3FileHandler));
     }

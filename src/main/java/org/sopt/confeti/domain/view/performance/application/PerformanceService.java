@@ -96,8 +96,6 @@ public class PerformanceService {
     @Transactional
     public Performance getUpcomingPerformance(final Long userId){
         return performanceRepository.upcomingPerformance(userId)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
+                .orElse(null);
     }
 }
