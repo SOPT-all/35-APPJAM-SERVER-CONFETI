@@ -61,6 +61,13 @@ jobs:
           echo "${{ secrets.APPLICATION_CLOUD_YML }}" > ./src/main/resources/cloud/application-cloud.yml
         shell: bash
 
+      # application-elastic-search.yml 파일 생성
+      - name: make application-elastic-search.yml
+        run: |
+          touch ./src/main/resources/cloud/application-elastic-search.yml
+          echo "${{ secrets.APPLICATION_ELASTIC_SEARCH_YML }}" > ./src/main/resources/cloud/application-elastic-search.yml
+        shell: bash
+
       # openapi 폴더 생성
       - name: Create cloud folder if not exist
         run: |
