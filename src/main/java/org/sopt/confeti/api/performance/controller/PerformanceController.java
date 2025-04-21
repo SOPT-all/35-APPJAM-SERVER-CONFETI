@@ -2,17 +2,9 @@ package org.sopt.confeti.api.performance.controller;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
-import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
-import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
-import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
-import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
+import org.sopt.confeti.api.performance.dto.response.*;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
-import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.*;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -88,5 +80,14 @@ public class PerformanceController {
         RecentPerformancesDTO recentPerformances = performanceFacade.getRecentPerformances(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 RecentPerformancesResponse.of(recentPerformances, s3FileHandler));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/recommend")
+    public ResponseEntity<BaseResponse<?>> getRecommendPerformances(
+    ) {
+        RecommendPerformancesDTO recommendPerformances = performanceFacade.getRecommendPerformances();
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                RecommendPerformancesResponse.of(recommendPerformances, s3FileHandler));
     }
 }
