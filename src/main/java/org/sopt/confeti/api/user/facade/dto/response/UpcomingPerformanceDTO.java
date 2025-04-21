@@ -1,11 +1,10 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
+import java.time.LocalDate;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
-import java.time.LocalDate;
-
-public record  UpcomingPerformanceDTO(
+public record UpcomingPerformanceDTO(
         long typeId,
         PerformanceType type,
         String title,

@@ -6,7 +6,7 @@ import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.util.DateConvertor;
 import org.sopt.confeti.global.util.S3FileHandler;
 
-public record UpcomingPerformanceResponse (
+public record UpcomingPerformanceResponse(
         long typeId,
         PerformanceType type,
         String title,
@@ -15,13 +15,15 @@ public record UpcomingPerformanceResponse (
         String endAt,
         String area
 ) {
-    public static UpcomingPerformanceResponse of(final UpcomingPerformanceDTO upcomingPerformanceDTO, final S3FileHandler s3FileHandler) {
+    public static UpcomingPerformanceResponse of(final UpcomingPerformanceDTO upcomingPerformanceDTO,
+                                                 final S3FileHandler s3FileHandler) {
         FolderPath topFolder = FolderPath.getFolderPathByPerformanceType(upcomingPerformanceDTO.type());
         return new UpcomingPerformanceResponse(
                 upcomingPerformanceDTO.typeId(),
                 upcomingPerformanceDTO.type(),
                 upcomingPerformanceDTO.title(),
-                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), upcomingPerformanceDTO.posterPath())
+                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER),
+                                upcomingPerformanceDTO.posterPath())
                         .toString(),
                 DateConvertor.convertToDefaultFormat(upcomingPerformanceDTO.startAt()),
                 DateConvertor.convertToDefaultFormat(upcomingPerformanceDTO.endAt()),

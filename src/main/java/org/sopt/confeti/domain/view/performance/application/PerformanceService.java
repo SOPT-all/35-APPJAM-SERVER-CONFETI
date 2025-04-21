@@ -95,7 +95,7 @@ public class PerformanceService {
     }
 
     @Transactional
-    public Performance getUpcomingPerformance(final Long userId){
+    public Performance getUpcomingPerformance(final Long userId) {
         return performanceRepository.upcomingPerformance(userId)
                 .orElse(null);
     }

@@ -1,9 +1,8 @@
 package org.sopt.confeti.api.user.dto.response;
 
+import java.util.List;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetablesDTO;
 import org.sopt.confeti.global.util.S3FileHandler;
-
-import java.util.List;
 
 public record UserTimetablesPreviewResponse(
         List<UserTimetableResponse> timetables

@@ -1,10 +1,19 @@
 package org.sopt.confeti.api.user.controller;
 
 import jakarta.validation.constraints.Min;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.user.dto.response.*;
+import org.sopt.confeti.api.user.dto.response.UpcomingPerformanceResponse;
+import org.sopt.confeti.api.user.dto.response.UserFavoriteArtistsPreviewResponse;
+import org.sopt.confeti.api.user.dto.response.UserFavoriteArtistsResponse;
+import org.sopt.confeti.api.user.dto.response.UserFavoritePerformancesAllResponse;
+import org.sopt.confeti.api.user.dto.response.UserFavoritePerformancesResponse;
 import org.sopt.confeti.api.user.facade.UserFavoriteFacade;
-import org.sopt.confeti.api.user.facade.dto.response.*;
+import org.sopt.confeti.api.user.facade.dto.response.UpcomingPerformanceDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistsDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistsPreviewDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesAllDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -22,8 +31,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Collections;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,7 +64,8 @@ public class UserFavoriteController {
     public ResponseEntity<BaseResponse<?>> getFavoriteArtistsPreview(
             @UserId Long userId
     ) {
-        UserFavoriteArtistsPreviewDTO userFavoriteArtistsPreviewDTO = userFavoriteFacade.getFavoriteArtistsPreview(userId);
+        UserFavoriteArtistsPreviewDTO userFavoriteArtistsPreviewDTO = userFavoriteFacade.getFavoriteArtistsPreview(
+                userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 UserFavoriteArtistsPreviewResponse.from(userFavoriteArtistsPreviewDTO.artists()));
     }
