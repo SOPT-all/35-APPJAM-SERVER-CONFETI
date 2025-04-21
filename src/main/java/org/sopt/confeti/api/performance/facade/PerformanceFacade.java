@@ -9,11 +9,19 @@ import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.facade.dto.response.*;
+import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
+import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
@@ -43,6 +51,7 @@ public class PerformanceFacade {
     private final PerformanceService performanceService;
     private final ConcertFavoriteService concertFavoriteService;
     private final ArtistFavoriteService artistFavoriteService;
+    private final PerformanceSearchService performanceSearchService;
 
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final Long userId, final long concertId) {
@@ -217,6 +226,13 @@ public class PerformanceFacade {
     public RecommendPerformancesDTO getRecommendPerformances() {
         return RecommendPerformancesDTO.from(
                 performanceService.getRecommendPerformances()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public SearchACPerformancesDTO searchACPerformances(String term, int limit) {
+        return SearchACPerformancesDTO.from(
+                performanceSearchService.getPerformancesByTitle(term, limit)
         );
     }
 }
