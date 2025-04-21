@@ -26,12 +26,16 @@ public class PerformanceSearchService {
 
     @Transactional(readOnly = true)
     public List<SearchPerformanceResult> getPerformancesByTitle(String title, int limit) {
-        List<PerformanceDocument> performances = performanceSearchRepository.findPerformanceDocumentsByTitleStartsWith(
-                title);
+        List<PerformanceDocument> performances = performanceSearchRepository.findPerformanceDocumentsByTitleStartingWith(
+                clearSentence(title));
 
         return performances.stream()
                 .map(SearchPerformanceResult::from)
                 .limit(limit)
                 .toList();
+    }
+
+    private String clearSentence(String sentence) {
+        return sentence.replaceAll("\"", "").replace("*", "\\*");
     }
 }

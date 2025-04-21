@@ -16,7 +16,7 @@ public record PerformanceDocument(
         @Id
         long id,
 
-        @Field(type = FieldType.Text)
+        @Field(type = FieldType.Text, analyzer = "autocomplete_analyzer", searchAnalyzer = "search_analyzer")
         String title,
 
         @Field(type = FieldType.Date)
