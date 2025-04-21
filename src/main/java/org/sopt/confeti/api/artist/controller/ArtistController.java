@@ -39,7 +39,7 @@ public class ArtistController {
     public ResponseEntity<BaseResponse<?>> searchAutoComplete(
             @UserId(require = false) Long userId,
             @RequestParam String term,
-            @RequestParam(defaultValue = "1") Integer limit
+            @RequestParam(required = false, defaultValue = "1") Integer limit
     ) {
         SearchACArtistsDTO artistsDTO = artistFacade.searchACArtists(term, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, SearchACArtistsResponse.from(artistsDTO));
