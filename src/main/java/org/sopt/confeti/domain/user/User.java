@@ -53,6 +53,10 @@ public class User {
     @Column(length = 20, nullable = false)
     private Role role;
 
+    @Setter
+    @Column(nullable = false)
+    private boolean hasTimetableHistory;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ArtistFavorite> artistFavorites = new ArrayList<>();
 
@@ -72,6 +76,7 @@ public class User {
         this.name = name;
         this.profilePath = profilePath;
         this.role = role;
+        this.hasTimetableHistory = false;
     }
 
     public static User create(AuthUser authUser) {
