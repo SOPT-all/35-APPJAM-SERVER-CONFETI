@@ -86,6 +86,7 @@ public class UserTimetableFacade {
         validateCountTimetableFestival(user.getTimetableFestivals().size(), addFestivals.size());
 
         timetableFestivalService.addTimetableFestivals(user, addFestivals);
+        userService.updateHasTimetableHistory(userId);
     }
 
     @Transactional

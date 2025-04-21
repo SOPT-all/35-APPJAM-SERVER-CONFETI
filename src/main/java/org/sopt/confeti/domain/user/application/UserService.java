@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.user.application;
 
+import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.request.PatchUserInfoRequest;
 import org.sopt.confeti.auth.dto.CreateUserDTO;
@@ -16,11 +17,12 @@ import org.sopt.confeti.global.util.FileDownloader;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.nio.file.Path;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    private static final boolean TIMETABLE_ADDED = true;
 
     private final UserRepository userRepository;
     private final AllUserRepository allUserRepository;
@@ -99,5 +101,15 @@ public class UserService {
         } finally {
             fileDownloader.deleteTempFile(profileImg);
         }
+    }
+
+    @Transactional
+    public void updateHasTimetableHistory(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
+
+        user.setHasTimetableHistory(TIMETABLE_ADDED);
     }
 }
