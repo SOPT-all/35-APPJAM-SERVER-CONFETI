@@ -3,6 +3,7 @@ package org.sopt.confeti.api.artist.facade;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.artist.facade.dto.response.SearchACArtistsDTO;
 import org.sopt.confeti.api.artist.facade.dto.response.SearchArtistDTO;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.global.annotation.Facade;
@@ -33,6 +34,12 @@ public class ArtistFacade {
         return SearchArtistDTO.from(
                 confetiArtist.orElse(ConfetiArtist.empty()),
                 isFavorite
+        );
+    }
+
+    public SearchACArtistsDTO searchACArtists(String term, int limit) {
+        return SearchACArtistsDTO.from(
+                musicAPIHandler.findArtistsByKeyword(term, limit)
         );
     }
 }
