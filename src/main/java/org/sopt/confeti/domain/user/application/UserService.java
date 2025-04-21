@@ -112,4 +112,14 @@ public class UserService {
 
         user.setHasTimetableHistory(TIMETABLE_ADDED);
     }
+
+    @Transactional(readOnly = true)
+    public boolean getHasTimetableHistory(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
+
+        return user.isHasTimetableHistory();
+    }
 }
