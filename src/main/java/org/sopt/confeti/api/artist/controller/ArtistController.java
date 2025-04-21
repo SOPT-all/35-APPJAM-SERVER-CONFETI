@@ -1,8 +1,10 @@
 package org.sopt.confeti.api.artist.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.artist.dto.response.SearchACArtistsResponse;
 import org.sopt.confeti.api.artist.dto.response.SearchArtistResponse;
 import org.sopt.confeti.api.artist.facade.ArtistFacade;
+import org.sopt.confeti.api.artist.facade.dto.response.SearchACArtistsDTO;
 import org.sopt.confeti.api.artist.facade.dto.response.SearchArtistDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
@@ -31,5 +33,15 @@ public class ArtistController {
     ) {
         SearchArtistDTO artist = artistFacade.searchByKeyword(userId, keyword);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, SearchArtistResponse.from(artist));
+    }
+
+    @GetMapping("/search/ac")
+    public ResponseEntity<BaseResponse<?>> searchAutoComplete(
+            @UserId(require = false) Long userId,
+            @RequestParam String term,
+            @RequestParam(defaultValue = "1") Integer limit
+    ) {
+        SearchACArtistsDTO artistsDTO = artistFacade.searchACArtists(term, limit);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, SearchACArtistsResponse.from(artistsDTO));
     }
 }
