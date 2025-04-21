@@ -6,7 +6,6 @@ import org.sopt.confeti.api.user.facade.dto.response.UserInfoDTO;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.exception.ConfetiException;
-import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;

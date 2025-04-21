@@ -7,7 +7,8 @@ import org.sopt.confeti.global.util.S3FileHandler;
 public record UserTimetableDetailFestivalsResponse(
         List<UserTimetableDetailFestivalResponse> festivals
 ) {
-    public static UserTimetableDetailFestivalsResponse of(UserTimetableDetailFestivalsDTO userTimeTableDetailFestivalsDTO, S3FileHandler s3FileHandler) {
+    public static UserTimetableDetailFestivalsResponse of(
+            UserTimetableDetailFestivalsDTO userTimeTableDetailFestivalsDTO, S3FileHandler s3FileHandler) {
         return new UserTimetableDetailFestivalsResponse(
                 userTimeTableDetailFestivalsDTO.festivals().stream()
                         .map(timetableFestivalDTO -> UserTimetableDetailFestivalResponse.of(timetableFestivalDTO,

@@ -41,7 +41,7 @@ public class TimetableFestivalService {
 
     @Transactional(readOnly = true)
     public List<TimetableFestival> getTimetables(final long userId, final String sortBy) {
-        List<TimetableFestival> festivals= timetableFestivalRepository.findByUserId(userId);
+        List<TimetableFestival> festivals = timetableFestivalRepository.findByUserId(userId);
 
         if ("createdAt".equalsIgnoreCase(sortBy)) {
             festivals.sort(Comparator.comparing(TimetableFestival::getCreatedAt).reversed());

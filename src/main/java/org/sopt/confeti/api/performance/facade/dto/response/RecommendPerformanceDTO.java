@@ -15,6 +15,6 @@ public record RecommendPerformanceDTO(
                 performance.getType(),
                 performance.getTitle(),
                 performance.getPosterPath()
-                );
+        );
     }
 }

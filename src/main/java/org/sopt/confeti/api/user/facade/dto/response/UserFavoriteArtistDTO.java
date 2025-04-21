@@ -1,7 +1,7 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
-import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import java.time.LocalDateTime;
+import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 
 public record UserFavoriteArtistDTO(
         String artistId,
