@@ -7,12 +7,14 @@ import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
+import org.sopt.confeti.api.performance.dto.response.SearchACPerformancesResponse;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -26,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -88,5 +91,16 @@ public class PerformanceController {
         RecentPerformancesDTO recentPerformances = performanceFacade.getRecentPerformances(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 RecentPerformancesResponse.of(recentPerformances, s3FileHandler));
+    }
+
+    @GetMapping("/search/ac")
+    public ResponseEntity<BaseResponse<?>> searchAutoComplete(
+            @UserId(require = false) Long userId,
+            @RequestParam String term,
+            @RequestParam(required = false, defaultValue = "1") Integer limit
+    ) {
+        SearchACPerformancesDTO performacnesDTO = performanceFacade.searchACPerformances(term, limit);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                SearchACPerformancesResponse.of(performacnesDTO, s3FileHandler));
     }
 }
