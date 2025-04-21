@@ -14,6 +14,7 @@ import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDetailFestivalsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetableHistoryDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetablesDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
@@ -267,6 +268,12 @@ public class UserTimetableFacade {
         if (!sortBy.equalsIgnoreCase("createdAt") && !sortBy.equalsIgnoreCase("oldestFirst")) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public UserTimetableHistoryDTO getHasTimetableHistory(long userId) {
+        boolean hasTimetableHistory = userService.getHasTimetableHistory(userId);
+        return UserTimetableHistoryDTO.from(hasTimetableHistory);
     }
 }
 

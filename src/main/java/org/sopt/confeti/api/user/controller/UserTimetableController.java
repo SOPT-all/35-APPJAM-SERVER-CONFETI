@@ -4,13 +4,19 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.request.AddTimetableFestivalRequest;
 import org.sopt.confeti.api.user.dto.request.PatchTimetableRequest;
-import org.sopt.confeti.api.user.dto.response.*;
+import org.sopt.confeti.api.user.dto.response.TimetablesToAddResponse;
+import org.sopt.confeti.api.user.dto.response.UserTimetableDetailFestivalsResponse;
+import org.sopt.confeti.api.user.dto.response.UserTimetableFestivalResponse;
+import org.sopt.confeti.api.user.dto.response.UserTimetableHistoryResponse;
+import org.sopt.confeti.api.user.dto.response.UserTimetablesPreviewResponse;
+import org.sopt.confeti.api.user.dto.response.UserTimetablesResponse;
 import org.sopt.confeti.api.user.facade.UserTimetableFacade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDetailFestivalsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetableHistoryDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetablesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
@@ -47,9 +53,19 @@ public class UserTimetableController {
     public ResponseEntity<BaseResponse<?>> getTimetablesListAndDate(
             @UserId Long userId
     ) {
-        UserTimetableDetailFestivalsDTO userTimetableDetailFestivalsDTO = userTimetableFacade.getTimetablesListAndDate(userId);
+        UserTimetableDetailFestivalsDTO userTimetableDetailFestivalsDTO = userTimetableFacade.getTimetablesListAndDate(
+                userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 UserTimetableDetailFestivalsResponse.of(userTimetableDetailFestivalsDTO, s3FileHandler));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/festivals/history")
+    public ResponseEntity<BaseResponse<?>> getHasTimetableHistory(
+            @UserId Long userId
+    ) {
+        UserTimetableHistoryDTO timetableHistoryDTO = userTimetableFacade.getHasTimetableHistory(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetableHistoryResponse.from(timetableHistoryDTO));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -106,7 +122,7 @@ public class UserTimetableController {
     @GetMapping
     public ResponseEntity<BaseResponse<?>> getTimetables(
             @UserId Long userId,
-            @RequestParam(value="sortBy", defaultValue = "createdAt") String sortBy
+            @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy
     ) {
         UserTimetablesDTO timetables = userTimetableFacade.getTimetables(userId, sortBy);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetablesResponse.of(timetables, s3FileHandler));
@@ -117,6 +133,7 @@ public class UserTimetableController {
             @UserId Long userId
     ) {
         UserTimetablesDTO timetables = userTimetableFacade.getTimetablesPreview(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserTimetablesPreviewResponse.of(timetables, s3FileHandler));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                UserTimetablesPreviewResponse.of(timetables, s3FileHandler));
     }
 }
