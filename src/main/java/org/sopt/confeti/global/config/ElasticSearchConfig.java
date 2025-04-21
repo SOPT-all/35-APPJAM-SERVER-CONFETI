@@ -8,7 +8,7 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfigurat
 import org.springframework.data.elasticsearch.repository.config.EnableReactiveElasticsearchRepositories;
 
 @Configuration
-@EnableReactiveElasticsearchRepositories(basePackages = "")
+@EnableReactiveElasticsearchRepositories(basePackages = "org.sopt.confeti.global.config")
 public class ElasticSearchConfig extends ElasticsearchConfiguration {
 
     @Value("${spring.data.elasticsearch.uris}")
