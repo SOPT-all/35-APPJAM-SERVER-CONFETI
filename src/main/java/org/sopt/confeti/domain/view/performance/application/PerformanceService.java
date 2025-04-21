@@ -106,4 +106,9 @@ public class PerformanceService {
                 .map(org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO::from)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getRecommendPerformances() {
+        return performanceRepository.findTop5ByRand();
+    }
 }

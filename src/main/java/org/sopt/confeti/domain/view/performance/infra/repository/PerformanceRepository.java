@@ -63,4 +63,6 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "ORDER BY p.startAt ASC LIMIT 1 ")
     Optional<Performance> upcomingPerformance(final @Param("userId") long userId);
 
+    @Query(value = "SELECT p FROM Performance p ORDER BY RAND() LIMIT 5")
+    List<Performance> findTop5ByRand();
 }

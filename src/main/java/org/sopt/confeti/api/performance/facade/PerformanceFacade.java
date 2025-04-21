@@ -8,12 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.*;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
@@ -29,6 +24,7 @@ import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
+import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -217,4 +213,10 @@ public class PerformanceFacade {
         };
     }
 
+    @Transactional(readOnly = true)
+    public RecommendPerformancesDTO getRecommendPerformances() {
+        return RecommendPerformancesDTO.from(
+                performanceService.getRecommendPerformances()
+        );
+    }
 }
