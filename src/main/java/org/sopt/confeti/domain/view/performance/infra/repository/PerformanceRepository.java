@@ -74,12 +74,12 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "ORDER BY p.startAt ASC LIMIT 1 ")
     Optional<Performance> upcomingPerformance(final @Param("userId") long userId);
 
-    @Query(value = "SELECT p FROM Performance p ORDER BY RAND() LIMIT 5")
+    @Query(value = "SELECT p FROM Performance p WHERE p.endAt >= CURRENT_DATE ORDER BY RAND() LIMIT 5")
     List<Performance> findTop5ByRand();
 
     Optional<Performance> findPerformanceByIdAndEndAtGreaterThanEqualOrderByStartAt(long performanceId, LocalDate date);
 
-    @Query(value = "SELECT p FROM Performance p ORDER BY RAND() LIMIT 1")
+    @Query(value = "SELECT p FROM Performance p WHERE p.endAt >= CURRENT_DATE ORDER BY RAND() LIMIT 1")
     Performance findPerformanceByRand();
 
     @Query(value = "SELECT p FROM Performance p " +
