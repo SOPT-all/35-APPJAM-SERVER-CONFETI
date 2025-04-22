@@ -11,6 +11,7 @@ import org.sopt.confeti.api.performance.dto.response.PerformanceReservationRespo
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.SearchACPerformancesResponse;
+import org.sopt.confeti.api.performance.dto.response.*;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
 import org.sopt.confeti.api.performance.facade.dto.response.AnalyzePerformanceTypeDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
@@ -21,6 +22,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservati
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.*;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -144,5 +146,15 @@ public class PerformanceController {
         AnalyzePerformanceTypeDTO analyzePerformanceTypeDTO = performanceFacade.analyzePerformanceType(term);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 AnalyzePerformanceTypeResponse.from(analyzePerformanceTypeDTO));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/recommend/musics")
+    public ResponseEntity<BaseResponse<?>> getRecommendMusics(
+            @UserId(require = false) Long userId
+    ) {
+        RecommendMusicsDTO recommendMusicsDTO = performanceFacade.getRecommendMusics(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                RecommendMusicsResponse.from(recommendMusicsDTO));
     }
 }

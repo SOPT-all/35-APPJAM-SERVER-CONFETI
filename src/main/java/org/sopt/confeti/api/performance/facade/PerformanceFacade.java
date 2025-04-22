@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import kr.co.shineware.nlp.komoran.model.KomoranResult;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.facade.dto.response.AnalyzePerformanceTypeDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
@@ -21,6 +23,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservati
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.*;
 import org.sopt.confeti.api.user.facade.UserFavoriteFacade;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
@@ -33,6 +36,7 @@ import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
@@ -42,6 +46,9 @@ import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.MorphemeAnalyzer;
+import org.sopt.confeti.global.resolver.music_api.MusicAPIResolver;
+import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
+import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
@@ -61,7 +68,7 @@ public class PerformanceFacade {
     private final ConcertFavoriteService concertFavoriteService;
     private final ArtistFavoriteService artistFavoriteService;
     private final PerformanceSearchService performanceSearchService;
-    private final UserFavoriteFacade userFavoriteFacade;
+    private final MusicAPIHandler musicAPIHandler;
 
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final Long userId, final long concertId) {
@@ -294,5 +301,34 @@ public class PerformanceFacade {
         String processedTerm = MorphemeAnalyzer.getRemovedPerformanceTypesTerm(term, analyzeResult);
 
         return AnalyzePerformanceTypeDTO.of(processedTerm, performanceType);
+    }
+
+    @Transactional(readOnly = true)
+    public RecommendMusicsDTO getRecommendMusics(final Long userId) {
+
+        Performance performance = performanceService.getPerformanceByUserFavorites(userId);
+        if( userId == null || performance == null){
+            performance = performanceService.getPerformanceByRand();
+        }
+
+        Set<String> selectedArtistIds = setArtistsByRandom(performance);
+        List<ConfetiMusic> musicList = musicAPIHandler.getMusicsByArtistIds(selectedArtistIds);
+
+        return RecommendMusicsDTO.of(performance, musicList);
+    }
+
+    protected Set<String> setArtistsByRandom(Performance performance) {
+        List<PerformanceArtist> performanceArtists = performance.getArtists();
+
+        if (performanceArtists.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        List<String> artistList = performanceArtists.stream()
+                .map(PerformanceArtist::getArtistId).distinct().collect(Collectors.toList());
+        Collections.shuffle(artistList);
+
+        int artistCount = Math.min(artistList.size(), 3);
+        return new HashSet<>(artistList.subList(0, artistCount));
     }
 }
