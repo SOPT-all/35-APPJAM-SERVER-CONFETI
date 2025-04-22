@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.performance.facade.dto.response.AnalyzePerformanceTypeDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
@@ -39,6 +41,7 @@ import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
+import org.sopt.confeti.global.util.MorphemeAnalyzer;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
@@ -283,5 +286,13 @@ public class PerformanceFacade {
         }
 
         return performanceFavorites;
+    }
+
+    public AnalyzePerformanceTypeDTO analyzePerformanceType(String term) {
+        KomoranResult analyzeResult = MorphemeAnalyzer.getAnalyzeResult(term);
+        PerformanceType performanceType = MorphemeAnalyzer.getFirstMatchingPerformanceType(analyzeResult);
+        String processedTerm = MorphemeAnalyzer.getRemovedPerformanceTypesTerm(term, analyzeResult);
+
+        return AnalyzePerformanceTypeDTO.of(processedTerm, performanceType);
     }
 }

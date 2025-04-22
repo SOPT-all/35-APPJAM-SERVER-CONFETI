@@ -2,6 +2,7 @@ package org.sopt.confeti.api.performance.controller;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.performance.dto.response.AnalyzePerformanceTypeResponse;
 import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
@@ -11,6 +12,7 @@ import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.SearchACPerformancesResponse;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
+import org.sopt.confeti.api.performance.facade.dto.response.AnalyzePerformanceTypeDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
@@ -131,5 +133,16 @@ public class PerformanceController {
         IntendedPerformancesDTO performancesDTO = performanceFacade.getPerformances(userId, pid, aid, ptype);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 IntendedPerformancesResponse.of(performancesDTO, s3FileHandler));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/search/type-analysis")
+    public ResponseEntity<BaseResponse<?>> analyzePerformanceType(
+            @UserId(require = false) Long userId,
+            @RequestParam String term
+    ) {
+        AnalyzePerformanceTypeDTO analyzePerformanceTypeDTO = performanceFacade.analyzePerformanceType(term);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                AnalyzePerformanceTypeResponse.from(analyzePerformanceTypeDTO));
     }
 }
