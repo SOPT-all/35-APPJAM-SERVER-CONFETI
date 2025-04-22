@@ -22,4 +22,6 @@ public interface MusicAPIHandler {
     List<ConfetiMusic> getMusicsByMusicIds(final Set<String> musicIds);
 
     List<ConfetiMusic> getTopMusics(final int fetchSize);
+
+    List<ConfetiMusic> getMusicsByArtistIds(final Set<String> artistIds);
 }
