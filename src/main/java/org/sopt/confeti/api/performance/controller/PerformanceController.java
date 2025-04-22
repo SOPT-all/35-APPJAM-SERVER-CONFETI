@@ -126,9 +126,9 @@ public class PerformanceController {
             @UserId(require = false) Long userId,
             @RequestParam(required = false) Long pid,
             @RequestParam(required = false) String aid,
-            @RequestParam(required = false, defaultValue = Default.PERFORMANCE_TYPE) PerformanceType type
+            @RequestParam(required = false, defaultValue = Default.PERFORMANCE_TYPE) PerformanceType ptype
     ) {
-        IntendedPerformancesDTO performancesDTO = performanceFacade.getPerformances(userId, pid, aid, type);
+        IntendedPerformancesDTO performancesDTO = performanceFacade.getPerformances(userId, pid, aid, ptype);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 IntendedPerformancesResponse.of(performancesDTO, s3FileHandler));
     }

@@ -245,7 +245,7 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public IntendedPerformancesDTO getPerformances(Long userId, Long pid, String aid, PerformanceType type) {
+    public IntendedPerformancesDTO getPerformances(Long userId, Long pid, String aid, PerformanceType ptype) {
         if (!isPresent(pid) && !isPresent(aid)) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
@@ -257,7 +257,7 @@ public class PerformanceFacade {
         }
 
         if (isPresent(aid)) {
-            performances = performanceService.getPerformancesByArtistIdAndType(aid, type);
+            performances = performanceService.getPerformancesByArtistIdAndType(aid, ptype);
         }
 
         Map<Long, Boolean> performanceFavorites = getPerformanceFavorites(userId, performances);
