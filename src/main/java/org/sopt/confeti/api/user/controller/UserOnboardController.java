@@ -56,9 +56,10 @@ public class UserOnboardController {
     @Permission(role = {Role.ONBOARDING})
     @GetMapping("/artists")
     public ResponseEntity<BaseResponse<?>> getTopArtists(
-            @UserId Long userId
+            @UserId Long userId,
+            @RequestParam(required = false, defaultValue = "100") @Min(1) @Max(200) int limit
     ) {
-        UserOnboardTopArtistsDTO topArtists = userOnboardFacade.getTopArtists();
+        UserOnboardTopArtistsDTO topArtists = userOnboardFacade.getTopArtists(limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserOnboardTopArtistsResponse.from(topArtists));
     }
 }

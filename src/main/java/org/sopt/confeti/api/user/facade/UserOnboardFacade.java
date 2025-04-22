@@ -16,16 +16,14 @@ import org.sopt.confeti.global.util.music.MusicAPIHandler;
 @RequiredArgsConstructor
 public class UserOnboardFacade {
 
-    private static final int TOP_MUSICS_COUNT = 200;
-
     private final MusicAPIHandler musicAPIHandler;
 
     public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(String term, int limit) {
         return UserOnboardRelatedArtistsDTO.from(musicAPIHandler.findArtistsByKeyword(term, limit));
     }
 
-    public UserOnboardTopArtistsDTO getTopArtists() {
-        List<ConfetiMusic> topMusics = musicAPIHandler.getTopMusics(TOP_MUSICS_COUNT);
+    public UserOnboardTopArtistsDTO getTopArtists(int limit) {
+        List<ConfetiMusic> topMusics = musicAPIHandler.getTopMusics(limit);
         Set<String> topMusicIds = topMusics.stream()
                 .map(ConfetiMusic::getId)
                 .collect(Collectors.toSet());
