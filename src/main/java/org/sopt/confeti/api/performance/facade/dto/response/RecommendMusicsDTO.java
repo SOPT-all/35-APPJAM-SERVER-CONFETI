@@ -7,6 +7,7 @@ import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import java.util.List;
 
 public record RecommendMusicsDTO(
+        Long id,
         Long typeId,
         PerformanceType type,
         String title,
@@ -14,6 +15,7 @@ public record RecommendMusicsDTO(
 ) {
     public static RecommendMusicsDTO of(Performance performance, List<ConfetiMusic> musicList) {
         return new RecommendMusicsDTO(
+                performance.getId(),
                 performance.getTypeId(),
                 performance.getType(),
                 performance.getTitle(),
