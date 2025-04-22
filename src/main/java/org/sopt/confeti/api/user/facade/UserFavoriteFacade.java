@@ -20,6 +20,7 @@ import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceType;
@@ -157,7 +158,7 @@ public class UserFavoriteFacade {
         validateExistUser(userId);
         validateType(type);
 
-        List<Performance> performances = performanceService.getFavoritePerformancesAll(userId, type);
+        List<PerformanceDTO> performances = performanceService.getFavoritePerformancesAll(userId, type);
         return UserFavoritePerformancesAllDTO.from(performances);
     }
 

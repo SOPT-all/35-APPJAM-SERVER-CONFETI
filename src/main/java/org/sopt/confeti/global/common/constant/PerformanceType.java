@@ -9,7 +9,7 @@ import org.sopt.confeti.global.message.ErrorMessage;
 @Getter
 @AllArgsConstructor
 public enum PerformanceType {
-    CONCERT("concert"), FESTIVAL("festival");
+    CONCERT("concert"), FESTIVAL("festival"), PERFORMANCE("performance");
 
     private final String type;
 

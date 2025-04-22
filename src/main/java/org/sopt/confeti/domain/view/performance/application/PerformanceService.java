@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.view.performance.application;
 
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.view.performance.Performance;
@@ -34,8 +35,10 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getFavoritePerformancesAll(final long userId, final String type) {
-        return performanceRepository.findPerformancesByUserFavorites(userId, type);
+    public List<PerformanceDTO> getFavoritePerformancesAll(final long userId, final String type) {
+        return performanceRepository.findPerformancesByUserFavorites(userId, type).stream()
+                .map(PerformanceDTO::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -72,8 +75,10 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> findPerformanceByArtistId(final String artistId) {
-        return performanceRepository.findPerformancesByArtistId(artistId);
+    public List<PerformanceDTO> findPerformancesByArtistId(final String artistId) {
+        return performanceRepository.findPerformancesByArtistId(artistId).stream()
+                .map(PerformanceDTO::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -86,7 +91,7 @@ public class PerformanceService {
     @Transactional
     public void addPerformanceArtists(PerformanceType performanceType, long festivalId,
                                       List<PerformanceArtist> performanceArtists) {
-        Performance performance = performanceRepository.findPerformancesByTypeAndTypeId(performanceType, festivalId)
+        Performance performance = performanceRepository.findPerformanceByTypeAndTypeId(performanceType, festivalId)
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
@@ -110,5 +115,30 @@ public class PerformanceService {
     @Transactional(readOnly = true)
     public List<Performance> getRecommendPerformances() {
         return performanceRepository.findTop5ByRand();
+    }
+
+    @Transactional(readOnly = true)
+    public PerformanceDTO getPerformance(long performanceId) {
+        Performance performance = performanceRepository.findPerformanceByIdAndEndAtGreaterThanEqualOrderByStartAt(
+                        performanceId,
+                        LocalDate.now())
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
+
+        return PerformanceDTO.from(performance);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PerformanceDTO> getPerformancesByArtistIdAndType(String artistId, PerformanceType type) {
+        if (type == PerformanceType.PERFORMANCE) {
+            return performanceRepository.findPerformancesByArtistId(artistId).stream()
+                    .map(PerformanceDTO::from)
+                    .toList();
+        }
+
+        return performanceRepository.findPerformancesByTypeAndArtistId(type, artistId).stream()
+                .map(PerformanceDTO::from)
+                .toList();
     }
 }
