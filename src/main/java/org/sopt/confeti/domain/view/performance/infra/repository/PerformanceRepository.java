@@ -78,4 +78,16 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     List<Performance> findTop5ByRand();
 
     Optional<Performance> findPerformanceByIdAndEndAtGreaterThanEqualOrderByStartAt(long performanceId, LocalDate date);
+
+    @Query(value = "SELECT p FROM Performance p ORDER BY RAND() LIMIT 1")
+    Performance findPerformanceByRand();
+
+    @Query(value = "SELECT p FROM Performance p " +
+            "WHERE ((p.type = org.sopt.confeti.global.common.constant.PerformanceType.CONCERT " +
+            "        AND p.typeId IN (SELECT cf.concert.id FROM ConcertFavorite cf WHERE cf.user.id = :userId)) " +
+            "    OR (p.type = org.sopt.confeti.global.common.constant.PerformanceType.FESTIVAL " +
+            "        AND p.typeId IN (SELECT tf.festival.id FROM TimetableFestival tf WHERE tf.user.id = :userId))) " +
+            "AND p.endAt >= CURRENT_DATE " +
+            "ORDER BY RAND() ASC LIMIT 1 ")
+    Performance getPerformanceByUserFavorites(final @Param("userId") Long userId);
 }

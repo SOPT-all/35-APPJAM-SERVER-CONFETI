@@ -141,4 +141,14 @@ public class PerformanceService {
                 .map(PerformanceDTO::from)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public Performance getPerformanceByRand(){
+        return performanceRepository.findPerformanceByRand();
+    }
+
+    @Transactional(readOnly = true)
+    public Performance getPerformanceByUserFavorites(final Long userId) {
+        return performanceRepository.getPerformanceByUserFavorites(userId);
+    }
 }
