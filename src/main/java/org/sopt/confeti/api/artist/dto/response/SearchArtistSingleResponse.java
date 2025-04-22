@@ -1,24 +1,21 @@
 package org.sopt.confeti.api.artist.dto.response;
 
 import org.sopt.confeti.api.artist.facade.dto.response.SearchArtistDTO;
-import org.sopt.confeti.global.util.DateConvertor;
 
 public record SearchArtistSingleResponse(
         String artistId,
         String name,
         String profileUrl,
-        String latestReleaseAt,
-        boolean isFavorite,
-        boolean isMultipleArtists
+        String recentAlbumName,
+        boolean isFavorite
 ) {
     public static SearchArtistSingleResponse from(final SearchArtistDTO searchArtistDTO) {
         return new SearchArtistSingleResponse(
                 searchArtistDTO.artistId(),
                 searchArtistDTO.name(),
                 searchArtistDTO.profileUrl(),
-                DateConvertor.convertToDefaultFormat(searchArtistDTO.latestReleaseAt()),
-                searchArtistDTO.isFavorite(),
-                searchArtistDTO.isMultipleArtists()
+                searchArtistDTO.recentAlbumName(),
+                searchArtistDTO.isFavorite()
         );
     }
 }

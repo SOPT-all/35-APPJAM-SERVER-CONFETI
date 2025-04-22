@@ -45,4 +45,8 @@ public class ConfetiAlbum {
                 album.attributes().releaseDate()
         );
     }
+
+    public static ConfetiAlbum empty() {
+        return new ConfetiAlbum();
+    }
 }

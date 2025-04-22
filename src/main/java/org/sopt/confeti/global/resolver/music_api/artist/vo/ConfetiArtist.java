@@ -72,6 +72,9 @@ public class ConfetiArtist {
     }
 
     public static ConfetiArtist empty() {
-        return new ConfetiArtist();
+        ConfetiArtist artist = new ConfetiArtist();
+        artist.setLatestReleaseAlbum(ConfetiAlbum.empty());
+
+        return artist;
     }
 }
