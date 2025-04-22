@@ -152,6 +152,10 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiArtist> convertToConfetiArtists(final AppleMusicArtistsResponse artists) {
+        if (Objects.isNull(artists)) {
+            return List.of();
+        }
+
         return artists.data().stream()
                 .map(ConfetiArtist::from)
                 .toList();
