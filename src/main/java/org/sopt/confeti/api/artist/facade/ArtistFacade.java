@@ -1,6 +1,6 @@
 package org.sopt.confeti.api.artist.facade;
 
-import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.artist.facade.dto.response.SearchACArtistsDTO;
@@ -15,24 +15,31 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ArtistFacade {
 
-    private static final int ARTISTS_SEARCH_COUNT = 5;
+    private static final int ARTIST_SEARCH_COUNT = 1;
 
     private final ArtistFavoriteService artistFavoriteService;
     private final MusicAPIHandler musicAPIHandler;
 
     @Transactional(readOnly = true)
-    public SearchArtistDTO searchByKeyword(final Long userId, final String keyword) {
-        List<ConfetiArtist> confetiArtists = musicAPIHandler.findArtistsByKeyword(keyword, ARTISTS_SEARCH_COUNT);
-        Optional<ConfetiArtist> confetiArtist = confetiArtists.stream().findFirst();
-
+    public SearchArtistDTO search(Long userId, String term, String aid) {
+        Optional<ConfetiArtist> artist = Optional.empty();
         boolean isFavorite = false;
 
-        if (userId != null && confetiArtist.isPresent()) {
-            isFavorite = artistFavoriteService.isFavorite(userId, confetiArtist.get().getId());
+        if (isPresent(aid)) {
+            artist = musicAPIHandler.findArtistByArtistId(aid);
+        }
+
+        if (isPresent(term)) {
+            artist = musicAPIHandler.findArtistsByKeyword(term, ARTIST_SEARCH_COUNT).stream()
+                    .findFirst();
+        }
+
+        if (isPresent(userId) && artist.isPresent()) {
+            isFavorite = artistFavoriteService.isFavorite(userId, artist.get().getId());
         }
 
         return SearchArtistDTO.from(
-                confetiArtist.orElse(ConfetiArtist.empty()),
+                artist.orElse(ConfetiArtist.empty()),
                 isFavorite
         );
     }
@@ -41,5 +48,9 @@ public class ArtistFacade {
         return SearchACArtistsDTO.from(
                 musicAPIHandler.findArtistsByKeyword(term, limit)
         );
+    }
+
+    private boolean isPresent(Object target) {
+        return Objects.nonNull(target);
     }
 }
