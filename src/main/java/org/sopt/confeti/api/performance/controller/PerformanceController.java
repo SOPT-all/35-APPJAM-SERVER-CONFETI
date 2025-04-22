@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
+import org.sopt.confeti.api.performance.dto.response.IntendedPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
@@ -13,6 +14,7 @@ import org.sopt.confeti.api.performance.facade.PerformanceFacade;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.IntendedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
@@ -21,6 +23,8 @@ import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.common.constant.Default;
+import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -104,6 +108,7 @@ public class PerformanceController {
                 RecommendPerformancesResponse.of(recommendPerformances, s3FileHandler));
     }
 
+    @Permission(role = {Role.GENERAL})
     @GetMapping("/search/ac")
     public ResponseEntity<BaseResponse<?>> searchAutoComplete(
             @UserId(require = false) Long userId,
@@ -113,5 +118,18 @@ public class PerformanceController {
         SearchACPerformancesDTO performacnesDTO = performanceFacade.searchACPerformances(term, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 SearchACPerformancesResponse.of(performacnesDTO, s3FileHandler));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/search")
+    public ResponseEntity<BaseResponse<?>> search(
+            @UserId(require = false) Long userId,
+            @RequestParam(required = false) Long pid,
+            @RequestParam(required = false) String aid,
+            @RequestParam(required = false, defaultValue = Default.PERFORMANCE_TYPE) PerformanceType type
+    ) {
+        IntendedPerformancesDTO performancesDTO = performanceFacade.getPerformances(userId, pid, aid, type);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                IntendedPerformancesResponse.of(performancesDTO, s3FileHandler));
     }
 }

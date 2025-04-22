@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.view.performance.infra.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.sopt.confeti.domain.view.performance.Performance;
@@ -38,7 +39,17 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             final @Param("artistId") String artistId
     );
 
-    Optional<Performance> findPerformancesByTypeAndTypeId(PerformanceType type, long typeId);
+    Optional<Performance> findPerformanceByTypeAndTypeId(PerformanceType type, long typeId);
+
+    @Query(
+            "SELECT p"
+                    + " FROM Performance p"
+                    + " JOIN FETCH p.artists pa"
+                    + " WHERE p.endAt >= CURRENT_DATE AND p.type = :type AND pa.artistId = :artistId"
+                    + " ORDER BY p.startAt"
+    )
+    List<Performance> findPerformancesByTypeAndArtistId(@Param("type") PerformanceType type,
+                                                        @Param("artistId") String artistId);
 
     @Query("SELECT p FROM Performance p " +
             "WHERE ((:type = '" + TYPE_CONCERT + "' OR :type = '" + TYPE_ALL
@@ -65,4 +76,6 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
 
     @Query(value = "SELECT p FROM Performance p ORDER BY RAND() LIMIT 5")
     List<Performance> findTop5ByRand();
+
+    Optional<Performance> findPerformanceByIdAndEndAtGreaterThanEqualOrderByStartAt(long performanceId, LocalDate date);
 }

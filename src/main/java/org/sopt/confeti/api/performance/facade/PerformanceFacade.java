@@ -1,21 +1,25 @@
 package org.sopt.confeti.api.performance.facade;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.IntendedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
+import org.sopt.confeti.api.user.facade.UserFavoriteFacade;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
@@ -29,8 +33,10 @@ import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +48,7 @@ public class PerformanceFacade {
     private static final int RECENT_PERFORMANCES_SIZE = 7;
     private static final boolean PERSONALIZED = true;
     private static final boolean UNPERSONALIZED = false;
+    private static final String TYPE_ALL = "ALL";
 
     private final ConcertService concertService;
     private final FestivalService festivalService;
@@ -51,6 +58,7 @@ public class PerformanceFacade {
     private final ConcertFavoriteService concertFavoriteService;
     private final ArtistFavoriteService artistFavoriteService;
     private final PerformanceSearchService performanceSearchService;
+    private final UserFavoriteFacade userFavoriteFacade;
 
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final Long userId, final long concertId) {
@@ -164,12 +172,12 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public ArtistPerformancesDTO getPerformancesByArtistId(final Long userId, final String artistId) {
-        List<Performance> performances = performanceService.findPerformanceByArtistId(artistId);
+        List<PerformanceDTO> performances = performanceService.findPerformancesByArtistId(artistId);
 
         Map<String, Boolean> favoriteMap = getFavoriteMap(userId, performances);
         List<ArtistPerformancesDetailDTO> performanceList = performances.stream()
                 .map(performance -> {
-                    String key = performance.getTypeId() + "_" + performance.getType();
+                    String key = performance.typeId() + "_" + performance.type();
                     boolean isFavorite = favoriteMap.getOrDefault(key, false);
                     return ArtistPerformancesDetailDTO.from(performance, isFavorite);
                 })
@@ -179,7 +187,7 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Boolean> getFavoriteMap(final Long userId, List<Performance> performances) {
+    public Map<String, Boolean> getFavoriteMap(final Long userId, List<PerformanceDTO> performances) {
         if (userId == null || performances.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -188,14 +196,14 @@ public class PerformanceFacade {
         return fetchFavoriteMap(userId, typeToIdsMap);
     }
 
-    private Map<PerformanceType, Set<Long>> groupPerformancesByType(List<Performance> performances) {
+    private Map<PerformanceType, Set<Long>> groupPerformancesByType(List<PerformanceDTO> performances) {
         Map<PerformanceType, Set<Long>> typeToIdsMap = new HashMap<>();
 
-        for (Performance performance : performances) {
-            if (!typeToIdsMap.containsKey(performance.getType())) {
-                typeToIdsMap.put(performance.getType(), new HashSet<>());
+        for (PerformanceDTO performance : performances) {
+            if (!typeToIdsMap.containsKey(performance.type())) {
+                typeToIdsMap.put(performance.type(), new HashSet<>());
             }
-            typeToIdsMap.get(performance.getType()).add(performance.getTypeId());
+            typeToIdsMap.get(performance.type()).add(performance.typeId());
         }
 
         return typeToIdsMap;
@@ -218,6 +226,7 @@ public class PerformanceFacade {
         return switch (type) {
             case CONCERT -> concertFavoriteService.findFavorites(userId, ids);
             case FESTIVAL -> festivalFavoriteService.findFavorites(userId, ids);
+            default -> List.of();
         };
     }
 
@@ -233,5 +242,46 @@ public class PerformanceFacade {
         return SearchACPerformancesDTO.from(
                 performanceSearchService.getPerformancesByTitle(term, limit)
         );
+    }
+
+    @Transactional(readOnly = true)
+    public IntendedPerformancesDTO getPerformances(Long userId, Long pid, String aid, PerformanceType type) {
+        if (!isPresent(pid) && !isPresent(aid)) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
+
+        List<PerformanceDTO> performances = new ArrayList<>();
+
+        if (isPresent(pid)) {
+            performances = List.of(performanceService.getPerformance(pid));
+        }
+
+        if (isPresent(aid)) {
+            performances = performanceService.getPerformancesByArtistIdAndType(aid, type);
+        }
+
+        Map<Long, Boolean> performanceFavorites = getPerformanceFavorites(userId, performances);
+        return IntendedPerformancesDTO.of(performances, performanceFavorites);
+    }
+
+    private boolean isPresent(Object target) {
+        return Objects.nonNull(target);
+    }
+
+    private Map<Long, Boolean> getPerformanceFavorites(Long userId, List<PerformanceDTO> performances) {
+        Map<Long, Boolean> performanceFavorites = new HashMap<>();
+        performances.forEach(performance -> performanceFavorites.put(performance.id(), false));
+
+        if (isPresent(userId)) {
+            List<PerformanceDTO> favoritePerformances = performanceService.getFavoritePerformancesAll(userId, TYPE_ALL);
+
+            favoritePerformances.forEach(favoritePerformance -> {
+                if (performanceFavorites.containsKey(favoritePerformance.id())) {
+                    performanceFavorites.put(favoritePerformance.id(), true);
+                }
+            });
+        }
+
+        return performanceFavorites;
     }
 }
