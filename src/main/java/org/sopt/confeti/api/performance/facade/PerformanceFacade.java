@@ -337,6 +337,8 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public RecommendNewMusicsDTO getNewRecommendMusics(PatchRecommendMusics patchRecommendMusics) {
+        validatePatchRecommendMusics(patchRecommendMusics);
+
         Performance performance = performanceService.getPerformanceById(patchRecommendMusics.performanceId());
         Set<String> selectedArtistIds = setArtistsByRandom(performance);
         Set<String> existingMusicIds = extractMusicIds(patchRecommendMusics);
@@ -384,5 +386,12 @@ public class PerformanceFacade {
         return patchRecommendMusics.musicList().stream()
                 .map(PatchRecommendMusic::musicId)
                 .collect(Collectors.toSet());
+    }
+
+    private void validatePatchRecommendMusics(PatchRecommendMusics patchRecommendMusics) {
+        if (patchRecommendMusics.performanceId() == null || patchRecommendMusics.musicList() == null ||
+                patchRecommendMusics.musicList().isEmpty()) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
     }
 }
