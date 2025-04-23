@@ -1,9 +1,11 @@
 package org.sopt.confeti.api.setlist;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
+import org.sopt.confeti.domain.setlist.application.dto.response.SetlistSummaryDto;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -32,6 +34,15 @@ public class SetlistController {
     ) {
         SetlistSortType sortType = SetlistSortType.from(sort);
         GetAllSetlistsResponse data = setlistService.getAllMySetlists(userId, sortType);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/preview")
+    public ResponseEntity<BaseResponse<?>> getPreviewMySetlists(
+            @UserId(require = false) Long userId
+    ) {
+        List<SetlistSummaryDto> data = setlistService.getPreviewMySetlists(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 }
