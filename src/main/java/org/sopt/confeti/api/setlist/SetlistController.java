@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
+import org.sopt.confeti.domain.user.constant.Role;
+import org.sopt.confeti.global.annotation.Permission;
+import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -21,9 +24,10 @@ public class SetlistController {
 
     private final SetlistService setlistService;
 
+    @Permission(role = {Role.GENERAL})
     @GetMapping("/all")
     public ResponseEntity<BaseResponse<?>> getAllMySetlists(
-            @AuthenticationPrincipal Long userId,
+            @UserId(require = false) Long userId,
             @RequestParam(required = false) String sort
     ) {
         SetlistSortType sortType = SetlistSortType.from(sort);
