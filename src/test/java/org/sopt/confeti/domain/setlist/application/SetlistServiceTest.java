@@ -18,12 +18,14 @@ import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.domain.setlist.*;
+import org.sopt.confeti.domain.setlist.application.dto.request.SetlistCreateRequest;
 import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.domain.setlist.application.dto.response.SetlistSummaryDto;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
 import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.constant.Role;
+import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +37,7 @@ class SetlistServiceTest {
     @Mock private SetlistRepository setlistRepository;
     @Mock private ConcertRepository concertRepository;
     @Mock private FestivalRepository festivalRepository;
+    @Mock private UserRepository userRepository;
 
     private final Long userId = 1L;
     private final User user = mockUser(userId);
@@ -155,5 +158,31 @@ class SetlistServiceTest {
                 .musics(List.of())
                 .reservationUrls(List.of())
                 .build();
+    }
+
+    @Test
+    void 여러개의_공연을_셋리스트로_생성() {
+        // given
+        SetlistCreateRequest request1 = new SetlistCreateRequest(SetlistType.CONCERT, 100L);
+        SetlistCreateRequest request2 = new SetlistCreateRequest(SetlistType.FESTIVAL, 200L);
+        List<SetlistCreateRequest> requests = List.of(request1, request2);
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+        Setlist savedSetlist1 = createSetlist(SetlistType.CONCERT, 100L);
+        Setlist savedSetlist2 = createSetlist(SetlistType.FESTIVAL, 200L);
+        ReflectionTestUtils.setField(savedSetlist1, "id", 1L);
+        ReflectionTestUtils.setField(savedSetlist2, "id", 2L);
+
+        given(setlistRepository.save(org.mockito.ArgumentMatchers.any(Setlist.class)))
+                .willReturn(savedSetlist1)
+                .willReturn(savedSetlist2);
+
+        // when
+        List<Long> result = setlistService.createSetLists(userId, requests);
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result).containsExactly(1L, 2L);
     }
 }
