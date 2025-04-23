@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,174 +32,128 @@ class SetlistServiceTest {
     @InjectMocks
     private SetlistService setlistService;
 
-    @Mock
-    private SetlistRepository setlistRepository;
-    @Mock
-    private ConcertRepository concertRepository;
-    @Mock
-    private FestivalRepository festivalRepository;
+    @Mock private SetlistRepository setlistRepository;
+    @Mock private ConcertRepository concertRepository;
+    @Mock private FestivalRepository festivalRepository;
+
+    private final Long userId = 1L;
+    private final User user = mockUser(userId);
 
     @Test
     void 셋리스트_전체조회_OLDEST() {
-        // given
-        Long userId = 1L;
-        User mockUser = User.builder()
-                .provider(OAuthProvider.KAKAO)
-                .socialId("kakao-123")
-                .name("테스트 유저")
-                .profilePath("profile.jpg")
-                .role(Role.GENERAL)
-                .build();
-        ReflectionTestUtils.setField(mockUser, "id", userId);
-
-        Setlist concertSetlist = Setlist.builder()
-                .user(mockUser)
-                .type(SetlistType.CONCERT)
-                .typeId(100L)
-                .build();
-
-        Setlist festivalSetlist = Setlist.builder()
-                .user(mockUser)
-                .type(SetlistType.FESTIVAL)
-                .typeId(200L)
-                .build();
-
-        Concert concert = Concert.builder()
-                .title("IU 콘서트")
-                .subtitle("Love Poem")
-                .startAt(LocalDate.of(2024, 11, 1))
-                .endAt(LocalDate.of(2024, 11, 3))
-                .area("서울")
-                .posterPath("iu.jpg")
-                .posterBgPath("bg.jpg")
-                .concertInfoImgPath("info.jpg")
-                .reserveAt(LocalDate.now().atStartOfDay())
-                .reservationUrl("url")
-                .reservationOffice("office")
-                .ageRating("전체관람가")
-                .time("18:00")
-                .price("99,000원")
-                .address("서울 올림픽공원")
-                .artists(List.of())
-                .musics(List.of())
-                .reservationUrls(List.of())
-                .build();
-
-        Festival festival = Festival.builder()
-                .title("서울재즈페스티벌")
-                .subtitle("2024 Edition")
-                .startAt(LocalDate.of(2024, 4, 28))
-                .endAt(LocalDate.of(2024, 5, 1))
-                .area("서울")
-                .posterPath("jazz.jpg")
-                .posterBgPath("bg.jpg")
-                .festivalInfoImgPath("info.jpg")
-                .logoPath("logo.jpg")
-                .reserveAt(LocalDate.now().atStartOfDay())
-                .reservationUrl("url")
-                .reservationOffice("office")
-                .ageRating("19세 이상")
-                .time("14:00")
-                .price("79,000원")
-                .address("서울 난지공원")
-                .dates(List.of())
-                .musics(List.of())
-                .reservationUrls(List.of())
-                .build();
+        Setlist concertSetlist = createSetlist(SetlistType.CONCERT, 100L);
+        Setlist festivalSetlist = createSetlist(SetlistType.FESTIVAL, 200L);
 
         given(setlistRepository.findAllByUserId(userId)).willReturn(List.of(concertSetlist, festivalSetlist));
-        given(concertRepository.findById(100L)).willReturn(Optional.of(concert));
-        given(festivalRepository.findById(200L)).willReturn(Optional.of(festival));
+        given(concertRepository.findById(100L)).willReturn(Optional.of(mockConcert("IU 콘서트", LocalDate.of(2024, 11, 3))));
+        given(festivalRepository.findById(200L)).willReturn(Optional.of(mockFestival("서울재즈페스티벌", LocalDate.of(2024, 5, 1))));
 
-        // when
-        GetAllSetlistsResponse response = setlistService.getAllMySetlists(userId, SetlistSortType.OLDEST);
+        GetAllSetlistsResponse result = setlistService.getAllMySetlists(userId, SetlistSortType.OLDEST);
 
-        // then
-        assertThat(response.totalCount()).isEqualTo(2);
-        assertThat(response.setlists())
-                .extracting(SetlistSummaryDto::title)
-                .containsExactly("서울재즈페스티벌", "IU 콘서트"); // endAt 기준 오름차순 정렬
+        assertThat(result.totalCount()).isEqualTo(2);
+        assertThat(result.setlists()).extracting(SetlistSummaryDto::title)
+                .containsExactly("서울재즈페스티벌", "IU 콘서트");
     }
 
     @Test
     void 셋리스트_전체조회_LATEST() {
-        // given
-        Long userId = 1L;
-        User mockUser = User.builder()
+        Setlist concertSetlist = createSetlist(SetlistType.CONCERT, 100L);
+        Setlist festivalSetlist = createSetlist(SetlistType.FESTIVAL, 200L);
+
+        given(setlistRepository.findAllByUserId(userId)).willReturn(List.of(concertSetlist, festivalSetlist));
+        given(concertRepository.findById(100L)).willReturn(Optional.of(mockConcert("IU 콘서트", LocalDate.of(2024, 11, 3))));
+        given(festivalRepository.findById(200L)).willReturn(Optional.of(mockFestival("서울재즈페스티벌", LocalDate.of(2024, 5, 1))));
+
+        GetAllSetlistsResponse result = setlistService.getAllMySetlists(userId, SetlistSortType.LATEST);
+
+        assertThat(result.totalCount()).isEqualTo(2);
+        assertThat(result.setlists()).extracting(SetlistSummaryDto::title)
+                .containsExactly("IU 콘서트", "서울재즈페스티벌");
+    }
+
+    @Test
+    void 셋리스트_미리보기_최대_3개까지만_오래된_순으로_반환() {
+        List<Setlist> setlists = List.of(
+                createSetlist(SetlistType.FESTIVAL, 201L),
+                createSetlist(SetlistType.FESTIVAL, 200L),
+                createSetlist(SetlistType.CONCERT, 100L),
+                createSetlist(SetlistType.CONCERT, 101L),
+                createSetlist(SetlistType.CONCERT, 102L)
+        );
+
+        given(setlistRepository.findAllByUserId(userId)).willReturn(setlists);
+        given(festivalRepository.findById(201L)).willReturn(Optional.of(mockFestival("F2", LocalDate.of(2024, 3, 1))));
+        given(festivalRepository.findById(200L)).willReturn(Optional.of(mockFestival("F1", LocalDate.of(2024, 4, 1))));
+        given(concertRepository.findById(100L)).willReturn(Optional.of(mockConcert("C1", LocalDate.of(2024, 5, 1))));
+        given(concertRepository.findById(101L)).willReturn(Optional.of(mockConcert("C2", LocalDate.of(2024, 6, 1))));
+        given(concertRepository.findById(102L)).willReturn(Optional.of(mockConcert("C3", LocalDate.of(2024, 7, 1))));
+
+        List<SetlistSummaryDto> result = setlistService.getPreviewMySetlists(userId);
+
+        assertThat(result).hasSize(3);
+        assertThat(result).extracting(SetlistSummaryDto::title).containsExactly("F2", "F1", "C1");
+    }
+
+    private static User mockUser(Long id) {
+        User user = User.builder()
                 .provider(OAuthProvider.KAKAO)
-                .socialId("kakao-123")
-                .name("테스트 유저")
+                .socialId("mock")
+                .name("mockUser")
                 .profilePath("profile.jpg")
                 .role(Role.GENERAL)
                 .build();
-        ReflectionTestUtils.setField(mockUser, "id", userId);
+        ReflectionTestUtils.setField(user, "id", id);
+        return user;
+    }
 
-        Setlist concertSetlist = Setlist.builder()
-                .user(mockUser)
-                .type(SetlistType.CONCERT)
-                .typeId(100L)
-                .build();
+    private Setlist createSetlist(SetlistType type, Long typeId) {
+        return Setlist.builder().user(user).type(type).typeId(typeId).build();
+    }
 
-        Setlist festivalSetlist = Setlist.builder()
-                .user(mockUser)
-                .type(SetlistType.FESTIVAL)
-                .typeId(200L)
-                .build();
-
-        Concert concert = Concert.builder()
-                .title("IU 콘서트")
-                .subtitle("Love Poem")
-                .startAt(LocalDate.of(2024, 11, 1))
-                .endAt(LocalDate.of(2024, 11, 3))
+    private Concert mockConcert(String title, LocalDate endAt) {
+        return Concert.builder()
+                .title(title)
+                .subtitle("sub")
+                .startAt(endAt.minusDays(2))
+                .endAt(endAt)
                 .area("서울")
-                .posterPath("iu.jpg")
+                .posterPath(title + ".jpg")
                 .posterBgPath("bg.jpg")
                 .concertInfoImgPath("info.jpg")
-                .reserveAt(LocalDate.now().atStartOfDay())
+                .reserveAt(LocalDateTime.now())
                 .reservationUrl("url")
                 .reservationOffice("office")
-                .ageRating("전체관람가")
+                .ageRating("ALL")
                 .time("18:00")
-                .price("99,000원")
-                .address("서울 올림픽공원")
+                .price("10000")
+                .address("서울시")
                 .artists(List.of())
                 .musics(List.of())
                 .reservationUrls(List.of())
                 .build();
+    }
 
-        Festival festival = Festival.builder()
-                .title("서울재즈페스티벌")
-                .subtitle("2024 Edition")
-                .startAt(LocalDate.of(2024, 4, 28))
-                .endAt(LocalDate.of(2024, 5, 1))
-                .area("서울")
-                .posterPath("jazz.jpg")
+    private Festival mockFestival(String title, LocalDate endAt) {
+        return Festival.builder()
+                .title(title)
+                .subtitle("sub")
+                .startAt(endAt.minusDays(2))
+                .endAt(endAt)
+                .area("부산")
+                .posterPath(title + ".jpg")
                 .posterBgPath("bg.jpg")
                 .festivalInfoImgPath("info.jpg")
                 .logoPath("logo.jpg")
-                .reserveAt(LocalDate.now().atStartOfDay())
+                .reserveAt(LocalDateTime.now())
                 .reservationUrl("url")
                 .reservationOffice("office")
-                .ageRating("19세 이상")
-                .time("14:00")
-                .price("79,000원")
-                .address("서울 난지공원")
+                .ageRating("ALL")
+                .time("16:00")
+                .price("8000")
+                .address("부산시")
                 .dates(List.of())
                 .musics(List.of())
                 .reservationUrls(List.of())
                 .build();
-
-        given(setlistRepository.findAllByUserId(userId)).willReturn(List.of(concertSetlist, festivalSetlist));
-        given(concertRepository.findById(100L)).willReturn(Optional.of(concert));
-        given(festivalRepository.findById(200L)).willReturn(Optional.of(festival));
-
-        // when
-        GetAllSetlistsResponse response = setlistService.getAllMySetlists(userId, SetlistSortType.LATEST);
-
-        // then
-        assertThat(response.totalCount()).isEqualTo(2);
-        assertThat(response.setlists())
-                .extracting(SetlistSummaryDto::title)
-                .containsExactly("IU 콘서트", "서울재즈페스티벌"); // endAt 기준 내림차순 정렬
     }
 }

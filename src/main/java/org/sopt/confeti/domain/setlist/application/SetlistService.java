@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.setlist.application;
 
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.concert.Concert;
@@ -55,4 +56,26 @@ public class SetlistService {
         return new GetAllSetlistsResponse(dtoList.size(), dtoList);
     }
 
+    @Transactional(readOnly = true)
+    public List<SetlistSummaryDto> getPreviewMySetlists(Long userId) {
+        List<Setlist> setlists = setlistRepository.findAllByUserId(userId);
+
+        return setlists.stream()
+                .map(setlist -> {
+                    if (setlist.getType() == SetlistType.CONCERT) {
+                        Concert concert = concertRepository.findById(setlist.getTypeId())
+                                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+                        return SetlistSummaryDto.of(
+                                setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt());
+                    } else {
+                        Festival festival = festivalRepository.findById(setlist.getTypeId())
+                                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+                        return SetlistSummaryDto.of(
+                                setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt());
+                    }
+                })
+                .sorted(Comparator.comparing(SetlistSummaryDto::endAt))
+                .limit(3)
+                .toList();
+    }
 }
