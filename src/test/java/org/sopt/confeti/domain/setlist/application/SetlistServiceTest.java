@@ -230,8 +230,8 @@ class SetlistServiceTest {
         given(setlistRepository.findById(setlistId)).willReturn(Optional.of(setlist));
 
         List<AddSetListMusicRequest> requests = List.of(
-                new AddSetListMusicRequest("IU", "Love wins all", "url1", "preview1"),
-                new AddSetListMusicRequest("NewJeans", "Hype Boy", "url2", "preview2")
+                new AddSetListMusicRequest("01", "IU", "Love wins all", "url1", "preview1"),
+                new AddSetListMusicRequest("02", "NewJeans", "Hype Boy", "url2", "preview2")
         );
 
         // when
