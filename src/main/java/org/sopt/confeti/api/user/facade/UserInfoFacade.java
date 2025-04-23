@@ -39,7 +39,7 @@ public class UserInfoFacade {
 
     @Transactional(readOnly = true)
     protected void validateUserInfoRequest(PatchUserInfoRequest patchUserInfoRequest) {
-        if (patchUserInfoRequest.profileUrl() == null || patchUserInfoRequest.name() == null) {
+        if (  patchUserInfoRequest.getName() == null || patchUserInfoRequest.getProfileFile() == null) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
