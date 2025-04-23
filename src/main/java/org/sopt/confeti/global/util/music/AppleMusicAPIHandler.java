@@ -331,4 +331,27 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                         .retrieve(AppleMusicMusicsResponse.class)
         );
     }
+
+    @Override
+    @RetryOnTokenExpire
+    public List<ConfetiMusic> getFilteredTopSongsByArtist(String artistId, int limit, Set<String> excludedMusicIds) {
+        List<ConfetiMusic> songs = getTopSongsByArtistId(artistId, limit * 5);
+
+        List<ConfetiMusic> filteredSongs = songs.stream()
+                .filter(song -> !excludedMusicIds.contains(song.getId()))
+                .collect(Collectors.toList());
+
+        if (filteredSongs.isEmpty()) return Collections.emptyList();
+
+        List<ConfetiMusic> result = new ArrayList<>();
+        Random random = new Random();
+
+        for (int i = 0; i < limit && !filteredSongs.isEmpty(); i++) {
+            int randomIndex = random.nextInt(filteredSongs.size());
+            result.add(filteredSongs.get(randomIndex));
+            filteredSongs.remove(randomIndex);
+        }
+
+        return result;
+    }
 }
