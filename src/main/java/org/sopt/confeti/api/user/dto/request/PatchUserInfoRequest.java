@@ -1,10 +1,16 @@
 package org.sopt.confeti.api.user.dto.request;
 
-public record PatchUserInfoRequest(
-        String profileUrl,
-        String name
-) {
-    public static PatchUserInfoRequest from(PatchUserInfoRequest request) {
-        return new PatchUserInfoRequest(request.profileUrl(), request.name());
-    }
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
+
+@Getter
+@Setter
+public class PatchUserInfoRequest {
+    @NotBlank
+    private String name;
+    @NotEmpty
+    private MultipartFile profileFile;
 }

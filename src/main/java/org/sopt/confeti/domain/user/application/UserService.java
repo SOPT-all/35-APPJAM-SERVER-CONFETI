@@ -17,6 +17,7 @@ import org.sopt.confeti.global.util.FileDownloader;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -87,20 +88,10 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        String fileName = uploadProfile(patchUserInfoRequest.profileUrl());
-
-        user.setProfilePath(fileName);
-        user.setName(patchUserInfoRequest.name());
-    }
-
-    public String uploadProfile(String profileImgUrl) {
-        Path profileImg = fileDownloader.downloadFile(profileImgUrl);
-        try {
-            return s3FileHandler.uploadFile(profileImg.toFile(),
-                    FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
-        } finally {
-            fileDownloader.deleteTempFile(profileImg);
-        }
+        String profilePath = s3FileHandler.uploadFile(patchUserInfoRequest.getProfileFile(),
+                FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
+        user.setName(patchUserInfoRequest.getName());
+        user.setProfilePath(profilePath);
     }
 
     @Transactional

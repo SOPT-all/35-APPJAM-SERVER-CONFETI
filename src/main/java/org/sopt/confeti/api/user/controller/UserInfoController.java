@@ -13,11 +13,8 @@ import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,7 +37,7 @@ public class UserInfoController {
     @PatchMapping
     public ResponseEntity<BaseResponse<?>> patchUserInfo(
             @UserId Long userId,
-            @RequestBody PatchUserInfoRequest patchUserInfoRequest
+            @ModelAttribute PatchUserInfoRequest patchUserInfoRequest
     ) {
         userInfoFacade.patchUserInfo(userId, patchUserInfoRequest);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
