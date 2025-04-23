@@ -119,6 +119,7 @@ public class SetlistService {
         for (int i = 0; i < requests.size(); i++) {
             AddSetListMusicRequest req = requests.get(i);
             SetlistMusic music = SetlistMusic.builder()
+                    .trackId(req.trackId())
                     .artistName(req.artistName())
                     .trackName(req.trackName())
                     .artworkUrl(req.artworkUrl())

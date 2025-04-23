@@ -18,6 +18,9 @@ public class SetlistMusic {
     @JoinColumn(name = "setlist_id", nullable = false)
     private Setlist setlist;
 
+    @Column(nullable = false)
+    private String trackId;
+
     @Column(name = "artist_name", nullable = false)
     private String artistName;
 
@@ -34,7 +37,8 @@ public class SetlistMusic {
     private int orders;
 
     @Builder
-    public SetlistMusic(String artistName, String trackName, String artworkUrl, String previewUrl, int orders) {
+    public SetlistMusic(String trackId, String artistName, String trackName, String artworkUrl, String previewUrl, int orders) {
+        this.trackId = trackId;
         this.artistName = artistName;
         this.trackName = trackName;
         this.artworkUrl = artworkUrl;
