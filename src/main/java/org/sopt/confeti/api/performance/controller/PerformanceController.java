@@ -2,6 +2,7 @@ package org.sopt.confeti.api.performance.controller;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.performance.dto.request.PatchRecommendMusics;
 import org.sopt.confeti.api.performance.dto.response.AnalyzePerformanceTypeResponse;
 import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
@@ -35,11 +36,7 @@ import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -156,5 +153,15 @@ public class PerformanceController {
         RecommendMusicsDTO recommendMusicsDTO = performanceFacade.getRecommendMusics(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 RecommendMusicsResponse.from(recommendMusicsDTO));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @PatchMapping("/recommend/musics")
+    public ResponseEntity<BaseResponse<?>> getRecommendMusics(
+            @RequestBody PatchRecommendMusics patchRecommendMusics
+    ) {
+        RecommendNewMusicsDTO recommendMusicsDTO = performanceFacade.getNewRecommendMusics(patchRecommendMusics);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                RecommendNewMusicsResponse.from(recommendMusicsDTO));
     }
 }

@@ -151,4 +151,12 @@ public class PerformanceService {
     public Performance getPerformanceByUserFavorites(final Long userId) {
         return performanceRepository.getPerformanceByUserFavorites(userId);
     }
+
+    @Transactional(readOnly = true)
+    public Performance getPerformanceById(long performanceId) {
+        return performanceRepository.findById(performanceId)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
+    }
 }

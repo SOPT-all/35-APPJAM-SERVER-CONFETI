@@ -13,6 +13,8 @@ import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.performance.dto.request.PatchRecommendMusic;
+import org.sopt.confeti.api.performance.dto.request.PatchRecommendMusics;
 import org.sopt.confeti.api.performance.facade.dto.response.AnalyzePerformanceTypeDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
@@ -56,6 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PerformanceFacade {
 
     private static final int RECENT_PERFORMANCES_SIZE = 7;
+    private static final int RECOMMEND_MUSIC_SIZE = 3;
     private static final boolean PERSONALIZED = true;
     private static final boolean UNPERSONALIZED = false;
     private static final String TYPE_ALL = "ALL";
@@ -330,5 +333,56 @@ public class PerformanceFacade {
 
         int artistCount = Math.min(artistList.size(), 3);
         return new HashSet<>(artistList.subList(0, artistCount));
+    }
+
+    @Transactional(readOnly = true)
+    public RecommendNewMusicsDTO getNewRecommendMusics(PatchRecommendMusics patchRecommendMusics) {
+        Performance performance = performanceService.getPerformanceById(patchRecommendMusics.performanceId());
+        Set<String> selectedArtistIds = setArtistsByRandom(performance);
+        Set<String> existingMusicIds = extractMusicIds(patchRecommendMusics);
+
+        List<String> artistIdList = new ArrayList<>(selectedArtistIds);
+        List<ConfetiMusic> recommendMusics = recommendMusicsByArtistCount(artistIdList, existingMusicIds);
+
+        return RecommendNewMusicsDTO.from(recommendMusics);
+    }
+
+    private List<ConfetiMusic> recommendMusicsByArtistCount(List<String> artistIdList, Set<String> existingMusicIds) {
+        int artistCount = artistIdList.size();
+        if (artistCount == 1) {
+            return recommendForSingleArtist(artistIdList, existingMusicIds);
+        }
+        if (artistCount == 2) {
+            return recommendForTwoArtists(artistIdList, existingMusicIds);
+        }
+        return recommendForMultipleArtists(artistIdList, existingMusicIds);
+    }
+
+    private List<ConfetiMusic> recommendForSingleArtist(List<String> artistIdList, Set<String> existingMusicIds) {
+        return musicAPIHandler.getFilteredTopSongsByArtist(
+                artistIdList.getFirst(), RECOMMEND_MUSIC_SIZE, existingMusicIds
+        );
+    }
+
+    private List<ConfetiMusic> recommendForTwoArtists(List<String> artistIdList, Set<String> existingMusicIds) {
+        List<ConfetiMusic> musics = new ArrayList<>();
+        musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistIdList.getFirst(), 2, existingMusicIds));
+        musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistIdList.getLast(), 1, existingMusicIds));
+        return musics;
+    }
+
+    private List<ConfetiMusic> recommendForMultipleArtists(List<String> artistIdList, Set<String> existingMusicIds) {
+        List<ConfetiMusic> musics = new ArrayList<>();
+        for (String artistId : artistIdList) {
+            if (musics.size() >= RECOMMEND_MUSIC_SIZE) break;
+            musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistId, 1, existingMusicIds));
+        }
+        return musics;
+    }
+
+    private Set<String> extractMusicIds(PatchRecommendMusics patchRecommendMusics) {
+        return patchRecommendMusics.musicList().stream()
+                .map(PatchRecommendMusic::musicId)
+                .collect(Collectors.toSet());
     }
 }
