@@ -19,6 +19,7 @@ import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.domain.setlist.*;
+import org.sopt.confeti.domain.setlist.application.dto.request.AddSetListMusicRequest;
 import org.sopt.confeti.domain.setlist.application.dto.request.SetlistCreateRequest;
 import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.domain.setlist.application.dto.response.SetlistSummaryDto;
@@ -208,5 +209,43 @@ class SetlistServiceTest {
         // then
         assertThat(result).containsExactly(999L);
     }
+
+    @Test
+    void 셋리스트에_여러_곡을_추가하면_순서가_자동으로_부여된다() {
+        // given
+        Long setlistId = 100L;
+        Setlist setlist = Setlist.builder()
+                .user(user)
+                .type(SetlistType.CONCERT)
+                .typeId(1L)
+                .build();
+
+        SetlistMusic existing1 = SetlistMusic.builder()
+                .artistName("EXO").trackName("Love Shot").orders(1).build();
+        SetlistMusic existing2 = SetlistMusic.builder()
+                .artistName("BTS").trackName("Dynamite").orders(2).build();
+        setlist.addMusics(existing1);
+        setlist.addMusics(existing2);
+
+        given(setlistRepository.findById(setlistId)).willReturn(Optional.of(setlist));
+
+        List<AddSetListMusicRequest> requests = List.of(
+                new AddSetListMusicRequest("IU", "Love wins all", "url1", "preview1"),
+                new AddSetListMusicRequest("NewJeans", "Hype Boy", "url2", "preview2")
+        );
+
+        // when
+        int result = setlistService.addMusics(userId, setlistId, requests);
+
+        // then
+        assertThat(result).isEqualTo(2);
+        List<SetlistMusic> allMusics = setlist.getMusics();
+        assertThat(allMusics).hasSize(4);
+        assertThat(allMusics.get(2).getOrders()).isEqualTo(3);
+        assertThat(allMusics.get(2).getArtistName()).isEqualTo("IU");
+        assertThat(allMusics.get(3).getOrders()).isEqualTo(4);
+        assertThat(allMusics.get(3).getArtistName()).isEqualTo("NewJeans");
+    }
+
 
 }

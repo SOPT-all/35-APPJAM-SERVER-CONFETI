@@ -4,7 +4,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
+import org.sopt.confeti.domain.setlist.application.dto.request.AddSetListMusicRequest;
 import org.sopt.confeti.domain.setlist.application.dto.request.SetlistCreateRequest;
+import org.sopt.confeti.domain.setlist.application.dto.response.AddSetListMusicResponse;
 import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.domain.setlist.application.dto.response.SetlistCreateResponse;
 import org.sopt.confeti.domain.setlist.application.dto.response.SetlistSummaryDto;
@@ -16,6 +18,7 @@ import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,5 +60,16 @@ public class SetlistController {
     ) {
         List<Long> ids = setlistService.createSetLists(userId, requests);
         return ApiResponseUtil.success(SuccessMessage.CREATED, new SetlistCreateResponse(ids));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @PostMapping("/{setlistId}/musics")
+    public ResponseEntity<BaseResponse<?>> addMusicsToSetlist(
+            @UserId(require = false) Long userId,
+            @PathVariable Long setlistId,
+            @RequestBody List<AddSetListMusicRequest> requests
+    ) {
+        int count = setlistService.addMusics(userId, setlistId, requests);
+        return ApiResponseUtil.success(SuccessMessage.CREATED, new AddSetListMusicResponse(count));
     }
 }
