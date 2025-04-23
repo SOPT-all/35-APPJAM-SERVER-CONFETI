@@ -3,6 +3,7 @@ package org.sopt.confeti.domain.setlist.application;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
 import org.sopt.confeti.domain.festival.Festival;
@@ -18,11 +19,13 @@ import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
+import org.springframework.data.elasticsearch.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SetlistService {
 
     private final SetlistRepository setlistRepository;
@@ -87,8 +90,8 @@ public class SetlistService {
     public List<Long> createSetLists(Long userId, List<SetlistCreateRequest> requests) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-
         return requests.stream()
+                .filter(req -> !setlistRepository.existsByUserIdAndTypeAndTypeId(userId, req.type(), req.typeId()))
                 .map(req -> Setlist.builder()
                         .user(user)
                         .type(req.type())
