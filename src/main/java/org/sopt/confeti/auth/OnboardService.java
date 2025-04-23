@@ -9,10 +9,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class OnboardService {
-    private static final int MINIMUM_ARTIST_COUNT = 3;
-
     public void validateFavoriteArtistCount(OnboardDTO onboardDTO) {
-        if (onboardDTO.favoriteArtists().size() < MINIMUM_ARTIST_COUNT) {
+        if (onboardDTO.favoriteArtists().isEmpty()) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
