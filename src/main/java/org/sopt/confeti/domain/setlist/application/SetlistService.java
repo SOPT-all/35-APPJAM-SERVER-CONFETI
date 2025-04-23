@@ -10,9 +10,12 @@ import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.domain.setlist.Setlist;
 import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.setlist.SetlistType;
+import org.sopt.confeti.domain.setlist.application.dto.request.SetlistCreateRequest;
 import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.domain.setlist.application.dto.response.SetlistSummaryDto;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
+import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,7 @@ public class SetlistService {
     private final SetlistRepository setlistRepository;
     private final ConcertRepository concertRepository;
     private final FestivalRepository festivalRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public GetAllSetlistsResponse getAllMySetlists(Long userId, SetlistSortType sortType) {
@@ -76,6 +80,22 @@ public class SetlistService {
                 })
                 .sorted(Comparator.comparing(SetlistSummaryDto::endAt))
                 .limit(3)
+                .toList();
+    }
+
+    @Transactional
+    public List<Long> createSetLists(Long userId, List<SetlistCreateRequest> requests) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+
+        return requests.stream()
+                .map(req -> Setlist.builder()
+                        .user(user)
+                        .type(req.type())
+                        .typeId(req.typeId())
+                        .build())
+                .map(setlistRepository::save)
+                .map(Setlist::getId)
                 .toList();
     }
 }
