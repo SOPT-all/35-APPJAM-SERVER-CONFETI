@@ -1,6 +1,7 @@
 package org.sopt.confeti.domain.setlist.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import java.time.LocalDate;
@@ -174,7 +175,7 @@ class SetlistServiceTest {
         ReflectionTestUtils.setField(savedSetlist1, "id", 1L);
         ReflectionTestUtils.setField(savedSetlist2, "id", 2L);
 
-        given(setlistRepository.save(org.mockito.ArgumentMatchers.any(Setlist.class)))
+        given(setlistRepository.save(any(Setlist.class)))
                 .willReturn(savedSetlist1)
                 .willReturn(savedSetlist2);
 
@@ -185,4 +186,27 @@ class SetlistServiceTest {
         assertThat(result).hasSize(2);
         assertThat(result).containsExactly(1L, 2L);
     }
+
+    @Test
+    void 이미_생성된_셋리스트는_중복_생성되지_않는다() {
+        // given
+        SetlistCreateRequest request1 = new SetlistCreateRequest(SetlistType.CONCERT, 100L);
+        SetlistCreateRequest request2 = new SetlistCreateRequest(SetlistType.FESTIVAL, 200L);
+        List<SetlistCreateRequest> requests = List.of(request1, request2);
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(setlistRepository.existsByUserIdAndTypeAndTypeId(userId, SetlistType.CONCERT, 100L)).willReturn(true); // 이미 존재
+        given(setlistRepository.existsByUserIdAndTypeAndTypeId(userId, SetlistType.FESTIVAL, 200L)).willReturn(false);
+
+        Setlist newSetlist = createSetlist(SetlistType.FESTIVAL, 200L);
+        ReflectionTestUtils.setField(newSetlist, "id", 999L);
+        given(setlistRepository.save(any(Setlist.class))).willReturn(newSetlist);
+
+        // when
+        List<Long> result = setlistService.createSetLists(userId, requests);
+
+        // then
+        assertThat(result).containsExactly(999L);
+    }
+
 }
