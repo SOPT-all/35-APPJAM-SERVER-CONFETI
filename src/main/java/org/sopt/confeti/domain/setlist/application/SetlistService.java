@@ -15,14 +15,16 @@ import org.sopt.confeti.domain.setlist.SetlistType;
 import org.sopt.confeti.domain.setlist.application.dto.request.AddSetListMusicRequest;
 import org.sopt.confeti.domain.setlist.application.dto.request.SetlistCreateRequest;
 import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
+import org.sopt.confeti.domain.setlist.application.dto.response.GetSetlistDetailResponse;
+import org.sopt.confeti.domain.setlist.application.dto.response.SetlistMusicResponseDto;
 import org.sopt.confeti.domain.setlist.application.dto.response.SetlistSummaryDto;
+import org.sopt.confeti.domain.setlist.infra.repository.SetlistMusicRepository;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.springframework.data.elasticsearch.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,7 @@ public class SetlistService {
     private final ConcertRepository concertRepository;
     private final FestivalRepository festivalRepository;
     private final UserRepository userRepository;
+    private final SetlistMusicRepository setlistMusicRepository;
 
     @Transactional(readOnly = true)
     public GetAllSetlistsResponse getAllMySetlists(Long userId, SetlistSortType sortType) {
@@ -131,5 +134,40 @@ public class SetlistService {
         }
 
         return requests.size();
+    }
+
+    public GetSetlistDetailResponse getSetlistDetail(Long userId, Long setlistId) {
+        Setlist setlist = setlistRepository.findByIdAndUserId(setlistId, userId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+
+        List<SetlistMusicResponseDto> musics = setlistMusicRepository.findBySetlist(setlist).stream()
+                .sorted(Comparator.comparing(SetlistMusic::getOrders))
+                .map(m -> new SetlistMusicResponseDto(
+                        m.getId(), m.getTrackId(), m.getArtistName(),
+                        m.getTrackName(), m.getArtworkUrl(), m.getPreviewUrl(), m.getOrders()
+                ))
+                .toList();
+
+        if (setlist.getType() == SetlistType.CONCERT) {
+            Concert concert = concertRepository.findById(setlist.getTypeId())
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+            return new GetSetlistDetailResponse(
+                    setlist.getId(), "CONCERT", concert.getId(),
+                    concert.getPosterPath(), concert.getPosterBgPath(),
+                    concert.getTitle(), concert.getSubtitle(),
+                    concert.getStartAt(), concert.getEndAt(),
+                    musics
+            );
+        } else {
+            Festival festival = festivalRepository.findById(setlist.getTypeId())
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+            return new GetSetlistDetailResponse(
+                    setlist.getId(), "FESTIVAL", festival.getId(),
+                    festival.getPosterPath(), festival.getPosterBgPath(),
+                    festival.getTitle(), festival.getSubtitle(),
+                    festival.getStartAt(), festival.getEndAt(),
+                    musics
+            );
+        }
     }
 }

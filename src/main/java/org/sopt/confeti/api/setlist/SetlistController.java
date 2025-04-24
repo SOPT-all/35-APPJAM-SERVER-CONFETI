@@ -8,6 +8,7 @@ import org.sopt.confeti.domain.setlist.application.dto.request.AddSetListMusicRe
 import org.sopt.confeti.domain.setlist.application.dto.request.SetlistCreateRequest;
 import org.sopt.confeti.domain.setlist.application.dto.response.AddSetListMusicResponse;
 import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
+import org.sopt.confeti.domain.setlist.application.dto.response.GetSetlistDetailResponse;
 import org.sopt.confeti.domain.setlist.application.dto.response.SetlistCreateResponse;
 import org.sopt.confeti.domain.setlist.application.dto.response.SetlistSummaryDto;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -71,5 +72,15 @@ public class SetlistController {
     ) {
         int count = setlistService.addMusics(userId, setlistId, requests);
         return ApiResponseUtil.success(SuccessMessage.CREATED, new AddSetListMusicResponse(count));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/{setlistId}")
+    public ResponseEntity<BaseResponse<?>> getSetlistDetail(
+            @UserId(require = false) Long userId,
+            @PathVariable Long setlistId
+    ) {
+        GetSetlistDetailResponse data = setlistService.getSetlistDetail(userId, setlistId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 }
