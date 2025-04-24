@@ -22,8 +22,8 @@ import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.IntendedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
@@ -190,7 +190,7 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public ArtistPerformancesDTO getPerformancesByArtistId(final Long userId, final String artistId) {
-        List<PerformanceDTO> performances = performanceService.findPerformancesByArtistId(artistId);
+        List<PerformanceDTO> performances = performanceService.getPerformancesByArtistId(artistId);
 
         Map<String, Boolean> favoriteMap = getFavoriteMap(userId, performances);
         List<ArtistPerformancesDetailDTO> performanceList = performances.stream()
@@ -272,7 +272,7 @@ public class PerformanceFacade {
         List<PerformanceDTO> performances = new ArrayList<>();
 
         if (isPresent(pid)) {
-            performances.add(performanceService.getPerformance(pid));
+            performances.add(PerformanceDTO.from(performanceService.getPerformanceById(pid)));
         }
 
         if (isPresent(aid)) {
