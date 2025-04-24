@@ -108,6 +108,47 @@ public class SetlistEditService {
         return deleted.trackId();
     }
 
+    @Transactional
+    public void completeEdit(Long userId, Long setlistId) {
+        String key = generateRedisKey(userId, setlistId);
+        Object raw = redisTemplate.opsForValue().get(key);
+        if (raw == null) throw new NotFoundException(ErrorMessage.NOT_FOUND);
+
+        List<SetlistMusicEditDto> edited = objectMapper.convertValue(raw, new TypeReference<>() {});
+        if (edited.isEmpty()) throw new NotFoundException(ErrorMessage.NOT_FOUND);
+
+        Setlist setlist = setlistRepository.findByIdAndUserId(setlistId, userId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+
+        List<SetlistMusic> original = setlistMusicRepository.findBySetlist(setlist);
+
+        Map<Long, SetlistMusicEditDto> editedMap = edited.stream()
+                .collect(Collectors.toMap(SetlistMusicEditDto::musicId, dto -> dto));
+
+        List<SetlistMusic> toUpdate = new ArrayList<>();
+        List<SetlistMusic> toDelete = new ArrayList<>();
+
+        for (SetlistMusic music : original) {
+            SetlistMusicEditDto dto = editedMap.get(music.getId());
+            if (dto != null) {
+                music.changeOrder(dto.orders());
+                toUpdate.add(music);
+            } else {
+                toDelete.add(music);
+            }
+        }
+
+        if (!toUpdate.isEmpty()) {
+            setlistMusicRepository.saveAll(toUpdate);
+        }
+        if (!toDelete.isEmpty()) {
+            setlistMusicRepository.deleteAll(toDelete);
+        }
+
+        redisTemplate.delete(key);
+    }
+
+
     private String generateRedisKey(Long userId, Long setlistId) {
         return "edit:setlist:" + userId + ":" + setlistId;
     }
