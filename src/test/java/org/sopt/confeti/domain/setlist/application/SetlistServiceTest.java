@@ -23,6 +23,7 @@ import org.sopt.confeti.domain.setlist.application.dto.request.AddSetListMusicRe
 import org.sopt.confeti.domain.setlist.application.dto.request.SetlistCreateRequest;
 import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.domain.setlist.application.dto.response.SetlistSummaryDto;
+import org.sopt.confeti.domain.setlist.infra.repository.SetlistMusicRepository;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
 import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.User;
@@ -40,6 +41,7 @@ class SetlistServiceTest {
     @Mock private ConcertRepository concertRepository;
     @Mock private FestivalRepository festivalRepository;
     @Mock private UserRepository userRepository;
+    @Mock private SetlistMusicRepository setlistMusicRepository;
 
     private final Long userId = 1L;
     private final User user = mockUser(userId);
@@ -116,7 +118,7 @@ class SetlistServiceTest {
     }
 
     private Concert mockConcert(String title, LocalDate endAt) {
-        return Concert.builder()
+        Concert concert = Concert.builder()
                 .title(title)
                 .subtitle("sub")
                 .startAt(endAt.minusDays(2))
@@ -136,10 +138,13 @@ class SetlistServiceTest {
                 .musics(List.of())
                 .reservationUrls(List.of())
                 .build();
+
+        ReflectionTestUtils.setField(concert, "id", 100L);
+        return concert;
     }
 
     private Festival mockFestival(String title, LocalDate endAt) {
-        return Festival.builder()
+        Festival festival = Festival.builder()
                 .title(title)
                 .subtitle("sub")
                 .startAt(endAt.minusDays(2))
@@ -160,6 +165,9 @@ class SetlistServiceTest {
                 .musics(List.of())
                 .reservationUrls(List.of())
                 .build();
+
+        ReflectionTestUtils.setField(festival, "id", 200L);
+        return festival;
     }
 
     @Test
@@ -247,5 +255,83 @@ class SetlistServiceTest {
         assertThat(allMusics.get(3).getArtistName()).isEqualTo("NewJeans");
     }
 
+    @Test
+    void 셋리스트_상세조회_CONCERT_타입일_경우_정상조회() {
+        // given
+        Long setlistId = 10L;
+        Long concertId = 100L;
 
+        Setlist setlist = Setlist.builder()
+                .user(user)
+                .type(SetlistType.CONCERT)
+                .typeId(concertId)
+                .build();
+        ReflectionTestUtils.setField(setlist, "id", setlistId);
+
+        SetlistMusic music = SetlistMusic.builder()
+                .trackId("01")
+                .artistName("IU")
+                .trackName("Love wins all")
+                .artworkUrl("art.jpg")
+                .previewUrl("prev.mp3")
+                .orders(1)
+                .build();
+        music.setSetlist(setlist);
+
+        Concert concert = mockConcert("아이유 콘서트", LocalDate.of(2024, 5, 10));
+        given(setlistRepository.findByIdAndUserId(setlistId, userId)).willReturn(Optional.of(setlist));
+        given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
+        given(setlistMusicRepository.findBySetlist(setlist)).willReturn(List.of(music));
+
+        // when
+        var result = setlistService.getSetlistDetail(userId, setlistId);
+
+        // then
+        assertThat(result.type()).isEqualTo("CONCERT");
+        assertThat(result.typeId()).isEqualTo(concertId);
+        assertThat(result.title()).isEqualTo("아이유 콘서트");
+        assertThat(result.musics()).hasSize(1);
+        assertThat(result.musics().get(0).trackId()).isEqualTo("01");
+        assertThat(result.musics().get(0).artistName()).isEqualTo("IU");
+    }
+
+    @Test
+    void 셋리스트_상세조회_FESTIVAL_타입일_경우_정상조회() {
+        // given
+        Long setlistId = 20L;
+        Long festivalId = 200L;
+
+        Setlist setlist = Setlist.builder()
+                .user(user)
+                .type(SetlistType.FESTIVAL)
+                .typeId(festivalId)
+                .build();
+        ReflectionTestUtils.setField(setlist, "id", setlistId);
+
+        SetlistMusic music = SetlistMusic.builder()
+                .trackId("02")
+                .artistName("NewJeans")
+                .trackName("ETA")
+                .artworkUrl("art2.jpg")
+                .previewUrl("prev2.mp3")
+                .orders(1)
+                .build();
+        music.setSetlist(setlist);
+
+        Festival festival = mockFestival("부산 록 페스티벌", LocalDate.of(2024, 8, 20));
+        given(setlistRepository.findByIdAndUserId(setlistId, userId)).willReturn(Optional.of(setlist));
+        given(festivalRepository.findById(festivalId)).willReturn(Optional.of(festival));
+        given(setlistMusicRepository.findBySetlist(setlist)).willReturn(List.of(music));
+
+        // when
+        var result = setlistService.getSetlistDetail(userId, setlistId);
+
+        // then
+        assertThat(result.type()).isEqualTo("FESTIVAL");
+        assertThat(result.typeId()).isEqualTo(festivalId);
+        assertThat(result.title()).isEqualTo("부산 록 페스티벌");
+        assertThat(result.musics()).hasSize(1);
+        assertThat(result.musics().get(0).trackId()).isEqualTo("02");
+        assertThat(result.musics().get(0).artistName()).isEqualTo("NewJeans");
+    }
 }
