@@ -10,7 +10,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Builder
-@Document(indexName = "performances")
+@Document(indexName = "expected_performances")
 public record PerformanceDocument(
 
         @Id

@@ -2,12 +2,13 @@ package org.sopt.confeti.domain.view.performance.application.dto.response;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import org.sopt.confeti.domain.elastic_search.application.dto.response.SearchPerformanceResult;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record PerformanceDTO(
         long id,
-        long typeId,
+        Long typeId,
         PerformanceType type,
         String area,
         String title,
@@ -31,6 +32,22 @@ public record PerformanceDTO(
                 performance.getPosterPath(),
                 performance.getCreatedAt(),
                 performance.getUpdatedAt()
+        );
+    }
+
+    public static PerformanceDTO from(final SearchPerformanceResult searchedPerformance) {
+        return new PerformanceDTO(
+                searchedPerformance.id(),
+                null,
+                searchedPerformance.type(),
+                searchedPerformance.area(),
+                searchedPerformance.title(),
+                null,
+                searchedPerformance.startAt(),
+                searchedPerformance.endAt(),
+                searchedPerformance.posterPath(),
+                null,
+                null
         );
     }
 }

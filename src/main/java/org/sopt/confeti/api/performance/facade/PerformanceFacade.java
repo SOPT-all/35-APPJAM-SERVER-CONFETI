@@ -9,9 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import java.util.stream.Collectors;
-
+import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.dto.request.PatchRecommendMusic;
 import org.sopt.confeti.api.performance.dto.request.PatchRecommendMusics;
@@ -23,10 +22,10 @@ import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.IntendedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecommendNewMusicsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.*;
-import org.sopt.confeti.api.user.facade.UserFavoriteFacade;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
@@ -51,9 +50,8 @@ import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.util.MorphemeAnalyzer;
-import org.sopt.confeti.global.resolver.music_api.MusicAPIResolver;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
+import org.sopt.confeti.global.util.MorphemeAnalyzer;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -264,8 +262,9 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public IntendedPerformancesDTO getPerformances(Long userId, Long pid, String aid, PerformanceType ptype) {
-        if (!isPresent(pid) && !isPresent(aid)) {
+    public IntendedPerformancesDTO getPerformances(Long userId, Long pid, String aid, String ptitle,
+                                                   PerformanceType ptype) {
+        if (!isPresent(pid) && !isPresent(aid) && !isPresent(ptitle)) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
 
@@ -279,8 +278,20 @@ public class PerformanceFacade {
             performances = performanceService.getPerformancesByArtistIdAndType(aid, ptype);
         }
 
+        if (isPresent(ptitle)) {
+            List<PerformanceDTO> searchedPerformances = performanceSearchService.getPerformancesByTitlePartialMatched(
+                            ptitle).stream()
+                    .map(PerformanceDTO::from)
+                    .toList();
+
+            performances.addAll(searchedPerformances);
+        }
+
         Map<Long, Boolean> performanceFavorites = getPerformanceFavorites(userId, performances);
-        return IntendedPerformancesDTO.of(performances, performanceFavorites);
+        return IntendedPerformancesDTO.of(
+                new HashSet<>(performances),
+                performanceFavorites
+        );
     }
 
     private boolean isPresent(Object target) {
@@ -316,7 +327,7 @@ public class PerformanceFacade {
     public RecommendMusicsDTO getRecommendMusics(final Long userId) {
 
         Performance performance = performanceService.getPerformanceByUserFavorites(userId);
-        if( userId == null || performance == null){
+        if (userId == null || performance == null) {
             performance = performanceService.getPerformanceByRand();
         }
 
@@ -382,7 +393,9 @@ public class PerformanceFacade {
     private List<ConfetiMusic> recommendForMultipleArtists(List<String> artistIdList, Set<String> existingMusicIds) {
         List<ConfetiMusic> musics = new ArrayList<>();
         for (String artistId : artistIdList) {
-            if (musics.size() >= RECOMMEND_MUSIC_SIZE) break;
+            if (musics.size() >= RECOMMEND_MUSIC_SIZE) {
+                break;
+            }
             musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistId, 1, existingMusicIds));
         }
         return musics;
