@@ -11,4 +11,5 @@ public class Default {
     public static final String TEXT = "CONFETI";
     public static final String PROFILE_IMG_NAME = "user-profile.svg";
     public static final String PERFORMANCE_TYPE = "performance";
+    public static final String PERFORMANCE_STATUS = "all";
 }
