@@ -22,8 +22,8 @@ import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.IntendedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendNewMusicsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
@@ -325,17 +325,14 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public RecommendMusicsDTO getRecommendMusics(final Long userId) {
+    public RecommendMusicsPerformanceDTO getRecommendPerformanceId(final Long userId) {
 
         Performance performance = performanceService.getPerformanceByUserFavorites(userId);
         if (userId == null || performance == null) {
             performance = performanceService.getPerformanceByRand();
         }
 
-        Set<String> selectedArtistIds = setArtistsByRandom(performance);
-        List<ConfetiMusic> musicList = musicAPIHandler.getMusicsByArtistIds(selectedArtistIds);
-
-        return RecommendMusicsDTO.of(performance, musicList);
+        return RecommendMusicsPerformanceDTO.from(performance);
     }
 
     protected Set<String> setArtistsByRandom(Performance performance) {
@@ -354,7 +351,7 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public RecommendNewMusicsDTO getNewRecommendMusics(long performanceId, List<String> musicIds) {
+    public RecommendMusicsDTO getNewRecommendMusics(long performanceId, List<String> musicIds) {
         Performance performance = performanceService.getPerformanceById(performanceId);
         Set<String> selectedArtistIds = setArtistsByRandom(performance);
         Set<String> existingMusicIds = (musicIds == null || musicIds.isEmpty())
@@ -364,7 +361,7 @@ public class PerformanceFacade {
         List<String> artistIdList = new ArrayList<>(selectedArtistIds);
         List<ConfetiMusic> recommendMusics = recommendMusicsByArtistCount(artistIdList, existingMusicIds);
 
-        return RecommendNewMusicsDTO.from(recommendMusics);
+        return RecommendMusicsDTO.from(recommendMusics);
     }
 
     private List<ConfetiMusic> recommendMusicsByArtistCount(List<String> artistIdList, Set<String> existingMusicIds) {
