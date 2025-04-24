@@ -1,8 +1,7 @@
-package org.sopt.confeti.api.setlist;
+package org.sopt.confeti.api.setlist.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.domain.setlist.application.SetlistEditService;
 import org.sopt.confeti.domain.setlist.application.dto.request.SetlistMusicOrderUpdateRequest;
 import org.sopt.confeti.global.annotation.UserId;

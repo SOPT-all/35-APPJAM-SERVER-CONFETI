@@ -1,4 +1,4 @@
-package org.sopt.confeti.api.setlist;
+package org.sopt.confeti.api.setlist.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
