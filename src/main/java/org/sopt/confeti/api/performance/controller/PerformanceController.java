@@ -164,4 +164,14 @@ public class PerformanceController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 RecommendNewMusicsResponse.from(recommendMusicsDTO));
     }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/record")
+    public ResponseEntity<BaseResponse<?>> getConfetiRecord(
+            @UserId Long userId
+    ) {
+        ConfetiRecordDTO recordDTO = performanceFacade.getConfetiRecord(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                ConfetiRecordResponse.from(recordDTO));
+    }
 }

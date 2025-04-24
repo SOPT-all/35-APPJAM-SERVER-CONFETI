@@ -36,6 +36,9 @@ import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchServi
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
+import org.sopt.confeti.domain.setlist.application.SetlistService;
+import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
+import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
@@ -46,6 +49,7 @@ import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
+import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.MorphemeAnalyzer;
 import org.sopt.confeti.global.resolver.music_api.MusicAPIResolver;
@@ -72,6 +76,8 @@ public class PerformanceFacade {
     private final ArtistFavoriteService artistFavoriteService;
     private final PerformanceSearchService performanceSearchService;
     private final MusicAPIHandler musicAPIHandler;
+    private final TimetableFestivalService timetableFestivalService;
+    private final SetlistService setlistService;
 
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final Long userId, final long concertId) {
@@ -392,6 +398,30 @@ public class PerformanceFacade {
         if (patchRecommendMusics.performanceId() == null || patchRecommendMusics.musicList() == null ||
                 patchRecommendMusics.musicList().isEmpty()) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
+    }
+
+
+    @Transactional(readOnly = true)
+    public ConfetiRecordDTO getConfetiRecord(final long userId) {
+        validateExistUser(userId);
+
+        List<Long> timetableFestivalIds = timetableFestivalService.findFestivalIdsByUserId(userId);
+        List<Long> setListFestivalIds =  setlistService.findFestivalIdsByUserId(userId);
+        List<Long> setListConcertIds =  setlistService.findConcertIdsByUserId(userId);
+
+        Set<Long> uniqueFestivalIds = new HashSet<>();
+        uniqueFestivalIds.addAll(timetableFestivalIds);
+        uniqueFestivalIds.addAll(setListFestivalIds);
+
+        int totalCount = uniqueFestivalIds.size() + setListConcertIds.size();
+
+        return ConfetiRecordDTO.of(totalCount, timetableFestivalIds.size(), setListFestivalIds.size()+setListConcertIds.size());
+    }
+
+    protected void validateExistUser(final long userId) {
+        if (!userService.existsById(userId)) {
+            throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
         }
     }
 }
