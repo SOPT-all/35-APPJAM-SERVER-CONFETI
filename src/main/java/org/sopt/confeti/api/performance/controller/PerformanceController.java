@@ -1,6 +1,8 @@
 package org.sopt.confeti.api.performance.controller;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.dto.request.PatchRecommendMusics;
 import org.sopt.confeti.api.performance.dto.response.AnalyzePerformanceTypeResponse;
@@ -33,6 +35,7 @@ import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.Default;
+import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
@@ -123,12 +126,14 @@ public class PerformanceController {
     @GetMapping("/search/ac")
     public ResponseEntity<BaseResponse<?>> searchAutoComplete(
             @UserId(require = false) Long userId,
-            @RequestParam String term,
-            @RequestParam(required = false, defaultValue = "1") Integer limit
+            @RequestParam @NotBlank String term,
+            @RequestParam(required = false, defaultValue = "1") @Min(1) @Max(10) Integer limit,
+            @RequestParam(required = false, defaultValue = Default.PERFORMANCE_STATUS) String status
     ) {
-        SearchACPerformancesDTO performacnesDTO = performanceFacade.searchACPerformances(term, limit);
+        SearchACPerformancesDTO performancesDTO = performanceFacade.searchACPerformances(term, limit,
+                PerformanceStatus.convert(status));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                SearchACPerformancesResponse.of(performacnesDTO, s3FileHandler));
+                SearchACPerformancesResponse.of(performancesDTO, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
