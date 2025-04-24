@@ -7,6 +7,8 @@ import org.sopt.confeti.global.util.S3FileHandler;
 
 public record IntendedPerformanceResponse(
         long performanceId,
+        String type,
+        long typeId,
         String title,
         String posterUrl,
         String startAt,
@@ -17,6 +19,8 @@ public record IntendedPerformanceResponse(
     public static IntendedPerformanceResponse of(IntendedPerformanceDTO performanceDTO, S3FileHandler s3FileHandler) {
         return new IntendedPerformanceResponse(
                 performanceDTO.id(),
+                performanceDTO.type().getType(),
+                performanceDTO.typeId(),
                 performanceDTO.title(),
                 s3FileHandler.getFileUrl(
                         FolderPath.combine(FolderPath.getFolderPathByPerformanceType(performanceDTO.type()),
