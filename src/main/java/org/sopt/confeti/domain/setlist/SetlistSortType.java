@@ -3,8 +3,8 @@ package org.sopt.confeti.domain.setlist;
 import java.util.Arrays;
 
 public enum SetlistSortType {
-    OLDEST("oldest"),
-    LATEST("latest");
+    OLDEST("oldestFirst"),
+    LATEST("createdAt");
 
     private final String value;
 
