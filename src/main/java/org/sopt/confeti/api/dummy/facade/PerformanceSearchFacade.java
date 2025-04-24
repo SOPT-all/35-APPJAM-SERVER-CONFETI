@@ -23,6 +23,7 @@ public class PerformanceSearchFacade {
         List<PerformanceDocument> performanceDocuments = performances.stream()
                 .map(PerformanceDocument::create)
                 .toList();
+
         performanceSearchService.save(performanceDocuments);
     }
 }

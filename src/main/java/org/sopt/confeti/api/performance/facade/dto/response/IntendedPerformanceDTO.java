@@ -7,6 +7,7 @@ import org.sopt.confeti.global.common.constant.PerformanceType;
 public record IntendedPerformanceDTO(
         long id,
         PerformanceType type,
+        long typeId,
         String title,
         String posterPath,
         LocalDate startAt,
@@ -18,6 +19,7 @@ public record IntendedPerformanceDTO(
         return new IntendedPerformanceDTO(
                 performanceDTO.id(),
                 performanceDTO.type(),
+                performanceDTO.typeId(),
                 performanceDTO.title(),
                 performanceDTO.posterPath(),
                 performanceDTO.startAt(),

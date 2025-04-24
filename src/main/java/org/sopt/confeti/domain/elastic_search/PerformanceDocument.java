@@ -15,6 +15,12 @@ public record PerformanceDocument(
         @Id
         long id,
 
+        @Field(type = FieldType.Keyword)
+        String type,
+
+        @Field(type = FieldType.Long)
+        long typeId,
+
         @Field(type = FieldType.Text, analyzer = "autocomplete_analyzer", searchAnalyzer = "search_analyzer")
         String title,
 
@@ -28,20 +34,18 @@ public record PerformanceDocument(
         String posterPath,
 
         @Field(type = FieldType.Text)
-        String area,
-
-        @Field(type = FieldType.Keyword)
-        String type
+        String area
 ) {
     public static PerformanceDocument create(PerformanceDTO performance) {
         return PerformanceDocument.builder()
                 .id(performance.id())
+                .type(performance.type().getType())
+                .typeId(performance.typeId())
                 .title(performance.title())
                 .startAt(performance.startAt())
                 .endAt(performance.endAt())
                 .posterPath(performance.posterPath())
                 .area(performance.area())
-                .type(performance.type().getType())
                 .build();
     }
 }

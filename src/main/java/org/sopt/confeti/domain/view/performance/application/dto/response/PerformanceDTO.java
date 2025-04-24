@@ -38,7 +38,7 @@ public record PerformanceDTO(
     public static PerformanceDTO from(final SearchPerformanceResult searchedPerformance) {
         return new PerformanceDTO(
                 searchedPerformance.id(),
-                null,
+                searchedPerformance.typeId(),
                 searchedPerformance.type(),
                 searchedPerformance.area(),
                 searchedPerformance.title(),

@@ -6,22 +6,24 @@ import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record SearchPerformanceResult(
         long id,
+        PerformanceType type,
+        long typeId,
         String title,
         LocalDate startAt,
         LocalDate endAt,
         String posterPath,
-        String area,
-        PerformanceType type
+        String area
 ) {
     public static SearchPerformanceResult from(PerformanceDocument performanceDocument) {
         return new SearchPerformanceResult(
                 performanceDocument.id(),
+                PerformanceType.convert(performanceDocument.type()),
+                performanceDocument.typeId(),
                 performanceDocument.title(),
                 performanceDocument.startAt(),
                 performanceDocument.endAt(),
                 performanceDocument.posterPath(),
-                performanceDocument.area(),
-                PerformanceType.convert(performanceDocument.type())
+                performanceDocument.area()
         );
     }
 }
