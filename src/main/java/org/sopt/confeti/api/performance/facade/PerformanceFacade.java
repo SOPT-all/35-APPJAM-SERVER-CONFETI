@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.api.performance.dto.request.PatchRecommendMusic;
-import org.sopt.confeti.api.performance.dto.request.PatchRecommendMusics;
 import org.sopt.confeti.api.performance.facade.dto.response.AnalyzePerformanceTypeDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
@@ -356,12 +354,12 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public RecommendNewMusicsDTO getNewRecommendMusics(PatchRecommendMusics patchRecommendMusics) {
-        validatePatchRecommendMusics(patchRecommendMusics);
-
-        Performance performance = performanceService.getPerformanceById(patchRecommendMusics.performanceId());
+    public RecommendNewMusicsDTO getNewRecommendMusics(long performanceId, List<String> musicIds) {
+        Performance performance = performanceService.getPerformanceById(performanceId);
         Set<String> selectedArtistIds = setArtistsByRandom(performance);
-        Set<String> existingMusicIds = extractMusicIds(patchRecommendMusics);
+        Set<String> existingMusicIds = (musicIds == null || musicIds.isEmpty())
+                ? Collections.emptySet()
+                : new HashSet<>(musicIds);
 
         List<String> artistIdList = new ArrayList<>(selectedArtistIds);
         List<ConfetiMusic> recommendMusics = recommendMusicsByArtistCount(artistIdList, existingMusicIds);
@@ -403,20 +401,6 @@ public class PerformanceFacade {
         }
         return musics;
     }
-
-    private Set<String> extractMusicIds(PatchRecommendMusics patchRecommendMusics) {
-        return patchRecommendMusics.musicList().stream()
-                .map(PatchRecommendMusic::musicId)
-                .collect(Collectors.toSet());
-    }
-
-    private void validatePatchRecommendMusics(PatchRecommendMusics patchRecommendMusics) {
-        if (patchRecommendMusics.performanceId() == null || patchRecommendMusics.musicList() == null ||
-                patchRecommendMusics.musicList().isEmpty()) {
-            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
-        }
-    }
-
 
     @Transactional(readOnly = true)
     public ConfetiRecordDTO getConfetiRecord(final long userId) {
