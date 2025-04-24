@@ -57,6 +57,9 @@ public class SetlistService {
                                 setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt());
                     }
                 })
+                .toList();
+
+        dtoList = dtoList.stream()
                 .sorted((a, b) -> {
                     if (sortType == SetlistSortType.OLDEST) {
                         return a.endAt().compareTo(b.endAt());
