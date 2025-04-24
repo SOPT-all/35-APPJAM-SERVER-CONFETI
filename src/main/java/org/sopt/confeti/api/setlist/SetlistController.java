@@ -37,9 +37,9 @@ public class SetlistController {
     @GetMapping("/all")
     public ResponseEntity<BaseResponse<?>> getAllMySetlists(
             @UserId(require = false) Long userId,
-            @RequestParam(required = false) String sort
+            @RequestParam(name = "sortBy", required = false) String sortBy
     ) {
-        SetlistSortType sortType = SetlistSortType.from(sort);
+        SetlistSortType sortType = SetlistSortType.from(sortBy);
         GetAllSetlistsResponse data = setlistService.getAllMySetlists(userId, sortType);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
