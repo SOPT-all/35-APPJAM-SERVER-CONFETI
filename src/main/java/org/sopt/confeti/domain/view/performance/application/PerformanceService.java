@@ -75,8 +75,15 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceDTO> findPerformancesByArtistId(final String artistId) {
+    public List<PerformanceDTO> getPerformancesByArtistId(final String artistId) {
         return performanceRepository.findPerformancesByArtistId(artistId).stream()
+                .map(PerformanceDTO::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PerformanceDTO> getAllPerformancesByArtistId(final String artistId) {
+        return performanceRepository.findPerformancesByArtists_ArtistId(artistId).stream()
                 .map(PerformanceDTO::from)
                 .toList();
     }
@@ -100,15 +107,15 @@ public class PerformanceService {
     }
 
     @Transactional
-    public Performance getUpcomingPerformance(final Long userId) {
-        return performanceRepository.upcomingPerformance(userId)
+    public Performance getUpcomingPerformanceByUserId(final Long userId) {
+        return performanceRepository.upcomingPerformanceByUserId(userId)
                 .orElse(null);
     }
 
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getAllPerformances() {
         return performanceRepository.findAll().stream()
-                .map(org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO::from)
+                .map(PerformanceDTO::from)
                 .toList();
     }
 
@@ -143,7 +150,7 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public Performance getPerformanceByRand(){
+    public Performance getPerformanceByRand() {
         return performanceRepository.findPerformanceByRand();
     }
 

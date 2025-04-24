@@ -202,7 +202,7 @@ public class UserFavoriteFacade {
     public UpcomingPerformanceDTO getUpcomingPerformance(final long userId) {
         validateExistUser(userId);
 
-        Performance performance = performanceService.getUpcomingPerformance(userId);
+        Performance performance = performanceService.getUpcomingPerformanceByUserId(userId);
         if (performance == null) {
             return null;
         }

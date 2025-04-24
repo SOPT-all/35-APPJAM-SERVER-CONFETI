@@ -28,6 +28,8 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             PageRequest pageRequest
     );
 
+    List<Performance> findPerformancesByArtists_ArtistId(String artistId);
+
     @Query(value = "SELECT p" +
             " FROM Performance p " +
             " JOIN FETCH p.artists pa" +
@@ -72,7 +74,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "        AND p.typeId IN (SELECT tf.festival.id FROM TimetableFestival tf WHERE tf.user.id = :userId))) " +
             "AND p.endAt >= CURRENT_DATE " +
             "ORDER BY p.startAt ASC LIMIT 1 ")
-    Optional<Performance> upcomingPerformance(final @Param("userId") long userId);
+    Optional<Performance> upcomingPerformanceByUserId(final @Param("userId") long userId);
 
     @Query(value = "SELECT p FROM Performance p WHERE p.endAt >= CURRENT_DATE ORDER BY RAND() LIMIT 5")
     List<Performance> findTop5ByRand();
