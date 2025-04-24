@@ -12,8 +12,8 @@ import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.IntendedPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
+import org.sopt.confeti.api.performance.dto.response.RecommendMusicsPerformanceResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendMusicsResponse;
-import org.sopt.confeti.api.performance.dto.response.RecommendNewMusicsResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.SearchACPerformancesResponse;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
@@ -25,8 +25,8 @@ import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.IntendedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendNewMusicsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -161,24 +161,24 @@ public class PerformanceController {
     }
 
     @Permission(role = {Role.GENERAL})
-    @GetMapping("/recommend/musics")
-    public ResponseEntity<BaseResponse<?>> getRecommendMusics(
+    @GetMapping("/recommend/performance")
+    public ResponseEntity<BaseResponse<?>> getRecommendPerformanceId(
             @UserId(require = false) Long userId
     ) {
-        RecommendMusicsDTO recommendMusicsDTO = performanceFacade.getRecommendMusics(userId);
+        RecommendMusicsPerformanceDTO recommendMusicsDTO = performanceFacade.getRecommendPerformanceId(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                RecommendMusicsResponse.from(recommendMusicsDTO));
+                RecommendMusicsPerformanceResponse.from(recommendMusicsDTO));
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend/musics")
     public ResponseEntity<BaseResponse<?>> getRecommendMusics(
             @RequestParam Long performanceId,
-            @RequestParam(required = false) List<String> musicIds
+            @RequestParam(required = false) List<String> musicId
     ) {
-        RecommendNewMusicsDTO recommendMusicsDTO = performanceFacade.getNewRecommendMusics(performanceId, musicIds);
+        RecommendMusicsDTO recommendMusicsDTO = performanceFacade.getNewRecommendMusics(performanceId, musicId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                RecommendNewMusicsResponse.from(recommendMusicsDTO));
+                RecommendMusicsResponse.from(recommendMusicsDTO));
     }
 
     @Permission(role = {Role.GENERAL})
