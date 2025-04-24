@@ -291,31 +291,6 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         }
     }
 
-    @Override
-    @RetryOnTokenExpire
-    public List<ConfetiMusic> getMusicsByArtistIds(final Set<String> artistIds) {
-        if (artistIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        int totalArtists = artistIds.size();
-        List<String> artistIdList = new ArrayList<>(artistIds);
-        List<ConfetiMusic> resultMusics = new ArrayList<>();
-
-        if (totalArtists == 1) {
-            resultMusics.addAll(getTopSongsByArtistId(artistIdList.get(0), 3));
-        } else if (totalArtists == 2) {
-            resultMusics.addAll(getTopSongsByArtistId(artistIdList.get(0), 1));
-            resultMusics.addAll(getTopSongsByArtistId(artistIdList.get(1), 2));
-        } else {
-            for (int i = 0; i < Math.min(totalArtists, 3); i++) {
-                resultMusics.addAll(getTopSongsByArtistId(artistIdList.get(i), 1));
-            }
-        }
-
-        return resultMusics;
-    }
-
     public List<ConfetiMusic> getTopSongsByArtistId(final String artistId, final int fetchSize) {
         Map<String, String> params = new HashMap<>();
         params.put("limit", String.valueOf(fetchSize));
