@@ -17,4 +17,7 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
     void deleteByUserIdAndFestivalId(final long userId, final long festivalId);
 
     List<TimetableFestival> findTop4ByUserIdOrderByCreatedAt(long userId);
+
+    @Query("SELECT tf.festival.id FROM TimetableFestival tf WHERE tf.user.id = :userId")
+    List<Long> findFestivalIdsByUserId(@Param("userId") Long userId);
 }

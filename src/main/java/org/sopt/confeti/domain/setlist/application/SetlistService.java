@@ -173,4 +173,14 @@ public class SetlistService {
             );
         }
     }
+
+    @Transactional(readOnly = true)
+    public List<Long> findFestivalIdsByUserId(final Long userId) {
+        return setlistRepository.findFestivalIdsByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> findConcertIdsByUserId(final Long userId) {
+        return setlistRepository.findConcertIdsByUserId(userId);
+    }
 }

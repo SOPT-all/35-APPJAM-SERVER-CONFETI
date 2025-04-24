@@ -56,4 +56,9 @@ public class TimetableFestivalService {
     public List<TimetableFestival> getTimetablesPreview(final long userId) {
         return timetableFestivalRepository.findTop4ByUserIdOrderByCreatedAt(userId);
     }
+
+    @Transactional(readOnly = true)
+    public List<Long> findFestivalIdsByUserId(final Long userId) {
+        return timetableFestivalRepository.findFestivalIdsByUserId(userId);
+    }
 }
