@@ -46,6 +46,7 @@ import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -257,9 +258,9 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public SearchACPerformancesDTO searchACPerformances(String term, int limit) {
+    public SearchACPerformancesDTO searchACPerformances(String term, int limit, PerformanceStatus status) {
         return SearchACPerformancesDTO.from(
-                performanceSearchService.getPerformancesByTitle(term, limit)
+                performanceSearchService.getPerformancesByTitle(term, limit, status)
         );
     }
 
