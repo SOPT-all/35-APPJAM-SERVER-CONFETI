@@ -8,11 +8,9 @@ import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.common.constant.PerformanceKeyword;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
-@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MorphemeAnalyzer {
 
@@ -26,7 +24,6 @@ public class MorphemeAnalyzer {
         List<Token> tokens = analyzeResult.getTokenList();
 
         for (Token token : tokens) {
-            log.debug(token.getMorph());
             if (PerformanceKeyword.isValid(token.getMorph())) {
                 return PerformanceKeyword.getMatchingPerformanceType(token.getMorph());
             }
