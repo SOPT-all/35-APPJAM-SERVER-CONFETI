@@ -18,6 +18,7 @@ import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -28,6 +29,7 @@ public class SetlistEditService {
     private final RedisTemplate<String, List<SetlistMusicEditDto>> redisTemplate;
     private final ObjectMapper objectMapper;
 
+    @Transactional
     public void startEdit(Long userId, Long setlistId) {
         Setlist setlist = setlistRepository.findByIdAndUserId(setlistId, userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
@@ -41,6 +43,7 @@ public class SetlistEditService {
         redisTemplate.opsForValue().set(redisKey, musicDtos);
     }
 
+    @Transactional
     public void updateMusicOrder(Long userId, Long setlistId, List<SetlistMusicOrderUpdateRequest> requests) {
         String key = generateRedisKey(userId, setlistId);
         Object raw = redisTemplate.opsForValue().get(key);
@@ -71,6 +74,38 @@ public class SetlistEditService {
                 .toList();
 
         redisTemplate.opsForValue().set(key, updated);
+    }
+
+    @Transactional
+    public String deleteMusic(Long userId, Long setlistId, int orders) {
+        String key = generateRedisKey(userId, setlistId);
+        Object raw = redisTemplate.opsForValue().get(key);
+        if(raw == null) throw new NotFoundException(ErrorMessage.NOT_FOUND);
+
+        List<SetlistMusicEditDto> musics = objectMapper.convertValue(raw, new TypeReference<>() {});
+        if(musics.isEmpty()) throw new NotFoundException(ErrorMessage.NOT_FOUND);
+
+        SetlistMusicEditDto deleted = musics.stream()
+                .filter(m -> m.orders() == orders)
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+
+        musics = musics.stream()
+                .filter(m -> m.orders() != orders)
+                .sorted(Comparator.comparing(SetlistMusicEditDto::orders))
+                .toList();
+
+        List<SetlistMusicEditDto> reordered = new ArrayList<>();
+        for (int i = 0; i < musics.size(); i++) {
+            SetlistMusicEditDto m = musics.get(i);
+            reordered.add(new SetlistMusicEditDto(
+                    m.musicId(), m.trackId(), m.artistName(), m.trackName(),
+                    m.artworkUrl(), m.previewUrl(), i + 1
+            ));
+        }
+
+        redisTemplate.opsForValue().set(key, reordered);
+        return deleted.trackId();
     }
 
     private String generateRedisKey(Long userId, Long setlistId) {

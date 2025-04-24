@@ -134,4 +134,36 @@ class SetlistEditServiceTest {
             }
         });
     }
+
+    @Test
+    void deleteMusic_곡_삭제_및_순서_재정렬() {
+        // given
+        Long userId = 1L;
+        Long setlistId = 100L;
+        String redisKey = "edit:setlist:" + userId + ":" + setlistId;
+
+        List<SetlistMusicEditDto> originalList = List.of(
+                new SetlistMusicEditDto(1L, "track1", "Artist A", "Song A", "url1", "preview1", 1),
+                new SetlistMusicEditDto(2L, "track2", "Artist B", "Song B", "url2", "preview2", 2),
+                new SetlistMusicEditDto(3L, "track3", "Artist C", "Song C", "url3", "preview3", 3)
+        );
+
+        given(redisTemplate.opsForValue()).willReturn(valueOperations);
+        given(valueOperations.get(redisKey)).willReturn(originalList);
+
+        // when
+        String deletedTrackId = setlistEditService.deleteMusic(userId, setlistId, 2);
+
+        // then
+        assertThat(deletedTrackId).isEqualTo("track2");
+
+        ArgumentCaptor<List<SetlistMusicEditDto>> captor = ArgumentCaptor.forClass(List.class);
+        verify(valueOperations).set(eq(redisKey), captor.capture());
+
+        List<SetlistMusicEditDto> updated = captor.getValue();
+        assertThat(updated).hasSize(2);
+        assertThat(updated.get(0).orders()).isEqualTo(1);
+        assertThat(updated.get(1).orders()).isEqualTo(2);
+        assertThat(updated).extracting(SetlistMusicEditDto::trackId).containsExactly("track1", "track3");
+    }
 }
