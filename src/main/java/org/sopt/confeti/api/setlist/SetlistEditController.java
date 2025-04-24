@@ -10,6 +10,7 @@ import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,5 +42,15 @@ public class SetlistEditController {
     ) {
         setlistEditService.updateMusicOrder(userId, setlistId, request);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @DeleteMapping("/{setlistId}/musics/{orders}")
+    public ResponseEntity<BaseResponse<?>> deleteMusic(
+            @UserId(require = false) Long userId,
+            @PathVariable Long setlistId,
+            @PathVariable int orders
+    ) {
+        String deleteTrackId = setlistEditService.deleteMusic(userId, setlistId, orders);
+        return ApiResponseUtil.success(SuccessMessage.DELETED, deleteTrackId);
     }
 }
