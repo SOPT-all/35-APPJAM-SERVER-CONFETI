@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.performance.dto.request.PatchRecommendMusic;
 import org.sopt.confeti.api.performance.dto.request.PatchRecommendMusics;
 import org.sopt.confeti.api.performance.facade.dto.response.AnalyzePerformanceTypeDTO;
@@ -55,6 +56,7 @@ import org.sopt.confeti.global.util.MorphemeAnalyzer;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Facade
 @RequiredArgsConstructor
 public class PerformanceFacade {
@@ -271,16 +273,16 @@ public class PerformanceFacade {
         List<PerformanceDTO> performances = new ArrayList<>();
 
         if (isPresent(pid)) {
-            performances = List.of(performanceService.getPerformance(pid));
+            performances.add(performanceService.getPerformance(pid));
         }
 
         if (isPresent(aid)) {
-            performances = performanceService.getPerformancesByArtistIdAndType(aid, ptype);
+            performances.addAll(performanceService.getPerformancesByArtistIdAndType(aid, ptype));
         }
 
         if (isPresent(ptitle)) {
-            List<PerformanceDTO> searchedPerformances = performanceSearchService.getPerformancesByTitlePartialMatched(
-                            ptitle).stream()
+            List<PerformanceDTO> searchedPerformances = performanceSearchService.getPerformancesByTitleAndTypePartialMatched(
+                            ptitle, ptype).stream()
                     .map(PerformanceDTO::from)
                     .toList();
 

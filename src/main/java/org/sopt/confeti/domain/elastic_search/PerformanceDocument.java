@@ -3,7 +3,6 @@ package org.sopt.confeti.domain.elastic_search;
 import java.time.LocalDate;
 import lombok.Builder;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
-import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -32,7 +31,7 @@ public record PerformanceDocument(
         String area,
 
         @Field(type = FieldType.Keyword)
-        PerformanceType type
+        String type
 ) {
     public static PerformanceDocument create(PerformanceDTO performance) {
         return PerformanceDocument.builder()
@@ -42,7 +41,7 @@ public record PerformanceDocument(
                 .endAt(performance.endAt())
                 .posterPath(performance.posterPath())
                 .area(performance.area())
-                .type(performance.type())
+                .type(performance.type().getType())
                 .build();
     }
 }
