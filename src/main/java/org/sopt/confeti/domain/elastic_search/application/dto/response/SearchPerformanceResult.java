@@ -21,7 +21,7 @@ public record SearchPerformanceResult(
                 performanceDocument.endAt(),
                 performanceDocument.posterPath(),
                 performanceDocument.area(),
-                performanceDocument.type()
+                PerformanceType.convert(performanceDocument.type())
         );
     }
 }
