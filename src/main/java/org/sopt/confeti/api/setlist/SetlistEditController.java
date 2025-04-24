@@ -53,4 +53,13 @@ public class SetlistEditController {
         String deleteTrackId = setlistEditService.deleteMusic(userId, setlistId, orders);
         return ApiResponseUtil.success(SuccessMessage.DELETED, deleteTrackId);
     }
+
+    @PatchMapping("/{setlistId}/edit/complete")
+    public ResponseEntity<BaseResponse<?>> completeEdit(
+            @UserId(require = false) Long userId,
+            @PathVariable Long setlistId
+    ) {
+        setlistEditService.completeEdit(userId, setlistId);
+        return ApiResponseUtil.success(SuccessMessage.UPDATED);
+    }
 }
