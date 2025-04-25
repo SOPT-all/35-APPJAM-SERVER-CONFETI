@@ -26,5 +26,7 @@ public interface MusicAPIHandler {
 
     List<ConfetiMusic> getFilteredTopSongsByArtist(String artistId, int limit, Set<String> excludedMusicIds);
 
-    MusicPage getArtistMusics(String artistId, int offset, int limit);
+    MusicPage getMusicsByKeyword(String term, int offset, int limit);
+
+    MusicPage getArtistMusicsByArtistId(String artistId, int offset, int limit);
 }
