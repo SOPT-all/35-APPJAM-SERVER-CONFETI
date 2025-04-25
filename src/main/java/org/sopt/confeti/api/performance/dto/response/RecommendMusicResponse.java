@@ -6,7 +6,7 @@ public record RecommendMusicResponse(
         String musicId,
         String artistName,
         String title,
-        String artWorkUrl,
+        String artworkUrl,
         String previewUrl
 ) {
     public static RecommendMusicResponse from(RecommendMusicDTO recommendMusicDTO) {
@@ -14,7 +14,7 @@ public record RecommendMusicResponse(
                 recommendMusicDTO.id(),
                 recommendMusicDTO.artistName(),
                 recommendMusicDTO.title(),
-                recommendMusicDTO.artWorkUrl(),
+                recommendMusicDTO.artworkUrl(),
                 recommendMusicDTO.previewUrl()
         );
     }

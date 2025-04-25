@@ -9,21 +9,25 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.setlist.facade.dto.response.SearchPerformancesDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchPerformancesDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArtistMusicsDTO;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.AnalyzeSearchTermResult;
 import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.MorphemeAnalyzer;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
+import org.sopt.confeti.global.util.music.dto.music.MusicPage;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
 @RequiredArgsConstructor
-public class SetlistFacade {
+public class SetlistSearchFacade {
 
     private static final int SEARCH_ARTIST_BY_KEYWORD_LIMIT = 1;
 
@@ -33,6 +37,31 @@ public class SetlistFacade {
 
     private boolean isPresent(Object that) {
         return Objects.nonNull(that);
+    }
+
+    private boolean isNotPresent(Object that) {
+        return Objects.isNull(that);
+    }
+
+    public SetlistSearchArtistMusicsDTO searchArtistMusics(String aid, String term, int offset, int limit) {
+        String artistId = null;
+
+        if (isPresent(aid)) {
+            artistId = aid;
+        }
+
+        if (isNotPresent(artistId)) {
+            Optional<String> searchedArtistId = getArtistId(term);
+
+            if (searchedArtistId.isEmpty()) {
+                throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+            }
+
+            artistId = searchedArtistId.get();
+        }
+
+        MusicPage musics = musicAPIHandler.getArtistMusics(artistId, offset, limit);
+        return SetlistSearchArtistMusicsDTO.from(musics);
     }
 
     @Transactional(readOnly = true)

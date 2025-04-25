@@ -33,6 +33,9 @@ public class AppleMusicAPIURL {
     @Value("${apple-music.api.endpoints.artists-path.relationship-view-by-name}")
     private String artistsPathRelationshipViewByName;
 
+    @Value("${apple-music.api.endpoints.artists-path.songs}")
+    private String artistsPathSongs;
+
     @Value("${apple-music.api.endpoints.albums-path.base}")
     private String albumsPathBase;
 
@@ -115,6 +118,12 @@ public class AppleMusicAPIURL {
     public String getArtistRelationshipViewByNamePath(String id, String view) {
         return UriComponentsBuilder.fromUriString(getArtistsBasePath() + artistsPathRelationshipViewByName)
                 .buildAndExpand(id, view)
+                .toUriString();
+    }
+
+    public String getArtistSongsPath(String id) {
+        return UriComponentsBuilder.fromUriString(getArtistsBasePath() + artistsPathSongs)
+                .buildAndExpand(id)
                 .toUriString();
     }
 

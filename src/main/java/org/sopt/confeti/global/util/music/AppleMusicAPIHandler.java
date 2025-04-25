@@ -1,8 +1,15 @@
 package org.sopt.confeti.global.util.music;
 
 import jakarta.annotation.PostConstruct;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -19,8 +26,10 @@ import org.sopt.confeti.global.util.music.dto.album.AppleMusicAlbumsResponse;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistsResponse;
 import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartSongResponse;
 import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartsResponse;
+import org.sopt.confeti.global.util.music.dto.music.AppleMusicArtistMusicsResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicsResponse;
+import org.sopt.confeti.global.util.music.dto.music.MusicPage;
 import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
@@ -160,7 +169,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         if (Objects.isNull(searchResult)) {
             return List.of();
         }
-        
+
         return convertToConfetiArtists(searchResult.results().artists());
     }
 
@@ -316,7 +325,9 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                 .filter(song -> !excludedMusicIds.contains(song.getId()))
                 .collect(Collectors.toList());
 
-        if (filteredSongs.isEmpty()) return Collections.emptyList();
+        if (filteredSongs.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         List<ConfetiMusic> result = new ArrayList<>();
         Random random = new Random();
@@ -328,5 +339,33 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         }
 
         return result;
+    }
+
+    @Override
+    @RetryOnTokenExpire
+    public MusicPage getArtistMusics(String artistId, int offset, int limit) {
+        Map<String, String> params = new HashMap<>();
+        params.put("offset", String.valueOf(offset));
+        params.put("limit", String.valueOf(limit));
+
+        return convertToConfetiMusicPage(
+                restClient.request()
+                        .get()
+                        .baseUrl(appleMusicAPIURL.getBaseUrl())
+                        .path(appleMusicAPIURL.getArtistSongsPath(artistId))
+                        .params(MultiValueMap.fromSingleValue(params))
+                        .build()
+                        .connect(headers)
+                        .retrieve(AppleMusicArtistMusicsResponse.class)
+        );
+    }
+
+    private MusicPage convertToConfetiMusicPage(AppleMusicArtistMusicsResponse artistMusics) {
+        return MusicPage.of(
+                artistMusics.next(),
+                artistMusics.data().stream()
+                        .map(ConfetiMusic::from)
+                        .toList()
+        );
     }
 }

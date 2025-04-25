@@ -6,6 +6,7 @@ import java.util.Set;
 import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
+import org.sopt.confeti.global.util.music.dto.music.MusicPage;
 
 public interface MusicAPIHandler {
 
@@ -24,4 +25,6 @@ public interface MusicAPIHandler {
     List<ConfetiMusic> getTopMusics(final int fetchSize);
 
     List<ConfetiMusic> getFilteredTopSongsByArtist(String artistId, int limit, Set<String> excludedMusicIds);
+
+    MusicPage getArtistMusics(String artistId, int offset, int limit);
 }

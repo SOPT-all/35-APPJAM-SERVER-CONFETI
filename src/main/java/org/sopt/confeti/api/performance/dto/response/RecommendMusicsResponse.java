@@ -1,10 +1,10 @@
 package org.sopt.confeti.api.performance.dto.response;
 
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
 import java.util.List;
+import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
 
 public record RecommendMusicsResponse(
-        List<RecommendMusicResponse> musicList
+        List<RecommendMusicResponse> musics
 ) {
     public static RecommendMusicsResponse from(RecommendMusicsDTO musicListDTO) {
         return new RecommendMusicsResponse(

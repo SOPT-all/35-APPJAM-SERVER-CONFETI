@@ -1,19 +1,19 @@
-package org.sopt.confeti.api.performance.facade.dto.response;
+package org.sopt.confeti.api.setlist.facade.dto.response.search;
 
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 
-public record RecommendMusicDTO(
+public record SetlistSearchArtistMusicDTO(
         String id,
-        String artistName,
         String title,
+        String artistName,
         String artworkUrl,
         String previewUrl
 ) {
-    public static RecommendMusicDTO from(ConfetiMusic music) {
-        return new RecommendMusicDTO(
+    public static SetlistSearchArtistMusicDTO from(ConfetiMusic music) {
+        return new SetlistSearchArtistMusicDTO(
                 music.getId(),
-                music.getArtistName(),
                 music.getTitle(),
+                music.getArtistName(),
                 music.getArtworkUrl(),
                 music.getPreviewUrl()
         );

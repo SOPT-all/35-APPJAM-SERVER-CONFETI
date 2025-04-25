@@ -1,6 +1,6 @@
-package org.sopt.confeti.api.setlist.dto.response;
+package org.sopt.confeti.api.setlist.dto.response.search;
 
-import org.sopt.confeti.api.setlist.facade.dto.response.SearchPerformanceDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchPerformanceDTO;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.S3FileHandler;
 
