@@ -60,7 +60,7 @@ public class SetlistSearchFacade {
             artistId = searchedArtistId.get();
         }
 
-        MusicPage musics = musicAPIHandler.getArtistMusics(aid, offset, limit);
+        MusicPage musics = musicAPIHandler.getArtistMusics(artistId, offset, limit);
         return SetlistSearchArtistMusicsDTO.from(musics);
     }
 
