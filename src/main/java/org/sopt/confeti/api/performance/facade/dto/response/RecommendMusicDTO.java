@@ -6,7 +6,7 @@ public record RecommendMusicDTO(
         String id,
         String artistName,
         String title,
-        String artWorkUrl,
+        String artworkUrl,
         String previewUrl
 ) {
     public static RecommendMusicDTO from(ConfetiMusic music) {
