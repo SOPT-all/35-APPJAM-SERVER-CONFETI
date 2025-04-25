@@ -9,7 +9,6 @@ import org.sopt.confeti.domain.elastic_search.infra.PerformanceSearchRepository;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,17 +17,14 @@ public class PerformanceSearchService {
     private final PerformanceSearchRepository performanceSearchRepository;
     private final PerformanceSearchOperator performanceSearchOperator;
 
-    @Transactional
     public void deleteAll() {
         performanceSearchRepository.deleteAll();
     }
 
-    @Transactional
     public void save(List<PerformanceDocument> performanceDocuments) {
         performanceSearchRepository.saveAll(performanceDocuments);
     }
 
-    @Transactional(readOnly = true)
     public List<SearchPerformanceResult> getPerformancesByTitleAndTypePartialMatched(String ptitle,
                                                                                      PerformanceType ptype) {
         List<PerformanceDocument> performances = performanceSearchOperator.searchByTitleAndTypePartialMatch(
@@ -39,7 +35,6 @@ public class PerformanceSearchService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<SearchPerformanceResult> getPerformancesByTitle(String title, int limit, PerformanceStatus status) {
         List<PerformanceDocument> performances = performanceSearchOperator.searchByTitleAndTypePartialMatch(title,
                 PerformanceType.PERFORMANCE, status);
