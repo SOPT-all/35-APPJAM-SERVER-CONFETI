@@ -1,7 +1,7 @@
-package org.sopt.confeti.api.setlist.dto.response;
+package org.sopt.confeti.api.setlist.dto.response.search;
 
 import java.util.List;
-import org.sopt.confeti.api.setlist.facade.dto.response.SearchPerformancesDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchPerformancesDTO;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record SetlistSearchPerformancesResponse(

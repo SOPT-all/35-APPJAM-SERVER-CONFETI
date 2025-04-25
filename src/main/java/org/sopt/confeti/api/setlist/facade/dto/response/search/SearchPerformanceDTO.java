@@ -1,4 +1,4 @@
-package org.sopt.confeti.api.setlist.facade.dto.response;
+package org.sopt.confeti.api.setlist.facade.dto.response.search;
 
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
