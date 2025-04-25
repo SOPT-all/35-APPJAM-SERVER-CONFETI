@@ -11,6 +11,7 @@ import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchPerformancesDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArtistMusicsDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchMusicsDTO;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
@@ -43,6 +44,12 @@ public class SetlistSearchFacade {
         return Objects.isNull(that);
     }
 
+    public SetlistSearchMusicsDTO searchMusics(String term, int offset, int limit) {
+        return SetlistSearchMusicsDTO.from(
+                musicAPIHandler.getMusicsByKeyword(term, offset, limit)
+        );
+    }
+
     public SetlistSearchArtistMusicsDTO searchArtistMusics(String aid, String term, int offset, int limit) {
         String artistId = null;
 
@@ -60,7 +67,7 @@ public class SetlistSearchFacade {
             artistId = searchedArtistId.get();
         }
 
-        MusicPage musics = musicAPIHandler.getArtistMusics(artistId, offset, limit);
+        MusicPage musics = musicAPIHandler.getArtistMusicsByArtistId(artistId, offset, limit);
         return SetlistSearchArtistMusicsDTO.from(musics);
     }
 

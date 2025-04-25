@@ -5,10 +5,12 @@ import jakarta.validation.constraints.Min;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.setlist.dto.response.search.SetlistSearchArtistMusicsResponse;
+import org.sopt.confeti.api.setlist.dto.response.search.SetlistSearchMusicsResponse;
 import org.sopt.confeti.api.setlist.dto.response.search.SetlistSearchPerformancesResponse;
 import org.sopt.confeti.api.setlist.facade.SetlistSearchFacade;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchPerformancesDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArtistMusicsDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchMusicsDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -60,5 +62,17 @@ public class SetlistSearchController {
 
         SetlistSearchArtistMusicsDTO artistMusics = setlistSearchFacade.searchArtistMusics(aid, term, offset, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, SetlistSearchArtistMusicsResponse.from(artistMusics));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/musics")
+    public ResponseEntity<BaseResponse<?>> searchMusics(
+            @UserId Long userId,
+            @RequestParam String term,
+            @RequestParam(required = false, defaultValue = "0") @Min(0) int offset,
+            @RequestParam(required = false, defaultValue = "5") @Min(1) @Max(20) int limit
+    ) {
+        SetlistSearchMusicsDTO musics = setlistSearchFacade.searchMusics(term, offset, limit);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, SetlistSearchMusicsResponse.from(musics));
     }
 }
