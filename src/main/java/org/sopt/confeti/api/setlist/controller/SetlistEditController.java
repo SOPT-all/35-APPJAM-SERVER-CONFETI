@@ -61,4 +61,13 @@ public class SetlistEditController {
         setlistEditService.completeEdit(userId, setlistId);
         return ApiResponseUtil.success(SuccessMessage.UPDATED);
     }
+
+    @DeleteMapping("/{setlistId}/edit/cancel")
+    public ResponseEntity<BaseResponse<?>> cancelEdit(
+            @UserId(require = false) Long userId,
+            @PathVariable Long setlistId
+    ) {
+        setlistEditService.cancelEdit(userId, setlistId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
 }
