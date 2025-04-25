@@ -35,7 +35,7 @@ public class SetlistSearchController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/performances")
     public ResponseEntity<BaseResponse<?>> searchPerformances(
-            @UserId(require = false) Long userId,
+            @UserId Long userId,
             @RequestParam(required = false) String aid,
             @RequestParam(required = false) Long pid,
             @RequestParam(required = false) String term
@@ -48,7 +48,7 @@ public class SetlistSearchController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/artist-musics")
     public ResponseEntity<BaseResponse<?>> searchArtistMusics(
-            @UserId(require = false) Long userId,
+            @UserId Long userId,
             @RequestParam(required = false) String aid,
             @RequestParam(required = false) String term,
             @RequestParam(required = false, defaultValue = "0") @Min(0) int offset,
