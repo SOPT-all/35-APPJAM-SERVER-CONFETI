@@ -174,9 +174,9 @@ public class PerformanceController {
     @GetMapping("/recommend/musics")
     public ResponseEntity<BaseResponse<?>> getRecommendMusics(
             @RequestParam Long performanceId,
-            @RequestParam(required = false) List<String> musicId
+            @RequestParam(required = false) List<String> musicIds
     ) {
-        RecommendMusicsDTO recommendMusicsDTO = performanceFacade.getNewRecommendMusics(performanceId, musicId);
+        RecommendMusicsDTO recommendMusicsDTO = performanceFacade.getNewRecommendMusics(performanceId, musicIds);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 RecommendMusicsResponse.from(recommendMusicsDTO));
     }
