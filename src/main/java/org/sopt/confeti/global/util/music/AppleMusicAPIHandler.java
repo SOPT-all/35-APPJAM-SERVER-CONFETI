@@ -343,7 +343,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     @Override
     @RetryOnTokenExpire
-    public MusicPage getArtistMusics(String artistId, int offset, int limit) {
+    public MusicPage getArtistMusicsByArtistId(String artistId, int offset, int limit) {
         Map<String, String> params = new HashMap<>();
         params.put("offset", String.valueOf(offset));
         params.put("limit", String.valueOf(limit));
@@ -364,6 +364,38 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         return MusicPage.of(
                 artistMusics.next(),
                 artistMusics.data().stream()
+                        .map(ConfetiMusic::from)
+                        .toList()
+        );
+    }
+
+    @Override
+    @RetryOnTokenExpire
+    public MusicPage getMusicsByKeyword(String term, int offset, int limit) {
+        Map<String, String> params = new HashMap<>();
+        params.put("term", term);
+        params.put("offset", String.valueOf(offset));
+        params.put("limit", String.valueOf(limit));
+        params.put("types", SONGS_TYPE);
+
+        return convertToConfetiMusicPage(
+                restClient.request()
+                        .get()
+                        .baseUrl(appleMusicAPIURL.getBaseUrl())
+                        .path(appleMusicAPIURL.getSingleSearchPath())
+                        .params(MultiValueMap.fromSingleValue(params))
+                        .build()
+                        .connect(headers)
+                        .retrieve(AppleMusicSearchResponse.class)
+        );
+    }
+
+    private MusicPage convertToConfetiMusicPage(AppleMusicSearchResponse searchResult) {
+        AppleMusicMusicsResponse musics = searchResult.results().songs();
+
+        return MusicPage.of(
+                musics.next(),
+                musics.data().stream()
                         .map(ConfetiMusic::from)
                         .toList()
         );
