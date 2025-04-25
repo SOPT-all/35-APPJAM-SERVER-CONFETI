@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.domain.setlist.Setlist;
 import org.sopt.confeti.domain.setlist.SetlistMusic;
 import org.sopt.confeti.domain.setlist.application.dto.request.SetlistMusicEditDto;
@@ -26,7 +27,7 @@ public class SetlistEditService {
 
     private final SetlistRepository setlistRepository;
     private final SetlistMusicRepository setlistMusicRepository;
-    private final RedisTemplate<String, List<SetlistMusicEditDto>> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
     @Transactional
@@ -148,6 +149,16 @@ public class SetlistEditService {
         redisTemplate.delete(key);
     }
 
+    @Transactional
+    public void cancelEdit(Long userId, Long setlistId) {
+        String key = generateRedisKey(userId, setlistId);
+        Boolean existed = redisTemplate.hasKey(key);
+        System.out.println(existed);
+        if (Boolean.FALSE.equals(existed)) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+        redisTemplate.delete(key);
+    }
 
     private String generateRedisKey(Long userId, Long setlistId) {
         return "edit:setlist:" + userId + ":" + setlistId;
