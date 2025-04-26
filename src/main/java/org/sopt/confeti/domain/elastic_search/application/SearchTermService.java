@@ -1,8 +1,10 @@
 package org.sopt.confeti.domain.elastic_search.application;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.elastic_search.SearchTermDocument;
+import org.sopt.confeti.domain.elastic_search.application.dto.response.PopularTermResult;
 import org.sopt.confeti.domain.elastic_search.infra.SearchTermOperator;
 import org.sopt.confeti.domain.elastic_search.infra.SearchTermRepository;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
@@ -23,5 +25,9 @@ public class SearchTermService {
         artist.ifPresent(
                 confetiArtist -> searchTermRepository.save(SearchTermDocument.create(confetiArtist.getName()))
         );
+    }
+
+    public List<PopularTermResult> getPopularSearchTerms(int limit) {
+        return searchTermOperator.getPopularSearchTerms(limit);
     }
 }
