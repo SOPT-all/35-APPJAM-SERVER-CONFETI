@@ -1,5 +1,7 @@
 package org.sopt.confeti.api.search_term.controller;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.search_term.dto.response.PopularTermsResponse;
 import org.sopt.confeti.api.search_term.facade.SearchTermFacade;
@@ -27,7 +29,7 @@ public class SearchTermController {
     @GetMapping("/popular")
     public ResponseEntity<BaseResponse<?>> getPopularSearchTerms(
             @UserId(require = false) Long userId,
-            @RequestParam(required = false, defaultValue = "10") int limit
+            @RequestParam(required = false, defaultValue = "10") @Min(1) @Max(20) Integer limit
     ) {
         PopularTermsDTO terms = searchTermFacade.getPopularSearchTerms(limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, PopularTermsResponse.from(terms));
