@@ -1,9 +1,9 @@
 package org.sopt.confeti.domain.elastic_search;
 
-import jakarta.persistence.Id;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.Builder;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -20,13 +20,13 @@ public record SearchTermDocument(
         String searchTerm,
 
         @Field(type = FieldType.Date)
-        LocalDateTime timestamp
+        Instant timestamp
 ) {
     public static SearchTermDocument create(String searchTerm) {
         return SearchTermDocument.builder()
                 .uuid(UUID.randomUUID().toString())
                 .searchTerm(searchTerm)
-                .timestamp(LocalDateTime.now())
+                .timestamp(Instant.now())
                 .build();
     }
 }

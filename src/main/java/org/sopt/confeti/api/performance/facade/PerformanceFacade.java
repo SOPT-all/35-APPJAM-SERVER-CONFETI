@@ -1,7 +1,15 @@
 package org.sopt.confeti.api.performance.facade;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +33,7 @@ import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
+import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
@@ -70,6 +79,7 @@ public class PerformanceFacade {
     private final MusicAPIHandler musicAPIHandler;
     private final TimetableFestivalService timetableFestivalService;
     private final SetlistService setlistService;
+    private final SearchTermService searchTermService;
 
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final Long userId, final long concertId) {
@@ -265,7 +275,9 @@ public class PerformanceFacade {
         List<PerformanceDTO> performances = new ArrayList<>();
 
         if (isPresent(pid)) {
-            performances.add(PerformanceDTO.from(performanceService.getPerformanceById(pid)));
+            PerformanceDTO performance = PerformanceDTO.from(performanceService.getPerformanceById(pid));
+            performances.add(performance);
+            searchTermService.write(performance.title());
         }
 
         if (isPresent(aid)) {
@@ -314,6 +326,8 @@ public class PerformanceFacade {
         PerformanceType performanceType = MorphemeAnalyzer.getFirstMatchingPerformanceType(analyzeResult);
         String processedTerm = MorphemeAnalyzer.getRemovedPerformanceTypesTerm(term, analyzeResult);
 
+        searchTermService.write(term);
+
         return AnalyzePerformanceTypeDTO.of(processedTerm, performanceType);
     }
 
@@ -350,7 +364,7 @@ public class PerformanceFacade {
         Set<String> existingMusicIds = (musicIds == null || musicIds.isEmpty())
                 ? Collections.emptySet()
                 : musicIds.stream().flatMap(ids -> Arrays.stream(ids.split(",")))
-                .map(String::trim).collect(Collectors.toSet());
+                        .map(String::trim).collect(Collectors.toSet());
 
         List<String> artistIdList = new ArrayList<>(selectedArtistIds);
         List<ConfetiMusic> recommendMusics = recommendMusicsByArtistCount(artistIdList, existingMusicIds);

@@ -1,9 +1,11 @@
 package org.sopt.confeti.domain.elastic_search.application;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.elastic_search.SearchTermDocument;
 import org.sopt.confeti.domain.elastic_search.infra.SearchTermOperator;
 import org.sopt.confeti.domain.elastic_search.infra.SearchTermRepository;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,5 +17,11 @@ public class SearchTermService {
 
     public void write(String searchTerm) {
         searchTermRepository.save(SearchTermDocument.create(searchTerm));
+    }
+
+    public void write(Optional<ConfetiArtist> artist) {
+        artist.ifPresent(
+                confetiArtist -> searchTermRepository.save(SearchTermDocument.create(confetiArtist.getName()))
+        );
     }
 }
