@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.artist.facade.dto.response.SearchACArtistsDTO;
 import org.sopt.confeti.api.artist.facade.dto.response.SearchArtistDTO;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
+import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
@@ -19,6 +20,7 @@ public class ArtistFacade {
 
     private final ArtistFavoriteService artistFavoriteService;
     private final MusicAPIHandler musicAPIHandler;
+    private final SearchTermService searchTermService;
 
     @Transactional(readOnly = true)
     public SearchArtistDTO search(Long userId, String term, String aid) {
@@ -27,6 +29,7 @@ public class ArtistFacade {
 
         if (isPresent(aid)) {
             artist = musicAPIHandler.findArtistByArtistId(aid);
+            searchTermService.write(artist);
         }
 
         if (isPresent(term)) {
