@@ -2,12 +2,19 @@ package org.sopt.confeti.domain.view.performance.application;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
+import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceCriteriaRepository;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceDTORepository;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceRepository;
 import org.sopt.confeti.global.common.constant.PerformanceType;
@@ -16,9 +23,11 @@ import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PerformanceService {
@@ -28,6 +37,7 @@ public class PerformanceService {
 
     private final PerformanceDTORepository performanceDTORepository;
     private final PerformanceRepository performanceRepository;
+    private final PerformanceCriteriaRepository performanceCriteriaRepository;
 
     @Transactional(readOnly = true)
     public List<PerformancePreviewDTO> getFavoritePerformancesPreview(final long userId) {
@@ -165,5 +175,30 @@ public class PerformanceService {
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
+    }
+
+    @Transactional(readOnly = true)
+    public List<PerformanceDTO> getExpectedPerformances(GetExpectedPerformancesDTO expectedPerformancesDTO) {
+        List<Pair<PerformanceType, Long>> performancePairs = convertToPairs(expectedPerformancesDTO);
+        List<Performance> performances = performanceCriteriaRepository.findPerformancesByTypeAndTypeId(
+                performancePairs);
+
+        Map<Pair<PerformanceType, Long>, Performance> performanceMapper = performances.stream()
+                .collect(Collectors.toMap(
+                        performance -> Pair.of(performance.getType(), performance.getTypeId()),
+                        Function.identity()
+                ));
+
+        return performancePairs.stream()
+                .map(performanceMapper::get)
+                .filter(Objects::nonNull)
+                .map(PerformanceDTO::from)
+                .toList();
+    }
+
+    private List<Pair<PerformanceType, Long>> convertToPairs(GetExpectedPerformancesDTO expectedPerformancesDTO) {
+        return expectedPerformancesDTO.expectedPerformanceDTOs().stream()
+                .map(performanceDTO -> Pair.of(performanceDTO.type(), performanceDTO.typeId()))
+                .toList();
     }
 }

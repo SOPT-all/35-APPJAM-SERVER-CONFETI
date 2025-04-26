@@ -14,11 +14,13 @@ import java.util.stream.Collectors;
 import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.AnalyzePerformanceTypeDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.IntendedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
@@ -429,5 +431,10 @@ public class PerformanceFacade {
         if (!userService.existsById(userId)) {
             throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public ExpectedPerformancesDTO getExpectedPerformances(GetExpectedPerformancesDTO expectedPerformancesDTO) {
+        return ExpectedPerformancesDTO.from(performanceService.getExpectedPerformances(expectedPerformancesDTO));
     }
 }

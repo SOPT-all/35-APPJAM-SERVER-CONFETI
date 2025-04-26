@@ -3,11 +3,15 @@ package org.sopt.confeti.api.performance.controller;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.performance.dto.request.GetExpectedPerformanceRequest;
 import org.sopt.confeti.api.performance.dto.response.AnalyzePerformanceTypeResponse;
 import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.ConfetiRecordResponse;
+import org.sopt.confeti.api.performance.dto.response.ExpectedPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.IntendedPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
@@ -17,16 +21,18 @@ import org.sopt.confeti.api.performance.dto.response.RecommendMusicsResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.SearchACPerformancesResponse;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
+import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.AnalyzePerformanceTypeDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.IntendedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -37,6 +43,8 @@ import org.sopt.confeti.global.common.constant.Default;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
+import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -47,8 +55,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -189,5 +195,34 @@ public class PerformanceController {
         ConfetiRecordDTO recordDTO = performanceFacade.getConfetiRecord(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 ConfetiRecordResponse.from(recordDTO));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/expected")
+    public ResponseEntity<BaseResponse<?>> getExpectedPerformances(
+            @UserId(require = false) Long userId,
+            @RequestParam String items
+    ) {
+        List<GetExpectedPerformanceRequest> performanceRequests = decodeToExpectedPerformancesRequest(items);
+        ExpectedPerformancesDTO expectedPerformances = performanceFacade.getExpectedPerformances(
+                GetExpectedPerformancesDTO.from(performanceRequests));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                ExpectedPerformancesResponse.of(expectedPerformances, s3FileHandler));
+    }
+
+    private List<GetExpectedPerformanceRequest> decodeToExpectedPerformancesRequest(String request) {
+        try {
+            return Arrays.stream(request.split(","))
+                    .map(item -> {
+                        String[] performance = item.split(":");
+                        return GetExpectedPerformanceRequest.of(
+                                PerformanceType.convert(performance[0].trim()),
+                                Long.parseLong(performance[1].trim())
+                        );
+                    })
+                    .toList();
+        } catch (Exception e) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
     }
 }

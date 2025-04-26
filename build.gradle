@@ -43,9 +43,6 @@ dependencies {
     implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.1.1'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.1'
 
-    // spotify api
-    implementation 'se.michaelthelin.spotify:spotify-web-api-java:8.4.1'
-
     // actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
