@@ -25,6 +25,7 @@ import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ public class SetlistService {
     private final FestivalRepository festivalRepository;
     private final UserRepository userRepository;
     private final SetlistMusicRepository setlistMusicRepository;
+    private final S3FileHandler s3FileHandler;
 
     @Transactional(readOnly = true)
     public GetAllSetlistsResponse getAllMySetlists(Long userId, SetlistSortType sortType) {
@@ -49,12 +51,12 @@ public class SetlistService {
                         Concert concert = concertRepository.findById(setlist.getTypeId())
                                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
                         return SetlistSummaryDto.of(
-                                setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt());
+                                setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt(), s3FileHandler);
                     } else {
                         Festival festival = festivalRepository.findById(setlist.getTypeId())
                                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
                         return SetlistSummaryDto.of(
-                                setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt());
+                                setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt(), s3FileHandler);
                     }
                 })
                 .toList();
@@ -82,12 +84,12 @@ public class SetlistService {
                         Concert concert = concertRepository.findById(setlist.getTypeId())
                                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
                         return SetlistSummaryDto.of(
-                                setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt());
+                                setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt(), s3FileHandler);
                     } else {
                         Festival festival = festivalRepository.findById(setlist.getTypeId())
                                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
                         return SetlistSummaryDto.of(
-                                setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt());
+                                setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt(), s3FileHandler);
                     }
                 })
                 .sorted(Comparator.comparing(SetlistSummaryDto::endAt))
@@ -154,22 +156,20 @@ public class SetlistService {
         if (setlist.getType() == SetlistType.CONCERT) {
             Concert concert = concertRepository.findById(setlist.getTypeId())
                     .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-            return new GetSetlistDetailResponse(
-                    setlist.getId(), "CONCERT", concert.getId(),
+            return GetSetlistDetailResponse.of(
+                    setlist, concert.getTitle(), concert.getSubtitle(),
                     concert.getPosterPath(), concert.getPosterBgPath(),
-                    concert.getTitle(), concert.getSubtitle(),
                     concert.getStartAt(), concert.getEndAt(),
-                    musics
+                    musics, setlist.getType(), s3FileHandler
             );
         } else {
             Festival festival = festivalRepository.findById(setlist.getTypeId())
                     .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-            return new GetSetlistDetailResponse(
-                    setlist.getId(), "FESTIVAL", festival.getId(),
+            return GetSetlistDetailResponse.of(
+                    setlist, festival.getTitle(), festival.getSubtitle(),
                     festival.getPosterPath(), festival.getPosterBgPath(),
-                    festival.getTitle(), festival.getSubtitle(),
                     festival.getStartAt(), festival.getEndAt(),
-                    musics
+                    musics, setlist.getType(), s3FileHandler
             );
         }
     }
