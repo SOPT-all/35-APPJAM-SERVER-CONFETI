@@ -24,9 +24,7 @@ public record SetlistSummaryDto(
         String posterUrl =  s3FileHandler.getFileUrl(
                 FolderPath.combine(
                         setlist.getType() == SetlistType.CONCERT ? FolderPath.CONCERT : FolderPath.FESTIVAL, FolderPath.POSTER
-                ),
-                posterPath
-        ).toString();
+                ), posterPath).toString();
         return new SetlistSummaryDto(
                 setlist.getId(),
                 setlist.getType().name(),
