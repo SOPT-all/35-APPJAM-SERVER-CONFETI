@@ -6,6 +6,7 @@ import org.sopt.confeti.global.common.constant.PerformanceType;
 public record SearchPerformanceDTO(
         long id,
         PerformanceType type,
+        long typeId,
         String title,
         String posterPath
 ) {
@@ -13,6 +14,7 @@ public record SearchPerformanceDTO(
         return new SearchPerformanceDTO(
                 performance.id(),
                 performance.type(),
+                performance.typeId(),
                 performance.title(),
                 performance.posterPath()
         );

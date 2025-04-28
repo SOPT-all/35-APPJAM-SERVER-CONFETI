@@ -6,6 +6,8 @@ import org.sopt.confeti.global.util.S3FileHandler;
 
 public record SetlistSearchPerformanceResponse(
         long performanceId,
+        String type,
+        long typeId,
         String title,
         String posterUrl
 ) {
@@ -13,6 +15,8 @@ public record SetlistSearchPerformanceResponse(
                                                       S3FileHandler s3FileHandler) {
         return new SetlistSearchPerformanceResponse(
                 performanceDTO.id(),
+                performanceDTO.type().getType(),
+                performanceDTO.typeId(),
                 performanceDTO.title(),
                 s3FileHandler.getFileUrl(
                         FolderPath.combine(FolderPath.getFolderPathByPerformanceType(performanceDTO.type()),
