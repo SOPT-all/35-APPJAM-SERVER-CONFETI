@@ -3,12 +3,15 @@ package org.sopt.confeti.domain.setlist.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
 
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,6 +32,7 @@ import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,9 +46,16 @@ class SetlistServiceTest {
     @Mock private FestivalRepository festivalRepository;
     @Mock private UserRepository userRepository;
     @Mock private SetlistMusicRepository setlistMusicRepository;
+    @Mock private S3FileHandler s3FileHandler;
 
     private final Long userId = 1L;
     private final User user = mockUser(userId);
+
+    @BeforeEach
+    void setup() throws Exception {
+        lenient().when(s3FileHandler.getFileUrl(any(), any()))
+                .thenReturn(new URL("https://mock-s3-url.com/poster.png"));
+    }
 
     @Test
     void 셋리스트_전체조회_OLDEST() {
@@ -101,6 +112,118 @@ class SetlistServiceTest {
         assertThat(result).extracting(SetlistSummaryDto::title).containsExactly("F2", "F1", "C1");
     }
 
+    @Test
+    void 여러개의_공연을_셋리스트로_생성() {
+        SetlistCreateRequest request1 = new SetlistCreateRequest(SetlistType.CONCERT, 100L);
+        SetlistCreateRequest request2 = new SetlistCreateRequest(SetlistType.FESTIVAL, 200L);
+        List<SetlistCreateRequest> requests = List.of(request1, request2);
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+        Setlist savedSetlist1 = createSetlist(SetlistType.CONCERT, 100L);
+        Setlist savedSetlist2 = createSetlist(SetlistType.FESTIVAL, 200L);
+        ReflectionTestUtils.setField(savedSetlist1, "id", 1L);
+        ReflectionTestUtils.setField(savedSetlist2, "id", 2L);
+
+        given(setlistRepository.save(any(Setlist.class)))
+                .willReturn(savedSetlist1)
+                .willReturn(savedSetlist2);
+
+        List<Long> result = setlistService.createSetLists(userId, requests);
+
+        assertThat(result).hasSize(2).containsExactly(1L, 2L);
+    }
+
+    @Test
+    void 이미_생성된_셋리스트는_중복_생성되지_않는다() {
+        SetlistCreateRequest request1 = new SetlistCreateRequest(SetlistType.CONCERT, 100L);
+        SetlistCreateRequest request2 = new SetlistCreateRequest(SetlistType.FESTIVAL, 200L);
+        List<SetlistCreateRequest> requests = List.of(request1, request2);
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(setlistRepository.existsByUserIdAndTypeAndTypeId(userId, SetlistType.CONCERT, 100L)).willReturn(true);
+        given(setlistRepository.existsByUserIdAndTypeAndTypeId(userId, SetlistType.FESTIVAL, 200L)).willReturn(false);
+
+        Setlist newSetlist = createSetlist(SetlistType.FESTIVAL, 200L);
+        ReflectionTestUtils.setField(newSetlist, "id", 999L);
+        given(setlistRepository.save(any(Setlist.class))).willReturn(newSetlist);
+
+        List<Long> result = setlistService.createSetLists(userId, requests);
+
+        assertThat(result).containsExactly(999L);
+    }
+
+    @Test
+    void 셋리스트에_여러_곡을_추가하면_순서가_자동으로_부여된다() {
+        Long setlistId = 100L;
+        Setlist setlist = createSetlist(SetlistType.CONCERT, 1L);
+
+        SetlistMusic existing1 = SetlistMusic.builder().artistName("EXO").trackName("Love Shot").orders(1).build();
+        SetlistMusic existing2 = SetlistMusic.builder().artistName("BTS").trackName("Dynamite").orders(2).build();
+        setlist.addMusics(existing1);
+        setlist.addMusics(existing2);
+
+        given(setlistRepository.findById(setlistId)).willReturn(Optional.of(setlist));
+
+        List<AddSetListMusicRequest> requests = List.of(
+                new AddSetListMusicRequest("01", "IU", "Love wins all", "url1", "preview1"),
+                new AddSetListMusicRequest("02", "NewJeans", "Hype Boy", "url2", "preview2")
+        );
+
+        int result = setlistService.addMusics(userId, setlistId, requests);
+
+        assertThat(result).isEqualTo(2);
+        assertThat(setlist.getMusics()).hasSize(4);
+    }
+
+    @Test
+    void 셋리스트_상세조회_CONCERT_타입일_경우_정상조회() {
+        Long setlistId = 10L;
+        Long concertId = 100L;
+
+        Setlist setlist = createSetlist(SetlistType.CONCERT, concertId);
+        ReflectionTestUtils.setField(setlist, "id", setlistId);
+
+        SetlistMusic music = createMusic("01", "IU", "Love wins all", 1);
+        music.setSetlist(setlist);
+
+        Concert concert = mockConcert("아이유 콘서트", LocalDate.of(2024, 5, 10));
+
+        given(setlistRepository.findByIdAndUserId(setlistId, userId)).willReturn(Optional.of(setlist));
+        given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
+        given(setlistMusicRepository.findBySetlist(setlist)).willReturn(List.of(music));
+
+        var result = setlistService.getSetlistDetail(userId, setlistId);
+
+        assertThat(result.type()).isEqualTo("CONCERT");
+        assertThat(result.posterUrl()).isEqualTo("https://mock-s3-url.com/poster.png");
+        assertThat(result.posterBgUrl()).isEqualTo("https://mock-s3-url.com/poster.png");
+    }
+
+    @Test
+    void 셋리스트_상세조회_FESTIVAL_타입일_경우_정상조회() {
+        Long setlistId = 20L;
+        Long festivalId = 200L;
+
+        Setlist setlist = createSetlist(SetlistType.FESTIVAL, festivalId);
+        ReflectionTestUtils.setField(setlist, "id", setlistId);
+
+        SetlistMusic music = createMusic("02", "NewJeans", "ETA", 1);
+        music.setSetlist(setlist);
+
+        Festival festival = mockFestival("부산 록 페스티벌", LocalDate.of(2024, 8, 20));
+
+        given(setlistRepository.findByIdAndUserId(setlistId, userId)).willReturn(Optional.of(setlist));
+        given(festivalRepository.findById(festivalId)).willReturn(Optional.of(festival));
+        given(setlistMusicRepository.findBySetlist(setlist)).willReturn(List.of(music));
+
+        var result = setlistService.getSetlistDetail(userId, setlistId);
+
+        assertThat(result.type()).isEqualTo("FESTIVAL");
+        assertThat(result.posterUrl()).isEqualTo("https://mock-s3-url.com/poster.png");
+        assertThat(result.posterBgUrl()).isEqualTo("https://mock-s3-url.com/poster.png");
+    }
+
     private static User mockUser(Long id) {
         User user = User.builder()
                 .provider(OAuthProvider.KAKAO)
@@ -119,219 +242,36 @@ class SetlistServiceTest {
 
     private Concert mockConcert(String title, LocalDate endAt) {
         Concert concert = Concert.builder()
-                .title(title)
-                .subtitle("sub")
-                .startAt(endAt.minusDays(2))
-                .endAt(endAt)
-                .area("서울")
-                .posterPath(title + ".jpg")
-                .posterBgPath("bg.jpg")
-                .concertInfoImgPath("info.jpg")
-                .reserveAt(LocalDateTime.now())
-                .reservationUrl("url")
-                .reservationOffice("office")
-                .ageRating("ALL")
-                .time("18:00")
-                .price("10000")
-                .address("서울시")
-                .artists(List.of())
-                .musics(List.of())
-                .reservationUrls(List.of())
+                .title(title).subtitle("sub")
+                .startAt(endAt.minusDays(2)).endAt(endAt)
+                .area("서울").posterPath(title + ".jpg").posterBgPath("bg.jpg")
+                .concertInfoImgPath("info.jpg").reserveAt(LocalDateTime.now())
+                .reservationUrl("url").reservationOffice("office")
+                .ageRating("ALL").time("18:00").price("10000").address("서울시")
+                .artists(List.of()).musics(List.of()).reservationUrls(List.of())
                 .build();
-
         ReflectionTestUtils.setField(concert, "id", 100L);
         return concert;
     }
 
     private Festival mockFestival(String title, LocalDate endAt) {
         Festival festival = Festival.builder()
-                .title(title)
-                .subtitle("sub")
-                .startAt(endAt.minusDays(2))
-                .endAt(endAt)
-                .area("부산")
-                .posterPath(title + ".jpg")
-                .posterBgPath("bg.jpg")
-                .festivalInfoImgPath("info.jpg")
-                .logoPath("logo.jpg")
-                .reserveAt(LocalDateTime.now())
-                .reservationUrl("url")
-                .reservationOffice("office")
-                .ageRating("ALL")
-                .time("16:00")
-                .price("8000")
-                .address("부산시")
-                .dates(List.of())
-                .musics(List.of())
-                .reservationUrls(List.of())
+                .title(title).subtitle("sub")
+                .startAt(endAt.minusDays(2)).endAt(endAt)
+                .area("부산").posterPath(title + ".jpg").posterBgPath("bg.jpg")
+                .festivalInfoImgPath("info.jpg").logoPath("logo.jpg")
+                .reserveAt(LocalDateTime.now()).reservationUrl("url")
+                .reservationOffice("office").ageRating("ALL").time("16:00")
+                .price("8000").address("부산시").dates(List.of()).musics(List.of()).reservationUrls(List.of())
                 .build();
-
         ReflectionTestUtils.setField(festival, "id", 200L);
         return festival;
     }
 
-    @Test
-    void 여러개의_공연을_셋리스트로_생성() {
-        // given
-        SetlistCreateRequest request1 = new SetlistCreateRequest(SetlistType.CONCERT, 100L);
-        SetlistCreateRequest request2 = new SetlistCreateRequest(SetlistType.FESTIVAL, 200L);
-        List<SetlistCreateRequest> requests = List.of(request1, request2);
-
-        given(userRepository.findById(userId)).willReturn(Optional.of(user));
-
-        Setlist savedSetlist1 = createSetlist(SetlistType.CONCERT, 100L);
-        Setlist savedSetlist2 = createSetlist(SetlistType.FESTIVAL, 200L);
-        ReflectionTestUtils.setField(savedSetlist1, "id", 1L);
-        ReflectionTestUtils.setField(savedSetlist2, "id", 2L);
-
-        given(setlistRepository.save(any(Setlist.class)))
-                .willReturn(savedSetlist1)
-                .willReturn(savedSetlist2);
-
-        // when
-        List<Long> result = setlistService.createSetLists(userId, requests);
-
-        // then
-        assertThat(result).hasSize(2);
-        assertThat(result).containsExactly(1L, 2L);
-    }
-
-    @Test
-    void 이미_생성된_셋리스트는_중복_생성되지_않는다() {
-        // given
-        SetlistCreateRequest request1 = new SetlistCreateRequest(SetlistType.CONCERT, 100L);
-        SetlistCreateRequest request2 = new SetlistCreateRequest(SetlistType.FESTIVAL, 200L);
-        List<SetlistCreateRequest> requests = List.of(request1, request2);
-
-        given(userRepository.findById(userId)).willReturn(Optional.of(user));
-        given(setlistRepository.existsByUserIdAndTypeAndTypeId(userId, SetlistType.CONCERT, 100L)).willReturn(true); // 이미 존재
-        given(setlistRepository.existsByUserIdAndTypeAndTypeId(userId, SetlistType.FESTIVAL, 200L)).willReturn(false);
-
-        Setlist newSetlist = createSetlist(SetlistType.FESTIVAL, 200L);
-        ReflectionTestUtils.setField(newSetlist, "id", 999L);
-        given(setlistRepository.save(any(Setlist.class))).willReturn(newSetlist);
-
-        // when
-        List<Long> result = setlistService.createSetLists(userId, requests);
-
-        // then
-        assertThat(result).containsExactly(999L);
-    }
-
-    @Test
-    void 셋리스트에_여러_곡을_추가하면_순서가_자동으로_부여된다() {
-        // given
-        Long setlistId = 100L;
-        Setlist setlist = Setlist.builder()
-                .user(user)
-                .type(SetlistType.CONCERT)
-                .typeId(1L)
+    private SetlistMusic createMusic(String trackId, String artistName, String trackName, int orders) {
+        return SetlistMusic.builder()
+                .trackId(trackId).artistName(artistName)
+                .trackName(trackName).orders(orders)
                 .build();
-
-        SetlistMusic existing1 = SetlistMusic.builder()
-                .artistName("EXO").trackName("Love Shot").orders(1).build();
-        SetlistMusic existing2 = SetlistMusic.builder()
-                .artistName("BTS").trackName("Dynamite").orders(2).build();
-        setlist.addMusics(existing1);
-        setlist.addMusics(existing2);
-
-        given(setlistRepository.findById(setlistId)).willReturn(Optional.of(setlist));
-
-        List<AddSetListMusicRequest> requests = List.of(
-                new AddSetListMusicRequest("01", "IU", "Love wins all", "url1", "preview1"),
-                new AddSetListMusicRequest("02", "NewJeans", "Hype Boy", "url2", "preview2")
-        );
-
-        // when
-        int result = setlistService.addMusics(userId, setlistId, requests);
-
-        // then
-        assertThat(result).isEqualTo(2);
-        List<SetlistMusic> allMusics = setlist.getMusics();
-        assertThat(allMusics).hasSize(4);
-        assertThat(allMusics.get(2).getOrders()).isEqualTo(3);
-        assertThat(allMusics.get(2).getArtistName()).isEqualTo("IU");
-        assertThat(allMusics.get(3).getOrders()).isEqualTo(4);
-        assertThat(allMusics.get(3).getArtistName()).isEqualTo("NewJeans");
-    }
-
-    @Test
-    void 셋리스트_상세조회_CONCERT_타입일_경우_정상조회() {
-        // given
-        Long setlistId = 10L;
-        Long concertId = 100L;
-
-        Setlist setlist = Setlist.builder()
-                .user(user)
-                .type(SetlistType.CONCERT)
-                .typeId(concertId)
-                .build();
-        ReflectionTestUtils.setField(setlist, "id", setlistId);
-
-        SetlistMusic music = SetlistMusic.builder()
-                .trackId("01")
-                .artistName("IU")
-                .trackName("Love wins all")
-                .artworkUrl("art.jpg")
-                .previewUrl("prev.mp3")
-                .orders(1)
-                .build();
-        music.setSetlist(setlist);
-
-        Concert concert = mockConcert("아이유 콘서트", LocalDate.of(2024, 5, 10));
-        given(setlistRepository.findByIdAndUserId(setlistId, userId)).willReturn(Optional.of(setlist));
-        given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
-        given(setlistMusicRepository.findBySetlist(setlist)).willReturn(List.of(music));
-
-        // when
-        var result = setlistService.getSetlistDetail(userId, setlistId);
-
-        // then
-        assertThat(result.type()).isEqualTo("CONCERT");
-        assertThat(result.typeId()).isEqualTo(concertId);
-        assertThat(result.title()).isEqualTo("아이유 콘서트");
-        assertThat(result.musics()).hasSize(1);
-        assertThat(result.musics().get(0).trackId()).isEqualTo("01");
-        assertThat(result.musics().get(0).artistName()).isEqualTo("IU");
-    }
-
-    @Test
-    void 셋리스트_상세조회_FESTIVAL_타입일_경우_정상조회() {
-        // given
-        Long setlistId = 20L;
-        Long festivalId = 200L;
-
-        Setlist setlist = Setlist.builder()
-                .user(user)
-                .type(SetlistType.FESTIVAL)
-                .typeId(festivalId)
-                .build();
-        ReflectionTestUtils.setField(setlist, "id", setlistId);
-
-        SetlistMusic music = SetlistMusic.builder()
-                .trackId("02")
-                .artistName("NewJeans")
-                .trackName("ETA")
-                .artworkUrl("art2.jpg")
-                .previewUrl("prev2.mp3")
-                .orders(1)
-                .build();
-        music.setSetlist(setlist);
-
-        Festival festival = mockFestival("부산 록 페스티벌", LocalDate.of(2024, 8, 20));
-        given(setlistRepository.findByIdAndUserId(setlistId, userId)).willReturn(Optional.of(setlist));
-        given(festivalRepository.findById(festivalId)).willReturn(Optional.of(festival));
-        given(setlistMusicRepository.findBySetlist(setlist)).willReturn(List.of(music));
-
-        // when
-        var result = setlistService.getSetlistDetail(userId, setlistId);
-
-        // then
-        assertThat(result.type()).isEqualTo("FESTIVAL");
-        assertThat(result.typeId()).isEqualTo(festivalId);
-        assertThat(result.title()).isEqualTo("부산 록 페스티벌");
-        assertThat(result.musics()).hasSize(1);
-        assertThat(result.musics().get(0).trackId()).isEqualTo("02");
-        assertThat(result.musics().get(0).artistName()).isEqualTo("NewJeans");
     }
 }
