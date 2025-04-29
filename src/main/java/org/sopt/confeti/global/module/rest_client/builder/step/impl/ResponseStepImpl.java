@@ -58,9 +58,11 @@ public class ResponseStepImpl implements ResponseStep {
                     })
                     .body(Void.class);
         } catch (UnauthorizedException e) {
+            e.printStackTrace();
             throw e;
         } catch (Exception e) {
-            log.error("Exception: {} | {}", e.getMessage(), e.getStackTrace()[0].toString());
+//            log.error("Exception: {} | {}", e.getMessage(), e.getStackTrace()[0].toString());
+            e.printStackTrace();
             throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
     }
