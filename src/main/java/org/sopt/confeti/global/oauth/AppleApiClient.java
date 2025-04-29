@@ -66,6 +66,11 @@ public class AppleApiClient implements OAuthApiClient {
         return OAuthSocialInfoResult.from(socialInfo);
     }
 
+    @Override
+    public void unlink(String socialId) {
+        
+    }
+
     private AppleTokenResult requestTokens(AppleTokenRequestParams requestParams) {
         Map<String, String> params = new HashMap<>();
         params.put("grant_type", requestParams.grantType());

@@ -43,4 +43,25 @@ public class ResponseStepImpl implements ResponseStep {
             throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Override
+    public void retrieve() {
+        try {
+            this.methodType
+                    .onStatus(status -> status.equals(HttpStatus.UNAUTHORIZED), (clientRequest, clientResponse) -> {
+                        log.error("Token Expired, url : {}", clientRequest.getURI());
+                        throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
+                    })
+                    .onStatus(HttpStatusCode::isError, (clientRequest, clientResponse) -> {
+                        log.error("RestClient HTTP Error with code : {}, url : {}", clientResponse.getStatusCode(),
+                                clientRequest.getURI());
+                    })
+                    .body(Void.class);
+        } catch (UnauthorizedException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Exception: {} | {}", e.getMessage(), e.getStackTrace()[0].toString());
+            throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

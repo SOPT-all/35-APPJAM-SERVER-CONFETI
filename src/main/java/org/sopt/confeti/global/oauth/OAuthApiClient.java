@@ -9,4 +9,6 @@ public interface OAuthApiClient {
     boolean supports(OAuthProvider provider);
 
     OAuthSocialInfoResult getSocialInfo(LoginCommand command);
+
+    void unlink(String socialId);
 }
