@@ -22,9 +22,13 @@ public class KakaoApiClient implements OAuthApiClient {
     @Value("${kakao.client-id}")
     private String clientId;
 
+    @Value("${kakao.admin-key}")
+    private String adminKey;
+
     private static final String GRANT_TYPE = "authorization_code";
     private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com/oauth/token";
     private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com/v2/user/me";
+    private final String KAUTH_USER_UNLINK_URL_HOST = "https://kapi.kakao.com/v1/user/unlink";
 
     private final ApiRestClientBuilder restClient;
 
@@ -38,6 +42,24 @@ public class KakaoApiClient implements OAuthApiClient {
         KakaoTokenResult tokenResult = requestAccessToken(KakaoLoginParams.from(command));
         KakaoSocialInfoResult socialInfo = getSocialInfo(tokenResult.accessToken());
         return OAuthSocialInfoResult.from(socialInfo);
+    }
+
+    @Override
+    public void unlink(String accessToken) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HttpHeaders.AUTHORIZATION, "KakaoAK " + adminKey);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("target_id_type", "user_id");
+        params.put("target_id", accessToken);
+
+        restClient.request()
+                .post()
+                .baseUrl(KAUTH_USER_UNLINK_URL_HOST)
+                .params(MultiValueMap.fromSingleValue(params))
+                .build()
+                .connect(headers)
+                .retrieve();
     }
 
     private KakaoTokenResult requestAccessToken(KakaoLoginParams requestParams) {

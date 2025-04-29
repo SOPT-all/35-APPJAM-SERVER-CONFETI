@@ -13,6 +13,7 @@ import org.sopt.confeti.auth.dto.LoginResult;
 import org.sopt.confeti.auth.dto.OAuthSocialInfoResult;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.user.AuthUser;
+import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -67,6 +68,15 @@ public class AuthFacade {
     @Transactional
     public void withdraw(long userId) {
         User user = userService.findById(userId);
+
+        if (user.getProvider() == OAuthProvider.KAKAO) {
+            withdrawService.unlinkKakaoAccount(user.getSocialId());
+        }
+
+        if (user.getProvider() == OAuthProvider.APPLE) {
+            withdrawService.unlinkAppleAccount(user.getId());
+        }
+
         userService.deleteUser(user);
         withdrawService.deleteAllExistAppleTokensByUserId(userId);
         withdrawService.deleteAllExistRefreshTokensByUserId(userId);
