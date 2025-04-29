@@ -1,11 +1,11 @@
 package org.sopt.confeti.global.resolver.music_api.artist;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.annotation.Resolver;
 import org.sopt.confeti.global.resolver.music_api.AbstractMusicAPISpecificResolver;
 import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
@@ -15,7 +15,6 @@ import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Resolver
 @RequiredArgsConstructor
 public class ArtistResolver extends AbstractMusicAPISpecificResolver {
@@ -38,7 +37,7 @@ public class ArtistResolver extends AbstractMusicAPISpecificResolver {
         final HashMap<String, Queue<ConfetiArtist>> artistMapper = new HashMap<>();
         collect(strategy, artistMapper, target);
         injection(
-                artistMapper, getArtistsByArtistIds(artistMapper.keySet())
+                artistMapper, getArtistsByArtistIds(new HashSet<>(artistMapper.keySet()))
         );
     }
 
