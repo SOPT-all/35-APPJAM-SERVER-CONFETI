@@ -19,6 +19,7 @@ public record ConcertDetailInfoResponse(
         String time,
         String ageRating,
         String price,
+        String address,
         boolean isFavorite,
         List<ConcertReservationResponse> reservations
 ) {
@@ -39,6 +40,7 @@ public record ConcertDetailInfoResponse(
                 concertDetailDTO.time(),
                 concertDetailDTO.ageRating(),
                 concertDetailDTO.price(),
+                concertDetailDTO.address(),
                 concertDetailDTO.isFavorite(),
                 concertDetailDTO.reservations().stream()
                         .map(reservation -> ConcertReservationResponse.of(reservation, s3FileHandler))
