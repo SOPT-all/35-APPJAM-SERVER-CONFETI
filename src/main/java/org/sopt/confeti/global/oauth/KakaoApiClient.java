@@ -45,13 +45,13 @@ public class KakaoApiClient implements OAuthApiClient {
     }
 
     @Override
-    public void unlink(String socialId) {
+    public void unlink(String accessToken) {
         Map<String, String> headers = new HashMap<>();
         headers.put(HttpHeaders.AUTHORIZATION, "KakaoAK " + adminKey);
 
         Map<String, String> params = new HashMap<>();
         params.put("target_id_type", "user_id");
-        params.put("target_id", socialId);
+        params.put("target_id", accessToken);
 
         restClient.request()
                 .post()

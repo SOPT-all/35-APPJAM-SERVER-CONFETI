@@ -70,7 +70,11 @@ public class AuthFacade {
         User user = userService.findById(userId);
 
         if (user.getProvider() == OAuthProvider.KAKAO) {
-            withdrawService.UnlinkKakaoAccount(user.getSocialId());
+            withdrawService.unlinkKakaoAccount(user.getSocialId());
+        }
+
+        if (user.getProvider() == OAuthProvider.APPLE) {
+            withdrawService.unlinkAppleAccount(user.getId());
         }
 
         userService.deleteUser(user);

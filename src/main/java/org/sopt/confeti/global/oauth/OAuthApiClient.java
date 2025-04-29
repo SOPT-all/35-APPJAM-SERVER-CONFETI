@@ -10,5 +10,5 @@ public interface OAuthApiClient {
 
     OAuthSocialInfoResult getSocialInfo(LoginCommand command);
 
-    void unlink(String socialId);
+    void unlink(String accessToken);
 }

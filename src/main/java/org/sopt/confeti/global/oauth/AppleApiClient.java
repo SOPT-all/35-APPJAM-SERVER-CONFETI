@@ -47,6 +47,7 @@ public class AppleApiClient implements OAuthApiClient {
     private final String AAUTH_AUDIENCE_URL_HOST = "https://appleid.apple.com";
     private final String AAUTH_TOKEN_URL_HOST = "https://appleid.apple.com/auth/token";
     private final String AAUTH_PUBLIC_KEY_URL_HOST = "https://appleid.apple.com/auth/keys";
+    private final String AAUTH_USER_UNLINK_URL_HOST = "https://appleid.apple.com/auth/revoke";
     private final int CLIENT_SECRET_EXPIRATION_MINUTE = 30;
     private final String PRIVATE_KEY_ALGORITHM = "EC";
 
@@ -67,8 +68,19 @@ public class AppleApiClient implements OAuthApiClient {
     }
 
     @Override
-    public void unlink(String socialId) {
-        
+    public void unlink(String accessToken) {
+        Map<String, String> params = new HashMap<>();
+        params.put("client_id", clientId);
+        params.put("client_secret", generateClientSecret());
+        params.put("token", accessToken);
+
+        restClient.request()
+                .post()
+                .baseUrl(AAUTH_USER_UNLINK_URL_HOST)
+                .params(MultiValueMap.fromSingleValue(params))
+                .build()
+                .connect()
+                .retrieve();
     }
 
     private AppleTokenResult requestTokens(AppleTokenRequestParams requestParams) {
