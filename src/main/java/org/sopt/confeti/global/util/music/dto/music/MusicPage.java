@@ -7,19 +7,21 @@ import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class MusicPage {
 
     private static final Pattern offsetPattern = Pattern.compile("offset=(\\d+)");
     private static final int FIRST_ITEM = 1;
     private static final int DEFAULT_NEXT_OFFSET = -1;
 
-    private final int nextOffset;
-    private final boolean isLast;
-    private final List<ConfetiMusic> musics;
+    private int nextOffset;
+    private boolean isLast;
+    private List<ConfetiMusic> musics;
 
     public static MusicPage of(String next, List<ConfetiMusic> musics) {
         boolean isLast = Objects.isNull(next);

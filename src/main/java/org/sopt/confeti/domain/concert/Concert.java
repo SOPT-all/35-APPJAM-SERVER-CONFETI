@@ -40,7 +40,7 @@ public class Concert {
     @Column(length = 50, nullable = false)
     private String title;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 80, nullable = false)
     private String subtitle;
 
     @Column(nullable = false)
