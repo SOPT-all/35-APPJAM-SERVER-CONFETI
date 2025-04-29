@@ -27,7 +27,7 @@ public class Setlist {
     @Column(name = "type_id", nullable = false)
     private Long typeId;
 
-    @OneToMany(mappedBy = "setlist", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "setlist", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<SetlistMusic> musics = new ArrayList<>();
 
     @Builder

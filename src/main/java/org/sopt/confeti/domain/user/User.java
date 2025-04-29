@@ -20,6 +20,7 @@ import lombok.Setter;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.concert_favorite.ConcertFavorite;
 import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
+import org.sopt.confeti.domain.setlist.Setlist;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.domain.user.constant.Role;
 
@@ -68,6 +69,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<TimetableFestival> timetableFestivals = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Setlist> setlists = new ArrayList<>();
 
     @Builder
     public User(OAuthProvider provider, String socialId, String name, String profilePath, Role role) {
