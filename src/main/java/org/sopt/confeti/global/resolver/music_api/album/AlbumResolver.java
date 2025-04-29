@@ -1,6 +1,7 @@
 package org.sopt.confeti.global.resolver.music_api.album;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -35,7 +36,7 @@ public class AlbumResolver extends AbstractMusicAPISpecificResolver {
         final HashMap<String, Queue<ConfetiAlbum>> albumMapper = new HashMap<>();
         collect(strategy, albumMapper, target);
         injection(
-                albumMapper, getAlbumsByAlbumIds(albumMapper.keySet())
+                albumMapper, getAlbumsByAlbumIds(new HashSet<>(albumMapper.keySet()))
         );
     }
 
