@@ -1,6 +1,5 @@
 package org.sopt.confeti.global.resolver.music_api.album.vo;
 
-import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,30 +18,24 @@ public class ConfetiAlbum {
     @Setter
     private String name;
 
-    @Setter
-    private LocalDate releaseAt;
-
     public static ConfetiAlbum from(final AppleMusicArtistAlbumResponse album) {
         return new ConfetiAlbum(
                 album.id(),
-                "",
-                null
+                ""
         );
     }
 
     public static ConfetiAlbum from(final String albumId) {
         return new ConfetiAlbum(
                 albumId,
-                "",
-                null
+                ""
         );
     }
 
     public static ConfetiAlbum from(final AppleMusicAlbumResponse album) {
         return new ConfetiAlbum(
                 album.id(),
-                album.attributes().name(),
-                album.attributes().releaseDate()
+                album.attributes().name()
         );
     }
 

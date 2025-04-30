@@ -86,7 +86,6 @@ public class AlbumResolver extends AbstractMusicAPISpecificResolver {
                 ConfetiAlbum mappedConfetiAlbum = mappedConfetiAlbums.poll();
 
                 mappedConfetiAlbum.setName(confetiAlbum.getName());
-                mappedConfetiAlbum.setReleaseAt(confetiAlbum.getReleaseAt());
             }
         }));
     }
