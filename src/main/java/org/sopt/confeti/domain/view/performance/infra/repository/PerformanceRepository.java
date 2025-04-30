@@ -92,4 +92,6 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "AND p.endAt >= CURRENT_DATE " +
             "ORDER BY RAND() ASC LIMIT 1 ")
     Performance getPerformanceByUserFavorites(final @Param("userId") Long userId);
+
+    List<Performance> findRecentPerformancesByEndAtGreaterThanEqual(LocalDate now, PageRequest pageRequest);
 }
