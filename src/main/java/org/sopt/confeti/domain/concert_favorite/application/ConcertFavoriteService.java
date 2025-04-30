@@ -34,8 +34,8 @@ public class ConcertFavoriteService {
     }
 
     @Transactional(readOnly = true)
-    public boolean existsByUserId(final Long userId) {
-        return concertFavoriteRepository.existsByUserId(userId);
+    public boolean existsUpcomingReservationByUserId(final Long userId) {
+        return concertFavoriteRepository.existsUpcomingReservationByUserId(userId);
     }
 
     @Transactional(readOnly = true)

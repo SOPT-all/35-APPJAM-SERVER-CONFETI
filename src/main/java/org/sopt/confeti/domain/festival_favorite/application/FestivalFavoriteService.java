@@ -40,8 +40,8 @@ public class FestivalFavoriteService {
         return festivalFavoriteRepository.existsByUserIdAndFestivalId(userId, festivalId);
     }
 
-    public boolean existsByUserId(final Long userId) {
-        return festivalFavoriteRepository.existsByUserId(userId);
+    public boolean existsUpcomingReservationByUserId(final Long userId) {
+        return festivalFavoriteRepository.existsUpcomingReservationByUserId(userId);
     }
 
     @Transactional(readOnly = true)
