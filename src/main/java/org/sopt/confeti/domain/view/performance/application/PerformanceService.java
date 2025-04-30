@@ -100,7 +100,8 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public List<Performance> getRecentPerformances(final int recentPerformancesSize) {
-        return performanceRepository.findAll(
+        return performanceRepository.findRecentPerformancesByEndAtGreaterThanEqual(
+                LocalDate.now(),
                 getPageRequest(recentPerformancesSize, getRecentPerformancesSort())
         ).stream().toList();
     }
