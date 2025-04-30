@@ -136,8 +136,8 @@ public class PerformanceFacade {
     @Transactional(readOnly = true)
     public PerformanceReservationDTO getPerformReservationInfo(final Long userId) {
         boolean isUserExist = userId != null && userService.existsById(userId);
-        boolean isCFExist = isUserExist && concertFavoriteService.existsByUserId(userId);
-        boolean isFFExist = isUserExist && festivalFavoriteService.existsByUserId(userId);
+        boolean isCFExist = isUserExist && concertFavoriteService.existsUpcomingReservationByUserId(userId);
+        boolean isFFExist = isUserExist && festivalFavoriteService.existsUpcomingReservationByUserId(userId);
 
         if (isCFExist || isFFExist) {
             List<PerformanceTicketDTO> performanceReserve = performanceService.getFavoritePerformancesReservation(

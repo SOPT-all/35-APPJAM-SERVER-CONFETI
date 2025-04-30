@@ -12,7 +12,11 @@ public interface ConcertFavoriteRepository extends JpaRepository<ConcertFavorite
 
     void deleteByUserIdAndConcertId(final long userId, final long concertId);
 
-    boolean existsByUserId(final Long userId);
+    @Query("SELECT CASE WHEN COUNT(cf) > 0 THEN true ELSE false END " +
+            "FROM ConcertFavorite cf " +
+            "WHERE cf.user.id = :userId " +
+            "AND cf.concert.reserveAt >= CURRENT_DATE ")
+    boolean existsUpcomingReservationByUserId(@Param("userId") Long userId);
 
     @Query("SELECT cf.concert.id FROM ConcertFavorite cf WHERE cf.user.id = :userId AND cf.concert.id IN :concertIds")
     List<Long> findFavoriteConcertIds(@Param("userId") Long userId, @Param("concertIds") Set<Long> concertIds);
