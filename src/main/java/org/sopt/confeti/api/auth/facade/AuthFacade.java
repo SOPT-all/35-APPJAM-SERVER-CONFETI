@@ -32,6 +32,7 @@ public class AuthFacade {
     private final OnboardService onboardService;
     private final WithdrawService withdrawService;
 
+    @Transactional
     public LoginResult login(LoginCommand loginCommand) {
         OAuthSocialInfoResult socialInfo = loginService.getSocialInfo(loginCommand);
 
