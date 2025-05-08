@@ -38,10 +38,6 @@ public class CreateFestivalRequest {
 
     @Valid
     @Size(min = 1)
-    private List<CreateFestivalMusicRequest> musics = new ArrayList<>();
-
-    @Valid
-    @Size(min = 1)
     private List<CreateFestivalReservationUrlRequest> reservationUrls = new ArrayList<>();
 
     @Valid

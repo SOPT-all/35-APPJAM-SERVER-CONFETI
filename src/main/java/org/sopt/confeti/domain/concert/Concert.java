@@ -20,9 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.domain.concert_artist.ConcertArtist;
-import org.sopt.confeti.domain.concert_music.ConcertMusic;
 import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
-import org.sopt.confeti.global.common.constant.Default;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -56,22 +54,8 @@ public class Concert {
     @Column(length = 250, nullable = false)
     private String posterPath;
 
-    @Setter
-    @Column(length = 250, nullable = false)
-    private String posterBgPath;
-
-    @Setter
-    @Column(length = 250, nullable = false)
-    private String concertInfoImgPath; // 제거 대상
-
     @Column(nullable = false)
     private LocalDateTime reserveAt;
-
-    @Column(length = 250, nullable = false)
-    private String reservationUrl; // 제거 대상
-
-    @Column(length = 50, nullable = false)
-    private String reservationOffice; // 제거 대상
 
     @Column(length = 30, nullable = false)
     private String ageRating;
@@ -96,17 +80,13 @@ public class Concert {
     private List<ConcertArtist> artists = new ArrayList<>();
 
     @OneToMany(mappedBy = "concert", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ConcertMusic> musics = new ArrayList<>();
-
-    @OneToMany(mappedBy = "concert", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConcertReservationUrl> reservationUrls = new ArrayList<>();
 
     @Builder
     private Concert(String title, String subtitle, LocalDate startAt, LocalDate endAt, String area,
-                    String posterPath, String posterBgPath, String concertInfoImgPath,
-                    LocalDateTime reserveAt, String reservationUrl, String reservationOffice, String ageRating,
+                    String posterPath, LocalDateTime reserveAt, String ageRating,
                     String time, String price, String address,
-                    List<ConcertArtist> artists, List<ConcertMusic> musics, List<ConcertReservationUrl> reservationUrls
+                    List<ConcertArtist> artists, List<ConcertReservationUrl> reservationUrls
     ) {
         this.title = title;
         this.subtitle = subtitle;
@@ -114,21 +94,15 @@ public class Concert {
         this.endAt = endAt;
         this.area = area;
         this.posterPath = posterPath;
-        this.posterBgPath = posterBgPath;
-        this.concertInfoImgPath = concertInfoImgPath;
         this.reserveAt = reserveAt;
-        this.reservationUrl = reservationUrl;
-        this.reservationOffice = reservationOffice;
         this.ageRating = ageRating;
         this.time = time;
         this.price = price;
         this.address = address;
         this.artists = artists;
-        this.musics = musics;
         this.reservationUrls = reservationUrls;
 
         this.artists.forEach(artist -> artist.setConcert(this));
-        this.musics.forEach(music -> music.setConcert(this));
         this.reservationUrls.forEach(url -> url.setConcert(this));
     }
 
@@ -140,11 +114,7 @@ public class Concert {
                 .endAt(concertDTO.endAt())
                 .area(concertDTO.area())
                 .posterPath(concertDTO.posterPath())
-                .posterBgPath(concertDTO.posterBgPath())
-                .concertInfoImgPath(Default.IMG_PATH)
                 .reserveAt(concertDTO.reserveAt())
-                .reservationUrl(Default.URL)
-                .reservationOffice(Default.TEXT)
                 .ageRating(concertDTO.ageRating())
                 .time(concertDTO.time())
                 .price(concertDTO.price())
@@ -152,11 +122,6 @@ public class Concert {
                 .artists(
                         concertDTO.artists().stream()
                                 .map(ConcertArtist::create)
-                                .toList()
-                )
-                .musics(
-                        concertDTO.musics().stream()
-                                .map(ConcertMusic::create)
                                 .toList()
                 )
                 .reservationUrls(

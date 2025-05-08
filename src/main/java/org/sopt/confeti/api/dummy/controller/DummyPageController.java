@@ -15,7 +15,6 @@ import org.sopt.confeti.api.dummy.facade.dto.concert.request.UploadConcertFilesD
 import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
-import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalMusicDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFilesDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.response.DummyFestivalPreviewDTO;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -71,13 +70,12 @@ public class DummyPageController {
     public String createFestival(
             @Valid @ModelAttribute("festival") CreateFestivalRequest request,
             @RequestParam("posterFile") MultipartFile poster,
-            @RequestParam("posterBgFile") MultipartFile posterBg,
             @RequestParam("logoFile") MultipartFile logo,
             @RequestParam(value = "reservationLogoFile", required = false) List<MultipartFile> reservationLogos,
             RedirectAttributes redirectAttributes
     ) {
         FestivalFilePathsDTO filePaths = dummyFacade.uploadFestivalFiles(
-                UploadFestivalFilesDTO.of(poster, posterBg, logo, reservationLogos)
+                UploadFestivalFilesDTO.of(poster, logo, reservationLogos)
         );
 
         dummyFacade.createFestival(CreateFestivalDTO.of(request, filePaths));
@@ -112,9 +110,6 @@ public class DummyPageController {
                 festivalId,
                 request.getDates().stream()
                         .map(CreateFestivalDateDTO::from)
-                        .toList(),
-                request.getMusics().stream()
-                        .map(CreateFestivalMusicDTO::from)
                         .toList()
         );
 
@@ -132,12 +127,11 @@ public class DummyPageController {
     public String createConcert(
             @Valid @ModelAttribute("concert") CreateConcertRequest request,
             @RequestParam("posterFile") MultipartFile poster,
-            @RequestParam("posterBgFile") MultipartFile posterBg,
             @RequestParam(value = "reservationLogoFile", required = false) List<MultipartFile> reservationLogos,
             RedirectAttributes redirectAttributes
     ) {
         ConcertFilePathsDTO filePaths = dummyFacade.uploadConcertFiles(
-                UploadConcertFilesDTO.of(poster, posterBg, reservationLogos)
+                UploadConcertFilesDTO.of(poster, reservationLogos)
         );
 
         dummyFacade.createConcert(CreateConcertDTO.of(request, filePaths));

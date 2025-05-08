@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +20,10 @@ import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
-import org.sopt.confeti.domain.setlist.*;
+import org.sopt.confeti.domain.setlist.Setlist;
+import org.sopt.confeti.domain.setlist.SetlistMusic;
+import org.sopt.confeti.domain.setlist.SetlistSortType;
+import org.sopt.confeti.domain.setlist.SetlistType;
 import org.sopt.confeti.domain.setlist.application.dto.request.AddSetListMusicRequest;
 import org.sopt.confeti.domain.setlist.application.dto.request.SetlistCreateRequest;
 import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
@@ -41,12 +43,18 @@ class SetlistServiceTest {
     @InjectMocks
     private SetlistService setlistService;
 
-    @Mock private SetlistRepository setlistRepository;
-    @Mock private ConcertRepository concertRepository;
-    @Mock private FestivalRepository festivalRepository;
-    @Mock private UserRepository userRepository;
-    @Mock private SetlistMusicRepository setlistMusicRepository;
-    @Mock private S3FileHandler s3FileHandler;
+    @Mock
+    private SetlistRepository setlistRepository;
+    @Mock
+    private ConcertRepository concertRepository;
+    @Mock
+    private FestivalRepository festivalRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private SetlistMusicRepository setlistMusicRepository;
+    @Mock
+    private S3FileHandler s3FileHandler;
 
     private final Long userId = 1L;
     private final User user = mockUser(userId);
@@ -63,8 +71,10 @@ class SetlistServiceTest {
         Setlist festivalSetlist = createSetlist(SetlistType.FESTIVAL, 200L);
 
         given(setlistRepository.findAllByUserId(userId)).willReturn(List.of(concertSetlist, festivalSetlist));
-        given(concertRepository.findById(100L)).willReturn(Optional.of(mockConcert("IU 콘서트", LocalDate.of(2024, 11, 3))));
-        given(festivalRepository.findById(200L)).willReturn(Optional.of(mockFestival("서울재즈페스티벌", LocalDate.of(2024, 5, 1))));
+        given(concertRepository.findById(100L)).willReturn(
+                Optional.of(mockConcert("IU 콘서트", LocalDate.of(2024, 11, 3))));
+        given(festivalRepository.findById(200L)).willReturn(
+                Optional.of(mockFestival("서울재즈페스티벌", LocalDate.of(2024, 5, 1))));
 
         GetAllSetlistsResponse result = setlistService.getAllMySetlists(userId, SetlistSortType.OLDEST);
 
@@ -79,8 +89,10 @@ class SetlistServiceTest {
         Setlist festivalSetlist = createSetlist(SetlistType.FESTIVAL, 200L);
 
         given(setlistRepository.findAllByUserId(userId)).willReturn(List.of(concertSetlist, festivalSetlist));
-        given(concertRepository.findById(100L)).willReturn(Optional.of(mockConcert("IU 콘서트", LocalDate.of(2024, 11, 3))));
-        given(festivalRepository.findById(200L)).willReturn(Optional.of(mockFestival("서울재즈페스티벌", LocalDate.of(2024, 5, 1))));
+        given(concertRepository.findById(100L)).willReturn(
+                Optional.of(mockConcert("IU 콘서트", LocalDate.of(2024, 11, 3))));
+        given(festivalRepository.findById(200L)).willReturn(
+                Optional.of(mockFestival("서울재즈페스티벌", LocalDate.of(2024, 5, 1))));
 
         GetAllSetlistsResponse result = setlistService.getAllMySetlists(userId, SetlistSortType.LATEST);
 
@@ -197,7 +209,6 @@ class SetlistServiceTest {
 
         assertThat(result.type()).isEqualTo("CONCERT");
         assertThat(result.posterUrl()).isEqualTo("https://mock-s3-url.com/poster.png");
-        assertThat(result.posterBgUrl()).isEqualTo("https://mock-s3-url.com/poster.png");
     }
 
     @Test
@@ -221,7 +232,6 @@ class SetlistServiceTest {
 
         assertThat(result.type()).isEqualTo("FESTIVAL");
         assertThat(result.posterUrl()).isEqualTo("https://mock-s3-url.com/poster.png");
-        assertThat(result.posterBgUrl()).isEqualTo("https://mock-s3-url.com/poster.png");
     }
 
     private static User mockUser(Long id) {
@@ -244,11 +254,10 @@ class SetlistServiceTest {
         Concert concert = Concert.builder()
                 .title(title).subtitle("sub")
                 .startAt(endAt.minusDays(2)).endAt(endAt)
-                .area("서울").posterPath(title + ".jpg").posterBgPath("bg.jpg")
-                .concertInfoImgPath("info.jpg").reserveAt(LocalDateTime.now())
-                .reservationUrl("url").reservationOffice("office")
+                .area("서울").posterPath(title + ".jpg")
+                .reserveAt(LocalDateTime.now())
                 .ageRating("ALL").time("18:00").price("10000").address("서울시")
-                .artists(List.of()).musics(List.of()).reservationUrls(List.of())
+                .artists(List.of()).reservationUrls(List.of())
                 .build();
         ReflectionTestUtils.setField(concert, "id", 100L);
         return concert;
@@ -258,11 +267,10 @@ class SetlistServiceTest {
         Festival festival = Festival.builder()
                 .title(title).subtitle("sub")
                 .startAt(endAt.minusDays(2)).endAt(endAt)
-                .area("부산").posterPath(title + ".jpg").posterBgPath("bg.jpg")
-                .festivalInfoImgPath("info.jpg").logoPath("logo.jpg")
-                .reserveAt(LocalDateTime.now()).reservationUrl("url")
-                .reservationOffice("office").ageRating("ALL").time("16:00")
-                .price("8000").address("부산시").dates(List.of()).musics(List.of()).reservationUrls(List.of())
+                .area("부산").posterPath(title + ".jpg")
+                .logoPath("logo.jpg").reserveAt(LocalDateTime.now())
+                .ageRating("ALL").time("16:00")
+                .price("8000").address("부산시").dates(List.of()).reservationUrls(List.of())
                 .build();
         ReflectionTestUtils.setField(festival, "id", 200L);
         return festival;

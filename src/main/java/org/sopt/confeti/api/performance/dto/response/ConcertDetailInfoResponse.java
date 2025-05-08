@@ -9,7 +9,6 @@ import org.sopt.confeti.global.util.S3FileHandler;
 public record ConcertDetailInfoResponse(
         long concertId,
         String posterUrl,
-        String posterBgUrl,
         String title,
         String subtitle,
         String startAt,
@@ -29,8 +28,6 @@ public record ConcertDetailInfoResponse(
                 concertDetailDTO.concertId(),
                 s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER),
                         concertDetailDTO.posterPath()).toString(),
-                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER_BG),
-                        concertDetailDTO.posterBgPath()).toString(),
                 concertDetailDTO.title(),
                 concertDetailDTO.subtitle(),
                 DateConvertor.convertToDefaultFormat(concertDetailDTO.startAt()),
