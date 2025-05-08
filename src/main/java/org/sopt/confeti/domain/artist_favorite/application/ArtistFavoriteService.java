@@ -2,6 +2,8 @@ package org.sopt.confeti.domain.artist_favorite.application;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.infra.repository.ArtistFavoriteRepository;
@@ -34,6 +36,15 @@ public class ArtistFavoriteService {
         artistFavoriteRepository.save(
                 ArtistFavorite.create(user, artistId)
         );
+    }
+
+    @Transactional
+    public void addFavorites(final User user, final Set<String> artistIds) {
+        Set<ArtistFavorite> artistFavorites = artistIds.stream()
+                .map(artistId -> ArtistFavorite.create(user, artistId))
+                .collect(Collectors.toSet());
+
+        artistFavoriteRepository.saveAll(artistFavorites);
     }
 
     @Transactional

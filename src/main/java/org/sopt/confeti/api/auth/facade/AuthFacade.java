@@ -67,9 +67,7 @@ public class AuthFacade {
                 .collect(Collectors.toSet());
 
         onboardService.validateFavoriteArtistCount(favoriteArtistIds);
-        favoriteArtistIds.forEach(favoriteArtistId ->
-                artistFavoriteService.addFavorite(user, favoriteArtistId)
-        );
+        artistFavoriteService.addFavorites(user, favoriteArtistIds);
         user.setRole(Role.GENERAL);
     }
 
