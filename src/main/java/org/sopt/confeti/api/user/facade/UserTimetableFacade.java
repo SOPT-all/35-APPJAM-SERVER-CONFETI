@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserTimetableFacade {
 
-    private static final int TIMETABLE_FESTIVAL_COUNT_MAXIMUM = 3;
+    private static final int TIMETABLE_FESTIVAL_COUNT_MAXIMUM = 5;
     private static final int NEXT_CURSOR_SIZE = 1;
     private static final int TIMETABLE_FESTIVALS_TO_ADD_SIZE = 6 + NEXT_CURSOR_SIZE;
 
