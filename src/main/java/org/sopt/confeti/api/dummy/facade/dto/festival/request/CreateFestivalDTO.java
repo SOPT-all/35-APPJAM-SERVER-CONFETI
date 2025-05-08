@@ -14,14 +14,12 @@ public record CreateFestivalDTO(
         LocalDate endAt,
         String area,
         String posterPath,
-        String posterBgPath,
         String logoPath,
         LocalDateTime reserveAt,
         String ageRating,
         String time,
         String price,
         String address,
-        List<CreateFestivalMusicDTO> musics,
         List<CreateFestivalReservationUrlDTO> reservationUrls,
         List<CreateFestivalDateDTO> dates
 ) {
@@ -34,16 +32,12 @@ public record CreateFestivalDTO(
                 request.getEndAt(),
                 request.getArea(),
                 filePaths.posterPath(),
-                filePaths.posterBgPath(),
                 filePaths.logoPath(),
                 request.getReserveAt(),
                 request.getAgeRating(),
                 request.getTime(),
                 request.getPrice(),
                 request.getAddress(),
-                request.getMusics().stream()
-                        .map(CreateFestivalMusicDTO::from)
-                        .toList(),
                 request.getReservationUrls().stream()
                         .map(reservationUrl -> CreateFestivalReservationUrlDTO.of(reservationUrl,
                                 filePaths.reservationLogoPaths().get(

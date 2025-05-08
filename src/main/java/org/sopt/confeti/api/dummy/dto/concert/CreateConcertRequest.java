@@ -41,9 +41,5 @@ public class CreateConcertRequest {
 
     @Valid
     @Size(min = 1)
-    private List<CreateConcertMusicRequest> musics = new ArrayList<>();
-
-    @Valid
-    @Size(min = 1)
     private List<CreateConcertReservationUrlRequest> reservationUrls = new ArrayList<>();
 }

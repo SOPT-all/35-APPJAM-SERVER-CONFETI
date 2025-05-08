@@ -12,7 +12,6 @@ public record GetSetlistDetailResponse(
         String type,
         Long typeId,
         String posterUrl,
-        String posterBgUrl,
         String title,
         String subTitle,
         LocalDate startAt,
@@ -24,7 +23,6 @@ public record GetSetlistDetailResponse(
             String title,
             String subtitle,
             String posterPath,
-            String posterBgPath,
             LocalDate startAt,
             LocalDate endAt,
             List<SetlistMusicResponseDto> musics,
@@ -37,18 +35,11 @@ public record GetSetlistDetailResponse(
                         FolderPath.POSTER
                 ), posterPath).toString();
 
-        String posterBgUrl = s3FileHandler.getFileUrl(
-                FolderPath.combine(
-                        type == SetlistType.CONCERT ? FolderPath.CONCERT : FolderPath.FESTIVAL,
-                        FolderPath.POSTER_BG
-                ), posterBgPath).toString();
-
         return new GetSetlistDetailResponse(
                 setlist.getId(),
                 type.name(),
                 setlist.getTypeId(),
                 posterUrl,
-                posterBgUrl,
                 title,
                 subtitle,
                 startAt,

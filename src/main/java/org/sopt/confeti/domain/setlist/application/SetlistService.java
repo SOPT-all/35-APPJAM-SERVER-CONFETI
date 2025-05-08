@@ -51,12 +51,14 @@ public class SetlistService {
                         Concert concert = concertRepository.findById(setlist.getTypeId())
                                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
                         return SetlistSummaryDto.of(
-                                setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt(), s3FileHandler);
+                                setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt(),
+                                s3FileHandler);
                     } else {
                         Festival festival = festivalRepository.findById(setlist.getTypeId())
                                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
                         return SetlistSummaryDto.of(
-                                setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt(), s3FileHandler);
+                                setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt(),
+                                s3FileHandler);
                     }
                 })
                 .toList();
@@ -84,12 +86,14 @@ public class SetlistService {
                         Concert concert = concertRepository.findById(setlist.getTypeId())
                                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
                         return SetlistSummaryDto.of(
-                                setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt(), s3FileHandler);
+                                setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt(),
+                                s3FileHandler);
                     } else {
                         Festival festival = festivalRepository.findById(setlist.getTypeId())
                                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
                         return SetlistSummaryDto.of(
-                                setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt(), s3FileHandler);
+                                setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt(),
+                                s3FileHandler);
                     }
                 })
                 .sorted(Comparator.comparing(SetlistSummaryDto::endAt))
@@ -158,7 +162,7 @@ public class SetlistService {
                     .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
             return GetSetlistDetailResponse.of(
                     setlist, concert.getTitle(), concert.getSubtitle(),
-                    concert.getPosterPath(), concert.getPosterBgPath(),
+                    concert.getPosterPath(),
                     concert.getStartAt(), concert.getEndAt(),
                     musics, setlist.getType(), s3FileHandler
             );
@@ -167,7 +171,7 @@ public class SetlistService {
                     .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
             return GetSetlistDetailResponse.of(
                     setlist, festival.getTitle(), festival.getSubtitle(),
-                    festival.getPosterPath(), festival.getPosterBgPath(),
+                    festival.getPosterPath(),
                     festival.getStartAt(), festival.getEndAt(),
                     musics, setlist.getType(), s3FileHandler
             );

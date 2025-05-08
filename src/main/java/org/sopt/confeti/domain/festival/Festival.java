@@ -21,10 +21,8 @@ import lombok.Setter;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
-import org.sopt.confeti.domain.festival_music.FestivalMusic;
 import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
-import org.sopt.confeti.global.common.constant.Default;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -60,25 +58,11 @@ public class Festival {
     private String posterPath;
 
     @Setter
-    @Column(length = 250, nullable = false)
-    private String posterBgPath;
-
-    @Setter
-    @Column(length = 250, nullable = false)
-    private String festivalInfoImgPath; // 제거 대상
-
-    @Setter
     @Column(length = 250)
     private String logoPath;
 
     @Column(nullable = false)
     private LocalDateTime reserveAt;
-
-    @Column(length = 250, nullable = false)
-    private String reservationUrl; // 제거 대상
-
-    @Column(length = 50, nullable = false)
-    private String reservationOffice; // 제거 대상
 
     @Column(length = 30, nullable = false)
     private String ageRating;
@@ -103,9 +87,6 @@ public class Festival {
     private List<FestivalDate> dates = new ArrayList<>();
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FestivalMusic> musics = new ArrayList<>();
-
-    @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FestivalReservationUrl> reservationUrls = new ArrayList<>();
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
@@ -116,10 +97,9 @@ public class Festival {
 
     @Builder
     private Festival(String title, String subtitle, LocalDate startAt, LocalDate endAt, String area,
-                     String posterPath, String posterBgPath, String festivalInfoImgPath,
-                     String logoPath, LocalDateTime reserveAt, String reservationUrl, String reservationOffice,
+                     String posterPath, String logoPath, LocalDateTime reserveAt,
                      String ageRating, String time, String price, String address,
-                     List<FestivalDate> dates, List<FestivalMusic> musics, List<FestivalReservationUrl> reservationUrls
+                     List<FestivalDate> dates, List<FestivalReservationUrl> reservationUrls
     ) {
         this.title = title;
         this.subtitle = subtitle;
@@ -127,22 +107,16 @@ public class Festival {
         this.endAt = endAt;
         this.area = area;
         this.posterPath = posterPath;
-        this.posterBgPath = posterBgPath;
-        this.festivalInfoImgPath = festivalInfoImgPath;
         this.logoPath = logoPath;
         this.reserveAt = reserveAt;
-        this.reservationUrl = reservationUrl;
-        this.reservationOffice = reservationOffice;
         this.ageRating = ageRating;
         this.time = time;
         this.price = price;
         this.address = address;
         this.dates = dates;
-        this.musics = musics;
         this.reservationUrls = reservationUrls;
 
         this.dates.forEach(date -> date.setFestival(this));
-        this.musics.forEach(music -> music.setFestival(this));
         this.reservationUrls.forEach(url -> url.setFestival(this));
     }
 
@@ -154,12 +128,8 @@ public class Festival {
                 .endAt(festivalDTO.endAt())
                 .area(festivalDTO.area())
                 .posterPath(festivalDTO.posterPath())
-                .posterBgPath(festivalDTO.posterBgPath())
-                .festivalInfoImgPath(Default.IMG_PATH) // 제거 대상
                 .logoPath(festivalDTO.logoPath())
                 .reserveAt(festivalDTO.reserveAt())
-                .reservationUrl(Default.URL) // 제거 대상
-                .reservationOffice(Default.TEXT) // 제거 대상
                 .ageRating(festivalDTO.ageRating())
                 .time(festivalDTO.time())
                 .price(festivalDTO.price())
@@ -167,11 +137,6 @@ public class Festival {
                 .dates(
                         festivalDTO.dates().stream()
                                 .map(FestivalDate::create)
-                                .toList()
-                )
-                .musics(
-                        festivalDTO.musics().stream()
-                                .map(FestivalMusic::create)
                                 .toList()
                 )
                 .reservationUrls(
@@ -185,11 +150,6 @@ public class Festival {
     public void addDates(List<FestivalDate> dates) {
         this.dates.addAll(dates);
         dates.forEach(date -> date.setFestival(this));
-    }
-
-    public void addMusics(List<FestivalMusic> musics) {
-        this.musics.addAll(musics);
-        musics.forEach(music -> music.setFestival(this));
     }
 }
 

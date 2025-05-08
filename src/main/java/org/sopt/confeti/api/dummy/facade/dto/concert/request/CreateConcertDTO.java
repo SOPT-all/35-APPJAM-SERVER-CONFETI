@@ -14,14 +14,12 @@ public record CreateConcertDTO(
         LocalDate endAt,
         String area,
         String posterPath,
-        String posterBgPath,
         LocalDateTime reserveAt,
         String ageRating,
         String time,
         String price,
         String address,
         List<CreateConcertArtistDTO> artists,
-        List<CreateConcertMusicDTO> musics,
         List<CreateConcertReservationUrlDTO> reservationUrls
 ) {
     public static CreateConcertDTO of(CreateConcertRequest request, ConcertFilePathsDTO filePaths) {
@@ -33,7 +31,6 @@ public record CreateConcertDTO(
                 request.getEndAt().toLocalDate(),
                 request.getArea(),
                 filePaths.posterPath(),
-                filePaths.posterBgPath(),
                 request.getReserveAt(),
                 request.getAgeRating(),
                 request.getTime(),
@@ -41,9 +38,6 @@ public record CreateConcertDTO(
                 request.getAddress(),
                 request.getArtists().stream()
                         .map(CreateConcertArtistDTO::from)
-                        .toList(),
-                request.getMusics().stream()
-                        .map(CreateConcertMusicDTO::from)
                         .toList(),
                 request.getReservationUrls().stream()
                         .map(reservationUrl -> CreateConcertReservationUrlDTO.of(reservationUrl,

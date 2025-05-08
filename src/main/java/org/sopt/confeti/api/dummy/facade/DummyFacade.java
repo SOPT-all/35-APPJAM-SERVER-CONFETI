@@ -9,7 +9,6 @@ import org.sopt.confeti.api.dummy.facade.dto.concert.request.UploadConcertFilesD
 import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
-import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalMusicDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFilesDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.response.DummyFestivalPreviewDTO;
 import org.sopt.confeti.domain.concert.Concert;
@@ -39,8 +38,6 @@ public class DummyFacade {
     public FestivalFilePathsDTO uploadFestivalFiles(UploadFestivalFilesDTO files) {
         String posterPath = s3FileHandler.uploadFile(files.poster(),
                 FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER));
-        String posterBgPath = s3FileHandler.uploadFile(files.posterBg(),
-                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER_BG));
         String logoPath = s3FileHandler.uploadFile(files.logo(),
                 FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO));
         List<String> reservationLogoPaths = files.reservationLogos().stream()
@@ -48,7 +45,7 @@ public class DummyFacade {
                         FolderPath.combine(FolderPath.FESTIVAL, FolderPath.RESERVATION, FolderPath.LOGO)))
                 .toList();
 
-        return FestivalFilePathsDTO.of(posterPath, posterBgPath, logoPath, reservationLogoPaths);
+        return FestivalFilePathsDTO.of(posterPath, logoPath, reservationLogoPaths);
     }
 
     @Transactional
@@ -60,14 +57,12 @@ public class DummyFacade {
     public ConcertFilePathsDTO uploadConcertFiles(UploadConcertFilesDTO files) {
         String posterPath = s3FileHandler.uploadFile(files.poster(),
                 FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER));
-        String posterBgPath = s3FileHandler.uploadFile(files.posterBg(),
-                FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER_BG));
         List<String> reservationLogoPaths = files.reservationLogos().stream()
                 .map(reservationLogo -> s3FileHandler.uploadFile(reservationLogo,
                         FolderPath.combine(FolderPath.CONCERT, FolderPath.RESERVATION, FolderPath.LOGO)))
                 .toList();
 
-        return ConcertFilePathsDTO.of(posterPath, posterBgPath, reservationLogoPaths);
+        return ConcertFilePathsDTO.of(posterPath, reservationLogoPaths);
     }
 
     @Transactional
@@ -97,9 +92,8 @@ public class DummyFacade {
     }
 
     @Transactional
-    public void fixFestival(long festivalId, List<CreateFestivalDateDTO> dates, List<CreateFestivalMusicDTO> musics) {
+    public void fixFestival(long festivalId, List<CreateFestivalDateDTO> dates) {
         festivalService.addDates(festivalId, dates);
-        festivalService.addMusics(festivalId, musics);
         performanceService.addPerformanceArtists(PerformanceType.FESTIVAL, festivalId, getPerformanceArtists(dates));
     }
 

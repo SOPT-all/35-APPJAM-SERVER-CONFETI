@@ -11,7 +11,4 @@ public class FixFestivalRequest {
 
     @Valid
     private List<CreateFestivalDateRequest> dates;
-
-    @Valid
-    private List<CreateFestivalMusicRequest> musics;
 }

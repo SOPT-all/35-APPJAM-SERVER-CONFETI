@@ -5,14 +5,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 public record UploadConcertFilesDTO(
         MultipartFile poster,
-        MultipartFile posterBg,
         List<MultipartFile> reservationLogos
 ) {
     public static UploadConcertFilesDTO of(
             MultipartFile poster,
-            MultipartFile posterBg,
             List<MultipartFile> reservationLogos
     ) {
-        return new UploadConcertFilesDTO(poster, posterBg, reservationLogos);
+        return new UploadConcertFilesDTO(poster, reservationLogos);
     }
 }
