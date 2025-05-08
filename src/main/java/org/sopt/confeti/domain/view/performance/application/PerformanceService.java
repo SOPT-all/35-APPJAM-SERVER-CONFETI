@@ -137,7 +137,7 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public PerformanceDTO getPerformance(long performanceId) {
-        Performance performance = performanceRepository.findPerformanceByIdAndEndAtGreaterThanEqualOrderByStartAt(
+        Performance performance = performanceRepository.findPerformanceByIdAndEndAtGreaterThanEqual(
                         performanceId,
                         LocalDate.now())
                 .orElseThrow(
