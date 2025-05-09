@@ -24,6 +24,10 @@ public enum ErrorMessage {
 
     /* 404 Not Found */
     NOT_FOUND(HttpStatus.NOT_FOUND, "요청하는 리소스가 존재하지 않습니다."),
+    SETLIST_NOT_FOUND(HttpStatus.NOT_FOUND, "셋리스트를 찾을 수 없습니다."),
+    MUSIC_NOT_FOUND(HttpStatus.NOT_FOUND, "셋리스트에 해당하는 음악을 찾을 수 없습니다."),
+    FESTIVAL_NOT_FOUND(HttpStatus.NOT_FOUND, "페스티벌 정보를 찾을 수 없습니다."),
+    CONCERT_NOT_FOUND(HttpStatus.NOT_FOUND, "콘서트 정보를 찾을 수 없습니다."),
 
     /* 405 Method Not Allowed */
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "잘못된 HTTP Method 요청입니다."),
