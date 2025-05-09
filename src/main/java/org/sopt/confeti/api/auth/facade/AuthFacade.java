@@ -1,6 +1,9 @@
 package org.sopt.confeti.api.auth.facade;
 
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.auth.facade.dto.request.OnboardArtistDTO;
 import org.sopt.confeti.api.auth.facade.dto.request.OnboardDTO;
 import org.sopt.confeti.auth.LoginService;
 import org.sopt.confeti.auth.LogoutService;
@@ -59,10 +62,12 @@ public class AuthFacade {
     @Transactional
     public void onboard(long userId, OnboardDTO onboardDTO) {
         User user = userService.findById(userId);
-        onboardService.validateFavoriteArtistCount(onboardDTO);
-        onboardDTO.favoriteArtists().forEach(favoriteArtist ->
-                artistFavoriteService.addFavorite(user, favoriteArtist.artistId())
-        );
+        Set<String> favoriteArtistIds = onboardDTO.favoriteArtists().stream()
+                .map(OnboardArtistDTO::artistId)
+                .collect(Collectors.toSet());
+
+        onboardService.validateFavoriteArtistCount(favoriteArtistIds);
+        artistFavoriteService.addFavorites(user, favoriteArtistIds);
         user.setRole(Role.GENERAL);
     }
 
