@@ -5,12 +5,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.auth.facade.dto.request.OnboardArtistDTO;
 import org.sopt.confeti.api.auth.facade.dto.request.OnboardDTO;
-import org.sopt.confeti.auth.LoginService;
-import org.sopt.confeti.auth.LogoutService;
-import org.sopt.confeti.auth.OnboardService;
-import org.sopt.confeti.auth.ReissueService;
-import org.sopt.confeti.auth.Token;
-import org.sopt.confeti.auth.WithdrawService;
+import org.sopt.confeti.auth.*;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
 import org.sopt.confeti.auth.dto.OAuthSocialInfoResult;
@@ -34,6 +29,7 @@ public class AuthFacade {
     private final ArtistFavoriteService artistFavoriteService;
     private final OnboardService onboardService;
     private final WithdrawService withdrawService;
+    private final WebhookService webhookService;
 
     @Transactional
     public LoginResult login(LoginCommand loginCommand) {
@@ -41,6 +37,7 @@ public class AuthFacade {
 
         if (userService.notExist(socialInfo.id(), loginCommand.provider())) {
             userService.create(loginService.getCreateUserDTO(loginCommand.provider(), socialInfo));
+            webhookService.sendDiscordNotification();
         }
 
         AuthUser authUser = userService.getAuthUser(socialInfo.id(), loginCommand.provider());
