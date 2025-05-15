@@ -150,7 +150,7 @@ public class PerformanceController {
             @RequestParam(required = false) String ptitle,
             @RequestParam(required = false, defaultValue = Default.PERFORMANCE_TYPE) PerformanceType ptype
     ) {
-        IntendedPerformancesDTO performancesDTO = performanceFacade.getPerformances(userId, pid, aid, ptitle, ptype);
+        IntendedPerformancesDTO performancesDTO = performanceFacade.searchPerformances(userId, pid, aid, ptitle, ptype);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 IntendedPerformancesResponse.of(performancesDTO, s3FileHandler));
     }
