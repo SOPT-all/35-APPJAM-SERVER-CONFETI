@@ -2,8 +2,8 @@ package org.sopt.confeti.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.module.rest_client.builder.ApiRestClientBuilder;
-import org.springframework.beans.factory.annotation.Value;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
@@ -16,11 +16,16 @@ public class WebhookService {
 
     private final UserRepository userRepository;
     private final ApiRestClientBuilder restClient;
-
-    @Value("${discord.webhook.url}")
-    private String discordWebhookUrl;
+    private final Environment environment;
 
     public void sendDiscordNotification() {
+
+        for (String profile : environment.getActiveProfiles()) {
+            if (profile.equalsIgnoreCase("dev")) return;
+        }
+
+        String discordWebhookUrl = environment.getProperty("discord.webhook.url");
+        if (discordWebhookUrl == null || discordWebhookUrl.isBlank()) return;
 
         long totalMembers = userRepository.count();
 
