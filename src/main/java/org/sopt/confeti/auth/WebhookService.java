@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class WebhookService {
 
     private final UserRepository userRepository;
