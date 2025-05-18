@@ -10,7 +10,7 @@ public record FestivalDetailDateResponse(
         boolean isOpen,
         List<FestivalDetailArtistResponse> artists
 ) {
-    private static final String FESTIVAL_AT_PREFIX = "Day ";
+    private static final String FESTIVAL_AT_PREFIX = "DAY ";
 
     public static FestivalDetailDateResponse of(final FestivalDetailDateDTO festivalDate, final int order) {
         List<FestivalDetailArtistResponse> artists = festivalDate.stages().stream()
