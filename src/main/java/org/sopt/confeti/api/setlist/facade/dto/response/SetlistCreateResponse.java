@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.setlist.application.dto.response;
+package org.sopt.confeti.api.setlist.facade.dto.response;
 
 import java.util.List;
 

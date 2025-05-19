@@ -1,8 +1,6 @@
 package org.sopt.confeti.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
-import org.sopt.confeti.domain.setlist.application.dto.request.SetlistMusicEditDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

@@ -1,8 +1,8 @@
-package org.sopt.confeti.domain.setlist.application.dto.request;
+package org.sopt.confeti.api.setlist.facade.dto.request;
 
 import org.sopt.confeti.domain.setlist.SetlistMusic;
 
-public record SetlistMusicEditDto(
+public record SetlistMusicEditDTO(
         Long musicId,
         String trackId,
         String artistName,
@@ -11,8 +11,8 @@ public record SetlistMusicEditDto(
         String previewUrl,
         int orders
 ) {
-    public static SetlistMusicEditDto from(SetlistMusic music) {
-        return new SetlistMusicEditDto(
+    public static SetlistMusicEditDTO from(SetlistMusic music) {
+        return new SetlistMusicEditDTO(
                 music.getId(),
                 music.getTrackId(),
                 music.getArtistName(),

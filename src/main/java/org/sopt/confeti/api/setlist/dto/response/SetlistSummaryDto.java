@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.setlist.application.dto.response;
+package org.sopt.confeti.api.setlist.dto.response;
 
 import java.time.LocalDate;
 import org.sopt.confeti.domain.setlist.Setlist;

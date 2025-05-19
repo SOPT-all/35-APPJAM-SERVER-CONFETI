@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.setlist.application.dto.response;
+package org.sopt.confeti.api.setlist.dto.response;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,7 +16,7 @@ public record GetSetlistDetailResponse(
         String subTitle,
         LocalDate startAt,
         LocalDate endAt,
-        List<SetlistMusicResponseDto> musics
+        List<SetlistMusicResponse> musics
 ) {
     public static GetSetlistDetailResponse of(
             Setlist setlist,
@@ -25,7 +25,7 @@ public record GetSetlistDetailResponse(
             String posterPath,
             LocalDate startAt,
             LocalDate endAt,
-            List<SetlistMusicResponseDto> musics,
+            List<SetlistMusicResponse> musics,
             SetlistType type,
             S3FileHandler s3FileHandler
     ) {
