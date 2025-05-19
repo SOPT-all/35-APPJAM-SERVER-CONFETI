@@ -12,12 +12,12 @@ import org.sopt.confeti.domain.setlist.Setlist;
 import org.sopt.confeti.domain.setlist.SetlistMusic;
 import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.setlist.SetlistType;
-import org.sopt.confeti.domain.setlist.application.dto.request.AddSetListMusicRequest;
-import org.sopt.confeti.domain.setlist.application.dto.request.SetlistCreateRequest;
-import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
-import org.sopt.confeti.domain.setlist.application.dto.response.GetSetlistDetailResponse;
-import org.sopt.confeti.domain.setlist.application.dto.response.SetlistMusicResponseDto;
-import org.sopt.confeti.domain.setlist.application.dto.response.SetlistSummaryDto;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateDTO;
+import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
+import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
+import org.sopt.confeti.api.setlist.dto.response.SetlistMusicResponse;
+import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryDto;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistMusicRepository;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
 import org.sopt.confeti.domain.user.User;
@@ -102,7 +102,7 @@ public class SetlistService {
     }
 
     @Transactional
-    public List<Long> createSetLists(Long userId, List<SetlistCreateRequest> requests) {
+    public List<Long> createSetLists(Long userId, List<SetlistCreateDTO> requests) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         return requests.stream()
@@ -118,7 +118,7 @@ public class SetlistService {
     }
 
     @Transactional
-    public int addMusics(Long userId, Long setlistId, List<AddSetListMusicRequest> requests) {
+    public int addMusics(Long userId, Long setlistId, List<SetlistAddMusicDTO> requests) {
         Setlist setlist = setlistRepository.findById(setlistId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
@@ -126,32 +126,39 @@ public class SetlistService {
             throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
         }
 
-        int startOrder = setlist.getMusics().size() + 1;
+        List<String> existingIds = setlist.getMusics().stream()
+                .map(SetlistMusic::getTrackId)
+                .toList();
 
-        for (int i = 0; i < requests.size(); i++) {
-            AddSetListMusicRequest req = requests.get(i);
+        int startOrder = setlist.getMusics().size() + 1;
+        int addedCount = 0;
+
+        for (SetlistAddMusicDTO req : requests) {
+            if(existingIds.contains(req.trackId())) continue;
+
             SetlistMusic music = SetlistMusic.builder()
                     .trackId(req.trackId())
                     .artistName(req.artistName())
                     .trackName(req.trackName())
                     .artworkUrl(req.artworkUrl())
                     .previewUrl(req.previewUrl())
-                    .orders(startOrder + i)
+                    .orders(startOrder++)
                     .build();
 
             setlist.addMusics(music);
+            addedCount++;
         }
 
-        return requests.size();
+        return addedCount;
     }
 
     public GetSetlistDetailResponse getSetlistDetail(Long userId, Long setlistId) {
         Setlist setlist = setlistRepository.findByIdAndUserId(setlistId, userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        List<SetlistMusicResponseDto> musics = setlistMusicRepository.findBySetlist(setlist).stream()
+        List<SetlistMusicResponse> musics = setlistMusicRepository.findBySetlist(setlist).stream()
                 .sorted(Comparator.comparing(SetlistMusic::getOrders))
-                .map(m -> new SetlistMusicResponseDto(
+                .map(m -> new SetlistMusicResponse(
                         m.getId(), m.getTrackId(), m.getArtistName(),
                         m.getTrackName(), m.getArtworkUrl(), m.getPreviewUrl(), m.getOrders()
                 ))
