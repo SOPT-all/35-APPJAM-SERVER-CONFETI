@@ -1,6 +1,6 @@
-package org.sopt.confeti.domain.setlist.application.dto.response;
+package org.sopt.confeti.api.setlist.dto.response;
 
-public record SetlistMusicResponseDto(
+public record SetlistMusicResponse(
         Long musicId,
         String trackId,
         String artistName,
