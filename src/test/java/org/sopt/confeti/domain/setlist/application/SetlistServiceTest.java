@@ -24,10 +24,10 @@ import org.sopt.confeti.domain.setlist.Setlist;
 import org.sopt.confeti.domain.setlist.SetlistMusic;
 import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.setlist.SetlistType;
-import org.sopt.confeti.domain.setlist.application.dto.request.AddSetListMusicRequest;
-import org.sopt.confeti.domain.setlist.application.dto.request.SetlistCreateRequest;
-import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
-import org.sopt.confeti.domain.setlist.application.dto.response.SetlistSummaryDto;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateDTO;
+import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
+import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryDto;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistMusicRepository;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
 import org.sopt.confeti.domain.user.OAuthProvider;
@@ -126,9 +126,9 @@ class SetlistServiceTest {
 
     @Test
     void 여러개의_공연을_셋리스트로_생성() {
-        SetlistCreateRequest request1 = new SetlistCreateRequest(SetlistType.CONCERT, 100L);
-        SetlistCreateRequest request2 = new SetlistCreateRequest(SetlistType.FESTIVAL, 200L);
-        List<SetlistCreateRequest> requests = List.of(request1, request2);
+        SetlistCreateDTO request1 = new SetlistCreateDTO(SetlistType.CONCERT, 100L);
+        SetlistCreateDTO request2 = new SetlistCreateDTO(SetlistType.FESTIVAL, 200L);
+        List<SetlistCreateDTO> requests = List.of(request1, request2);
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
@@ -148,9 +148,9 @@ class SetlistServiceTest {
 
     @Test
     void 이미_생성된_셋리스트는_중복_생성되지_않는다() {
-        SetlistCreateRequest request1 = new SetlistCreateRequest(SetlistType.CONCERT, 100L);
-        SetlistCreateRequest request2 = new SetlistCreateRequest(SetlistType.FESTIVAL, 200L);
-        List<SetlistCreateRequest> requests = List.of(request1, request2);
+        SetlistCreateDTO request1 = new SetlistCreateDTO(SetlistType.CONCERT, 100L);
+        SetlistCreateDTO request2 = new SetlistCreateDTO(SetlistType.FESTIVAL, 200L);
+        List<SetlistCreateDTO> requests = List.of(request1, request2);
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(setlistRepository.existsByUserIdAndTypeAndTypeId(userId, SetlistType.CONCERT, 100L)).willReturn(true);
@@ -177,9 +177,9 @@ class SetlistServiceTest {
 
         given(setlistRepository.findById(setlistId)).willReturn(Optional.of(setlist));
 
-        List<AddSetListMusicRequest> requests = List.of(
-                new AddSetListMusicRequest("01", "IU", "Love wins all", "url1", "preview1"),
-                new AddSetListMusicRequest("02", "NewJeans", "Hype Boy", "url2", "preview2")
+        List<SetlistAddMusicDTO> requests = List.of(
+                new SetlistAddMusicDTO("01", "IU", "Love wins all", "url1", "preview1"),
+                new SetlistAddMusicDTO("02", "NewJeans", "Hype Boy", "url2", "preview2")
         );
 
         int result = setlistService.addMusics(userId, setlistId, requests);
