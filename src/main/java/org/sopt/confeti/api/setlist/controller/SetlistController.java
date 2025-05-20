@@ -4,12 +4,12 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.setlist.facade.SetlistFacade;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
-import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateDTO;
-import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddMusicResponse;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddMusicResponseDTO;
 import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
-import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponse;
-import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryDto;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponseDTO;
+import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -47,7 +47,7 @@ public class SetlistController {
     public ResponseEntity<BaseResponse<?>> getPreviewMySetlists(
             @UserId(require = false) Long userId
     ) {
-        List<SetlistSummaryDto> data = setlistFacade.getPreviewMySetlists(userId);
+        List<SetlistSummaryResponse> data = setlistFacade.getPreviewMySetlists(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 
@@ -55,9 +55,9 @@ public class SetlistController {
     @PostMapping
     public ResponseEntity<BaseResponse<?>> createSetlists(
             @UserId(require = false) Long userId,
-            @RequestBody List<SetlistCreateDTO> requests
+            @RequestBody List<SetlistCreateRequestDTO> requests
     ) {
-        SetlistCreateResponse data = setlistFacade.createSetLists(userId, requests);
+        SetlistCreateResponseDTO data = setlistFacade.createSetLists(userId, requests);
         return ApiResponseUtil.success(SuccessMessage.CREATED, data);
     }
 
@@ -68,7 +68,7 @@ public class SetlistController {
             @PathVariable Long setlistId,
             @RequestBody List<SetlistAddMusicDTO> requests
     ) {
-        SetlistAddMusicResponse data = setlistFacade.addMusics(userId, setlistId, requests);
+        SetlistAddMusicResponseDTO data = setlistFacade.addMusics(userId, setlistId, requests);
         return ApiResponseUtil.success(SuccessMessage.CREATED, data);
     }
 

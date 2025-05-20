@@ -13,11 +13,11 @@ import org.sopt.confeti.domain.setlist.SetlistMusic;
 import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.setlist.SetlistType;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
-import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateDTO;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
 import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
 import org.sopt.confeti.api.setlist.dto.response.SetlistMusicResponse;
-import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryDto;
+import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistMusicRepository;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
 import org.sopt.confeti.domain.user.User;
@@ -45,18 +45,18 @@ public class SetlistService {
     public GetAllSetlistsResponse getAllMySetlists(Long userId, SetlistSortType sortType) {
         List<Setlist> setlists = setlistRepository.findAllByUserId(userId);
 
-        List<SetlistSummaryDto> dtoList = setlists.stream()
+        List<SetlistSummaryResponse> dtoList = setlists.stream()
                 .map(setlist -> {
                     if (setlist.getType() == SetlistType.CONCERT) {
                         Concert concert = concertRepository.findById(setlist.getTypeId())
                                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-                        return SetlistSummaryDto.of(
+                        return SetlistSummaryResponse.of(
                                 setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt(),
                                 s3FileHandler);
                     } else {
                         Festival festival = festivalRepository.findById(setlist.getTypeId())
                                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-                        return SetlistSummaryDto.of(
+                        return SetlistSummaryResponse.of(
                                 setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt(),
                                 s3FileHandler);
                     }
@@ -77,7 +77,7 @@ public class SetlistService {
     }
 
     @Transactional(readOnly = true)
-    public List<SetlistSummaryDto> getPreviewMySetlists(Long userId) {
+    public List<SetlistSummaryResponse> getPreviewMySetlists(Long userId) {
         List<Setlist> setlists = setlistRepository.findAllByUserId(userId);
 
         return setlists.stream()
@@ -85,24 +85,24 @@ public class SetlistService {
                     if (setlist.getType() == SetlistType.CONCERT) {
                         Concert concert = concertRepository.findById(setlist.getTypeId())
                                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-                        return SetlistSummaryDto.of(
+                        return SetlistSummaryResponse.of(
                                 setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt(),
                                 s3FileHandler);
                     } else {
                         Festival festival = festivalRepository.findById(setlist.getTypeId())
                                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-                        return SetlistSummaryDto.of(
+                        return SetlistSummaryResponse.of(
                                 setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt(),
                                 s3FileHandler);
                     }
                 })
-                .sorted(Comparator.comparing(SetlistSummaryDto::endAt))
+                .sorted(Comparator.comparing(SetlistSummaryResponse::endAt))
                 .limit(3)
                 .toList();
     }
 
     @Transactional
-    public List<Long> createSetLists(Long userId, List<SetlistCreateDTO> requests) {
+    public List<Long> createSetLists(Long userId, List<SetlistCreateRequestDTO> requests) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         return requests.stream()

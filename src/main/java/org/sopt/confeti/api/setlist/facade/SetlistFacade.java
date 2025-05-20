@@ -6,13 +6,13 @@ import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.setlist.application.SetlistEditService;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
-import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateDTO;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistUpdateMusicOrderDTO;
-import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddMusicResponse;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddMusicResponseDTO;
 import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
-import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponse;
-import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryDto;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponseDTO;
+import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.global.annotation.Facade;
 
 @Facade
@@ -27,16 +27,16 @@ public class SetlistFacade {
         return setlistService.getAllMySetlists(userId, sortType);
     }
 
-    public List<SetlistSummaryDto> getPreviewMySetlists(Long userId) {
+    public List<SetlistSummaryResponse> getPreviewMySetlists(Long userId) {
         return setlistService.getPreviewMySetlists(userId);
     }
 
-    public SetlistCreateResponse createSetLists(Long userId, List<SetlistCreateDTO> requests) {
-        return new SetlistCreateResponse(setlistService.createSetLists(userId, requests));
+    public SetlistCreateResponseDTO createSetLists(Long userId, List<SetlistCreateRequestDTO> requests) {
+        return new SetlistCreateResponseDTO(setlistService.createSetLists(userId, requests));
     }
 
-    public SetlistAddMusicResponse addMusics(Long userId, Long setlistId, List<SetlistAddMusicDTO> requests) {
-        return new SetlistAddMusicResponse(setlistService.addMusics(userId, setlistId, requests));
+    public SetlistAddMusicResponseDTO addMusics(Long userId, Long setlistId, List<SetlistAddMusicDTO> requests) {
+        return new SetlistAddMusicResponseDTO(setlistService.addMusics(userId, setlistId, requests));
     }
 
     public GetSetlistDetailResponse getSetlistDetail(Long userId, Long setlistId) {

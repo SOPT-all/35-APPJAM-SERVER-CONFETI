@@ -4,6 +4,6 @@ import java.util.List;
 
 public record GetAllSetlistsResponse(
         int totalCount,
-        List<SetlistSummaryDto> setlists
+        List<SetlistSummaryResponse> setlists
 ) {
 }

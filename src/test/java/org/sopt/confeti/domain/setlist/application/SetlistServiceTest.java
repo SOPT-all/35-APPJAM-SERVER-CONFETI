@@ -25,9 +25,9 @@ import org.sopt.confeti.domain.setlist.SetlistMusic;
 import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.setlist.SetlistType;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
-import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateDTO;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
 import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
-import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryDto;
+import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistMusicRepository;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
 import org.sopt.confeti.domain.user.OAuthProvider;
@@ -79,7 +79,7 @@ class SetlistServiceTest {
         GetAllSetlistsResponse result = setlistService.getAllMySetlists(userId, SetlistSortType.OLDEST);
 
         assertThat(result.totalCount()).isEqualTo(2);
-        assertThat(result.setlists()).extracting(SetlistSummaryDto::title)
+        assertThat(result.setlists()).extracting(SetlistSummaryResponse::title)
                 .containsExactly("서울재즈페스티벌", "IU 콘서트");
     }
 
@@ -97,7 +97,7 @@ class SetlistServiceTest {
         GetAllSetlistsResponse result = setlistService.getAllMySetlists(userId, SetlistSortType.LATEST);
 
         assertThat(result.totalCount()).isEqualTo(2);
-        assertThat(result.setlists()).extracting(SetlistSummaryDto::title)
+        assertThat(result.setlists()).extracting(SetlistSummaryResponse::title)
                 .containsExactly("IU 콘서트", "서울재즈페스티벌");
     }
 
@@ -118,17 +118,17 @@ class SetlistServiceTest {
         given(concertRepository.findById(101L)).willReturn(Optional.of(mockConcert("C2", LocalDate.of(2024, 6, 1))));
         given(concertRepository.findById(102L)).willReturn(Optional.of(mockConcert("C3", LocalDate.of(2024, 7, 1))));
 
-        List<SetlistSummaryDto> result = setlistService.getPreviewMySetlists(userId);
+        List<SetlistSummaryResponse> result = setlistService.getPreviewMySetlists(userId);
 
         assertThat(result).hasSize(3);
-        assertThat(result).extracting(SetlistSummaryDto::title).containsExactly("F2", "F1", "C1");
+        assertThat(result).extracting(SetlistSummaryResponse::title).containsExactly("F2", "F1", "C1");
     }
 
     @Test
     void 여러개의_공연을_셋리스트로_생성() {
-        SetlistCreateDTO request1 = new SetlistCreateDTO(SetlistType.CONCERT, 100L);
-        SetlistCreateDTO request2 = new SetlistCreateDTO(SetlistType.FESTIVAL, 200L);
-        List<SetlistCreateDTO> requests = List.of(request1, request2);
+        SetlistCreateRequestDTO request1 = new SetlistCreateRequestDTO(SetlistType.CONCERT, 100L);
+        SetlistCreateRequestDTO request2 = new SetlistCreateRequestDTO(SetlistType.FESTIVAL, 200L);
+        List<SetlistCreateRequestDTO> requests = List.of(request1, request2);
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
@@ -148,9 +148,9 @@ class SetlistServiceTest {
 
     @Test
     void 이미_생성된_셋리스트는_중복_생성되지_않는다() {
-        SetlistCreateDTO request1 = new SetlistCreateDTO(SetlistType.CONCERT, 100L);
-        SetlistCreateDTO request2 = new SetlistCreateDTO(SetlistType.FESTIVAL, 200L);
-        List<SetlistCreateDTO> requests = List.of(request1, request2);
+        SetlistCreateRequestDTO request1 = new SetlistCreateRequestDTO(SetlistType.CONCERT, 100L);
+        SetlistCreateRequestDTO request2 = new SetlistCreateRequestDTO(SetlistType.FESTIVAL, 200L);
+        List<SetlistCreateRequestDTO> requests = List.of(request1, request2);
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(setlistRepository.existsByUserIdAndTypeAndTypeId(userId, SetlistType.CONCERT, 100L)).willReturn(true);

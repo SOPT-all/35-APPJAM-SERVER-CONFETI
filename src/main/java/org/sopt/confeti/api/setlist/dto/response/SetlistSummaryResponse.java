@@ -6,7 +6,7 @@ import org.sopt.confeti.domain.setlist.SetlistType;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.S3FileHandler;
 
-public record SetlistSummaryDto(
+public record SetlistSummaryResponse(
         Long setlistId,
         String type,
         Long typeId,
@@ -14,7 +14,7 @@ public record SetlistSummaryDto(
         String posterUrl,
         LocalDate endAt
 ) {
-    public static SetlistSummaryDto of(
+    public static SetlistSummaryResponse of(
             Setlist setlist,
             String title,
             String posterPath,
@@ -25,7 +25,7 @@ public record SetlistSummaryDto(
                 FolderPath.combine(
                         setlist.getType() == SetlistType.CONCERT ? FolderPath.CONCERT : FolderPath.FESTIVAL, FolderPath.POSTER
                 ), posterPath).toString();
-        return new SetlistSummaryDto(
+        return new SetlistSummaryResponse(
                 setlist.getId(),
                 setlist.getType().name(),
                 setlist.getTypeId(),
