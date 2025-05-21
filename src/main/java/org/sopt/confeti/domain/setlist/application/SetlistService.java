@@ -45,6 +45,8 @@ public class SetlistService {
     private final S3FileHandler s3FileHandler;
     private final PerformanceService performanceService;
 
+    private static final int MAX_SETLIST_PREVIEW_COUNT = 3;
+
     @Transactional(readOnly = true)
     public GetAllSetlistsResponse getAllMySetlists(Long userId, SetlistSortType sortType) {
         List<Setlist> setlists = setlistRepository.findAllByUserId(userId);
@@ -73,7 +75,7 @@ public class SetlistService {
                     return SetlistSummaryResponse.of(setlist, performance, s3FileHandler);
                 })
                 .sorted(Comparator.comparing(SetlistSummaryResponse::endAt))
-                .limit(3)
+                .limit(MAX_SETLIST_PREVIEW_COUNT)
                 .toList();
     }
 
