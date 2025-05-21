@@ -40,7 +40,6 @@ public class SetlistService {
     private final SetlistRepository setlistRepository;
     private final ConcertRepository concertRepository;
     private final FestivalRepository festivalRepository;
-    private final UserRepository userRepository;
     private final SetlistMusicRepository setlistMusicRepository;
     private final S3FileHandler s3FileHandler;
     private final PerformanceService performanceService;
@@ -122,10 +121,7 @@ public class SetlistService {
 
         List<SetlistMusicResponse> musics = setlistMusicRepository.findBySetlist(setlist).stream()
                 .sorted(Comparator.comparing(SetlistMusic::getOrders))
-                .map(m -> new SetlistMusicResponse(
-                        m.getId(), m.getTrackId(), m.getArtistName(),
-                        m.getTrackName(), m.getArtworkUrl(), m.getPreviewUrl(), m.getOrders()
-                ))
+                .map(SetlistMusicResponse::create)
                 .toList();
 
         if (setlist.getType() == SetlistType.CONCERT) {
