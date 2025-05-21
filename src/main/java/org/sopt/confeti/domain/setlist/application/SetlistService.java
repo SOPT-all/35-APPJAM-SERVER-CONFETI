@@ -80,11 +80,9 @@ public class SetlistService {
     }
 
     @Transactional
-    public List<Long> createSetLists(Long userId, List<SetlistCreateRequestDTO> requests) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+    public List<Long> createSetLists(User user, List<SetlistCreateRequestDTO> requests) {
         return requests.stream()
-                .filter(req -> !setlistRepository.existsByUserIdAndTypeAndTypeId(userId, req.type(), req.typeId()))
+                .filter(req -> !setlistRepository.existsByUserIdAndTypeAndTypeId(user.getId(), req.type(), req.typeId()))
                 .map(req -> Setlist.builder()
                         .user(user)
                         .type(req.type())

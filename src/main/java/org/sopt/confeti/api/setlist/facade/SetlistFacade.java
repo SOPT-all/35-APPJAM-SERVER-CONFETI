@@ -13,7 +13,11 @@ import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponseDTO;
 import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
+import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.exception.NotFoundException;
+import org.sopt.confeti.global.message.ErrorMessage;
 
 @Facade
 @RequiredArgsConstructor
@@ -21,6 +25,7 @@ public class SetlistFacade {
 
     private final SetlistService setlistService;
     private final SetlistEditService setlistEditService;
+    private final UserService userService;
 
     public GetAllSetlistsResponse getAllMySetlists(Long userId, String sortBy) {
         SetlistSortType sortType = SetlistSortType.from(sortBy);
@@ -32,7 +37,8 @@ public class SetlistFacade {
     }
 
     public SetlistCreateResponseDTO createSetLists(Long userId, List<SetlistCreateRequestDTO> requests) {
-        return new SetlistCreateResponseDTO(setlistService.createSetLists(userId, requests));
+        User user = userService.findById(userId);
+        return new SetlistCreateResponseDTO(setlistService.createSetLists(user, requests));
     }
 
     public SetlistAddMusicResponseDTO addMusics(Long userId, Long setlistId, List<SetlistAddMusicDTO> requests) {
