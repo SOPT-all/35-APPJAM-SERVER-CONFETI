@@ -22,6 +22,9 @@ import org.sopt.confeti.domain.setlist.infra.repository.SetlistMusicRepository;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
+import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -40,6 +43,7 @@ public class SetlistService {
     private final UserRepository userRepository;
     private final SetlistMusicRepository setlistMusicRepository;
     private final S3FileHandler s3FileHandler;
+    private final PerformanceService performanceService;
 
     @Transactional(readOnly = true)
     public GetAllSetlistsResponse getAllMySetlists(Long userId, SetlistSortType sortType) {
@@ -47,30 +51,12 @@ public class SetlistService {
 
         List<SetlistSummaryResponse> dtoList = setlists.stream()
                 .map(setlist -> {
-                    if (setlist.getType() == SetlistType.CONCERT) {
-                        Concert concert = concertRepository.findById(setlist.getTypeId())
-                                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-                        return SetlistSummaryResponse.of(
-                                setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt(),
-                                s3FileHandler);
-                    } else {
-                        Festival festival = festivalRepository.findById(setlist.getTypeId())
-                                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-                        return SetlistSummaryResponse.of(
-                                setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt(),
-                                s3FileHandler);
-                    }
+                    Performance performance = performanceService.getPerformanceByTypeAndTypeId(
+                            PerformanceType.valueOf(setlist.getType().name()), setlist.getTypeId());
+                    return SetlistSummaryResponse.of(setlist, performance, s3FileHandler);
                 })
-                .toList();
-
-        dtoList = dtoList.stream()
-                .sorted((a, b) -> {
-                    if (sortType == SetlistSortType.OLDEST) {
-                        return a.endAt().compareTo(b.endAt());
-                    } else {
-                        return b.endAt().compareTo(a.endAt());
-                    }
-                })
+                .sorted((a , b) -> sortType == SetlistSortType.OLDEST
+                        ? a.endAt().compareTo(b.endAt()) : b.endAt().compareTo(a.endAt()))
                 .toList();
 
         return new GetAllSetlistsResponse(dtoList.size(), dtoList);
@@ -82,19 +68,9 @@ public class SetlistService {
 
         return setlists.stream()
                 .map(setlist -> {
-                    if (setlist.getType() == SetlistType.CONCERT) {
-                        Concert concert = concertRepository.findById(setlist.getTypeId())
-                                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-                        return SetlistSummaryResponse.of(
-                                setlist, concert.getTitle(), concert.getPosterPath(), concert.getEndAt(),
-                                s3FileHandler);
-                    } else {
-                        Festival festival = festivalRepository.findById(setlist.getTypeId())
-                                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-                        return SetlistSummaryResponse.of(
-                                setlist, festival.getTitle(), festival.getPosterPath(), festival.getEndAt(),
-                                s3FileHandler);
-                    }
+                    Performance performance = performanceService.getPerformanceByTypeAndTypeId(
+                            PerformanceType.valueOf(setlist.getType().name()), setlist.getTypeId());
+                    return SetlistSummaryResponse.of(setlist, performance, s3FileHandler);
                 })
                 .sorted(Comparator.comparing(SetlistSummaryResponse::endAt))
                 .limit(3)
