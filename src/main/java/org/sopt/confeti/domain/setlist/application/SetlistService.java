@@ -95,12 +95,8 @@ public class SetlistService {
 
     @Transactional
     public int addMusics(Long userId, Long setlistId, List<SetlistAddMusicDTO> requests) {
-        Setlist setlist = setlistRepository.findById(setlistId)
+        Setlist setlist = setlistRepository.findByIdAndUserId(userId, setlistId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-
-        if (!setlist.getUser().getId().equals(userId)) {
-            throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
-        }
 
         List<String> existingIds = setlist.getMusics().stream()
                 .map(SetlistMusic::getTrackId)
