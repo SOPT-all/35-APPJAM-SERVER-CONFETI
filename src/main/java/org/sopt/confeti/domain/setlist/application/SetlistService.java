@@ -108,15 +108,7 @@ public class SetlistService {
         for (SetlistAddMusicDTO req : requests) {
             if(existingIds.contains(req.trackId())) continue;
 
-            SetlistMusic music = SetlistMusic.builder()
-                    .trackId(req.trackId())
-                    .artistName(req.artistName())
-                    .trackName(req.trackName())
-                    .artworkUrl(req.artworkUrl())
-                    .previewUrl(req.previewUrl())
-                    .orders(startOrder++)
-                    .build();
-
+            SetlistMusic music = SetlistMusic.of(req, startOrder++);
             setlist.addMusics(music);
             addedCount++;
         }
