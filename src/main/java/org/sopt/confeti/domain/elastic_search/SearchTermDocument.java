@@ -7,9 +7,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.Setting;
 
 @Builder
 @Document(indexName = "search_terms")
+@Setting(settingPath = "/elasticsearch/search-term-settings.json")
 public record SearchTermDocument(
 
         @Id
