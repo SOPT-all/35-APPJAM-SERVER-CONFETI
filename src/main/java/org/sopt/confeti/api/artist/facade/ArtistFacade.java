@@ -35,6 +35,7 @@ public class ArtistFacade {
         if (isPresent(term)) {
             artist = musicAPIHandler.findArtistsByKeyword(term, ARTIST_SEARCH_COUNT).stream()
                     .findFirst();
+            searchTermService.write(artist);
         }
 
         if (isPresent(userId) && artist.isPresent()) {
