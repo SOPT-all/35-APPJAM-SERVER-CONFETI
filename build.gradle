@@ -2,12 +2,19 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.asciidoctor.jvm.convert' version '3.3.2'
     id 'com.epages.restdocs-api-spec' version '0.18.2'
 }
 
 group = 'org.sopt'
 version = '0.0.1-SNAPSHOT'
+
+openapi3 {
+    setServer("https://api.confeti.xyz")
+    title = "CONFETI Server API Document"
+    description = "-"
+    version = "0.0.1"
+    format = "yaml"
+}
 
 java {
     toolchain {
@@ -15,23 +22,9 @@ java {
     }
 }
 
-bootJar {
-    dependsOn asciidoctor
-    from("${asciidoctor.outputDir}/html5") {
-        into 'static/docs'
-    }
-}
-
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
-}
-
-configurations {
-    asciidoctorExt
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
 }
 
 dependencies {
@@ -79,7 +72,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
 
     // Elastic Search
-    implementation 'org.springframework.data:spring-data-elasticsearch'
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
     // Komoran
     implementation 'com.github.shin285:KOMORAN:3.3.9'
@@ -97,24 +90,22 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     // Spring Rest Docs
-    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
-    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation "com.epages:restdocs-api-spec-restassured:0.18.2"
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
+    testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
 
+    // Test Containers
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:elasticsearch'
+    testImplementation 'org.testcontainers:mysql'
 }
 
-ext {
-    snippetsDir = file('build/generated-snippets')
-}
-
-test {
-    outputs.dir snippetsDir
-}
-
-asciidoctor {
-    inputs.dir snippetsDir
-    configurations 'asciidoctorExt'
-    dependsOn test
+dependencyManagement {
+    imports {
+        mavenBom "org.testcontainers:testcontainers-bom:1.17.4"
+    }
 }
 
 tasks.named('test') {
