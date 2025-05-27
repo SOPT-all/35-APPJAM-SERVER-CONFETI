@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Default {
 
-    public static final String IMG_PATH = "default/img_logo_3d.svg";
+    public static final String IMG_PATH = "img_logo_3d.svg";
     public static final String URL = "https://www.naver.com/";
     public static final String TEXT = "CONFETI";
     public static final String PROFILE_IMG_NAME = "user-profile.svg";
