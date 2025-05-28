@@ -27,25 +27,25 @@ import org.sopt.confeti.global.common.constant.Default;
 
 public class TestDataManager {
 
-    private static final String 데이식스 = "1037939997";
-    private static final String 아이묭 = "1165017710";
-    private static final String 실리카겔 = "1031084591";
-    private static final String 빅뱅 = "318754656";
-    private static final String 잔나비 = "913424316";
-    private static final String 로이킴 = "572430917";
-    private static final String 창모 = "887777364";
-    private static final String 우디 = "1277551001";
-    private static final String 칸예 = "2715720";
-    private static final String 빈지노 = "331767820";
-    private static final String 리쌍 = "339950117";
-    private static final String 리도어 = "1547913995";
-    private static final String 한로로 = "1613668993";
-    private static final String 터치드 = "1543982676";
-    private static final String 오아시스 = "512633";
-    private static final String 샤이니 = "433371033";
-    private static final String 슈퍼주니어 = "284066214";
-    private static final String 투애니원 = "329155759";
-    private static final String wavetoearth = "1477295619";
+    public static final String 데이식스 = "1037939997";
+    public static final String 아이묭 = "1165017710";
+    public static final String 실리카겔 = "1031084591";
+    public static final String 빅뱅 = "318754656";
+    public static final String 잔나비 = "913424316";
+    public static final String 로이킴 = "572430917";
+    public static final String 창모 = "887777364";
+    public static final String 우디 = "1277551001";
+    public static final String 칸예 = "2715720";
+    public static final String 빈지노 = "331767820";
+    public static final String 리쌍 = "339950117";
+    public static final String 리도어 = "1547913995";
+    public static final String 한로로 = "1613668993";
+    public static final String 터치드 = "1543982676";
+    public static final String 오아시스 = "512633";
+    public static final String 샤이니 = "433371033";
+    public static final String 슈퍼주니어 = "284066214";
+    public static final String 투애니원 = "329155759";
+    public static final String wavetoearth = "1477295619";
 
     private static final List<CreateConcertDTO> createConcertDTOs = new ArrayList<>(
             Arrays.asList(
@@ -653,28 +653,28 @@ public class TestDataManager {
             )
     );
 
-    public static final List<Concert> concerts = new ArrayList<>(
-            createConcertDTOs.stream()
-                    .map(Concert::create)
-                    .toList()
-    );
+    public static List<Concert> createConcerts() {
+        return createConcertDTOs.stream()
+                .map(Concert::create)
+                .toList();
+    }
 
-    public static final List<Festival> festivals = new ArrayList<>(
-            createFestivalDTOs.stream()
-                    .map(Festival::create)
-                    .toList()
-    );
+    public static List<Festival> createFestivals() {
+        return createFestivalDTOs.stream()
+                .map(Festival::create)
+                .toList();
+    }
 
-    public static final List<Performance> performances = new ArrayList<>(
-            Stream.concat(
-                    IntStream.range(1, createConcertDTOs.size() + 1).mapToObj(i ->
-                            Performance.create(i, createConcertDTOs.get(i - 1))
-                    ),
-                    IntStream.range(1, createFestivalDTOs.size() + 1).mapToObj(i ->
-                            Performance.create(i, createFestivalDTOs.get(i - 1))
-                    )
-            ).toList()
-    );
+    public static List<Performance> createPerformances() {
+        return Stream.concat(
+                IntStream.range(1, createConcertDTOs.size() + 1).mapToObj(i ->
+                        Performance.create(i, createConcertDTOs.get(i - 1))
+                ),
+                IntStream.range(1, createFestivalDTOs.size() + 1).mapToObj(i ->
+                        Performance.create(i, createFestivalDTOs.get(i - 1))
+                )
+        ).toList();
+    }
 
     public static final List<String> searchTerms = new ArrayList<>(
             Arrays.asList(
@@ -686,11 +686,16 @@ public class TestDataManager {
             )
     );
 
-    public static final User user = User.builder()
-            .name("테스트 유저")
-            .role(Role.GENERAL)
-            .provider(OAuthProvider.KAKAO)
-            .socialId("99999999")
-            .profilePath(Default.PROFILE_IMG_NAME)
-            .build();
+    public static final OAuthProvider userProvider = OAuthProvider.KAKAO;
+    public static final String userSocialId = "99999999";
+
+    public static User createUser() {
+        return User.builder()
+                .name("테스트 유저")
+                .role(Role.GENERAL)
+                .provider(userProvider)
+                .socialId(userSocialId)
+                .profilePath(Default.PROFILE_IMG_NAME)
+                .build();
+    }
 }
