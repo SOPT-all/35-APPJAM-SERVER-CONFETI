@@ -30,14 +30,12 @@ public class UserInfoFacade {
         userService.patchUserInfo(userId, patchUserInfoRequest);
     }
 
-    @Transactional(readOnly = true)
     protected void validateExistUser(final long userId) {
         if (!userService.existsById(userId)) {
             throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
         }
     }
 
-    @Transactional(readOnly = true)
     protected void validateUserInfoRequest(PatchUserInfoRequest patchUserInfoRequest) {
         if (  patchUserInfoRequest.getName() == null || patchUserInfoRequest.getProfileFile() == null) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
