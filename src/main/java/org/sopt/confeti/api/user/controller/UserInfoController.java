@@ -14,7 +14,6 @@ import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,7 +36,7 @@ public class UserInfoController {
     @PatchMapping
     public ResponseEntity<BaseResponse<?>> patchUserInfo(
             @UserId Long userId,
-            @ModelAttribute PatchUserInfoRequest patchUserInfoRequest
+            @RequestBody PatchUserInfoRequest patchUserInfoRequest
     ) {
         userInfoFacade.patchUserInfo(userId, patchUserInfoRequest);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);

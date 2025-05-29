@@ -88,10 +88,19 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        String profilePath = s3FileHandler.uploadFile(patchUserInfoRequest.getProfileFile(),
-                FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
-        user.setName(patchUserInfoRequest.getName());
-        user.setProfilePath(profilePath);
+        String fileName = uploadProfile(patchUserInfoRequest.profileUrl());
+        user.setProfilePath(fileName);
+        user.setName(patchUserInfoRequest.name());
+    }
+
+    public String uploadProfile(String profileImgUrl) {
+        Path profileImg = fileDownloader.downloadFile(profileImgUrl);
+        try {
+            return s3FileHandler.uploadFile(profileImg.toFile(),
+                    FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
+        } finally {
+            fileDownloader.deleteTempFile(profileImg);
+        }
     }
 
     @Transactional
