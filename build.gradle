@@ -133,29 +133,37 @@ tasks.withType(GenerateSwaggerUI) {
     doFirst {
         def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.yml")
 
-        def securitySchemesContent = "  securitySchemes:\n" +     \
-                                         "    bearerAuth:\n" +     \
-                                         "      type: https\n" +     \
-                                         "      scheme: bearer\n" +     \
-                                         "      bearerFormat: JWT\n" +     \
-                                         "      name: Authorization\n" +     \
-                                         "      in: header\n" +    \
-                                         "      description: \"Use 'your-access-token' as the value of the Authorization header\"\n" +    \
-                                         "security:\n" +
-                "  - bearerAuth: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiR0VORVJBTCIsImlzQWNjZXNzVG9rZW4iOnRydWUsInByb3ZpZGVyIjoiS0FLQU8iLCJzdWIiOiI3MSIsImlhdCI6MTc1OTA3OTQwMCwiZXhwIjo5OTk5OTk5OTk5fQ.xXbEbyOweMtq8zhVTbIXb2rx7mm_rzcQWcMzhDF4ocI  # Apply the security scheme here"
+        def securitySchemesContent = "  securitySchemes:\n" +         \
+                                             "    bearerAuth:\n" +         \
+                                             "      type: https\n" +         \
+                                             "      scheme: bearer\n" +         \
+                                             "      bearerFormat: JWT\n" +         \
+                                             "      name: Authorization\n" +         \
+                                             "      in: header\n" +        \
+                                             "      description: \"Use 'your-access-token' as the value of the Authorization header\"\n" +        \
+                                             "security:\n" +
+                "  - bearerAuth: []  # Apply the security scheme here"
 
         swaggerUIFile.append securitySchemesContent
     }
 }
 
 // 생성된 Swagger UI 파일들 복사
-tasks.register('copyDocument', Copy) {
+tasks.register('copySwaggerDocument', Copy) {
     dependsOn generateSwaggerUISample
 
     from file("build/swagger-ui-sample/")
     into file("src/main/resources/static/docs")
 }
 
+// 생성된 OpenAPI 파일 복사
+tasks.register('copyOpenAPIDocument', Copy) {
+    dependsOn generateSwaggerUISample
+
+    from file("build/api-spec/")
+    into file("src/main/resources/static/docs")
+}
+
 bootJar {
-    dependsOn copyDocument
+    dependsOn copySwaggerDocument, copyOpenAPIDocument
 }
