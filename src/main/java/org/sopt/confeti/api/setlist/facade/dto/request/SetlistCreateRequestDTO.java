@@ -1,8 +1,8 @@
-package org.sopt.confeti.domain.setlist.application.dto.request;
+package org.sopt.confeti.api.setlist.facade.dto.request;
 
 import org.sopt.confeti.domain.setlist.SetlistType;
 
-public record SetlistCreateRequest(
+public record SetlistCreateRequestDTO(
         SetlistType type,
         Long typeId
 ) {

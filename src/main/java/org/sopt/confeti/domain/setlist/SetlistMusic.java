@@ -2,6 +2,7 @@ package org.sopt.confeti.domain.setlist;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
 
 @Entity
 @Table(name = "setlist_musics")
@@ -35,6 +36,17 @@ public class SetlistMusic {
 
     @Column(name = "orders", nullable = false)
     private int orders;
+
+    public static SetlistMusic of(SetlistAddMusicDTO dto, int order) {
+        return SetlistMusic.builder()
+                .trackId(dto.trackId())
+                .artistName(dto.artistName())
+                .trackName(dto.trackName())
+                .artworkUrl(dto.artworkUrl())
+                .previewUrl(dto.previewUrl())
+                .orders(order)
+                .build();
+    }
 
     @Builder
     public SetlistMusic(String trackId, String artistName, String trackName, String artworkUrl, String previewUrl, int orders) {

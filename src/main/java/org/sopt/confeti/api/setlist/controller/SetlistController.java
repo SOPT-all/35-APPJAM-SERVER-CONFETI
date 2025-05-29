@@ -2,15 +2,14 @@ package org.sopt.confeti.api.setlist.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.domain.setlist.SetlistSortType;
-import org.sopt.confeti.domain.setlist.application.SetlistService;
-import org.sopt.confeti.domain.setlist.application.dto.request.AddSetListMusicRequest;
-import org.sopt.confeti.domain.setlist.application.dto.request.SetlistCreateRequest;
-import org.sopt.confeti.domain.setlist.application.dto.response.AddSetListMusicResponse;
-import org.sopt.confeti.domain.setlist.application.dto.response.GetAllSetlistsResponse;
-import org.sopt.confeti.domain.setlist.application.dto.response.GetSetlistDetailResponse;
-import org.sopt.confeti.domain.setlist.application.dto.response.SetlistCreateResponse;
-import org.sopt.confeti.domain.setlist.application.dto.response.SetlistSummaryDto;
+import org.sopt.confeti.api.setlist.facade.SetlistFacade;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddMusicResponseDTO;
+import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
+import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponseDTO;
+import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -31,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/my/setlists")
 public class SetlistController {
 
-    private final SetlistService setlistService;
+    private final SetlistFacade setlistFacade;
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/all")
@@ -39,8 +38,7 @@ public class SetlistController {
             @UserId(require = false) Long userId,
             @RequestParam(name = "sortBy", required = false) String sortBy
     ) {
-        SetlistSortType sortType = SetlistSortType.from(sortBy);
-        GetAllSetlistsResponse data = setlistService.getAllMySetlists(userId, sortType);
+        GetAllSetlistsResponse data = setlistFacade.getAllMySetlists(userId, sortBy);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 
@@ -49,7 +47,7 @@ public class SetlistController {
     public ResponseEntity<BaseResponse<?>> getPreviewMySetlists(
             @UserId(require = false) Long userId
     ) {
-        List<SetlistSummaryDto> data = setlistService.getPreviewMySetlists(userId);
+        List<SetlistSummaryResponse> data = setlistFacade.getPreviewMySetlists(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 
@@ -57,10 +55,10 @@ public class SetlistController {
     @PostMapping
     public ResponseEntity<BaseResponse<?>> createSetlists(
             @UserId(require = false) Long userId,
-            @RequestBody List<SetlistCreateRequest> requests
+            @RequestBody List<SetlistCreateRequestDTO> requests
     ) {
-        List<Long> ids = setlistService.createSetLists(userId, requests);
-        return ApiResponseUtil.success(SuccessMessage.CREATED, new SetlistCreateResponse(ids));
+        SetlistCreateResponseDTO data = setlistFacade.createSetLists(userId, requests);
+        return ApiResponseUtil.success(SuccessMessage.CREATED, data);
     }
 
     @Permission(role = {Role.GENERAL})
@@ -68,10 +66,10 @@ public class SetlistController {
     public ResponseEntity<BaseResponse<?>> addMusicsToSetlist(
             @UserId(require = false) Long userId,
             @PathVariable Long setlistId,
-            @RequestBody List<AddSetListMusicRequest> requests
+            @RequestBody List<SetlistAddMusicDTO> requests
     ) {
-        int count = setlistService.addMusics(userId, setlistId, requests);
-        return ApiResponseUtil.success(SuccessMessage.CREATED, new AddSetListMusicResponse(count));
+        SetlistAddMusicResponseDTO data = setlistFacade.addMusics(userId, setlistId, requests);
+        return ApiResponseUtil.success(SuccessMessage.CREATED, data);
     }
 
     @Permission(role = {Role.GENERAL})
@@ -80,7 +78,7 @@ public class SetlistController {
             @UserId(require = false) Long userId,
             @PathVariable Long setlistId
     ) {
-        GetSetlistDetailResponse data = setlistService.getSetlistDetail(userId, setlistId);
+        GetSetlistDetailResponse data = setlistFacade.getSetlistDetail(userId, setlistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 }

@@ -197,6 +197,12 @@ public class PerformanceService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public Performance getPerformanceByTypeAndTypeId(PerformanceType type, long typeId) {
+        return performanceRepository.findPerformanceByTypeAndTypeId(type, typeId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+    }
+
     private List<Pair<PerformanceType, Long>> convertToPairs(GetExpectedPerformancesDTO expectedPerformancesDTO) {
         return expectedPerformancesDTO.expectedPerformanceDTOs().stream()
                 .map(performanceDTO -> Pair.of(performanceDTO.type(), performanceDTO.typeId()))

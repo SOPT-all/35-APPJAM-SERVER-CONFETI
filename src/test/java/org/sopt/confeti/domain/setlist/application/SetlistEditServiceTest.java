@@ -18,8 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.sopt.confeti.domain.setlist.Setlist;
 import org.sopt.confeti.domain.setlist.SetlistMusic;
 import org.sopt.confeti.domain.setlist.SetlistType;
-import org.sopt.confeti.domain.setlist.application.dto.request.SetlistMusicEditDto;
-import org.sopt.confeti.domain.setlist.application.dto.request.SetlistMusicOrderUpdateRequest;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistMusicEditDTO;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistUpdateMusicOrderDTO;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistMusicRepository;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
 import org.sopt.confeti.domain.user.OAuthProvider;
@@ -86,10 +86,10 @@ class SetlistEditServiceTest {
 
         // then
         String expectedKey = "edit:setlist:" + userId + ":" + setlistId;
-        ArgumentCaptor<List<SetlistMusicEditDto>> captor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List<SetlistMusicEditDTO>> captor = ArgumentCaptor.forClass(List.class);
         verify(valueOperations).set(eq(expectedKey), captor.capture());
 
-        List<SetlistMusicEditDto> captured = captor.getValue();
+        List<SetlistMusicEditDTO> captured = captor.getValue();
         assertThat(captured).hasSize(1);
         assertThat(captured.get(0).trackId()).isEqualTo("203948575");
         assertThat(captured.get(0).trackName()).isEqualTo("Super Shy");
@@ -103,14 +103,14 @@ class SetlistEditServiceTest {
         Long setlistId = 100L;
         String redisKey = "edit:setlist:" + userId + ":" + setlistId;
 
-        List<SetlistMusicEditDto> originalList = List.of(
-                new SetlistMusicEditDto(1L, "track1", "Artist A", "Song A", "url1", "preview1", 1),
-                new SetlistMusicEditDto(2L, "track2", "Artist B", "Song B", "url2", "preview2", 2)
+        List<SetlistMusicEditDTO> originalList = List.of(
+                new SetlistMusicEditDTO(1L, "track1", "Artist A", "Song A", "url1", "preview1", 1),
+                new SetlistMusicEditDTO(2L, "track2", "Artist B", "Song B", "url2", "preview2", 2)
         );
 
-        List<SetlistMusicOrderUpdateRequest> requestList = List.of(
-                new SetlistMusicOrderUpdateRequest("track1", 1),
-                new SetlistMusicOrderUpdateRequest("track2", 2)
+        List<SetlistUpdateMusicOrderDTO> requestList = List.of(
+                new SetlistUpdateMusicOrderDTO("track1", 1),
+                new SetlistUpdateMusicOrderDTO("track2", 2)
         );
 
         given(redisTemplate.opsForValue()).willReturn(valueOperations);
@@ -120,10 +120,10 @@ class SetlistEditServiceTest {
         setlistEditService.updateMusicOrder(userId, setlistId, requestList);
 
         // then
-        ArgumentCaptor<List<SetlistMusicEditDto>> captor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List<SetlistMusicEditDTO>> captor = ArgumentCaptor.forClass(List.class);
         verify(valueOperations).set(eq(redisKey), captor.capture());
 
-        List<SetlistMusicEditDto> updated = captor.getValue();
+        List<SetlistMusicEditDTO> updated = captor.getValue();
 
         assertThat(updated).hasSize(2);
         assertThat(updated).anySatisfy(dto -> {
@@ -142,10 +142,10 @@ class SetlistEditServiceTest {
         Long setlistId = 100L;
         String redisKey = "edit:setlist:" + userId + ":" + setlistId;
 
-        List<SetlistMusicEditDto> originalList = List.of(
-                new SetlistMusicEditDto(1L, "track1", "Artist A", "Song A", "url1", "preview1", 1),
-                new SetlistMusicEditDto(2L, "track2", "Artist B", "Song B", "url2", "preview2", 2),
-                new SetlistMusicEditDto(3L, "track3", "Artist C", "Song C", "url3", "preview3", 3)
+        List<SetlistMusicEditDTO> originalList = List.of(
+                new SetlistMusicEditDTO(1L, "track1", "Artist A", "Song A", "url1", "preview1", 1),
+                new SetlistMusicEditDTO(2L, "track2", "Artist B", "Song B", "url2", "preview2", 2),
+                new SetlistMusicEditDTO(3L, "track3", "Artist C", "Song C", "url3", "preview3", 3)
         );
 
         given(redisTemplate.opsForValue()).willReturn(valueOperations);
@@ -157,13 +157,13 @@ class SetlistEditServiceTest {
         // then
         assertThat(deletedTrackId).isEqualTo("track2");
 
-        ArgumentCaptor<List<SetlistMusicEditDto>> captor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List<SetlistMusicEditDTO>> captor = ArgumentCaptor.forClass(List.class);
         verify(valueOperations).set(eq(redisKey), captor.capture());
 
-        List<SetlistMusicEditDto> updated = captor.getValue();
+        List<SetlistMusicEditDTO> updated = captor.getValue();
         assertThat(updated).hasSize(2);
         assertThat(updated.get(0).orders()).isEqualTo(1);
         assertThat(updated.get(1).orders()).isEqualTo(2);
-        assertThat(updated).extracting(SetlistMusicEditDto::trackId).containsExactly("track1", "track3");
+        assertThat(updated).extracting(SetlistMusicEditDTO::trackId).containsExactly("track1", "track3");
     }
 }
