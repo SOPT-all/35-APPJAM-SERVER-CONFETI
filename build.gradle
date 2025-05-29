@@ -17,7 +17,7 @@ openapi3 {
             { url = "http://localhost:8080" }
     ]
     title = "CONFETI Server API Document"
-    description = "-"
+    description = "응답 테스트 검증이 완료된 명세서입니다."
     version = "0.0.1"
     format = "yaml"
 }
@@ -133,15 +133,15 @@ tasks.withType(GenerateSwaggerUI) {
     doFirst {
         def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.yml")
 
-        def securitySchemesContent = "  securitySchemes:\n" +          \
-                                              "    bearerAuth:\n" +          \
-                                              "      type: https\n" +          \
-                                              "      scheme: bearer\n" +          \
-                                              "      bearerFormat: JWT\n" +          \
-                                              "      name: Authorization\n" +          \
-                                              "      in: header\n" +         \
-                                              "      description: \"Use 'your-access-token' as the value of the Authorization header\"\n" +         \
-                                              "security:\n" +
+        def securitySchemesContent = "  securitySchemes:\n" +              \
+                                                  "    bearerAuth:\n" +              \
+                                                  "      type: https\n" +              \
+                                                  "      scheme: bearer\n" +              \
+                                                  "      bearerFormat: JWT\n" +              \
+                                                  "      name: Authorization\n" +              \
+                                                  "      in: header\n" +             \
+                                                  "      description: \"Use 'your-access-token' as the value of the Authorization header\"\n" +             \
+                                                  "security:\n" +
                 "  - bearerAuth: []  # Apply the security scheme here"
 
         swaggerUIFile.append securitySchemesContent
@@ -155,6 +155,7 @@ tasks.register('copySwaggerDocument', Copy) {
     from file("build/swagger-ui-sample/")
     into file("src/main/resources/static/docs")
 }
+
 bootJar {
     dependsOn copySwaggerDocument
 }
