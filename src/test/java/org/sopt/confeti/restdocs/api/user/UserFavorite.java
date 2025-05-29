@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.setlist.application;
+package org.sopt.confeti.restdocs.api.user;
 
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
 import static io.restassured.RestAssured.given;
@@ -12,11 +12,13 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
+import org.sopt.confeti.restdocs.base.APIBaseTest;
+import org.sopt.confeti.restdocs.base.TestDataManager;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
-public class UserFavoriteTest extends BaseControllerTest {
+public class UserFavorite extends APIBaseTest {
 
     @Test
     @DisplayName("아티스트 좋아요 삭제 API 테스트")

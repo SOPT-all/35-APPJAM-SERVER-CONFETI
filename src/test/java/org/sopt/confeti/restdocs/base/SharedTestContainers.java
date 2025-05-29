@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.setlist.application;
+package org.sopt.confeti.restdocs.base;
 
 import java.time.Duration;
 import org.testcontainers.containers.GenericContainer;

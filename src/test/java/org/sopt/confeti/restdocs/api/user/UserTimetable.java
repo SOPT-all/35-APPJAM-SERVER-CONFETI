@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.setlist.application;
+package org.sopt.confeti.restdocs.api.user;
 
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
 import static io.restassured.RestAssured.given;
@@ -10,11 +10,12 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.sopt.confeti.restdocs.base.APIBaseTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
-public class UserTimetableTest extends BaseControllerTest {
+public class UserTimetable extends APIBaseTest {
 
     @Test
     @DisplayName("타임테이블에 페스티벌 추가 API 테스트")
