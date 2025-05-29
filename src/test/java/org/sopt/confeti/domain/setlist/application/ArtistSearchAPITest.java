@@ -9,19 +9,14 @@ import static org.springframework.restdocs.request.RequestDocumentation.queryPar
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
 public class ArtistSearchAPITest extends BaseControllerTest {
 
-    private static final Logger log = LoggerFactory.getLogger(ArtistSearchAPITest.class);
-
     @Test
     @DisplayName("아티스트 검색 API 테스트")
     void 아티스트_검색_API_테스트() {
-        log.debug("아티스트_검색_API_테스트");
         given(this.spec)
                 .filter(document(DEFAULT_RESTDOC_PATH,
                         queryParameters(
@@ -56,7 +51,6 @@ public class ArtistSearchAPITest extends BaseControllerTest {
     @Test
     @DisplayName("공연 연관 검색 API 테스트")
     void 공연_연관_검색_API_테스트() {
-        log.debug("공연_연관_검색_API_테스트");
         given(this.spec)
                 .filter(document(DEFAULT_RESTDOC_PATH,
                         queryParameters(

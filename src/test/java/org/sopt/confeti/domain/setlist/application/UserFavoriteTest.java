@@ -11,16 +11,12 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
 public class UserFavoriteTest extends BaseControllerTest {
-
-    private static final Logger log = LoggerFactory.getLogger(UserFavoriteTest.class);
 
     @Test
     @DisplayName("아티스트 좋아요 삭제 API 테스트")
