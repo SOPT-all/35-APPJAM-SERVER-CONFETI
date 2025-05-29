@@ -37,7 +37,7 @@ public class UserInfoFacade {
     }
 
     protected void validateUserInfoRequest(PatchUserInfoRequest patchUserInfoRequest) {
-        if (patchUserInfoRequest.name() == null || patchUserInfoRequest.profileUrl() == null) {
+        if (patchUserInfoRequest.name() == null && patchUserInfoRequest.profileUrl() == null) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }

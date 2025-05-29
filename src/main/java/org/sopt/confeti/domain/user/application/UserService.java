@@ -88,9 +88,17 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        String fileName = uploadProfile(patchUserInfoRequest.profileUrl());
-        user.setProfilePath(fileName);
-        user.setName(patchUserInfoRequest.name());
+        String name = patchUserInfoRequest.name();
+        String profileUrl = patchUserInfoRequest.profileUrl();
+
+        if (profileUrl != null) {
+            String fileName = uploadProfile(profileUrl);
+            user.setProfilePath(fileName);
+        }
+
+        if (name != null) {
+            user.setName(name);
+        }
     }
 
     public String uploadProfile(String profileImgUrl) {
