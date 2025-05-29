@@ -22,7 +22,6 @@ public class UserInfoFacade {
         );
     }
 
-    @Transactional
     public void patchUserInfo(Long userId, PatchUserInfoRequest patchUserInfoRequest) {
         validateExistUser(userId);
         validateUserInfoRequest(patchUserInfoRequest);
