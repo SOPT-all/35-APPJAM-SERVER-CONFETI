@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.setlist.application;
+package org.sopt.confeti.restdocs.base;
 
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyUris;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -63,16 +63,17 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(RestDocumentationExtension.class)
-@Import(TestElasticsearchConfiguration.class)
+@Import(ElasticsearchTestConfiguration.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class BaseControllerTest {
+public abstract class APIBaseTest {
 
     protected static final String DEFAULT_RESTDOC_PATH = "{class_name}/{method_name}/";
-    private static final Logger log = LoggerFactory.getLogger(BaseControllerTest.class);
+    protected static final Logger log = LoggerFactory.getLogger(APIBaseTest.class);
     protected RequestSpecification spec;
 
     @Autowired
     private DataSource dataSource;
+
     @Autowired
     protected ArtistFavoriteRepository artistFavoriteRepository;
 
