@@ -52,10 +52,12 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
@@ -137,6 +139,9 @@ public abstract class BaseControllerTest {
     @Autowired
     protected JwtTokenGenerator jwtTokenGenerator;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
     @LocalServerPort
     int port;
 
@@ -144,17 +149,26 @@ public abstract class BaseControllerTest {
 
     protected static MySQLContainer<?> mySQLContainer = SharedTestContainers.MYSQL_CONTAINER;
 
+    protected static GenericContainer<?> redisContainer = SharedTestContainers.REDIS_CONTAINER;
+
     protected static String accessToken = "Empty";
 
     @DynamicPropertySource
     public static void configureProperties(DynamicPropertyRegistry registry) {
+        // mysql
         registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
         registry.add("spring.datasource.username", mySQLContainer::getUsername);
         registry.add("spring.datasource.password", mySQLContainer::getPassword);
         registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
 
+        // elastic search
         registry.add("spring.data.elasticsearch.uris", elasticsearchContainer::getHttpHostAddress);
         registry.add("spring.elasticsearch.uris", elasticsearchContainer::getHttpHostAddress);
+
+        // redis
+        registry.add("spring.data.redis.host", redisContainer::getHost);
+        registry.add("spring.data.redis.port",
+                () -> redisContainer.getMappedPort(SharedTestContainers.REDIS_PORT).toString());
     }
 
     @BeforeEach
@@ -181,6 +195,9 @@ public abstract class BaseControllerTest {
 
         // generate Access Token
         generateAccessToken();
+
+        // clear redis
+        clearRedisData();
     }
 
     @BeforeEach
@@ -213,6 +230,21 @@ public abstract class BaseControllerTest {
         }
     }
 
+    /**
+     * 레디스의 모든 데이터를 삭제하는 함수
+     */
+    private void clearRedisData() {
+        try {
+            redisTemplate.getConnectionFactory().getConnection().flushAll();
+            log.info("=== Redis 모든 데이터 초기화 완료 ===");
+        } catch (Exception e) {
+            log.error("Redis 데이터 초기화 실패: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * mysql의 모든 데이터를 삭제하는 함수
+     */
     private void initializeAllTableData() {
         try (Connection connection = dataSource.getConnection()) {
             try (Statement statement = connection.createStatement()) {
