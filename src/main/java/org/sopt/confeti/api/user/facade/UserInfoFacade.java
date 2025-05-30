@@ -13,6 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Facade
 @RequiredArgsConstructor
 public class UserInfoFacade {
+
+    private static final int MINIMUM_NAME_LENGTH = 2;
+    private static final int MAXIMUM_NAME_LENGTH = 10;
+
     private final UserService userService;
 
     @Transactional
@@ -22,7 +26,6 @@ public class UserInfoFacade {
         );
     }
 
-    @Transactional
     public void patchUserInfo(Long userId, PatchUserInfoRequest patchUserInfoRequest) {
         validateExistUser(userId);
         validateUserInfoRequest(patchUserInfoRequest);
@@ -30,16 +33,21 @@ public class UserInfoFacade {
         userService.patchUserInfo(userId, patchUserInfoRequest);
     }
 
-    @Transactional(readOnly = true)
     protected void validateExistUser(final long userId) {
         if (!userService.existsById(userId)) {
             throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
         }
     }
 
-    @Transactional(readOnly = true)
     protected void validateUserInfoRequest(PatchUserInfoRequest patchUserInfoRequest) {
-        if (  patchUserInfoRequest.getName() == null || patchUserInfoRequest.getProfileFile() == null) {
+        if (patchUserInfoRequest.profileUrl() != null) return;
+
+        if (patchUserInfoRequest.name() == null) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
+
+        String trimmedName = patchUserInfoRequest.name().trim();
+        if (trimmedName.length() < MINIMUM_NAME_LENGTH || trimmedName.length() > MAXIMUM_NAME_LENGTH) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
