@@ -35,7 +35,7 @@ public class SetlistController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/all")
     public ResponseEntity<BaseResponse<?>> getAllMySetlists(
-            @UserId(require = false) Long userId,
+            @UserId Long userId,
             @RequestParam(name = "sortBy", required = false) String sortBy
     ) {
         GetAllSetlistsResponse data = setlistFacade.getAllMySetlists(userId, sortBy);
@@ -45,7 +45,7 @@ public class SetlistController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/preview")
     public ResponseEntity<BaseResponse<?>> getPreviewMySetlists(
-            @UserId(require = false) Long userId
+            @UserId Long userId
     ) {
         List<SetlistSummaryResponse> data = setlistFacade.getPreviewMySetlists(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
@@ -54,7 +54,7 @@ public class SetlistController {
     @Permission(role = {Role.GENERAL})
     @PostMapping
     public ResponseEntity<BaseResponse<?>> createSetlists(
-            @UserId(require = false) Long userId,
+            @UserId Long userId,
             @RequestBody List<SetlistCreateRequestDTO> requests
     ) {
         SetlistCreateResponseDTO data = setlistFacade.createSetLists(userId, requests);
@@ -64,7 +64,7 @@ public class SetlistController {
     @Permission(role = {Role.GENERAL})
     @PostMapping("/{setlistId}/musics")
     public ResponseEntity<BaseResponse<?>> addMusicsToSetlist(
-            @UserId(require = false) Long userId,
+            @UserId Long userId,
             @PathVariable Long setlistId,
             @RequestBody List<SetlistAddMusicDTO> requests
     ) {
@@ -75,7 +75,7 @@ public class SetlistController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/{setlistId}")
     public ResponseEntity<BaseResponse<?>> getSetlistDetail(
-            @UserId(require = false) Long userId,
+            @UserId Long userId,
             @PathVariable Long setlistId
     ) {
         GetSetlistDetailResponse data = setlistFacade.getSetlistDetail(userId, setlistId);
