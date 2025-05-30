@@ -14,7 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserInfoFacade {
 
-    private static final int REQUIRED_NAME_LENGTH = 2;
+    private static final int MINIMUM_NAME_LENGTH = 2;
+    private static final int MAXIMUM_NAME_LENGTH = 10;
 
     private final UserService userService;
 
@@ -39,8 +40,14 @@ public class UserInfoFacade {
     }
 
     protected void validateUserInfoRequest(PatchUserInfoRequest patchUserInfoRequest) {
-        if ((patchUserInfoRequest.name() == null || patchUserInfoRequest.name().trim().length() < REQUIRED_NAME_LENGTH)
-                && patchUserInfoRequest.profileUrl() == null) {
+        if (patchUserInfoRequest.profileUrl() != null) return;
+
+        if (patchUserInfoRequest.name() == null) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
+
+        String trimmedName = patchUserInfoRequest.name().trim();
+        if (trimmedName.length() < MINIMUM_NAME_LENGTH || trimmedName.length() > MAXIMUM_NAME_LENGTH) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
