@@ -1,4 +1,4 @@
-package org.sopt.confeti.api.search_term.facade.dto.response;
+package org.sopt.confeti.api.search.facade.dto.response;
 
 import org.sopt.confeti.domain.elastic_search.application.dto.response.PopularTermResult;
 
