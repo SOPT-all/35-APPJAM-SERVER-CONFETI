@@ -56,6 +56,10 @@ public class SearchController {
             searchResult = searchFacade.getHomeSearchResultWithPid(userId, pid);
         }
 
+        if (Objects.isNull(searchResult) && Objects.nonNull(term)) {
+            searchResult = searchFacade.getHomeSearchResultWithTerm(userId, term);
+        }
+
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, SearchResultResponse.of(searchResult, s3FileHandler));
     }
 
