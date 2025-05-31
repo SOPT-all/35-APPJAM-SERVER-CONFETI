@@ -19,4 +19,11 @@ public record SearchResultDTO(
                         .toList()
         );
     }
+
+    public static SearchResultDTO of(PerformanceDTO performance, boolean performanceFavorite) {
+        return new SearchResultDTO(
+                null,
+                List.of(SearchResultPerformanceDTO.of(performance, performanceFavorite))
+        );
+    }
 }
