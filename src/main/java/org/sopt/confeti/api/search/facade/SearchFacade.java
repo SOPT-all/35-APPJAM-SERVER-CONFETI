@@ -33,6 +33,7 @@ public class SearchFacade {
     @Transactional(readOnly = true)
     public SearchResultDTO getHomeSearchResultWithAid(Long userId, String aid) {
         ConfetiArtist artist = getArtistById(aid);
+        searchTermService.write(artist.getName());
         boolean artistFavorite = false;
 
         if (Objects.nonNull(userId)) {
