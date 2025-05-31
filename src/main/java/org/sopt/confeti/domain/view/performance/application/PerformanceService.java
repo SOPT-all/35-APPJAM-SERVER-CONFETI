@@ -137,7 +137,7 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public PerformanceDTO getPerformance(long performanceId) {
-        Performance performance = performanceRepository.findPerformanceByIdAndEndAtGreaterThanEqualOrderByStartAt(
+        Performance performance = performanceRepository.findPerformanceByIdAndEndAtGreaterThanEqual(
                         performanceId,
                         LocalDate.now())
                 .orElseThrow(
@@ -195,6 +195,12 @@ public class PerformanceService {
                 .filter(Objects::nonNull)
                 .map(PerformanceDTO::from)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Performance getPerformanceByTypeAndTypeId(PerformanceType type, long typeId) {
+        return performanceRepository.findPerformanceByTypeAndTypeId(type, typeId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
     private List<Pair<PerformanceType, Long>> convertToPairs(GetExpectedPerformancesDTO expectedPerformancesDTO) {

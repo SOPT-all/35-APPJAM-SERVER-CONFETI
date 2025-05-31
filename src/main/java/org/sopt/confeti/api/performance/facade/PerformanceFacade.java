@@ -268,8 +268,8 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public IntendedPerformancesDTO getPerformances(Long userId, Long pid, String aid, String ptitle,
-                                                   PerformanceType ptype) {
+    public IntendedPerformancesDTO searchPerformances(Long userId, Long pid, String aid, String ptitle,
+                                                      PerformanceType ptype) {
         if (!isPresent(pid) && !isPresent(aid) && !isPresent(ptitle)) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
@@ -277,7 +277,7 @@ public class PerformanceFacade {
         List<PerformanceDTO> performances = new ArrayList<>();
 
         if (isPresent(pid)) {
-            PerformanceDTO performance = PerformanceDTO.from(performanceService.getPerformanceById(pid));
+            PerformanceDTO performance = performanceService.getPerformance(pid);
             performances.add(performance);
             searchTermService.write(performance.title());
         }
@@ -287,7 +287,7 @@ public class PerformanceFacade {
         }
 
         if (isPresent(ptitle)) {
-            List<PerformanceDTO> searchedPerformances = performanceSearchService.getPerformancesByTitleAndTypePartialMatched(
+            List<PerformanceDTO> searchedPerformances = performanceSearchService.getExpectedPerformancesByTitleAndTypePartialMatched(
                             ptitle, ptype).stream()
                     .map(PerformanceDTO::from)
                     .toList();
@@ -295,9 +295,11 @@ public class PerformanceFacade {
             performances.addAll(searchedPerformances);
         }
 
-        Map<Long, Boolean> performanceFavorites = getPerformanceFavorites(userId, performances);
+        Set<PerformanceDTO> performancesResult = new HashSet<>(performances);
+
+        Map<Long, Boolean> performanceFavorites = getPerformanceFavorites(userId, performancesResult);
         return IntendedPerformancesDTO.of(
-                new HashSet<>(performances),
+                performancesResult,
                 performanceFavorites
         );
     }
@@ -306,7 +308,7 @@ public class PerformanceFacade {
         return Objects.nonNull(target);
     }
 
-    private Map<Long, Boolean> getPerformanceFavorites(Long userId, List<PerformanceDTO> performances) {
+    private Map<Long, Boolean> getPerformanceFavorites(Long userId, Set<PerformanceDTO> performances) {
         Map<Long, Boolean> performanceFavorites = new HashMap<>();
         performances.forEach(performance -> performanceFavorites.put(performance.id(), false));
 

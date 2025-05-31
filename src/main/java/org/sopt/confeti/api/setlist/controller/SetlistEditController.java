@@ -2,8 +2,8 @@ package org.sopt.confeti.api.setlist.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.domain.setlist.application.SetlistEditService;
-import org.sopt.confeti.domain.setlist.application.dto.request.SetlistMusicOrderUpdateRequest;
+import org.sopt.confeti.api.setlist.facade.SetlistFacade;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistUpdateMusicOrderDTO;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
@@ -22,14 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/my/setlists")
 public class SetlistEditController {
 
-    private final SetlistEditService setlistEditService;
+    private final SetlistFacade setlistFacade;
 
     @PostMapping("/{setlistId}/edit/start")
     public ResponseEntity<BaseResponse<?>> startEdit(
             @UserId(require = false) Long userId,
             @PathVariable Long setlistId
     ) {
-        setlistEditService.startEdit(userId, setlistId);
+        setlistFacade.startEdit(userId, setlistId);
         return ApiResponseUtil.success(SuccessMessage.CREATED);
     }
 
@@ -37,9 +37,9 @@ public class SetlistEditController {
     public ResponseEntity<BaseResponse<?>> updateMusicOrder(
             @UserId(require = false) Long userId,
             @PathVariable Long setlistId,
-            @RequestBody List<SetlistMusicOrderUpdateRequest> request
+            @RequestBody List<SetlistUpdateMusicOrderDTO> request
     ) {
-        setlistEditService.updateMusicOrder(userId, setlistId, request);
+        setlistFacade.updateMusicOrder(userId, setlistId, request);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
@@ -49,7 +49,7 @@ public class SetlistEditController {
             @PathVariable Long setlistId,
             @PathVariable int orders
     ) {
-        String deleteTrackId = setlistEditService.deleteMusic(userId, setlistId, orders);
+        String deleteTrackId = setlistFacade.deleteMusic(userId, setlistId, orders);
         return ApiResponseUtil.success(SuccessMessage.DELETED, deleteTrackId);
     }
 
@@ -58,7 +58,7 @@ public class SetlistEditController {
             @UserId(require = false) Long userId,
             @PathVariable Long setlistId
     ) {
-        setlistEditService.completeEdit(userId, setlistId);
+        setlistFacade.completeEdit(userId, setlistId);
         return ApiResponseUtil.success(SuccessMessage.UPDATED);
     }
 
@@ -67,7 +67,7 @@ public class SetlistEditController {
             @UserId(require = false) Long userId,
             @PathVariable Long setlistId
     ) {
-        setlistEditService.cancelEdit(userId, setlistId);
+        setlistFacade.cancelEdit(userId, setlistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }

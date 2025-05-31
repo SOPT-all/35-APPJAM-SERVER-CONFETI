@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.time.Duration;
@@ -29,6 +32,9 @@ public class S3FileHandler {
     private final S3Operations s3Operations;
     private final S3Client s3Client;
     private final FileNameGenerator fileNameGenerator;
+
+    @Value("${spring.cloud.aws.s3.host}")
+    private String host;
 
     @Value("${spring.cloud.aws.s3.bucket-name}")
     private String bucket;
@@ -108,9 +114,22 @@ public class S3FileHandler {
     }
 
     /**
-     * 파일 조회 URL 생성
+     * Public 설정이 된 파일 조회 URL 생성
      */
     public URL getFileUrl(String folderPath, String key) {
+        checkFileExist(folderPath, key);
+
+        try {
+            return new URI(host + folderPath + key).toURL();
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Public 설정이 되지 않은 파일 조회 URL 생성
+     */
+    public URL getFileSignedUrl(String folderPath, String key) {
         checkFileExist(folderPath, key);
 
         return s3Operations.createSignedGetURL(bucket, folderPath + key, urlDuration);

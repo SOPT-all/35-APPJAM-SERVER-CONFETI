@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.elastic_search.application;
 
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.elastic_search.PerformanceDocument;
@@ -32,6 +33,17 @@ public class PerformanceSearchService {
 
         return performances.stream()
                 .map(SearchPerformanceResult::from)
+                .toList();
+    }
+
+    public List<SearchPerformanceResult> getExpectedPerformancesByTitleAndTypePartialMatched(String ptitle,
+                                                                                             PerformanceType ptype) {
+        List<PerformanceDocument> performances = performanceSearchOperator.searchByTitleAndTypePartialMatch(
+                clearSentence(ptitle), ptype, PerformanceStatus.ALL);
+
+        return performances.stream()
+                .map(SearchPerformanceResult::from)
+                .filter(performance -> !performance.endAt().isBefore(LocalDate.now()))
                 .toList();
     }
 
