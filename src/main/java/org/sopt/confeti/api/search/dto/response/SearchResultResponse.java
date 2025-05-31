@@ -1,6 +1,7 @@
 package org.sopt.confeti.api.search.dto.response;
 
 import java.util.List;
+import java.util.Objects;
 import org.sopt.confeti.api.search.facade.dto.response.SearchResultDTO;
 import org.sopt.confeti.global.util.S3FileHandler;
 
@@ -10,8 +11,13 @@ public record SearchResultResponse(
         List<SearchResultPerformanceResponse> performances
 ) {
     public static SearchResultResponse of(SearchResultDTO searchResult, S3FileHandler s3FileHandler) {
+        SearchResultArtistResponse artist = null;
+        if (Objects.nonNull(searchResult.artist())) {
+            artist = SearchResultArtistResponse.from(searchResult.artist());
+        }
+
         return new SearchResultResponse(
-                SearchResultArtistResponse.from(searchResult.artist()),
+                artist,
                 searchResult.performances().size(),
                 searchResult.performances().stream()
                         .map(performance -> SearchResultPerformanceResponse.of(performance, s3FileHandler))

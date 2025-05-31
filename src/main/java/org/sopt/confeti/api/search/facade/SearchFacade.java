@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.search.facade.dto.response.PopularTermsDTO;
 import org.sopt.confeti.api.search.facade.dto.response.SearchResultDTO;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
+import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
+import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
@@ -29,6 +31,8 @@ public class SearchFacade {
     private final MusicAPIHandler musicAPIHandler;
     private final ArtistFavoriteService artistFavoriteService;
     private final PerformanceService performanceService;
+    private final FestivalFavoriteService festivalFavoriteService;
+    private final ConcertFavoriteService concertFavoriteService;
 
     @Transactional(readOnly = true)
     public SearchResultDTO getHomeSearchResultWithAid(Long userId, String aid) {
@@ -58,7 +62,22 @@ public class SearchFacade {
     }
 
     @Transactional(readOnly = true)
-    public void getHomeSearchResultWithPid(Long userId, long pid) {
+    public SearchResultDTO getHomeSearchResultWithPid(Long userId, long pid) {
+        PerformanceDTO performance = performanceService.getPerformance(pid);
+        searchTermService.write(performance.title());
+        boolean performanceFavorite = false;
+
+        if (Objects.nonNull(userId)) {
+            if (performance.type() == PerformanceType.FESTIVAL) {
+                performanceFavorite = festivalFavoriteService.isFavorite(userId, performance.typeId());
+            }
+
+            if (performance.type() == PerformanceType.CONCERT) {
+                performanceFavorite = concertFavoriteService.isFavorite(userId, performance.typeId());
+            }
+        }
+
+        return SearchResultDTO.of(performance, performanceFavorite);
     }
 
     @Transactional(readOnly = true)

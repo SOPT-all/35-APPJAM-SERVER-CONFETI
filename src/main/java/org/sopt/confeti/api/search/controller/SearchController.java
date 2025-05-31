@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.search.dto.response.PopularTermsResponse;
 import org.sopt.confeti.api.search.dto.response.SearchResultResponse;
 import org.sopt.confeti.api.search.facade.SearchFacade;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/search")
@@ -48,6 +50,10 @@ public class SearchController {
 
         if (Objects.nonNull(aid)) {
             searchResult = searchFacade.getHomeSearchResultWithAid(userId, aid);
+        }
+
+        if (Objects.isNull(searchResult) && Objects.nonNull(pid)) {
+            searchResult = searchFacade.getHomeSearchResultWithPid(userId, pid);
         }
 
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, SearchResultResponse.of(searchResult, s3FileHandler));
