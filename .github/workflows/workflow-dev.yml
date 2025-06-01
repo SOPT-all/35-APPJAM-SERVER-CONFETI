@@ -14,14 +14,6 @@ jobs:
     # 실행환경 설정
     runs-on: ubuntu-24.04
 
-    services:
-      docker:
-        image: docker:dind
-        options: --privileged
-    env:
-      DOCKER_HOST: tcp://docker:2375
-      DOCKER_TLS_VERIFY: "0"
-
     # Action을 사용하여 Step을 구성
     steps:
       - name: 체크아웃
