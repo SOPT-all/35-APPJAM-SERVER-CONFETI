@@ -20,6 +20,7 @@ public final class SharedTestContainers {
             .withUsername("test")
             .withPassword("test123")
             .withEnv("MYSQL_ROOT_PASSWORD", "root_password")
+            .withUrlParam("tc", "proxy")
             .withCommand("--character-set-server=utf8mb4",
                     "--collation-server=utf8mb4_unicode_ci",
                     "--sql-mode=STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION")
