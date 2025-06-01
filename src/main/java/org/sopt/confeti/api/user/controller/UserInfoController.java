@@ -36,7 +36,7 @@ public class UserInfoController {
     @PatchMapping
     public ResponseEntity<BaseResponse<?>> patchUserInfo(
             @UserId Long userId,
-            @RequestBody PatchUserInfoRequest patchUserInfoRequest
+            @ModelAttribute PatchUserInfoRequest patchUserInfoRequest
     ) {
         userInfoFacade.patchUserInfo(userId, patchUserInfoRequest);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
