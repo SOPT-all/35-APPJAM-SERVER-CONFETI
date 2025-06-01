@@ -137,4 +137,6 @@ jobs:
 
       # Gradle을 사용하여 빌드 실행
       - name: Build with Gradle Wrapper
-        run: ./gradlew clean build
+        run: |
+          ./gradlew clean build
+          cat /home/runner/work/confeti-server/confeti-server/build/reports/problems/problems-report.html
