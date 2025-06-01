@@ -14,6 +14,11 @@ jobs:
     # 실행환경 설정
     runs-on: ubuntu-24.04
 
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged
+
     # Action을 사용하여 Step을 구성
     steps:
       - name: 체크아웃
@@ -138,4 +143,4 @@ jobs:
       # Gradle을 사용하여 빌드 실행
       - name: Build with Gradle Wrapper
         run: |
-          ./gradlew clean build --debug
+          ./gradlew clean build
