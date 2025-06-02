@@ -10,6 +10,8 @@ import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Facade
 @RequiredArgsConstructor
 public class UserInfoFacade {
@@ -40,9 +42,9 @@ public class UserInfoFacade {
     }
 
     protected void validateUserInfoRequest(PatchUserInfoRequest patchUserInfoRequest) {
-        if (patchUserInfoRequest.profileUrl() != null) return;
+        if (Objects.nonNull(patchUserInfoRequest.profileFile())) return;
 
-        if (patchUserInfoRequest.name() == null) {
+        if (Objects.isNull(patchUserInfoRequest.name())) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
 

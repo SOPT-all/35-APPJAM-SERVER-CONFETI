@@ -1,6 +1,8 @@
 package org.sopt.confeti.domain.user.application;
 
 import java.nio.file.Path;
+import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.request.PatchUserInfoRequest;
 import org.sopt.confeti.auth.dto.CreateUserDTO;
@@ -88,16 +90,14 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        String name = patchUserInfoRequest.name();
-        String profileUrl = patchUserInfoRequest.profileUrl();
-
-        if (profileUrl != null) {
-            String fileName = uploadProfile(profileUrl);
-            user.setProfilePath(fileName);
+        if (Objects.nonNull(patchUserInfoRequest.profileFile())) {
+            String profilePath = s3FileHandler.uploadFile(patchUserInfoRequest.profileFile(),
+                    FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
+            user.setProfilePath(profilePath);
         }
 
-        if (name != null) {
-            user.setName(name);
+        if (Objects.nonNull(patchUserInfoRequest.name())) {
+            user.setName(patchUserInfoRequest.name());
         }
     }
 
