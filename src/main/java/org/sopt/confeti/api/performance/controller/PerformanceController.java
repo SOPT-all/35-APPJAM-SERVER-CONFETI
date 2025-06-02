@@ -20,6 +20,7 @@ import org.sopt.confeti.api.performance.dto.response.RecommendMusicsPerformanceR
 import org.sopt.confeti.api.performance.dto.response.RecommendMusicsResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.SearchACPerformancesResponse;
+import org.sopt.confeti.api.performance.dto.response.PerformanceIdsResponse;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
 import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.AnalyzePerformanceTypeDTO;
@@ -35,6 +36,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -224,5 +226,13 @@ public class PerformanceController {
         } catch (Exception e) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping
+    public ResponseEntity<BaseResponse<?>> getPerformances() {
+        PerformanceIdsDTO performances = performanceFacade.getPerformances();
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                PerformanceIdsResponse.from(performances));
     }
 }

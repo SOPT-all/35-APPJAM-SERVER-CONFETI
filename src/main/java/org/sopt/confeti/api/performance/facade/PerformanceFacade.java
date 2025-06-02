@@ -29,6 +29,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
@@ -438,5 +439,11 @@ public class PerformanceFacade {
     @Transactional(readOnly = true)
     public ExpectedPerformancesDTO getExpectedPerformances(GetExpectedPerformancesDTO expectedPerformancesDTO) {
         return ExpectedPerformancesDTO.from(performanceService.getExpectedPerformances(expectedPerformancesDTO));
+    }
+
+    public PerformanceIdsDTO getPerformances() {
+        return PerformanceIdsDTO.from(
+                performanceService.getPerformances()
+        );
     }
 }
