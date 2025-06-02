@@ -1,7 +1,7 @@
 package org.sopt.confeti.api.setlist.facade.dto.request;
 
 public record SetlistAddMusicDTO(
-        String trackId,
+        String musicId,
         String artistName,
         String trackName,
         String artworkUrl,
