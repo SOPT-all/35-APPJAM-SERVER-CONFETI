@@ -8,21 +8,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.AnalyzePerformanceTypeDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.IntendedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
@@ -51,12 +47,10 @@ import org.sopt.confeti.domain.view.performance.application.dto.response.Perform
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.PerformanceType;
-import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
-import org.sopt.confeti.global.util.MorphemeAnalyzer;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,7 +63,6 @@ public class PerformanceFacade {
     private static final int RECOMMEND_MUSIC_SIZE = 3;
     private static final boolean PERSONALIZED = true;
     private static final boolean UNPERSONALIZED = false;
-    private static final String TYPE_ALL = "ALL";
 
     private final ConcertService concertService;
     private final FestivalService festivalService;
@@ -266,74 +259,6 @@ public class PerformanceFacade {
         return SearchACPerformancesDTO.from(
                 performanceSearchService.getPerformancesByTitle(term, limit, status)
         );
-    }
-
-    @Transactional(readOnly = true)
-    public IntendedPerformancesDTO searchPerformances(Long userId, Long pid, String aid, String ptitle,
-                                                      PerformanceType ptype) {
-        if (!isPresent(pid) && !isPresent(aid) && !isPresent(ptitle)) {
-            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
-        }
-
-        List<PerformanceDTO> performances = new ArrayList<>();
-
-        if (isPresent(pid)) {
-            PerformanceDTO performance = performanceService.getPerformance(pid);
-            performances.add(performance);
-            searchTermService.write(performance.title());
-        }
-
-        if (isPresent(aid)) {
-            performances.addAll(performanceService.getPerformancesByArtistIdAndType(aid, ptype));
-        }
-
-        if (isPresent(ptitle)) {
-            List<PerformanceDTO> searchedPerformances = performanceSearchService.getExpectedPerformancesByTitleAndTypePartialMatched(
-                            ptitle, ptype).stream()
-                    .map(PerformanceDTO::from)
-                    .toList();
-
-            performances.addAll(searchedPerformances);
-        }
-
-        Set<PerformanceDTO> performancesResult = new HashSet<>(performances);
-
-        Map<Long, Boolean> performanceFavorites = getPerformanceFavorites(userId, performancesResult);
-        return IntendedPerformancesDTO.of(
-                performancesResult,
-                performanceFavorites
-        );
-    }
-
-    private boolean isPresent(Object target) {
-        return Objects.nonNull(target);
-    }
-
-    private Map<Long, Boolean> getPerformanceFavorites(Long userId, Set<PerformanceDTO> performances) {
-        Map<Long, Boolean> performanceFavorites = new HashMap<>();
-        performances.forEach(performance -> performanceFavorites.put(performance.id(), false));
-
-        if (isPresent(userId)) {
-            List<PerformanceDTO> favoritePerformances = performanceService.getFavoritePerformancesAll(userId, TYPE_ALL);
-
-            favoritePerformances.forEach(favoritePerformance -> {
-                if (performanceFavorites.containsKey(favoritePerformance.id())) {
-                    performanceFavorites.put(favoritePerformance.id(), true);
-                }
-            });
-        }
-
-        return performanceFavorites;
-    }
-
-    public AnalyzePerformanceTypeDTO analyzePerformanceType(String term) {
-        KomoranResult analyzeResult = MorphemeAnalyzer.getAnalyzeResult(term);
-        PerformanceType performanceType = MorphemeAnalyzer.getFirstMatchingPerformanceType(analyzeResult);
-        String processedTerm = MorphemeAnalyzer.getRemovedPerformanceTypesTerm(term, analyzeResult);
-
-        searchTermService.write(term);
-
-        return AnalyzePerformanceTypeDTO.of(processedTerm, performanceType);
     }
 
     @Transactional(readOnly = true)

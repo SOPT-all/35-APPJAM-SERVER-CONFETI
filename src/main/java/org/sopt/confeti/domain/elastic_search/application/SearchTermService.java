@@ -21,6 +21,10 @@ public class SearchTermService {
         searchTermRepository.save(SearchTermDocument.create(searchTerm));
     }
 
+    public void write(ConfetiArtist artist) {
+        searchTermRepository.save(SearchTermDocument.create(artist.getName()));
+    }
+
     public void write(Optional<ConfetiArtist> artist) {
         artist.ifPresent(
                 confetiArtist -> searchTermRepository.save(SearchTermDocument.create(confetiArtist.getName()))

@@ -1,7 +1,7 @@
-package org.sopt.confeti.api.search_term.dto.response;
+package org.sopt.confeti.api.search.dto.response;
 
 import java.util.List;
-import org.sopt.confeti.api.search_term.facade.dto.response.PopularTermsDTO;
+import org.sopt.confeti.api.search.facade.dto.response.PopularTermsDTO;
 
 public record PopularTermsResponse(
         List<PopularTermResponse> popularTerms
