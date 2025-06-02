@@ -121,6 +121,20 @@ jobs:
         run: |
           echo 'testcontainers.reuse.enable=true' > .testcontainers.properties
 
+      # main/resources/static 폴더 생성 - Swagger
+      - name: Create main/resources/static folder if not exist
+        run: |
+          if [ ! -d "./src/main/resources/static" ]; then
+            mkdir -p ./src/main/resources/static
+          fi
+
+      # main/resources/static/docs 폴더 생성 - Swagger
+      - name: Create main/resources/static/docs folder if not exist
+        run: |
+          if [ ! -d "./src/main/resources/static/docs" ]; then
+            mkdir -p ./src/main/resources/static/docs
+          fi
+
       # 빌드 속도 향상을 위한 Gradle 캐싱
       - name: Gradle Caching
         uses: actions/cache@v4

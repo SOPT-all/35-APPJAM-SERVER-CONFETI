@@ -7,13 +7,11 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.dto.request.GetExpectedPerformanceRequest;
-import org.sopt.confeti.api.performance.dto.response.AnalyzePerformanceTypeResponse;
 import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.ConfetiRecordResponse;
 import org.sopt.confeti.api.performance.dto.response.ExpectedPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
-import org.sopt.confeti.api.performance.dto.response.IntendedPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendMusicsPerformanceResponse;
@@ -22,13 +20,11 @@ import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesRespon
 import org.sopt.confeti.api.performance.dto.response.SearchACPerformancesResponse;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
 import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.AnalyzePerformanceTypeDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.IntendedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
@@ -139,31 +135,6 @@ public class PerformanceController {
                 PerformanceStatus.convert(status));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 SearchACPerformancesResponse.of(performancesDTO, s3FileHandler));
-    }
-
-    @Permission(role = {Role.GENERAL})
-    @GetMapping("/search")
-    public ResponseEntity<BaseResponse<?>> search(
-            @UserId(require = false) Long userId,
-            @RequestParam(required = false) Long pid,
-            @RequestParam(required = false) String aid,
-            @RequestParam(required = false) String ptitle,
-            @RequestParam(required = false, defaultValue = Default.PERFORMANCE_TYPE) PerformanceType ptype
-    ) {
-        IntendedPerformancesDTO performancesDTO = performanceFacade.searchPerformances(userId, pid, aid, ptitle, ptype);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                IntendedPerformancesResponse.of(performancesDTO, s3FileHandler));
-    }
-
-    @Permission(role = {Role.GENERAL})
-    @GetMapping("/search/type-analysis")
-    public ResponseEntity<BaseResponse<?>> analyzePerformanceType(
-            @UserId(require = false) Long userId,
-            @RequestParam String term
-    ) {
-        AnalyzePerformanceTypeDTO analyzePerformanceTypeDTO = performanceFacade.analyzePerformanceType(term);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                AnalyzePerformanceTypeResponse.from(analyzePerformanceTypeDTO));
     }
 
     @Permission(role = {Role.GENERAL})

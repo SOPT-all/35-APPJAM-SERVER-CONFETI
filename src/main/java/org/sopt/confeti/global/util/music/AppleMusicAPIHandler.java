@@ -204,6 +204,15 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         return artists;
     }
 
+    @Override
+    @RetryOnTokenExpire
+    public Optional<ConfetiArtist> findArtistByKeyword(final String keyword) {
+        return findArtistsByKeyword(keyword, 1).stream()
+                .findFirst();
+    }
+
+    @Override
+    @RetryOnTokenExpire
     public List<ConfetiArtist> findArtistsByKeyword(final String keyword, final int limit) {
         Map<String, String> params = new HashMap<>();
         params.put("term", keyword);

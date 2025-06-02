@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchPerformancesDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArtistMusicsDTO;
@@ -16,12 +15,12 @@ import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchServi
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
-import org.sopt.confeti.global.common.AnalyzeSearchTermResult;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
-import org.sopt.confeti.global.util.MorphemeAnalyzer;
+import org.sopt.confeti.global.util.analyzer.SearchTermAnalyzer;
+import org.sopt.confeti.global.util.analyzer.dto.PerformanceSearchTermAnalyzeResult;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.sopt.confeti.global.util.music.dto.music.MusicPage;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,7 +73,7 @@ public class SetlistSearchFacade {
     @Transactional(readOnly = true)
     public SearchPerformancesDTO searchPerformances(String aid, Long pid, String term) {
         List<PerformanceDTO> performances = new ArrayList<>();
-        AnalyzeSearchTermResult analyzeResult = AnalyzeSearchTermResult.empty();
+        PerformanceSearchTermAnalyzeResult analyzeResult = PerformanceSearchTermAnalyzeResult.empty();
 
         if (isPresent(aid)) {
             performances.addAll(performanceService.getAllPerformancesByArtistId(aid));
@@ -85,7 +84,7 @@ public class SetlistSearchFacade {
         }
 
         if (isPresent(term)) {
-            analyzeResult = analyzeSearchTerm(term);
+            analyzeResult = SearchTermAnalyzer.analyzePerformance(term);
             Optional<String> artistId = getArtistId(analyzeResult.processedTerm());
 
             artistId.ifPresent(s -> performances.addAll(performanceService.getAllPerformancesByArtistId(s)));
@@ -98,7 +97,7 @@ public class SetlistSearchFacade {
             );
         }
 
-        AnalyzeSearchTermResult finalAnalyzeResult = analyzeResult;
+        PerformanceSearchTermAnalyzeResult finalAnalyzeResult = analyzeResult;
         Set<PerformanceDTO> searchedPerformances = performances.stream()
                 .filter(
                         performance -> finalAnalyzeResult.performanceType() == PerformanceType.PERFORMANCE ||
@@ -111,14 +110,6 @@ public class SetlistSearchFacade {
                         .sorted(Comparator.comparing(PerformanceDTO::startAt).reversed())
                         .toList()
         );
-    }
-
-    private AnalyzeSearchTermResult analyzeSearchTerm(String term) {
-        KomoranResult analyzeResult = MorphemeAnalyzer.getAnalyzeResult(term);
-        String processedTerm = MorphemeAnalyzer.getRemovedPerformanceTypesTerm(term, analyzeResult);
-        PerformanceType performanceType = MorphemeAnalyzer.getFirstMatchingPerformanceType(analyzeResult);
-
-        return AnalyzeSearchTermResult.of(processedTerm, performanceType);
     }
 
     private Optional<String> getArtistId(String processedTerm) {
