@@ -114,6 +114,20 @@ jobs:
           touch ./src/test/resources/application-test.yml
           echo "${{ secrets.APPLICATION_TEST_YML }}" > ./src/test/resources/application-test.yml
 
+      # main/resources/static 폴더 생성 - Swagger
+      - name: Create main/resources/static folder if not exist
+        run: |
+          if [ ! -d "./src/main/resources/static" ]; then
+            mkdir -p ./src/main/resources/static
+          fi
+
+      # main/resources/static/docs 폴더 생성 - Swagger
+      - name: Create main/resources/static/docs folder if not exist
+        run: |
+          if [ ! -d "./src/main/resources/static/docs" ]; then
+            mkdir -p ./src/main/resources/static/docs
+          fi
+
       # 테스트 컨테이너 reuse 설정
       - name: Configure Testcontainers reuse
         run: |
