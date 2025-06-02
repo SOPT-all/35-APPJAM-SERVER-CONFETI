@@ -2,7 +2,6 @@ package org.sopt.confeti.api.search.controller;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.search.dto.response.PopularTermsResponse;
@@ -14,8 +13,6 @@ import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
-import org.sopt.confeti.global.exception.ConfetiException;
-import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -42,23 +39,8 @@ public class SearchController {
             @RequestParam(required = false) Long pid,
             @RequestParam(required = false) String term
     ) {
-        if (Objects.isNull(aid) && Objects.isNull(pid) && Objects.isNull(term)) {
-            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
-        }
-
-        SearchResultDTO searchResult = null;
-
-        if (Objects.nonNull(aid)) {
-            searchResult = searchFacade.getHomeSearchResultWithAid(userId, aid);
-        }
-
-        if (Objects.isNull(searchResult) && Objects.nonNull(pid)) {
-            searchResult = searchFacade.getHomeSearchResultWithPid(userId, pid);
-        }
-
-        if (Objects.isNull(searchResult) && Objects.nonNull(term)) {
-            searchResult = searchFacade.getHomeSearchResultWithTerm(userId, term);
-        }
+        SearchType searchType = SearchType.resolve(aid, pid, term);
+        SearchResultDTO searchResult = searchType.search(searchFacade, userId, aid, pid, term);
 
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, SearchResultResponse.of(searchResult, s3FileHandler));
     }
