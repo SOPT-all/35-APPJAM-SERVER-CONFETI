@@ -94,18 +94,18 @@ public class SetlistService {
 
     @Transactional
     public int addMusics(Long userId, Long setlistId, List<SetlistAddMusicDTO> requests) {
-        Setlist setlist = setlistRepository.findByIdAndUserId(userId, setlistId)
+        Setlist setlist = setlistRepository.findByIdAndUserId(setlistId, userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
         List<String> existingIds = setlist.getMusics().stream()
-                .map(SetlistMusic::getTrackId)
+                .map(SetlistMusic::getMusicId)
                 .toList();
 
         int startOrder = setlist.getMusics().size() + 1;
         int addedCount = 0;
 
         for (SetlistAddMusicDTO req : requests) {
-            if(existingIds.contains(req.trackId())) continue;
+            if(existingIds.contains(req.musicId())) continue;
 
             SetlistMusic music = SetlistMusic.of(req, startOrder++);
             setlist.addMusics(music);
@@ -121,7 +121,7 @@ public class SetlistService {
 
         List<SetlistMusicResponse> musics = setlistMusicRepository.findBySetlist(setlist).stream()
                 .sorted(Comparator.comparing(SetlistMusic::getOrders))
-                .map(SetlistMusicResponse::create)
+                .map(SetlistMusicResponse::from)
                 .toList();
 
         if (setlist.getType() == SetlistType.CONCERT) {
