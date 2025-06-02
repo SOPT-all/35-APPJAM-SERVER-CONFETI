@@ -1,14 +1,16 @@
 package org.sopt.confeti.auth;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.global.module.rest_client.builder.ApiRestClientBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
+import org.sopt.confeti.global.module.rest_client.builder.ApiRestClientBuilder;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.HashMap;
-import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -21,13 +23,18 @@ public class WebhookService {
     public void sendDiscordNotification() {
 
         for (String profile : environment.getActiveProfiles()) {
-            if (profile.equalsIgnoreCase("dev")) return;
+            if (profile.equalsIgnoreCase("dev")) {
+                return;
+            }
         }
 
         String discordWebhookUrl = environment.getProperty("discord.webhook.url");
-        if (discordWebhookUrl == null || discordWebhookUrl.isBlank()) return;
+        if (discordWebhookUrl == null || discordWebhookUrl.isBlank()) {
+            return;
+        }
 
         long totalMembers = userRepository.count();
+        log.debug("Total Members : {}", totalMembers);
 
         String message = "CONFETI에 " + totalMembers + "번째 유저가 가입했습니다!🎉\n";
 
