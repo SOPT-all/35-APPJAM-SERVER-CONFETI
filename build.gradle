@@ -1,24 +1,30 @@
+import org.hidetake.gradle.swagger.generator.GenerateSwaggerUI
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.asciidoctor.jvm.convert' version '3.3.2'
     id 'com.epages.restdocs-api-spec' version '0.18.2'
+    id 'org.hidetake.swagger.generator' version '2.18.2'
 }
 
 group = 'org.sopt'
 version = '0.0.1-SNAPSHOT'
 
+openapi3 {
+    servers = [
+            { url = "https://api.confeti.xyz" },
+            { url = "http://localhost:8080" }
+    ]
+    title = "CONFETI Server API Document"
+    description = "응답 테스트 검증이 완료된 명세서입니다."
+    version = "0.0.1"
+    format = "yaml"
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-bootJar {
-    dependsOn asciidoctor
-    from("${asciidoctor.outputDir}/html5") {
-        into 'static/docs'
     }
 }
 
@@ -27,10 +33,9 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-configurations {
-    asciidoctorExt
-    compileOnly {
-        extendsFrom annotationProcessor
+swaggerSources {
+    sample {
+        setInputFile(file("${project.buildDir}/api-spec/openapi3.yaml"))
     }
 }
 
@@ -79,7 +84,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
 
     // Elastic Search
-    implementation 'org.springframework.data:spring-data-elasticsearch'
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
     // Komoran
     implementation 'com.github.shin285:KOMORAN:3.3.9'
@@ -97,26 +102,60 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     // Spring Rest Docs
-    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
-    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation "com.epages:restdocs-api-spec-restassured:0.18.2"
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
+    testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
 
+    // Test Containers
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:elasticsearch'
+    testImplementation 'org.testcontainers:mysql'
+
+    // Swagger
+    swaggerUI 'org.webjars:swagger-ui:4.11.1'
 }
 
-ext {
-    snippetsDir = file('build/generated-snippets')
-}
-
-test {
-    outputs.dir snippetsDir
-}
-
-asciidoctor {
-    inputs.dir snippetsDir
-    configurations 'asciidoctorExt'
-    dependsOn test
+dependencyManagement {
+    imports {
+        mavenBom "org.testcontainers:testcontainers-bom:1.17.4"
+    }
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.withType(GenerateSwaggerUI) {
+    dependsOn 'openapi3'
+
+    doFirst {
+        def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.yml")
+
+        def securitySchemesContent = "  securitySchemes:\n" +              \
+                                                  "    bearerAuth:\n" +              \
+                                                  "      type: https\n" +              \
+                                                  "      scheme: bearer\n" +              \
+                                                  "      bearerFormat: JWT\n" +              \
+                                                  "      name: Authorization\n" +              \
+                                                  "      in: header\n" +             \
+                                                  "      description: \"Use 'your-access-token' as the value of the Authorization header\"\n" +             \
+                                                  "security:\n" +
+                "  - bearerAuth: []  # Apply the security scheme here"
+
+        swaggerUIFile.append securitySchemesContent
+    }
+}
+
+// 생성된 Swagger UI 파일들 복사
+tasks.register('copySwaggerDocument', Copy) {
+    dependsOn generateSwaggerUISample
+
+    from file("build/swagger-ui-sample/")
+    into file("src/main/resources/static/docs")
+}
+
+bootJar {
+    dependsOn copySwaggerDocument
 }

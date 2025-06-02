@@ -3,9 +3,16 @@ package org.sopt.confeti.api.auth.facade;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.auth.facade.dto.request.OnboardArtistDTO;
 import org.sopt.confeti.api.auth.facade.dto.request.OnboardDTO;
-import org.sopt.confeti.auth.*;
+import org.sopt.confeti.auth.LoginService;
+import org.sopt.confeti.auth.LogoutService;
+import org.sopt.confeti.auth.OnboardService;
+import org.sopt.confeti.auth.ReissueService;
+import org.sopt.confeti.auth.Token;
+import org.sopt.confeti.auth.WebhookService;
+import org.sopt.confeti.auth.WithdrawService;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
 import org.sopt.confeti.auth.dto.OAuthSocialInfoResult;
@@ -18,6 +25,7 @@ import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Facade;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Facade
 @RequiredArgsConstructor
 public class AuthFacade {
@@ -37,6 +45,7 @@ public class AuthFacade {
 
         if (userService.notExist(socialInfo.id(), loginCommand.provider())) {
             userService.create(loginService.getCreateUserDTO(loginCommand.provider(), socialInfo));
+            log.debug("Social ID : {}, User Name : {}", socialInfo.id(), socialInfo.name());
             webhookService.sendDiscordNotification();
         }
 
