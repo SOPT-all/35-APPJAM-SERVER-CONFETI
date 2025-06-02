@@ -20,7 +20,7 @@ public class SetlistMusic {
     private Setlist setlist;
 
     @Column(nullable = false)
-    private String trackId;
+    private String musicId;
 
     @Column(name = "artist_name", nullable = false)
     private String artistName;
@@ -39,7 +39,7 @@ public class SetlistMusic {
 
     public static SetlistMusic of(SetlistAddMusicDTO dto, int order) {
         return SetlistMusic.builder()
-                .trackId(dto.trackId())
+                .musicId(dto.musicId())
                 .artistName(dto.artistName())
                 .trackName(dto.trackName())
                 .artworkUrl(dto.artworkUrl())
@@ -49,8 +49,8 @@ public class SetlistMusic {
     }
 
     @Builder
-    public SetlistMusic(String trackId, String artistName, String trackName, String artworkUrl, String previewUrl, int orders) {
-        this.trackId = trackId;
+    public SetlistMusic(String musicId, String artistName, String trackName, String artworkUrl, String previewUrl, int orders) {
+        this.musicId = musicId;
         this.artistName = artistName;
         this.trackName = trackName;
         this.artworkUrl = artworkUrl;
