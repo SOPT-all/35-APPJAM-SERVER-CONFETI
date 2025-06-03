@@ -94,4 +94,6 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     Performance getPerformanceByUserFavorites(final @Param("userId") Long userId);
 
     List<Performance> findRecentPerformancesByEndAtGreaterThanEqual(LocalDate now, PageRequest pageRequest);
+
+    List<Performance> findByEndAtGreaterThanEqual(LocalDate now);
 }

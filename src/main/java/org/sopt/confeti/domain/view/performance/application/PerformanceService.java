@@ -208,4 +208,9 @@ public class PerformanceService {
                 .map(performanceDTO -> Pair.of(performanceDTO.type(), performanceDTO.typeId()))
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getPerformances() {
+        return performanceRepository.findByEndAtGreaterThanEqual(LocalDate.now());
+    }
 }
