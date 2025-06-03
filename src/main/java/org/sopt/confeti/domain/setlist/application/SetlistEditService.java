@@ -125,7 +125,7 @@ public class SetlistEditService {
 
         for (SetlistMusic music : original) {
             SetlistMusicEditDTO dto = editedMap.get(music.getId());
-            if (dto != null) {
+            if (Objects.nonNull(dto)) {
                 music.changeOrder(dto.orders());
                 toUpdate.add(music);
             } else {
@@ -177,7 +177,7 @@ public class SetlistEditService {
         SetlistMusicEditDTO a = musicMap.get(requests.get(0).musicId());
         SetlistMusicEditDTO b = musicMap.get(requests.get(1).musicId());
 
-        if (a != null && b != null) {
+        if (Objects.nonNull(a) && Objects.nonNull(b)) {
             int tmpOrder = a.orders();
             a = new SetlistMusicEditDTO(a.setlistMusicId(), a.musicId(), a.artistName(), a.trackName(), a.artworkUrl(), a.previewUrl(), b.orders());
             b = new SetlistMusicEditDTO(b.setlistMusicId(), b.musicId(), b.artistName(), b.trackName(), b.artworkUrl(), b.previewUrl(), tmpOrder);
