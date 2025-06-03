@@ -26,7 +26,7 @@ public class SetlistEditController {
 
     @PostMapping("/{setlistId}/edit/start")
     public ResponseEntity<BaseResponse<?>> startEdit(
-            @UserId(require = false) Long userId,
+            @UserId Long userId,
             @PathVariable Long setlistId
     ) {
         setlistFacade.startEdit(userId, setlistId);
@@ -35,7 +35,7 @@ public class SetlistEditController {
 
     @PatchMapping("/{setlistId}/edit/musics/order")
     public ResponseEntity<BaseResponse<?>> updateMusicOrder(
-            @UserId(require = false) Long userId,
+            @UserId Long userId,
             @PathVariable Long setlistId,
             @RequestBody List<SetlistUpdateMusicOrderDTO> request
     ) {
@@ -45,7 +45,7 @@ public class SetlistEditController {
 
     @DeleteMapping("/{setlistId}/musics/{orders}")
     public ResponseEntity<BaseResponse<?>> deleteMusic(
-            @UserId(require = false) Long userId,
+            @UserId Long userId,
             @PathVariable Long setlistId,
             @PathVariable int orders
     ) {
@@ -55,7 +55,7 @@ public class SetlistEditController {
 
     @PatchMapping("/{setlistId}/edit/complete")
     public ResponseEntity<BaseResponse<?>> completeEdit(
-            @UserId(require = false) Long userId,
+            @UserId Long userId,
             @PathVariable Long setlistId
     ) {
         setlistFacade.completeEdit(userId, setlistId);
@@ -64,7 +64,7 @@ public class SetlistEditController {
 
     @DeleteMapping("/{setlistId}/edit/cancel")
     public ResponseEntity<BaseResponse<?>> cancelEdit(
-            @UserId(require = false) Long userId,
+            @UserId Long userId,
             @PathVariable Long setlistId
     ) {
         setlistFacade.cancelEdit(userId, setlistId);

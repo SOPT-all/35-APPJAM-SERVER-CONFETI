@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,7 +67,7 @@ class SetlistEditServiceTest {
         ReflectionTestUtils.setField(setlist, "id", setlistId);
 
         SetlistMusic music = SetlistMusic.builder()
-                .trackId("203948575")
+                .musicId("203948575")
                 .artistName("NewJeans")
                 .trackName("Super Shy")
                 .artworkUrl("https://img")
@@ -91,7 +92,7 @@ class SetlistEditServiceTest {
 
         List<SetlistMusicEditDTO> captured = captor.getValue();
         assertThat(captured).hasSize(1);
-        assertThat(captured.get(0).trackId()).isEqualTo("203948575");
+        AssertionsForClassTypes.assertThat(captured.get(0).musicId()).isEqualTo("203948575");
         assertThat(captured.get(0).trackName()).isEqualTo("Super Shy");
         assertThat(captured.get(0).orders()).isEqualTo(1);
     }
@@ -127,9 +128,9 @@ class SetlistEditServiceTest {
 
         assertThat(updated).hasSize(2);
         assertThat(updated).anySatisfy(dto -> {
-            if (dto.trackId().equals("track1")) {
+            if (dto.musicId().equals("track1")) {
                 assertThat(dto.orders()).isEqualTo(2);
-            } else if (dto.trackId().equals("track2")) {
+            } else if (dto.musicId().equals("track2")) {
                 assertThat(dto.orders()).isEqualTo(1);
             }
         });
@@ -164,6 +165,6 @@ class SetlistEditServiceTest {
         assertThat(updated).hasSize(2);
         assertThat(updated.get(0).orders()).isEqualTo(1);
         assertThat(updated.get(1).orders()).isEqualTo(2);
-        assertThat(updated).extracting(SetlistMusicEditDTO::trackId).containsExactly("track1", "track3");
+        assertThat(updated).extracting(SetlistMusicEditDTO::musicId).containsExactly("track1", "track3");
     }
 }

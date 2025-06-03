@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.setlist.Setlist;
@@ -28,6 +29,8 @@ public class SetlistEditService {
     private final SetlistMusicRepository setlistMusicRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
+
+    private static final int SWAP_REQUEST_SIZE = 2;
 
     @Transactional
     public void startEdit(Long userId, Long setlistId) {
@@ -53,27 +56,12 @@ public class SetlistEditService {
     @Transactional
     public void updateMusicOrder(Long userId, Long setlistId, List<SetlistUpdateMusicOrderDTO> requests) {
         String key = generateRedisKey(userId, setlistId);
-        Object raw = redisTemplate.opsForValue().get(key);
-        if (raw == null) throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        List<SetlistMusicEditDTO> musics = getRedisMusicList(key);
 
-        List<SetlistMusicEditDTO> musics = objectMapper.convertValue(raw, new TypeReference<>() {});
-        if (musics.isEmpty()) throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        Map<String, SetlistMusicEditDTO> musicMap = toMusicMap(musics);
 
-        Map<String, SetlistMusicEditDTO> musicMap = musics.stream()
-                .collect(Collectors.toMap(SetlistMusicEditDTO::trackId, dto -> dto));
-
-        if (requests.size() == 2) {
-            SetlistMusicEditDTO a = musicMap.get(requests.get(0).trackId());
-            SetlistMusicEditDTO b = musicMap.get(requests.get(1).trackId());
-
-            if (a != null && b != null) {
-                int tmpOrder = a.orders();
-                a = new SetlistMusicEditDTO(a.musicId(), a.trackId(), a.artistName(), a.trackName(), a.artworkUrl(), a.previewUrl(), b.orders());
-                b = new SetlistMusicEditDTO(b.musicId(), b.trackId(), b.artistName(), b.trackName(), b.artworkUrl(), b.previewUrl(), tmpOrder);
-
-                musicMap.put(a.trackId(), a);
-                musicMap.put(b.trackId(), b);
-            }
+        if (requests.size() == SWAP_REQUEST_SIZE) {
+            swapOrders(musicMap, requests);
         }
 
         List<SetlistMusicEditDTO> updated = new ArrayList<>(musicMap.values()).stream()
@@ -87,7 +75,7 @@ public class SetlistEditService {
     public String deleteMusic(Long userId, Long setlistId, int orders) {
         String key = generateRedisKey(userId, setlistId);
         Object raw = redisTemplate.opsForValue().get(key);
-        if(raw == null) throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        if(Objects.isNull(raw)) throw new NotFoundException(ErrorMessage.NOT_FOUND);
 
         List<SetlistMusicEditDTO> musics = objectMapper.convertValue(raw, new TypeReference<>() {});
         if(musics.isEmpty()) throw new NotFoundException(ErrorMessage.NOT_FOUND);
@@ -106,20 +94,20 @@ public class SetlistEditService {
         for (int i = 0; i < musics.size(); i++) {
             SetlistMusicEditDTO m = musics.get(i);
             reordered.add(new SetlistMusicEditDTO(
-                    m.musicId(), m.trackId(), m.artistName(), m.trackName(),
+                    m.setlistMusicId(), m.musicId(), m.artistName(), m.trackName(),
                     m.artworkUrl(), m.previewUrl(), i + 1
             ));
         }
 
         redisTemplate.opsForValue().set(key, reordered);
-        return deleted.trackId();
+        return deleted.musicId();
     }
 
     @Transactional
     public void completeEdit(Long userId, Long setlistId) {
         String key = generateRedisKey(userId, setlistId);
         Object raw = redisTemplate.opsForValue().get(key);
-        if (raw == null) throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        if (Objects.isNull(raw)) throw new NotFoundException(ErrorMessage.NOT_FOUND);
 
         List<SetlistMusicEditDTO> edited = objectMapper.convertValue(raw, new TypeReference<>() {});
         if (edited.isEmpty()) throw new NotFoundException(ErrorMessage.NOT_FOUND);
@@ -130,14 +118,14 @@ public class SetlistEditService {
         List<SetlistMusic> original = setlistMusicRepository.findBySetlist(setlist);
 
         Map<Long, SetlistMusicEditDTO> editedMap = edited.stream()
-                .collect(Collectors.toMap(SetlistMusicEditDTO::musicId, dto -> dto));
+                .collect(Collectors.toMap(SetlistMusicEditDTO::setlistMusicId, dto -> dto));
 
         List<SetlistMusic> toUpdate = new ArrayList<>();
         List<SetlistMusic> toDelete = new ArrayList<>();
 
         for (SetlistMusic music : original) {
             SetlistMusicEditDTO dto = editedMap.get(music.getId());
-            if (dto != null) {
+            if (Objects.nonNull(dto)) {
                 music.changeOrder(dto.orders());
                 toUpdate.add(music);
             } else {
@@ -168,5 +156,34 @@ public class SetlistEditService {
 
     private String generateRedisKey(Long userId, Long setlistId) {
         return "edit:setlist:" + userId + ":" + setlistId;
+    }
+
+    private List<SetlistMusicEditDTO> getRedisMusicList(String key) {
+        Object raw = redisTemplate.opsForValue().get(key);
+        if(Objects.isNull(raw)) throw new NotFoundException(ErrorMessage.NOT_FOUND);
+
+        List<SetlistMusicEditDTO> musics = objectMapper.convertValue(raw, new TypeReference<>() {});
+        if (musics.isEmpty()) throw new NotFoundException(ErrorMessage.NOT_FOUND);
+
+        return musics;
+    }
+
+    private Map<String, SetlistMusicEditDTO> toMusicMap(List<SetlistMusicEditDTO> musics) {
+        return musics.stream()
+                .collect(Collectors.toMap(SetlistMusicEditDTO::musicId, dto -> dto));
+    }
+
+    private void swapOrders(Map<String, SetlistMusicEditDTO> musicMap, List<SetlistUpdateMusicOrderDTO> requests) {
+        SetlistMusicEditDTO a = musicMap.get(requests.get(0).musicId());
+        SetlistMusicEditDTO b = musicMap.get(requests.get(1).musicId());
+
+        if (Objects.nonNull(a) && Objects.nonNull(b)) {
+            int tmpOrder = a.orders();
+            a = new SetlistMusicEditDTO(a.setlistMusicId(), a.musicId(), a.artistName(), a.trackName(), a.artworkUrl(), a.previewUrl(), b.orders());
+            b = new SetlistMusicEditDTO(b.setlistMusicId(), b.musicId(), b.artistName(), b.trackName(), b.artworkUrl(), b.previewUrl(), tmpOrder);
+
+            musicMap.put(a.musicId(), a);
+            musicMap.put(b.musicId(), b);
+        }
     }
 }
