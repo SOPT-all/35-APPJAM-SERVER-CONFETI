@@ -8,7 +8,7 @@ public record PerformanceIdResponse(
 ) {
     public static PerformanceIdResponse from(PerformanceIdDTO performanceIdDTO) {
         return new PerformanceIdResponse(
-                performanceIdDTO.type().getType(),
+                performanceIdDTO.type().getType().toUpperCase(),
                 performanceIdDTO.typeId()
         );
     }
