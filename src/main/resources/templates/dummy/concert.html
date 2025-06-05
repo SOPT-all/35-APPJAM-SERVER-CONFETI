@@ -185,29 +185,6 @@
                     <img src="#" alt="포스터 미리보기">
                 </div>
             </div>
-
-            <div class="form-group">
-                <label for="posterBg">배경 이미지</label>
-                <input type="file" id="posterBg" name="posterBgFile" accept="image/*" required onchange="previewImage(this, 'posterBgPreview')">
-                <div id="posterBgPreview" class="image-preview">
-                    <img src="#" alt="배경 이미지 미리보기">
-                </div>
-            </div>
-        </div>
-
-        <!-- 콘서트 음악 섹션 -->
-        <div class="form-section">
-            <div class="section-title">콘서트 음악</div>
-            <div id="concertMusicContainer">
-                <div th:each="music, musicStat : *{musics}" class="nested-item">
-                    <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
-                    <div class="form-group">
-                        <label th:for="${'musics[' + musicStat.index + '].musicId'}">음악 ID</label>
-                        <input type="text" th:id="${'musics[' + musicStat.index + '].musicId'}" th:field="*{musics[__${musicStat.index}__].musicId}" required>
-                    </div>
-                </div>
-            </div>
-            <button type="button" class="btn btn-secondary" onclick="addConcertMusic()">음악 추가</button>
         </div>
 
         <!-- 콘서트 예약 링크 섹션 -->
@@ -258,7 +235,6 @@
 </div>
 
 <script th:inline="javascript">
-    let musicCounter = [[${concert?.musics?.size() ?: 0}]];
     let urlCounter = [[${concert?.reservationUrls?.size() ?: 0}]];
     let artistCounter = [[${concert?.artists?.size() ?: 0}]];
 
@@ -280,21 +256,6 @@
             previewImg.src = '#';
             preview.style.display = 'none';
         }
-    }
-
-    function addConcertMusic() {
-        const container = document.getElementById('concertMusicContainer');
-        const newItem = document.createElement('div');
-        newItem.className = 'nested-item';
-        newItem.innerHTML = `
-                <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
-                <div class="form-group">
-                    <label for="musics[${musicCounter}].musicId">음악 ID</label>
-                    <input type="text" id="musics[${musicCounter}].musicId" name="musics[${musicCounter}].musicId" required>
-                </div>
-            `;
-        container.appendChild(newItem);
-        musicCounter++;
     }
 
     function addReservationUrl() {
@@ -351,9 +312,6 @@
             alert(message);
         }
 
-        if (musicCounter === 0) {
-            addConcertMusic();
-        }
         if (urlCounter === 0) {
             addReservationUrl();
         }

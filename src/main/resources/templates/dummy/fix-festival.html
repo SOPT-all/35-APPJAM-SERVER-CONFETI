@@ -286,13 +286,12 @@
 </head>
 <body>
 <div class="container">
-    <h1 th:text="${festivalTitle} + ' - 날짜 및 음악 추가'">페스티벌 날짜 및 음악 등록</h1>
+    <h1 th:text="${festivalTitle} + ' - 날짜 및 음악 추가'">페스티벌 등록</h1>
 
     <form th:action="${actionUrl}" method="post" th:object="${festival}">
         <!-- 탭 네비게이션 -->
         <ul class="nav-tabs">
             <li><button type="button" class="tab-link active" data-tab="festival-dates">페스티벌 날짜</button></li>
-            <li><button type="button" class="tab-link" data-tab="music-info">음악 정보</button></li>
         </ul>
 
         <!-- 페스티벌 날짜 탭 -->
@@ -317,18 +316,6 @@
             </div>
         </div>
 
-        <!-- 음악 정보 탭 -->
-        <div id="music-info" class="tab-content">
-            <!-- 페스티벌 음악 섹션 -->
-            <div class="form-section">
-                <div class="section-title">페스티벌 음악</div>
-                <div id="festivalMusicContainer" class="scroll-container">
-                    <!-- JavaScript로 동적 추가되는 부분이므로 초기 내용은 비워둠 -->
-                </div>
-                <button type="button" class="btn btn-secondary" onclick="addFestivalMusic()">음악 추가</button>
-            </div>
-        </div>
-
         <div class="submit-container">
             <button type="submit" class="btn submit-btn">등록하기</button>
         </div>
@@ -337,7 +324,6 @@
 
 <script th:inline="javascript">
     // 페이지 로드 시 실행될 스크립트
-    let musicCounter = [[${festival?.musics?.size() ?: 0}]];
     let dateCounter = [[${festival?.dates?.size() ?: 0}]];
     let stages = [[${stages}]]; // 서버에서 제공한 스테이지 목록
 
@@ -345,11 +331,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         // 스테이지 탭 이벤트 리스너 초기화
         initStageTabListeners();
-
-        // 음악이 없으면 초기 음악 추가
-        if (musicCounter === 0) {
-            addFestivalMusic();
-        }
 
         // 날짜가 없으면 초기 날짜 추가
         if (dateCounter === 0) {
@@ -415,22 +396,6 @@
             }
         });
     });
-
-    // 음악 추가 함수
-    function addFestivalMusic() {
-        const container = document.getElementById('festivalMusicContainer');
-        const newItem = document.createElement('div');
-        newItem.className = 'nested-item';
-        newItem.innerHTML = `
-            <button type="button" class="remove-btn" onclick="removeItem(this)">삭제</button>
-            <div class="form-group">
-                <label for="musics[${musicCounter}].musicId">음악 ID</label>
-                <input type="text" id="musics[${musicCounter}].musicId" name="musics[${musicCounter}].musicId" required>
-            </div>
-        `;
-        container.appendChild(newItem);
-        musicCounter++;
-    }
 
     // 페스티벌 날짜 추가 함수
     function addFestivalDate() {
@@ -695,11 +660,11 @@
             container.removeChild(item);
 
             // 스케줄 미리보기 업데이트
-            if (container.id === 'festivalMusicContainer') {
-                musicCounter = container.querySelectorAll('.nested-item').length;
-            } else {
+            // if (container.id === 'festivalMusicContainer') {
+            //     musicCounter = container.querySelectorAll('.nested-item').length;
+            // } else {
                 updateSchedulePreview();
-            }
+            // }
         }
     }
 
@@ -952,22 +917,6 @@
 
                 if (!hasTimeWithArtists) {
                     errors.push(`날짜 #${idx+1}에 최소 하나의 시간대와 아티스트를 추가해주세요.`);
-                    isValid = false;
-                }
-            });
-        }
-
-        // 음악 항목 검사
-        const musicItems = document.querySelectorAll('#festivalMusicContainer > .nested-item');
-        if (musicItems.length === 0) {
-            errors.push('최소 하나 이상의 음악을 추가해주세요.');
-            isValid = false;
-        } else {
-            // 각 음악 ID 검사
-            musicItems.forEach((item, idx) => {
-                const musicId = item.querySelector('input[name$="].musicId"]');
-                if (!musicId || !musicId.value) {
-                    errors.push(`음악 #${idx+1}의 ID를 입력해주세요.`);
                     isValid = false;
                 }
             });
