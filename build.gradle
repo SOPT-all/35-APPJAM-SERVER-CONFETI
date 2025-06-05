@@ -133,15 +133,15 @@ tasks.withType(GenerateSwaggerUI) {
     doFirst {
         def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.yml")
 
-        def securitySchemesContent = "  securitySchemes:\n" +                \
-                                                    "    bearerAuth:\n" +                \
-                                                    "      type: https\n" +                \
-                                                    "      scheme: bearer\n" +                \
-                                                    "      bearerFormat: JWT\n" +                \
-                                                    "      name: Authorization\n" +                \
-                                                    "      in: header\n" +               \
-                                                    "      description: \"Use 'your-access-token' as the value of the Authorization header\"\n" +               \
-                                                    "security:\n" +
+        def securitySchemesContent = "  securitySchemes:\n" +                  \
+                                                      "    bearerAuth:\n" +                  \
+                                                      "      type: https\n" +                  \
+                                                      "      scheme: bearer\n" +                  \
+                                                      "      bearerFormat: JWT\n" +                  \
+                                                      "      name: Authorization\n" +                  \
+                                                      "      in: header\n" +                 \
+                                                      "      description: \"Use 'your-access-token' as the value of the Authorization header\"\n" +                 \
+                                                      "security:\n" +
                 "  - bearerAuth: []  # Apply the security scheme here"
 
         swaggerUIFile.append securitySchemesContent
@@ -153,10 +153,10 @@ tasks.register('copySwaggerDocument', Copy) {
     dependsOn generateSwaggerUISample
 
     from file("build/swagger-ui-sample/")
-    into file("src/main/resources/static/docs")
+    into file("build/resources/static/docs")
 }
 
-processResources.dependsOn copySwaggerDocument
+//processResources.dependsOn copySwaggerDocument
 
 bootJar {
     dependsOn copySwaggerDocument
