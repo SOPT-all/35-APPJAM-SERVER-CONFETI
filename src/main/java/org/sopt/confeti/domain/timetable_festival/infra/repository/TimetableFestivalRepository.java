@@ -10,8 +10,6 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
     @Query("select tf from TimetableFestival tf join fetch tf.festival f where tf.user.id = :userId and f.endAt >= CURRENT_DATE")
     List<TimetableFestival> findByUserIdWhereEndAtLENow(@Param("userId") Long userId);
 
-    List<TimetableFestival> findByUserId(final long userId);
-
     boolean existsByUserIdAndFestivalId(final long userId, final long festivalId);
 
     void deleteByUserIdAndFestivalId(final long userId, final long festivalId);
@@ -20,4 +18,8 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
 
     @Query("SELECT tf.festival.id FROM TimetableFestival tf WHERE tf.user.id = :userId")
     List<Long> findFestivalIdsByUserId(@Param("userId") Long userId);
+
+    List<TimetableFestival> findByUserIdOrderByCreatedAtDesc(final long userId);
+
+    List<TimetableFestival> findByUserIdOrderByCreatedAtAsc(final long userId);
 }

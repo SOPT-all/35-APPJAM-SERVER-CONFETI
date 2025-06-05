@@ -8,6 +8,8 @@ import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.domain.timetable_festival.infra.repository.TimetableFestivalRepository;
 import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,15 +44,13 @@ public class TimetableFestivalService {
 
     @Transactional(readOnly = true)
     public List<TimetableFestival> getTimetables(final long userId, final UserTimetableSortType sortBy) {
-        List<TimetableFestival> festivals = timetableFestivalRepository.findByUserId(userId);
-
-        if ("createdAt".equalsIgnoreCase(sortBy.getValue())) {
-            festivals.sort(Comparator.comparing(TimetableFestival::getCreatedAt).reversed());
-        } else if ("oldestFirst".equalsIgnoreCase(sortBy.getValue())) {
-            festivals.sort(Comparator.comparing(TimetableFestival::getCreatedAt));
+        if (sortBy == UserTimetableSortType.CREATED_AT) {
+            return timetableFestivalRepository.findByUserIdOrderByCreatedAtDesc(userId);
         }
-
-        return festivals;
+        if (sortBy == UserTimetableSortType.OLDEST_FIRST) {
+            return timetableFestivalRepository.findByUserIdOrderByCreatedAtAsc(userId);
+        }
+        throw new ConfetiException(ErrorMessage.BAD_REQUEST);
     }
 
     @Transactional(readOnly = true)
