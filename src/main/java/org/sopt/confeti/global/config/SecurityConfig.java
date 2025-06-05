@@ -19,7 +19,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorizeRequests) ->
                         authorizeRequests
-                                .requestMatchers("/", "/**").permitAll()
+                                .requestMatchers("/", "/**", "/docs", "/docs/**").permitAll()
                 ).cors(cors -> cors
                         .configurationSource(CorsConfig.corsConfigurationSource())
                 );
