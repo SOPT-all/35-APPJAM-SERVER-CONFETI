@@ -3,6 +3,7 @@ package org.sopt.confeti.api.user.facade;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.user.controller.UserFavoriteSortType;
 import org.sopt.confeti.api.user.facade.dto.response.UpcomingPerformanceDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistsPreviewDTO;
@@ -212,16 +213,9 @@ public class UserFavoriteFacade {
     @Transactional(readOnly = true)
     public UserFavoriteArtistsDTO getFavoriteArtists(long userId, String sortBy) {
         validateExistUser(userId);
-        validateSortType(sortBy);
+        UserFavoriteSortType sortType = UserFavoriteSortType.from(sortBy);
 
-        List<ArtistFavorite> artists = artistFavoriteService.getFavoriteArtists(userId, sortBy);
+        List<ArtistFavorite> artists = artistFavoriteService.getFavoriteArtists(userId, sortType);
         return UserFavoriteArtistsDTO.from(artists);
-    }
-
-    @Transactional(readOnly = true)
-    protected void validateSortType(final String sortBy) {
-        if (!sortBy.equalsIgnoreCase("createdAt") && !sortBy.equalsIgnoreCase("alphabetically")) {
-            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
-        }
     }
 }

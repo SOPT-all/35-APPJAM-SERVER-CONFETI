@@ -3,6 +3,7 @@ package org.sopt.confeti.domain.timetable_festival.application;
 import java.util.Comparator;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.sopt.confeti.api.user.controller.UserTimetableSortType;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.domain.timetable_festival.infra.repository.TimetableFestivalRepository;
@@ -40,12 +41,12 @@ public class TimetableFestivalService {
     }
 
     @Transactional(readOnly = true)
-    public List<TimetableFestival> getTimetables(final long userId, final String sortBy) {
+    public List<TimetableFestival> getTimetables(final long userId, final UserTimetableSortType sortBy) {
         List<TimetableFestival> festivals = timetableFestivalRepository.findByUserId(userId);
 
-        if ("createdAt".equalsIgnoreCase(sortBy)) {
+        if ("createdAt".equalsIgnoreCase(sortBy.getValue())) {
             festivals.sort(Comparator.comparing(TimetableFestival::getCreatedAt).reversed());
-        } else if ("oldestFirst".equalsIgnoreCase(sortBy)) {
+        } else if ("oldestFirst".equalsIgnoreCase(sortBy.getValue())) {
             festivals.sort(Comparator.comparing(TimetableFestival::getCreatedAt));
         }
 

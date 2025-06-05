@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.user.controller.UserTimetableSortType;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalArtiestDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
@@ -207,9 +208,9 @@ public class UserTimetableFacade {
     @Transactional(readOnly = true)
     public UserTimetablesDTO getTimetables(final long userId, final String sortBy) {
         validateUserExists(userId);
-        validateSortType(sortBy);
+        UserTimetableSortType sortType = UserTimetableSortType.from(sortBy);
 
-        List<TimetableFestival> userTimetables = timetableFestivalService.getTimetables(userId, sortBy);
+        List<TimetableFestival> userTimetables = timetableFestivalService.getTimetables(userId, sortType);
 
         return UserTimetablesDTO.from(userTimetables);
     }
@@ -260,13 +261,6 @@ public class UserTimetableFacade {
             if (!existingIds.contains(timetableListDTO.userTimetableId())) {
                 throw new NotFoundException(ErrorMessage.NOT_FOUND);
             }
-        }
-    }
-
-    @Transactional(readOnly = true)
-    protected void validateSortType(final String sortBy) {
-        if (!sortBy.equalsIgnoreCase("createdAt") && !sortBy.equalsIgnoreCase("oldestFirst")) {
-            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
 
