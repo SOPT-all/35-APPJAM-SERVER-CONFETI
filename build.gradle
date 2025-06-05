@@ -133,31 +133,57 @@ tasks.withType(GenerateSwaggerUI) {
     doFirst {
         def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.yml")
 
-        def securitySchemesContent = "  securitySchemes:\n" +                  \
-                                                      "    bearerAuth:\n" +                  \
-                                                      "      type: https\n" +                  \
-                                                      "      scheme: bearer\n" +                  \
-                                                      "      bearerFormat: JWT\n" +                  \
-                                                      "      name: Authorization\n" +                  \
-                                                      "      in: header\n" +                 \
-                                                      "      description: \"Use 'your-access-token' as the value of the Authorization header\"\n" +                 \
-                                                      "security:\n" +
+        def securitySchemesContent = "  securitySchemes:\n" +
+                "    bearerAuth:\n" +
+                "      type: https\n" +
+                "      scheme: bearer\n" +
+                "      bearerFormat: JWT\n" +
+                "      name: Authorization\n" +
+                "      in: header\n" +
+                "      description: \"Use 'your-access-token' as the value of the Authorization header\"\n" +
+                "security:\n" +
                 "  - bearerAuth: []  # Apply the security scheme here"
 
         swaggerUIFile.append securitySchemesContent
     }
 }
 
-// 생성된 Swagger UI 파일들 복사
-tasks.register('copySwaggerDocument', Copy) {
-    dependsOn generateSwaggerUISample
+tasks.register('generateApiDocs') {
+    group = 'documentation'
+    description = 'Generate complete API documentation with Swagger UI'
 
-    from file("build/swagger-ui-sample/")
-    into file("build/resources/static/docs")
+    // 명시적으로 test -> openapi3 -> generateSwaggerUISample -> copySwaggerDocument 순서로 실행
+    dependsOn test
+    finalizedBy 'copySwaggerDocument'
 }
 
-//processResources.dependsOn copySwaggerDocument
+tasks.register('copySwaggerDocument', Copy) {
+    group = 'documentation'
+    description = 'Copy generated Swagger UI files to static resources'
+
+    dependsOn 'generateSwaggerUISample'
+
+    from file("build/swagger-ui-sample/")
+    into file("src/main/resources/static/docs")
+
+    doLast {
+        println "Swagger UI files copied to src/main/resources/static/docs"
+    }
+}
 
 bootJar {
-    dependsOn copySwaggerDocument
+    dependsOn processResources
+}
+
+tasks.register('bootJarWithDocs', org.springframework.boot.gradle.tasks.bundling.BootJar) {
+    dependsOn generateApiDocs
+    dependsOn bootJar
+
+    archiveClassifier = 'with-docs'
+
+    with bootJar
+
+    from("src/main/resources/static/docs") {
+        into "BOOT-INF/classes/static/docs"
+    }
 }
