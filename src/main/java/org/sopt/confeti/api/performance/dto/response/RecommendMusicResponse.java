@@ -5,7 +5,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicDTO;
 public record RecommendMusicResponse(
         String musicId,
         String artistName,
-        String title,
+        String trackName,
         String artworkUrl,
         String previewUrl
 ) {
@@ -13,7 +13,7 @@ public record RecommendMusicResponse(
         return new RecommendMusicResponse(
                 recommendMusicDTO.id(),
                 recommendMusicDTO.artistName(),
-                recommendMusicDTO.title(),
+                recommendMusicDTO.trackName(),
                 recommendMusicDTO.artworkUrl(),
                 recommendMusicDTO.previewUrl()
         );

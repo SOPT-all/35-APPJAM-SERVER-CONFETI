@@ -85,7 +85,7 @@ public class MusicResolver extends AbstractMusicAPISpecificResolver {
             while (!mappedConfetiMusics.isEmpty()) {
                 ConfetiMusic mappedConfetiMusic = mappedConfetiMusics.poll();
 
-                mappedConfetiMusic.setTitle(confetiMusic.getTitle());
+                mappedConfetiMusic.setTrackName(confetiMusic.getTrackName());
                 mappedConfetiMusic.setArtworkUrl(confetiMusic.getArtworkUrl());
                 mappedConfetiMusic.setArtistName(confetiMusic.getArtistName());
                 mappedConfetiMusic.setPreviewUrl(confetiMusic.getPreviewUrl());

@@ -4,7 +4,7 @@ import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 
 public record SetlistSearchMusicDTO(
         String id,
-        String title,
+        String trackName,
         String artistName,
         String artworkUrl,
         String previewUrl
@@ -12,7 +12,7 @@ public record SetlistSearchMusicDTO(
     public static SetlistSearchMusicDTO from(ConfetiMusic music) {
         return new SetlistSearchMusicDTO(
                 music.getId(),
-                music.getTitle(),
+                music.getTrackName(),
                 music.getArtistName(),
                 music.getArtworkUrl(),
                 music.getPreviewUrl()
