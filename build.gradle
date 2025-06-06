@@ -169,9 +169,7 @@ bootJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     dependsOn copySwaggerDocument
 
-    doLast {
-        from("${rootProject.layout.projectDirectory}/src/main/resources/static/docs") {
-            into "BOOT-INF/classes/static/docs"
-        }
+    from("${rootProject.layout.projectDirectory}/src/main/resources/static/docs") {
+        into "BOOT-INF/classes/static/docs"
     }
 }
