@@ -631,6 +631,10 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private MusicPage convertToConfetiMusicPage(AppleMusicArtistMusicsResponse artistMusics) {
+        if (Objects.isNull(artistMusics.data())) {
+            return MusicPage.empty();
+        }
+        
         return MusicPage.of(
                 artistMusics.next(),
                 artistMusics.data().stream()
@@ -686,6 +690,10 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private MusicPage convertToConfetiMusicPage(AppleMusicSearchResponse searchResult) {
+        if (Objects.isNull(searchResult.results().songs())) {
+            return MusicPage.empty();
+        }
+
         AppleMusicMusicsResponse musics = searchResult.results().songs();
 
         return MusicPage.of(
