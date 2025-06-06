@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -92,22 +93,22 @@ public class SearchFacade {
         // 검색어 저장 추가
         PerformanceSearchTermAnalyzeResult analyzeResult = SearchTermAnalyzer.analyzePerformance(term);
 
-        ConfetiArtist artist = musicAPIHandler.findArtistByKeyword(analyzeResult.processedTerm())
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
+        Optional<ConfetiArtist> artist = musicAPIHandler.findArtistByKeyword(analyzeResult.processedTerm());
         boolean artistFavorite = false;
 
-        if (Objects.nonNull(userId)) {
-            artistFavorite = artistFavoriteService.isFavorite(userId, artist.getId());
+        if (Objects.nonNull(userId) && artist.isPresent()) {
+            artistFavorite = artistFavoriteService.isFavorite(userId, artist.get().getId());
         }
 
         // 공연은 아티스트 + 검색어 기반
         Set<PerformanceDTO> performances = new HashSet<>();
 
         // 아티스트 기반
-        performances.addAll(
-                performanceService.getPerformancesByArtistIdAndType(artist.getId(), analyzeResult.performanceType()));
+        artist.ifPresent(confetiArtist -> performances.addAll(
+                        performanceService.getPerformancesByArtistIdAndType(confetiArtist.getId(),
+                                analyzeResult.performanceType())
+                )
+        );
 
         // 검색어 기반
         List<PerformanceDTO> searchedPerformances = performanceSearchService.getExpectedPerformancesByTitleAndTypePartialMatched(
@@ -128,7 +129,8 @@ public class SearchFacade {
             getPerformanceFavorites(performanceFavorites, favoritePerformances);
         }
 
-        return SearchResultDTO.of(artist, artistFavorite, performances.stream().toList(), performanceFavorites);
+        return SearchResultDTO.of(artist.orElse(null), artistFavorite, performances.stream().toList(),
+                performanceFavorites);
     }
 
     public PopularTermsDTO getPopularSearchTerms(int limit) {
