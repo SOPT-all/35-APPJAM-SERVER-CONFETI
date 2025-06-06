@@ -37,4 +37,8 @@ public class MusicPage {
 
         return new MusicPage(nextOffset, isLast, musics);
     }
+
+    public static MusicPage empty() {
+        return new MusicPage(DEFAULT_NEXT_OFFSET, true, List.of());
+    }
 }
