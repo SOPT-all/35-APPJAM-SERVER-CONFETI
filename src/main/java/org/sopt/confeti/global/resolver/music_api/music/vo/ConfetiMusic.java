@@ -27,7 +27,7 @@ public class ConfetiMusic {
 
     @Setter
     @Transient
-    private String title;
+    private String trackName;
 
     @Setter
     @Transient

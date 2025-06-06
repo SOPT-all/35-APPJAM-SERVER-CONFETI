@@ -5,7 +5,7 @@ import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 public record RecommendMusicDTO(
         String id,
         String artistName,
-        String title,
+        String trackName,
         String artworkUrl,
         String previewUrl
 ) {
@@ -13,7 +13,7 @@ public record RecommendMusicDTO(
         return new RecommendMusicDTO(
                 music.getId(),
                 music.getArtistName(),
-                music.getTitle(),
+                music.getTrackName(),
                 music.getArtworkUrl(),
                 music.getPreviewUrl()
         );
