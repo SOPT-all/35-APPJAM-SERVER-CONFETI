@@ -148,42 +148,30 @@ tasks.withType(GenerateSwaggerUI) {
     }
 }
 
-tasks.register('generateApiDocs') {
-    group = 'documentation'
-    description = 'Generate complete API documentation with Swagger UI'
-
-    // 명시적으로 test -> openapi3 -> generateSwaggerUISample -> copySwaggerDocument 순서로 실행
-    dependsOn test
-    finalizedBy 'copySwaggerDocument'
-}
-
 tasks.register('copySwaggerDocument', Copy) {
     group = 'documentation'
     description = 'Copy generated Swagger UI files to static resources'
 
     dependsOn 'generateSwaggerUISample'
 
-    from file("build/swagger-ui-sample/")
-    into file("src/main/resources/static/docs")
+    doFirst {
+        from './build/swagger-ui-sample'
+        include '*'
+        into './src/main/resources/static/docs'
+    }
 
     doLast {
-        println "Swagger UI files copied to src/main/resources/static/docs"
+        println "Swagger UI files copied to ./src/main/resources/static/docs"
     }
 }
 
 bootJar {
-    dependsOn processResources
-}
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    dependsOn copySwaggerDocument
 
-tasks.register('bootJarWithDocs', org.springframework.boot.gradle.tasks.bundling.BootJar) {
-    dependsOn generateApiDocs
-    dependsOn bootJar
-
-    archiveClassifier = 'with-docs'
-
-    with bootJar
-
-    from("src/main/resources/static/docs") {
-        into "BOOT-INF/classes/static/docs"
+    doLast {
+        from("${rootProject.layout.projectDirectory}/src/main/resources/static/docs") {
+            into "BOOT-INF/classes/static/docs"
+        }
     }
 }
