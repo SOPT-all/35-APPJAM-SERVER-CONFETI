@@ -1,14 +1,7 @@
 package org.sopt.confeti.api.performance.facade;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -261,15 +254,12 @@ public class PerformanceFacade {
         );
     }
 
-    @Transactional(readOnly = true)
-    public RecommendMusicsPerformanceDTO getRecommendPerformanceId(final Long userId) {
+    public RecommendMusicsPerformanceDTO getRecommendPerformanceIdByRand() {
+        return RecommendMusicsPerformanceDTO.from(performanceService.getPerformanceByRand());
+    }
 
-        Performance performance = performanceService.getPerformanceByUserFavorites(userId);
-        if (userId == null || performance == null) {
-            performance = performanceService.getPerformanceByRand();
-        }
-
-        return RecommendMusicsPerformanceDTO.from(performance);
+    public RecommendMusicsPerformanceDTO getRecommendPerformanceIdByUserId(final Long userId) {
+        return RecommendMusicsPerformanceDTO.from(performanceService.getPerformanceByUserFavorites(userId));
     }
 
     protected Set<String> setArtistsByRandom(Performance performance) {
@@ -287,7 +277,6 @@ public class PerformanceFacade {
         return new HashSet<>(artistList.subList(0, artistCount));
     }
 
-    @Transactional(readOnly = true)
     public RecommendMusicsDTO getNewRecommendMusics(long performanceId, List<String> musicIds) {
         Performance performance = performanceService.getPerformanceById(performanceId);
         Set<String> selectedArtistIds = setArtistsByRandom(performance);

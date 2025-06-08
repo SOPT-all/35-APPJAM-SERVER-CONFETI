@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.dto.request.GetExpectedPerformanceRequest;
 import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
@@ -144,9 +146,12 @@ public class PerformanceController {
     public ResponseEntity<BaseResponse<?>> getRecommendPerformanceId(
             @UserId(require = false) Long userId
     ) {
-        RecommendMusicsPerformanceDTO recommendMusicsDTO = performanceFacade.getRecommendPerformanceId(userId);
+        if (Objects.isNull(userId)) {
+            return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                    RecommendMusicsPerformanceResponse.from(performanceFacade.getRecommendPerformanceIdByRand()));
+        }
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                RecommendMusicsPerformanceResponse.from(recommendMusicsDTO));
+                RecommendMusicsPerformanceResponse.from(performanceFacade.getRecommendPerformanceIdByUserId(userId)));
     }
 
     @Permission(role = {Role.GENERAL})

@@ -91,7 +91,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "        AND p.typeId IN (SELECT tf.festival.id FROM TimetableFestival tf WHERE tf.user.id = :userId))) " +
             "AND p.endAt >= CURRENT_DATE " +
             "ORDER BY RAND() ASC LIMIT 1 ")
-    Performance getPerformanceByUserFavorites(final @Param("userId") Long userId);
+    Optional<Performance> getPerformanceByUserFavorites(final @Param("userId") Long userId);
 
     List<Performance> findRecentPerformancesByEndAtGreaterThanEqual(LocalDate now, PageRequest pageRequest);
 

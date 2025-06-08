@@ -167,7 +167,8 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public Performance getPerformanceByUserFavorites(final Long userId) {
-        return performanceRepository.getPerformanceByUserFavorites(userId);
+        return performanceRepository.getPerformanceByUserFavorites(userId)
+                .orElseGet(this::getPerformanceByRand);
     }
 
     @Transactional(readOnly = true)
