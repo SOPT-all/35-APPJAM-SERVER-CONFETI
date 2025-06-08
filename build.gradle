@@ -112,7 +112,6 @@ dependencyManagement {
 }
 
 tasks.named('test') {
-    println 'Test started'
     useJUnitPlatform()
 }
 
