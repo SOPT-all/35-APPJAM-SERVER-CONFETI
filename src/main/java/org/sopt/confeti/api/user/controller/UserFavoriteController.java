@@ -2,6 +2,7 @@ package org.sopt.confeti.api.user.controller;
 
 import jakarta.validation.constraints.Min;
 import java.util.Collections;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.response.UpcomingPerformanceResponse;
 import org.sopt.confeti.api.user.dto.response.UserFavoriteArtistsPreviewResponse;
@@ -137,12 +138,11 @@ public class UserFavoriteController {
     public ResponseEntity<BaseResponse<?>> getUpcomingPerformance(
             @UserId Long userId
     ) {
-        UpcomingPerformanceDTO upcomingPerformanceDTO = userFavoriteFacade.getUpcomingPerformance(userId);
-        if (upcomingPerformanceDTO == null) {
-            return ApiResponseUtil.success(SuccessMessage.SUCCESS, Collections.emptyMap());
-        }
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                UpcomingPerformanceResponse.of(upcomingPerformanceDTO, s3FileHandler));
+        Optional<UpcomingPerformanceDTO> upcomingPerformanceDTO = userFavoriteFacade.getUpcomingPerformance(userId);
+        return upcomingPerformanceDTO
+                .map(performanceDTO ->
+                        ApiResponseUtil.success(SuccessMessage.SUCCESS, UpcomingPerformanceResponse.of(performanceDTO, s3FileHandler)))
+                .orElseGet(() -> ApiResponseUtil.success(SuccessMessage.SUCCESS, Collections.emptyMap()));
     }
 
     @Permission(role = {Role.GENERAL})

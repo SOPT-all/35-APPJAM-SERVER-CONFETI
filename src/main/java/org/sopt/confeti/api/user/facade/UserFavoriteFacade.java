@@ -1,6 +1,7 @@
 package org.sopt.confeti.api.user.facade;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.UserFavoriteSortType;
@@ -177,7 +178,6 @@ public class UserFavoriteFacade {
         }
     }
 
-    @Transactional(readOnly = true)
     protected void validateExistUser(final long userId) {
         if (!userService.existsById(userId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
@@ -199,15 +199,14 @@ public class UserFavoriteFacade {
         }
     }
 
-    @Transactional(readOnly = true)
-    public UpcomingPerformanceDTO getUpcomingPerformance(final long userId) {
+    public Optional<UpcomingPerformanceDTO> getUpcomingPerformance(final long userId) {
         validateExistUser(userId);
 
         Performance performance = performanceService.getUpcomingPerformanceByUserId(userId);
-        if (performance == null) {
-            return null;
+        if (Objects.isNull(performance)) {
+            return Optional.empty();
         }
-        return UpcomingPerformanceDTO.from(performance);
+        return Optional.of(UpcomingPerformanceDTO.from(performance));
     }
 
     @Transactional(readOnly = true)

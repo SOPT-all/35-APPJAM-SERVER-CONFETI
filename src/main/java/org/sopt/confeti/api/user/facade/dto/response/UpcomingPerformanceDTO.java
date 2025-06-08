@@ -24,5 +24,4 @@ public record UpcomingPerformanceDTO(
                 performance.getArea()
         );
     }
-
 }
