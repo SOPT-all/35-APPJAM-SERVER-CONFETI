@@ -5,7 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 application*.yml
-**/src/main/resources/static/docs/
+src/main/resources/static/swagger-ui/openapi3.yaml
 
 ### STS ###
 .apt_generated

@@ -121,20 +121,6 @@ jobs:
         run: |
           echo 'testcontainers.reuse.enable=true' > .testcontainers.properties
 
-      # main/resources/static 폴더 생성 - Swagger
-      - name: Create main/resources/static folder if not exist
-        run: |
-          if [ ! -d "./src/main/resources/static" ]; then
-            mkdir -p ./src/main/resources/static
-          fi
-
-      # main/resources/static/docs 폴더 생성 - Swagger
-      - name: Create main/resources/static/docs folder if not exist
-        run: |
-          if [ ! -d "./src/main/resources/static/docs" ]; then
-            mkdir -p ./src/main/resources/static/docs
-          fi
-
       # 빌드 속도 향상을 위한 Gradle 캐싱
       - name: Gradle Caching
         uses: actions/cache@v4
@@ -150,7 +136,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew  # Gradle wrapper에 실행 권한 부여
 
+      # Gradle을 사용하여 openapi3.yaml 파일 복사
+      - name: Copy openapi3.yaml to Swagger Folder
+        run: |
+          ./gradlew copySwaggerDocument
+
       # Gradle을 사용하여 빌드 실행
       - name: Build with Gradle Wrapper
         run: |
-          ./gradlew clean build
+          ./gradlew clean build -x test

@@ -1,11 +1,8 @@
-import org.hidetake.gradle.swagger.generator.GenerateSwaggerUI
-
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.epages.restdocs-api-spec' version '0.18.2'
-    id 'org.hidetake.swagger.generator' version '2.18.2'
 }
 
 group = 'org.sopt'
@@ -31,12 +28,6 @@ java {
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
-}
-
-swaggerSources {
-    sample {
-        setInputFile(file("${project.buildDir}/api-spec/openapi3.yaml"))
-    }
 }
 
 dependencies {
@@ -112,9 +103,6 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:elasticsearch'
     testImplementation 'org.testcontainers:mysql'
-
-    // Swagger
-    swaggerUI 'org.webjars:swagger-ui:4.11.1'
 }
 
 dependencyManagement {
@@ -127,35 +115,9 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-tasks.withType(GenerateSwaggerUI) {
-    dependsOn 'openapi3'
-
-    doFirst {
-        def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.yml")
-
-        def securitySchemesContent = "  securitySchemes:\n" +              \
-                                                  "    bearerAuth:\n" +              \
-                                                  "      type: https\n" +              \
-                                                  "      scheme: bearer\n" +              \
-                                                  "      bearerFormat: JWT\n" +              \
-                                                  "      name: Authorization\n" +              \
-                                                  "      in: header\n" +             \
-                                                  "      description: \"Use 'your-access-token' as the value of the Authorization header\"\n" +             \
-                                                  "security:\n" +
-                "  - bearerAuth: []  # Apply the security scheme here"
-
-        swaggerUIFile.append securitySchemesContent
-    }
-}
-
-// 생성된 Swagger UI 파일들 복사
 tasks.register('copySwaggerDocument', Copy) {
-    dependsOn generateSwaggerUISample
-
-    from file("build/swagger-ui-sample/")
-    into file("src/main/resources/static/docs")
-}
-
-bootJar {
-    dependsOn copySwaggerDocument
+    delete "src/main/resources/static/swagger-ui/openapi3.yaml"
+    from "${buildDir}/api-spec/openapi3.yaml"
+    into "src/main/resources/static/swagger-ui/"
+    dependsOn "openapi3"
 }
