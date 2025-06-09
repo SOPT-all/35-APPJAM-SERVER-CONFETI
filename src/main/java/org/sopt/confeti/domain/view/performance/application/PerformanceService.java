@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -161,14 +162,13 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public Performance getPerformanceByRand() {
+    public Optional<Performance> getPerformanceByRand() {
         return performanceRepository.findPerformanceByRand();
     }
 
     @Transactional(readOnly = true)
-    public Performance getPerformanceByUserFavorites(final Long userId) {
-        return performanceRepository.getPerformanceByUserFavorites(userId)
-                .orElseGet(this::getPerformanceByRand);
+    public Optional<Performance> getPerformanceByUserFavorites(final Long userId) {
+        return performanceRepository.getPerformanceByUserFavorites(userId);
     }
 
     @Transactional(readOnly = true)

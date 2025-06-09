@@ -3,9 +3,8 @@ package org.sopt.confeti.api.performance.controller;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+
+import java.util.*;
 
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.dto.request.GetExpectedPerformanceRequest;
@@ -146,12 +145,14 @@ public class PerformanceController {
     public ResponseEntity<BaseResponse<?>> getRecommendPerformanceId(
             @UserId(require = false) Long userId
     ) {
-        if (Objects.isNull(userId)) {
-            return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                    RecommendMusicsPerformanceResponse.from(performanceFacade.getRecommendPerformanceIdByRand()));
-        }
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                RecommendMusicsPerformanceResponse.from(performanceFacade.getRecommendPerformanceIdByUserId(userId)));
+        Optional<RecommendMusicsPerformanceDTO> performanceDto = Objects.isNull(userId)
+                ? performanceFacade.getRecommendPerformanceIdByRand()
+                : performanceFacade.getRecommendPerformanceIdByUserId(userId);
+
+        return performanceDto
+                .map(performance ->
+                        ApiResponseUtil.success(SuccessMessage.SUCCESS, RecommendMusicsPerformanceResponse.from(performance)))
+                .orElseGet(()-> ApiResponseUtil.success(SuccessMessage.SUCCESS, Collections.emptyMap()));
     }
 
     @Permission(role = {Role.GENERAL})

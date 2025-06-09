@@ -82,7 +82,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     Optional<Performance> findPerformanceByIdAndEndAtGreaterThanEqual(long performanceId, LocalDate date);
 
     @Query(value = "SELECT p FROM Performance p WHERE p.endAt >= CURRENT_DATE ORDER BY RAND() LIMIT 1")
-    Performance findPerformanceByRand();
+    Optional<Performance> findPerformanceByRand();
 
     @Query(value = "SELECT p FROM Performance p " +
             "WHERE ((p.type = org.sopt.confeti.global.common.constant.PerformanceType.CONCERT " +

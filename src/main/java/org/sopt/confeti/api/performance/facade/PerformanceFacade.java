@@ -256,12 +256,14 @@ public class PerformanceFacade {
         );
     }
 
-    public RecommendMusicsPerformanceDTO getRecommendPerformanceIdByRand() {
-        return RecommendMusicsPerformanceDTO.from(performanceService.getPerformanceByRand());
+    public Optional<RecommendMusicsPerformanceDTO> getRecommendPerformanceIdByRand() {
+        return performanceService.getPerformanceByRand()
+                .map(RecommendMusicsPerformanceDTO::from);
     }
 
-    public RecommendMusicsPerformanceDTO getRecommendPerformanceIdByUserId(final Long userId) {
-        return RecommendMusicsPerformanceDTO.from(performanceService.getPerformanceByUserFavorites(userId));
+    public Optional<RecommendMusicsPerformanceDTO> getRecommendPerformanceIdByUserId(final Long userId) {
+        return performanceService.getPerformanceByUserFavorites(userId)
+                .map(RecommendMusicsPerformanceDTO::from);
     }
 
     @Transactional(readOnly = true)
