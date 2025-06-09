@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.time.Duration;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.exception.ConfetiException;
@@ -43,7 +44,7 @@ public class S3FileHandler {
      * 파일 업로드
      */
     public String uploadFile(MultipartFile file, String folderPath) {
-        final String fileName = fileNameGenerator.generate(file.getOriginalFilename());
+        final String fileName = fileNameGenerator.generate(Objects.requireNonNull(file.getOriginalFilename()));
         checkFileNotExist(folderPath, fileName);
 
         final ObjectMetadata metadata = getMetadata(file);
