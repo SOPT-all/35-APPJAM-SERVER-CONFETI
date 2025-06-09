@@ -536,6 +536,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         redisTemplate.opsForValue().set(REDIS_KEY_ARTISTS_TOP_MUSICS + artistId, musics, REDIS_TTL_DAY, TimeUnit.DAYS);
     }
 
+    @RetryOnTokenExpire
     public List<ConfetiMusic> getTopSongsByArtistId(final String artistId, final int fetchSize) {
         List<ConfetiMusic> topMusics = new ArrayList<>(getCachedTopMusicsByArtistId(artistId, fetchSize));
         if (!topMusics.isEmpty()) {
@@ -561,7 +562,6 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     @Override
-    @RetryOnTokenExpire
     public List<ConfetiMusic> getFilteredTopSongsByArtist(String artistId, int limit, Set<String> excludedMusicIds) {
         List<ConfetiMusic> songs = getTopSongsByArtistId(artistId, limit);
 
