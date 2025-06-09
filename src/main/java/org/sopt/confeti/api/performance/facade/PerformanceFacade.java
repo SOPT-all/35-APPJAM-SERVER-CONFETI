@@ -54,6 +54,8 @@ public class PerformanceFacade {
 
     private static final int RECENT_PERFORMANCES_SIZE = 7;
     private static final int RECOMMEND_MUSIC_SIZE = 3;
+    private static final int MUSIC_FETCH_SIZE = 5;
+    private static final int SELECTED_ARTISTS_SIZE = 3;
     private static final boolean PERSONALIZED = true;
     private static final boolean UNPERSONALIZED = false;
 
@@ -262,24 +264,10 @@ public class PerformanceFacade {
         return RecommendMusicsPerformanceDTO.from(performanceService.getPerformanceByUserFavorites(userId));
     }
 
-    protected Set<String> setArtistsByRandom(Performance performance) {
-        List<PerformanceArtist> performanceArtists = performance.getArtists();
-
-        if (performanceArtists.isEmpty()) {
-            return Collections.emptySet();
-        }
-
-        List<String> artistList = performanceArtists.stream()
-                .map(PerformanceArtist::getArtistId).distinct().collect(Collectors.toList());
-        Collections.shuffle(artistList);
-
-        int artistCount = Math.min(artistList.size(), 3);
-        return new HashSet<>(artistList.subList(0, artistCount));
-    }
-
+    @Transactional(readOnly = true)
     public RecommendMusicsDTO getNewRecommendMusics(long performanceId, List<String> musicIds) {
         Performance performance = performanceService.getPerformanceById(performanceId);
-        Set<String> selectedArtistIds = setArtistsByRandom(performance);
+        Set<String> selectedArtistIds = selectRandomArtistIds(performance);
         Set<String> existingMusicIds = (musicIds == null || musicIds.isEmpty())
                 ? Collections.emptySet()
                 : musicIds.stream().flatMap(ids -> Arrays.stream(ids.split(",")))
@@ -291,38 +279,45 @@ public class PerformanceFacade {
         return RecommendMusicsDTO.from(recommendMusics);
     }
 
+    protected Set<String> selectRandomArtistIds(Performance performance) {
+        List<PerformanceArtist> performanceArtists = performance.getArtists();
+
+        if (performanceArtists.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        List<String> artistList = performanceArtists.stream()
+                .map(PerformanceArtist::getArtistId).distinct().collect(Collectors.toList());
+        Collections.shuffle(artistList);
+
+        int artistCount = Math.min(artistList.size(), SELECTED_ARTISTS_SIZE);
+        return new HashSet<>(artistList.subList(0, artistCount));
+    }
+
     private List<ConfetiMusic> recommendMusicsByArtistCount(List<String> artistIdList, Set<String> existingMusicIds) {
-        int artistCount = artistIdList.size();
-        if (artistCount == 1) {
-            return recommendForSingleArtist(artistIdList, existingMusicIds);
-        }
-        if (artistCount == 2) {
-            return recommendForTwoArtists(artistIdList, existingMusicIds);
-        }
-        return recommendForMultipleArtists(artistIdList, existingMusicIds);
-    }
-
-    private List<ConfetiMusic> recommendForSingleArtist(List<String> artistIdList, Set<String> existingMusicIds) {
-        return musicAPIHandler.getFilteredTopSongsByArtist(
-                artistIdList.getFirst(), RECOMMEND_MUSIC_SIZE, existingMusicIds
-        );
-    }
-
-    private List<ConfetiMusic> recommendForTwoArtists(List<String> artistIdList, Set<String> existingMusicIds) {
         List<ConfetiMusic> musics = new ArrayList<>();
-        musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistIdList.getFirst(), 2, existingMusicIds));
-        musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistIdList.getLast(), 1, existingMusicIds));
-        return musics;
-    }
+        Set<String> seenMusicIds = new HashSet<>(existingMusicIds);
+        int round = 0;
 
-    private List<ConfetiMusic> recommendForMultipleArtists(List<String> artistIdList, Set<String> existingMusicIds) {
-        List<ConfetiMusic> musics = new ArrayList<>();
-        for (String artistId : artistIdList) {
-            if (musics.size() >= RECOMMEND_MUSIC_SIZE) {
-                break;
+        while (musics.size() < RECOMMEND_MUSIC_SIZE && round < MUSIC_FETCH_SIZE) {
+            for (String artistId : artistIdList) {
+                if (musics.size() >= RECOMMEND_MUSIC_SIZE) break;
+
+                List<ConfetiMusic> topSongs = musicAPIHandler.getFilteredTopSongsByArtist(
+                        artistId, MUSIC_FETCH_SIZE, seenMusicIds
+                );
+
+                if (round < topSongs.size()) {
+                    ConfetiMusic song = topSongs.get(round);
+                    if (!seenMusicIds.contains(song.getId())) {
+                        musics.add(song);
+                        seenMusicIds.add(song.getId());
+                    }
+                }
             }
-            musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistId, 1, existingMusicIds));
+            round++;
         }
+
         return musics;
     }
 

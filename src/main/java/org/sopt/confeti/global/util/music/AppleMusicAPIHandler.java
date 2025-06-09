@@ -563,7 +563,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     @Override
     @RetryOnTokenExpire
     public List<ConfetiMusic> getFilteredTopSongsByArtist(String artistId, int limit, Set<String> excludedMusicIds) {
-        List<ConfetiMusic> songs = getTopSongsByArtistId(artistId, limit * 5);
+        List<ConfetiMusic> songs = getTopSongsByArtistId(artistId, limit);
 
         List<ConfetiMusic> filteredSongs = songs.stream()
                 .filter(song -> !excludedMusicIds.contains(song.getId()))
