@@ -19,6 +19,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerfo
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
+import org.sopt.confeti.api.performance.vo.UserPerformanceRecordVO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
@@ -29,6 +30,7 @@ import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
+import org.sopt.confeti.domain.setlist.SetlistType;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.application.UserService;
@@ -323,7 +325,6 @@ public class PerformanceFacade {
         return musics;
     }
 
-    @Transactional(readOnly = true)
     public ConfetiRecordDTO getConfetiRecord(final long userId) {
         validateExistUser(userId);
 
@@ -331,14 +332,13 @@ public class PerformanceFacade {
         List<Long> setListFestivalIds = setlistService.findFestivalIdsByUserId(userId);
         List<Long> setListConcertIds = setlistService.findConcertIdsByUserId(userId);
 
-        Set<Long> uniqueFestivalIds = new HashSet<>();
-        uniqueFestivalIds.addAll(timetableFestivalIds);
-        uniqueFestivalIds.addAll(setListFestivalIds);
+        UserPerformanceRecordVO record = new UserPerformanceRecordVO(
+                timetableFestivalIds,
+                setListFestivalIds,
+                setListConcertIds
+        );
 
-        int totalCount = uniqueFestivalIds.size() + setListConcertIds.size();
-
-        return ConfetiRecordDTO.of(totalCount, timetableFestivalIds.size(),
-                setListFestivalIds.size() + setListConcertIds.size());
+        return ConfetiRecordDTO.from(record);
     }
 
     protected void validateExistUser(final long userId) {

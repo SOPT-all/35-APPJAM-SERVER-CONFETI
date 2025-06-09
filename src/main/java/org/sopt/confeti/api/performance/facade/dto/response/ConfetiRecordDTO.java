@@ -1,13 +1,17 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
+import org.sopt.confeti.api.performance.vo.UserPerformanceRecordVO;
+
 public record ConfetiRecordDTO(
         long totalCount,
         long timetableCount,
         long setlistCount
 ) {
-    public static ConfetiRecordDTO of(final long totalCount, final long timetableCount, final long setlistCount) {
+    public static ConfetiRecordDTO from(UserPerformanceRecordVO record) {
         return new ConfetiRecordDTO(
-                totalCount, timetableCount, setlistCount
+                record.getTotalUniquePerformanceCount(),
+                record.getTimetableFestivalCount(),
+                record.getSetListPerformanceCount()
         );
     }
 }
