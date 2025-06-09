@@ -146,12 +146,7 @@ public class SetlistService {
     }
 
     @Transactional(readOnly = true)
-    public List<Long> findFestivalIdsByUserId(final Long userId) {
-        return setlistRepository.findFestivalIdsByUserId(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Long> findConcertIdsByUserId(final Long userId) {
-        return setlistRepository.findConcertIdsByUserId(userId);
+    public List<Long> findMusicIdsByUserId(final Long userId, final SetlistType sortType) {
+        return setlistRepository.findTypeIdsByUserIdAndType(userId, sortType);
     }
 }

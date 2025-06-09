@@ -19,9 +19,6 @@ public interface SetlistRepository extends JpaRepository<Setlist, Long> {
 
     Optional<Setlist> findByIdAndUserId(Long id, Long userId);
 
-    @Query("SELECT s.typeId FROM Setlist s WHERE s.type = org.sopt.confeti.domain.setlist.SetlistType.FESTIVAL AND s.user.id = :userId")
-    List<Long> findFestivalIdsByUserId(@Param("userId") Long userId);
-
-    @Query("SELECT s.typeId FROM Setlist s WHERE s.type =  org.sopt.confeti.domain.setlist.SetlistType.CONCERT AND s.user.id = :userId")
-    List<Long> findConcertIdsByUserId(@Param("userId") Long userId);
+    @Query("SELECT s.typeId FROM Setlist s WHERE s.type = :type AND s.user.id = :userId")
+    List<Long> findTypeIdsByUserIdAndType(@Param("userId") Long userId, @Param("type") SetlistType type);
 }

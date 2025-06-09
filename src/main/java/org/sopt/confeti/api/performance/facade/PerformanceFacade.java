@@ -329,8 +329,8 @@ public class PerformanceFacade {
         validateExistUser(userId);
 
         List<Long> timetableFestivalIds = timetableFestivalService.findFestivalIdsByUserId(userId);
-        List<Long> setListFestivalIds = setlistService.findFestivalIdsByUserId(userId);
-        List<Long> setListConcertIds = setlistService.findConcertIdsByUserId(userId);
+        List<Long> setListFestivalIds = setlistService.findMusicIdsByUserId(userId, SetlistType.FESTIVAL);
+        List<Long> setListConcertIds = setlistService.findMusicIdsByUserId(userId, SetlistType.CONCERT);
 
         UserPerformanceRecordVO record = new UserPerformanceRecordVO(
                 timetableFestivalIds,
