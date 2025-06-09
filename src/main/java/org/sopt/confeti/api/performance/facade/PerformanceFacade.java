@@ -1,7 +1,15 @@
 package org.sopt.confeti.api.performance.facade;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -274,8 +282,10 @@ public class PerformanceFacade {
         Set<String> selectedArtistIds = selectRandomArtistIds(performance);
         Set<String> existingMusicIds = (musicIds == null || musicIds.isEmpty())
                 ? Collections.emptySet()
-                : musicIds.stream().flatMap(ids -> Arrays.stream(ids.split(",")))
-                        .map(String::trim).collect(Collectors.toSet());
+                : musicIds.stream()
+                    .flatMap(ids -> Arrays.stream(ids.split(",")))
+                    .map(String::trim)
+                    .collect(Collectors.toSet());
 
         List<String> artistIdList = new ArrayList<>(selectedArtistIds);
         List<ConfetiMusic> recommendMusics = recommendMusicsByArtistCount(artistIdList, existingMusicIds);

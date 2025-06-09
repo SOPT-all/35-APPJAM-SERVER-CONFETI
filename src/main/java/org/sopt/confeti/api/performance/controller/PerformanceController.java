@@ -3,9 +3,11 @@ package org.sopt.confeti.api.performance.controller;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-
-import java.util.*;
-
+import java.util.List;
+import java.util.Optional;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.dto.request.GetExpectedPerformanceRequest;
 import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
