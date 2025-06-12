@@ -41,7 +41,7 @@ public class Performance extends APIBaseTest {
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .header("Content-Type", "application/json")
                 .when()
-                .queryParam("term", "콘서트")
+                .queryParam("term", "예정된 콘서트")
                 .get("/performances/search/ac")
                 .then()
                 .statusCode(200);
