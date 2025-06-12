@@ -10,6 +10,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.util.Objects;
@@ -121,7 +123,7 @@ public class S3FileHandler {
         checkFileExist(folderPath, key);
 
         try {
-            return new URI(host + folderPath + key).toURL();
+            return new URI(host + folderPath + URLEncoder.encode(key, StandardCharsets.UTF_8)).toURL();
         } catch (URISyntaxException | MalformedURLException e) {
             throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
@@ -133,7 +135,8 @@ public class S3FileHandler {
     public URL getFileSignedUrl(String folderPath, String key) {
         checkFileExist(folderPath, key);
 
-        return s3Operations.createSignedGetURL(bucket, folderPath + key, urlDuration);
+        return s3Operations.createSignedGetURL(bucket, folderPath + URLEncoder.encode(key, StandardCharsets.UTF_8),
+                urlDuration);
     }
 
     /**
