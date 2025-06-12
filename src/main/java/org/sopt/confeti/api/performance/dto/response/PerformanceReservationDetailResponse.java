@@ -8,7 +8,7 @@ public record PerformanceReservationDetailResponse(
         int index,
         long typeId,
         PerformanceType type,
-        String subtitle,
+        String title,
         String reserveAt
 ) {
     public static PerformanceReservationDetailResponse from(PerformanceReservationDetailDTO performanceReservation) {
@@ -17,7 +17,7 @@ public record PerformanceReservationDetailResponse(
                 performanceReservation.index(),
                 performanceReservation.typeId(),
                 performanceReservation.type(),
-                performanceReservation.subtitle(),
+                performanceReservation.title(),
                 DateConvertor.convertToDefaultFormat(performanceReservation.reserveAt())
         );
     }

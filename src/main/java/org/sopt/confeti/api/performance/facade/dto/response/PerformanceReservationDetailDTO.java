@@ -8,7 +8,7 @@ public record PerformanceReservationDetailDTO(
         int index,
         long typeId,
         PerformanceType type,
-        String subtitle,
+        String title,
         LocalDateTime reserveAt
 ) {
     public static PerformanceReservationDetailDTO from(PerformanceTicketDTO performanceTicketDTO) {
@@ -16,7 +16,7 @@ public record PerformanceReservationDetailDTO(
                 performanceTicketDTO.index(),
                 performanceTicketDTO.typeId(),
                 performanceTicketDTO.type(),
-                performanceTicketDTO.subtitle(),
+                performanceTicketDTO.title(),
                 performanceTicketDTO.reserveAt()
         );
     }
