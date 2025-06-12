@@ -9,6 +9,7 @@ import org.sopt.confeti.domain.elastic_search.PerformanceDocument;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -23,8 +24,14 @@ public class PerformanceSearchOperator {
     private static final String TYPE = "type";
     private static final String END_AT = "type";
     private static final String CURRENT_DATE = LocalDate.now().toString();
+    private static final float MIN_SCORE = 5.0f;
 
     private final ElasticsearchOperations elasticsearchOperations;
+
+    private static NativeQueryBuilder getDefaultNativeQueryBuilder() {
+        return NativeQuery.builder()
+                .withMinScore(MIN_SCORE);
+    }
 
     private static class BoolQueryBuilder {
 
@@ -104,7 +111,7 @@ public class PerformanceSearchOperator {
 
     public List<PerformanceDocument> searchByTitleAndTypePartialMatch(String term, PerformanceType type,
                                                                       PerformanceStatus status) {
-        Query partialMatchedQuery = NativeQuery.builder()
+        Query partialMatchedQuery = getDefaultNativeQueryBuilder()
                 .withQuery(query -> query.bool(
                                 BoolQueryBuilder.builder()
                                         .match(TITLE_PARTIAL, term)
