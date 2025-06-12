@@ -57,14 +57,14 @@ public class PerformanceDTORepository {
 
     public List<PerformanceTicketDTO> findFavoritePerformancesReservation(final Long userId) {
         String sql = """
-                SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, subtitle, reserve_at
+                SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, title, reserve_at
                 FROM (
-                    SELECT c.id performance_id, :concertType type, c.subtitle subtitle, c.reserve_at
+                    SELECT c.id performance_id, :concertType type, c.title title, c.reserve_at
                     FROM concert_favorites cf
                     JOIN concerts c ON cf.concert_id = c.id
                     WHERE cf.user_id = :userId AND c.reserve_at >= CURRENT_DATE 
                     UNION ALL
-                    SELECT f.id performance_id, :festivalType type, f.subtitle subtitle, f.reserve_at
+                    SELECT f.id performance_id, :festivalType type, f.title title, f.reserve_at
                     FROM festival_favorites ff
                     JOIN festivals f ON ff.festival_id = f.id
                     WHERE ff.user_id = :userId AND f.reserve_at >= CURRENT_DATE
@@ -85,13 +85,13 @@ public class PerformanceDTORepository {
 
     public List<PerformanceTicketDTO> findPerformancesReservation() {
         String sql = """
-                SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, subtitle, reserve_at
+                SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, title, reserve_at
                 FROM (
-                    SELECT c.id performance_id, :concertType type, c.subtitle subtitle, c.reserve_at
+                    SELECT c.id performance_id, :concertType type, c.title title, c.reserve_at
                     FROM concerts c
                     WHERE c.reserve_at >= CURRENT_DATE
                     UNION ALL
-                    SELECT f.id performance_id, :festivalType type, f.subtitle subtitle, f.reserve_at
+                    SELECT f.id performance_id, :festivalType type, f.title title, f.reserve_at
                     FROM festivals f
                     WHERE f.reserve_at >= CURRENT_DATE
                 ) AS all_performances
