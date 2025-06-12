@@ -11,13 +11,15 @@ public class FileNameGenerator {
     private static final String UUID_SEQUENCE_DELIMITER = "_";
     private static final String EXTENSION_DOT = ".";
 
-    public String generate(String originalFileName) {
-        int lastDotIndex = originalFileName.lastIndexOf(EXTENSION_DOT);
-        String fileName = originalFileName.substring(0, lastDotIndex);
-        String extension = originalFileName.substring(lastDotIndex + 1);
+    public String generate(String originalFileFullName) {
+        int lastDotIndex = originalFileFullName.lastIndexOf(EXTENSION_DOT);
+        String originalFileName = originalFileFullName.substring(0, lastDotIndex);
+        String extension = originalFileFullName.substring(lastDotIndex + 1);
 
-        return getRandomUUID() + UUID_SEQUENCE_DELIMITER + Base64.getEncoder()
-                .encodeToString(fileName.getBytes(StandardCharsets.UTF_8)) + EXTENSION_DOT + extension;
+        String fileName = getRandomUUID() + UUID_SEQUENCE_DELIMITER + Base64.getEncoder()
+                .encodeToString(originalFileName.getBytes(StandardCharsets.UTF_8)) + EXTENSION_DOT + extension;
+
+        return fileName.replaceAll("/", "");
     }
 
     private String getRandomUUID() {
