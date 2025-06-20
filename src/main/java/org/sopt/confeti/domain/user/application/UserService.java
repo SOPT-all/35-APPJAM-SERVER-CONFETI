@@ -2,13 +2,13 @@ package org.sopt.confeti.domain.user.application;
 
 import java.nio.file.Path;
 import java.util.Objects;
-
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.request.PatchUserInfoRequest;
 import org.sopt.confeti.auth.dto.CreateUserDTO;
 import org.sopt.confeti.domain.user.AuthUser;
 import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.domain.user.infra.repository.AllUserRepository;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.global.common.constant.FolderPath;
@@ -19,7 +19,6 @@ import org.sopt.confeti.global.util.FileDownloader;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -129,5 +128,15 @@ public class UserService {
                 );
 
         return user.isHasTimetableHistory();
+    }
+
+    @Transactional(readOnly = true)
+    public Role getRole(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
+
+        return user.getRole();
     }
 }
