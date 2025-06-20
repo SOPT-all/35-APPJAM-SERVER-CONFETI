@@ -1,9 +1,13 @@
 package org.sopt.confeti.restdocs.base;
 
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyUris;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
+import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
@@ -55,6 +59,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
@@ -429,6 +434,19 @@ public abstract class APIBaseTest {
                 TestDataManager.userSocialId, TestDataManager.userProvider
         ).orElseThrow(
                 () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+        );
+    }
+
+    /**
+     * 문서 구성 함수
+     */
+    protected ResourceSnippetParametersBuilder tag(String name) {
+        return ResourceSnippetParameters.builder().tag(name);
+    }
+
+    protected RestDocumentationFilter APIDocument(ResourceSnippetParametersBuilder resourceSnippetParametersBuilder) {
+        return document(DEFAULT_RESTDOC_PATH,
+                resource(resourceSnippetParametersBuilder.build())
         );
     }
 }
