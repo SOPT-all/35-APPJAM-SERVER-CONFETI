@@ -10,7 +10,7 @@ import org.sopt.confeti.restdocs.base.APIBaseTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
-public class Performance extends APIBaseTest {
+public class PerformanceTest extends APIBaseTest {
 
     private static final String TAG = "performance";
 
@@ -51,9 +51,9 @@ public class Performance extends APIBaseTest {
                                                 .description("공연 포스터 URL")
                                 )
                 ))
+                .when()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .header("Content-Type", "application/json")
-                .when()
                 .queryParam("term", "콘서트")
                 .get("/performances/search/ac")
                 .then()

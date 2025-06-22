@@ -11,7 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
-public class UserTimetable extends APIBaseTest {
+public class UserTimetableTest extends APIBaseTest {
 
     private static final String TAG = "user-timetable";
 
@@ -37,9 +37,9 @@ public class UserTimetable extends APIBaseTest {
                                         fieldWithPath("message").type(JsonFieldType.STRING).description("요청이 성공했습니다.")
                                 )
                 ))
+                .when()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .contentType("application/json")
-                .when()
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .body("{\"festivals\": [{\"festivalId\":  1}, {\"festivalId\" :  2}]}")
                 .post("/user/timetables/festivals")

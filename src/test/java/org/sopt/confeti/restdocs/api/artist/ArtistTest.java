@@ -2,7 +2,7 @@ package org.sopt.confeti.restdocs.api.artist;
 
 import org.sopt.confeti.restdocs.base.APIBaseTest;
 
-public class Artist extends APIBaseTest {
+public class ArtistTest extends APIBaseTest {
 
     @Override
     protected boolean shouldResetESSearchTermData() {
