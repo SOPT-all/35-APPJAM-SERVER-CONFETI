@@ -20,23 +20,26 @@ import org.springframework.restdocs.payload.JsonFieldType;
 
 public class UserFavorite extends APIBaseTest {
 
+    private static final String TAG = "user-favorite";
+
     @Test
     @DisplayName("아티스트 좋아요 삭제 API 테스트")
     void 아티스트_좋아요_삭제_API() {
         artistFavoriteRepository.save(ArtistFavorite.create(getUser(), TestDataManager.데이식스));
 
         given(this.spec)
-                .filter(document(DEFAULT_RESTDOC_PATH,
-                        requestHeaders(
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰")
-                        ),
-                        pathParameters(
-                                parameterWithName("artistId").description("아티스트 식별 ID")
-                        ),
-                        responseFields(
-                                fieldWithPath("status").type(JsonFieldType.NUMBER).description("200"),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청이 성공했습니다.")
-                        )
+                .filter(APIDocument(
+                        tag(TAG)
+                                .requestHeaders(
+                                        headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰")
+                                )
+                                .pathParameters(
+                                        parameterWithName("artistId").description("아티스트 식별 ID")
+                                )
+                                .responseFields(
+                                        fieldWithPath("status").type(JsonFieldType.NUMBER).description("200"),
+                                        fieldWithPath("message").type(JsonFieldType.STRING).description("요청이 성공했습니다.")
+                                )
                 ))
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
