@@ -11,7 +11,7 @@ paths:
   /performances/search/ac:
     get:
       tags:
-      - performances
+      - performance
       operationId: performance/공연_연관_검색_api/
       parameters:
       - name: accessToken
@@ -28,10 +28,7 @@ paths:
           type: string
       - name: limit
         in: query
-        description: |-
-          검색 개수
-          범위 : 1 ~ 10
-          기본 값 : 1
+        description: "검색 개수<br>범위 : 1 ~ 10<br>기본 값 : 1"
         required: false
         schema:
           type: string
@@ -67,7 +64,9 @@ paths:
   /user/timetables/festivals:
     post:
       tags:
-      - user
+      - user-timetable
+      summary: 타임테이블에 페스티벌 추가 API
+      description: 타임테이블에 페스티벌 추가 API
       operationId: user_timetable/타임테이블_페스티벌_추가_api/
       parameters:
       - name: Authorization
@@ -76,7 +75,7 @@ paths:
         required: true
         schema:
           type: string
-        example: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiR0VORVJBTCIsImlzQWNjZXNzVG9rZW4iOnRydWUsInByb3ZpZGVyIjoiS0FLQU8iLCJzdWIiOiIxIiwiaWF0IjoxNzQ5MjgxMDE2LCJleHAiOjE3NDkzNjc0MTZ9.qINhVTAu_q9CA2xu0G3uGzM_jTb6RAb9WEOlo_5DjmI
+        example: "Bearer {access_token}"
       - name: Content-Type
         in: header
         description: application/json
@@ -105,7 +104,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/user-timetables-festivals-1478031720"
+                $ref: "#/components/schemas/user-favorites-artists-artistId-1478031720"
               examples:
                 user_timetable/타임테이블_페스티벌_추가_api/:
                   value: |-
@@ -113,8 +112,6 @@ paths:
                       "status" : 200,
                       "message" : "요청이 성공했습니다."
                     }
-      security:
-      - bearerAuthJWT: []
   /user/favorites/artists/{artistId}:
     post:
       tags:
@@ -133,14 +130,14 @@ paths:
         required: true
         schema:
           type: string
-        example: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiR0VORVJBTCIsImlzQWNjZXNzVG9rZW4iOnRydWUsInByb3ZpZGVyIjoiS0FLQU8iLCJzdWIiOiIxIiwiaWF0IjoxNzQ5MjgxMDE0LCJleHAiOjE3NDkzNjc0MTR9.34_3fGxPhicmSUvA9gDbU7Kp_fcZl6rxroqrsRvVazk
+        example: "Bearer {access_token}"
       responses:
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/user-timetables-festivals-1478031720"
+                $ref: "#/components/schemas/user-favorites-artists-artistId-1478031720"
               examples:
                 user_favorite/아티스트_좋아요_추가_api/:
                   value: |-
@@ -148,11 +145,9 @@ paths:
                       "status" : 200,
                       "message" : "요청이 성공했습니다."
                     }
-      security:
-      - bearerAuthJWT: []
     delete:
       tags:
-      - user
+      - user-favorite
       operationId: user_favorite/아티스트_좋아요_삭제_api/
       parameters:
       - name: artistId
@@ -167,14 +162,14 @@ paths:
         required: true
         schema:
           type: string
-        example: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiR0VORVJBTCIsImlzQWNjZXNzVG9rZW4iOnRydWUsInByb3ZpZGVyIjoiS0FLQU8iLCJzdWIiOiIxIiwiaWF0IjoxNzQ5MjgxMDE0LCJleHAiOjE3NDkzNjc0MTR9.34_3fGxPhicmSUvA9gDbU7Kp_fcZl6rxroqrsRvVazk
+        example: "Bearer {access_token}"
       responses:
         "200":
           description: "200"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/user-timetables-festivals-1478031720"
+                $ref: "#/components/schemas/user-favorites-artists-artistId-1478031720"
               examples:
                 user_favorite/아티스트_좋아요_삭제_api/:
                   value: |-
@@ -182,8 +177,6 @@ paths:
                       "status" : 200,
                       "message" : "요청이 성공했습니다."
                     }
-      security:
-      - bearerAuthJWT: []
 components:
   schemas:
     user-timetables-festivals-2067042806:
@@ -225,7 +218,7 @@ components:
         status:
           type: number
           description: "200"
-    user-timetables-festivals-1478031720:
+    user-favorites-artists-artistId-1478031720:
       type: object
       properties:
         message:
@@ -234,8 +227,3 @@ components:
         status:
           type: number
           description: "200"
-  securitySchemes:
-    bearerAuthJWT:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT

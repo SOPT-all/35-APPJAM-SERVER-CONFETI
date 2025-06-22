@@ -1,12 +1,8 @@
 package org.sopt.confeti.restdocs.api.user;
 
-import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
 import static io.restassured.RestAssured.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,24 +13,29 @@ import org.springframework.restdocs.payload.JsonFieldType;
 
 public class UserTimetable extends APIBaseTest {
 
+    private static final String TAG = "user-timetable";
+
     @Test
     @DisplayName("타임테이블에 페스티벌 추가 API 테스트")
     void 타임테이블_페스티벌_추가_API() {
         given(this.spec)
-                .filter(document(DEFAULT_RESTDOC_PATH,
-                        requestHeaders(
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"),
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("application/json")
-                        ),
-                        requestFields(
-                                fieldWithPath("festivals").type(JsonFieldType.ARRAY).description("추가할 페스티벌 리스트"),
-                                fieldWithPath("festivals[].festivalId").type(JsonFieldType.NUMBER)
-                                        .description("페스티벌 아이디")
-                        ),
-                        responseFields(
-                                fieldWithPath("status").type(JsonFieldType.NUMBER).description("200"),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description("요청이 성공했습니다.")
-                        )
+                .filter(APIDocument(
+                        tag(TAG)
+                                .description("타임테이블에 페스티벌 추가 API")
+                                .requestHeaders(
+                                        headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰"),
+                                        headerWithName(HttpHeaders.CONTENT_TYPE).description("application/json")
+                                )
+                                .requestFields(
+                                        fieldWithPath("festivals").type(JsonFieldType.ARRAY)
+                                                .description("추가할 페스티벌 리스트"),
+                                        fieldWithPath("festivals[].festivalId").type(JsonFieldType.NUMBER)
+                                                .description("페스티벌 아이디")
+                                )
+                                .responseFields(
+                                        fieldWithPath("status").type(JsonFieldType.NUMBER).description("200"),
+                                        fieldWithPath("message").type(JsonFieldType.STRING).description("요청이 성공했습니다.")
+                                )
                 ))
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .contentType("application/json")
