@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
@@ -450,5 +451,17 @@ public abstract class APIBaseTest {
         return document(DEFAULT_RESTDOC_PATH,
                 resource(resourceSnippetParametersBuilder.build())
         );
+    }
+
+    protected Object detail(Object obj) {
+        return obj;
+    }
+
+    protected Object detail(Object... objs) {
+        List<String> details = Arrays.stream(objs)
+                .map(String::valueOf)
+                .toList();
+
+        return String.join("<br>", details);
     }
 }
