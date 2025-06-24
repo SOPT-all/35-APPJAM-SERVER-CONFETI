@@ -16,16 +16,16 @@ import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusicArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
 @RequiredArgsConstructor
 public class UserOnboardFacade {
 
+    private static final int FIXED_RELATED_ARTISTS_FETCH_SIZE = 50;
+
     private final MusicAPIHandler musicAPIHandler;
     private final UserService userService;
-    private final RedisTemplate<String, Object> redisTemplate;
     private final UserOnboardService userOnboardService;
 
     public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(String term, int limit) {
@@ -48,10 +48,21 @@ public class UserOnboardFacade {
         return UserOnboardTopArtistsDTO.from(topArtists);
     }
 
-    public UserOnboardRelatedArtistsDTO getRelatedArtists(String artistId, int limit) {
-        return UserOnboardRelatedArtistsDTO.from(
-                musicAPIHandler.getRelatedArtists(artistId, limit)
-        );
+    public UserOnboardRelatedArtistsDTO getRelatedArtists(long userId, String artistId, int limit) {
+        Set<String> topArtistIds = userOnboardService.getCachedTopArtists(userId);
+        List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(artistId,
+                        FIXED_RELATED_ARTISTS_FETCH_SIZE).stream()
+                .filter(artist -> !topArtistIds.contains(artist.getId()))
+                .limit(limit)
+                .toList();
+        List<String> relatedArtistIds = relatedArtists.stream()
+                .map(ConfetiArtist::getId)
+                .toList();
+
+        topArtistIds.addAll(relatedArtistIds);
+        userOnboardService.cacheTopArtists(userId, UserOnboardCacheTopArtistsDTO.from(topArtistIds));
+
+        return UserOnboardRelatedArtistsDTO.from(relatedArtists);
     }
 
     @Transactional(readOnly = true)

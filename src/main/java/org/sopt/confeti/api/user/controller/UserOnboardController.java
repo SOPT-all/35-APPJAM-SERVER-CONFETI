@@ -38,7 +38,7 @@ public class UserOnboardController {
             @PathVariable String artistId,
             @RequestParam(defaultValue = "1") @Min(1) @Max(30) Integer limit
     ) {
-        UserOnboardRelatedArtistsDTO relatedArtists = userOnboardFacade.getRelatedArtists(artistId, limit);
+        UserOnboardRelatedArtistsDTO relatedArtists = userOnboardFacade.getRelatedArtists(userId, artistId, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserOnboardRelatedArtistsResponse.from(relatedArtists));
     }
 
