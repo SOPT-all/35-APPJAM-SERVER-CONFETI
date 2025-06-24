@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.user.application.dto.request.UserOnboardCacheTopArtistsDTO;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 public class UserOnboardService {
 
     private static final String REDIS_KEY_PREFIX = "user:onboard:top-artists:%d";
+    private static final int REDIS_TTL_DAY = 1;
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
@@ -37,7 +39,7 @@ public class UserOnboardService {
     }
 
     public void cacheTopArtists(long userId, UserOnboardCacheTopArtistsDTO artistsDTO) {
-        redisTemplate.opsForValue().set(generateRedisKey(userId), artistsDTO.artistIds());
+        redisTemplate.opsForValue().set(generateRedisKey(userId), artistsDTO.artistIds(), REDIS_TTL_DAY, TimeUnit.DAYS);
     }
 
     public void flushCachedTopArtists(long userId) {
