@@ -287,6 +287,10 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
             return List.of();
         }
 
+        if (Objects.isNull(searchResult.results())) {
+            return List.of();
+        }
+
         return convertToConfetiArtists(searchResult.results().artists());
     }
 

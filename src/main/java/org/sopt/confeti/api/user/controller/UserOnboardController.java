@@ -48,7 +48,7 @@ public class UserOnboardController {
             @RequestParam String term,
             @RequestParam(defaultValue = "1") @Min(1) @Max(25) Integer limit
     ) {
-        UserOnboardRelatedArtistsDTO relatedArtistsDTO = userOnboardFacade.getArtistsRelatedTerm(term, limit);
+        UserOnboardRelatedArtistsDTO relatedArtistsDTO = userOnboardFacade.getArtistsRelatedTerm(userId, term, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 UserOnboardRelatedArtistsResponse.from(relatedArtistsDTO));
     }
