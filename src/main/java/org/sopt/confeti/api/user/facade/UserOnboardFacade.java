@@ -78,6 +78,12 @@ public class UserOnboardFacade {
         userOnboardService.cacheTopArtists(userId, UserOnboardCacheTopArtistsDTO.from(topArtists));
     }
 
+    public void cacheTopArtist(long userId, String artistId) {
+        Set<String> topArtistIds = userOnboardService.getCachedTopArtists(userId);
+        topArtistIds.add(artistId);
+        userOnboardService.cacheTopArtists(userId, UserOnboardCacheTopArtistsDTO.from(topArtistIds));
+    }
+
     private void cacheTopArtists(long userId, List<ConfetiArtist> artists) {
         Set<String> topArtistIds = userOnboardService.getCachedTopArtists(userId);
 
