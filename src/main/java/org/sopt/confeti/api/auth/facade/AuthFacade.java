@@ -20,6 +20,7 @@ import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService
 import org.sopt.confeti.domain.user.AuthUser;
 import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.domain.user.application.UserOnboardService;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Facade;
@@ -38,6 +39,7 @@ public class AuthFacade {
     private final OnboardService onboardService;
     private final WithdrawService withdrawService;
     private final WebhookService webhookService;
+    private final UserOnboardService userOnboardService;
 
     @Transactional
     public LoginResult login(LoginCommand loginCommand) {
@@ -75,6 +77,10 @@ public class AuthFacade {
         onboardService.validateFavoriteArtistCount(favoriteArtistIds);
         artistFavoriteService.addFavorites(user, favoriteArtistIds);
         user.setRole(Role.GENERAL);
+    }
+
+    public void flushCachedTopArtists(long userId) {
+        userOnboardService.flushCachedTopArtists(userId);
     }
 
     @Transactional

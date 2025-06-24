@@ -62,6 +62,7 @@ public class AuthController {
             @Valid @RequestBody OnboardRequest request
     ) {
         authFacade.onboard(userId, OnboardDTO.from(request));
+        authFacade.flushCachedTopArtists(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
