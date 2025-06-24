@@ -39,4 +39,8 @@ public class UserOnboardService {
     public void cacheTopArtists(long userId, UserOnboardCacheTopArtistsDTO artistsDTO) {
         redisTemplate.opsForValue().set(generateRedisKey(userId), artistsDTO.artistIds());
     }
+
+    public void flushCachedTopArtists(long userId) {
+        redisTemplate.delete(generateRedisKey(userId));
+    }
 }
