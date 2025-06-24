@@ -23,13 +23,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserOnboardFacade {
 
     private static final int FIXED_RELATED_ARTISTS_FETCH_SIZE = 50;
+    private static final int FIXED_SEARCH_ARTISTS_FETCH_SIZE = 25;
 
     private final MusicAPIHandler musicAPIHandler;
     private final UserService userService;
     private final UserOnboardService userOnboardService;
 
-    public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(String term, int limit) {
-        return UserOnboardRelatedArtistsDTO.from(musicAPIHandler.findArtistsByKeyword(term, limit));
+    public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(long userId, String term, int limit) {
+        Set<String> topArtistIds = userOnboardService.getCachedTopArtists(userId);
+        List<ConfetiArtist> artists = musicAPIHandler.findArtistsByKeyword(term, FIXED_SEARCH_ARTISTS_FETCH_SIZE)
+                .stream()
+                .filter(artist -> !topArtistIds.contains(artist.getId()))
+                .limit(limit)
+                .toList();
+
+        return UserOnboardRelatedArtistsDTO.from(artists);
     }
 
     public UserOnboardTopArtistsDTO getTopArtists(int limit) {
@@ -55,12 +63,8 @@ public class UserOnboardFacade {
                 .filter(artist -> !topArtistIds.contains(artist.getId()))
                 .limit(limit)
                 .toList();
-        List<String> relatedArtistIds = relatedArtists.stream()
-                .map(ConfetiArtist::getId)
-                .toList();
 
-        topArtistIds.addAll(relatedArtistIds);
-        userOnboardService.cacheTopArtists(userId, UserOnboardCacheTopArtistsDTO.from(topArtistIds));
+        cacheTopArtists(userId, relatedArtists);
 
         return UserOnboardRelatedArtistsDTO.from(relatedArtists);
     }
@@ -72,5 +76,16 @@ public class UserOnboardFacade {
         }
 
         userOnboardService.cacheTopArtists(userId, UserOnboardCacheTopArtistsDTO.from(topArtists));
+    }
+
+    private void cacheTopArtists(long userId, List<ConfetiArtist> artists) {
+        Set<String> topArtistIds = userOnboardService.getCachedTopArtists(userId);
+
+        List<String> artistIds = artists.stream()
+                .map(ConfetiArtist::getId)
+                .toList();
+        topArtistIds.addAll(artistIds);
+
+        userOnboardService.cacheTopArtists(userId, UserOnboardCacheTopArtistsDTO.from(topArtistIds));
     }
 }
