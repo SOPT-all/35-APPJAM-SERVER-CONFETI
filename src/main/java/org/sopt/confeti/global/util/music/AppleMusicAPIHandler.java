@@ -54,7 +54,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     private static final int REDIS_TTL_DAY = 1;
     private static final String REDIS_KEY_BASE = "apple-music-api:";
     private static final String REDIS_KEY_ARTISTS = REDIS_KEY_BASE + "artists:";
-    private static final String REDIS_KEY_ARTISTS_RELATED = REDIS_KEY_BASE + "artists-related:";
+    private static final String REDIS_KEY_ARTISTS_RELATED = REDIS_KEY_BASE + "artists-related:%s:%d";
     private static final String REDIS_KEY_ARTISTS_TOP_MUSICS = REDIS_KEY_BASE + "artists:top-musics:";
     private static final String REDIS_KEY_MUSICS = REDIS_KEY_BASE + "musics:";
     private static final String REDIS_KEY_TOP_MUSICS = REDIS_KEY_BASE + "top-musics";
@@ -160,7 +160,8 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiArtist> getCachedRelatedArtists(final String artistId, final int limit) {
-        Object raw = redisTemplate.opsForValue().get(REDIS_KEY_ARTISTS_RELATED + artistId);
+        String key = String.format(REDIS_KEY_ARTISTS_RELATED, artistId, limit);
+        Object raw = redisTemplate.opsForValue().get(key);
         if (Objects.isNull(raw)) {
             return List.of();
         }
@@ -173,8 +174,10 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                 .toList();
     }
 
-    private void cachingRelatedArtists(final String artistId, final List<ConfetiArtist> artists) {
-        redisTemplate.opsForValue().set(REDIS_KEY_ARTISTS_RELATED + artistId, artists, REDIS_TTL_DAY, TimeUnit.DAYS);
+    private void cacheRelatedArtists(final String artistId, final int limit, final List<ConfetiArtist> artists) {
+        String key = String.format(REDIS_KEY_ARTISTS_RELATED, artistId, limit);
+        redisTemplate.opsForValue()
+                .set(key, artists, REDIS_TTL_DAY, TimeUnit.DAYS);
     }
 
     @Override
@@ -199,7 +202,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                         .connect(headers)
                         .retrieve(AppleMusicArtistsResponse.class)
         );
-        cachingRelatedArtists(artistId, artists);
+        cacheRelatedArtists(artistId, limit, artists);
 
         return artists;
     }
@@ -634,7 +637,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         if (Objects.isNull(artistMusics.data())) {
             return MusicPage.empty();
         }
-        
+
         return MusicPage.of(
                 artistMusics.next(),
                 artistMusics.data().stream()
