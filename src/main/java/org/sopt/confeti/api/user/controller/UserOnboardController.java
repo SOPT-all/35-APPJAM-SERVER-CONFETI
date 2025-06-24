@@ -60,6 +60,7 @@ public class UserOnboardController {
             @RequestParam(required = false, defaultValue = "100") @Min(1) @Max(200) int limit
     ) {
         UserOnboardTopArtistsDTO topArtists = userOnboardFacade.getTopArtists(limit);
+        userOnboardFacade.cacheTopArtistsToUser(userId, topArtists);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserOnboardTopArtistsResponse.from(topArtists));
     }
 }
