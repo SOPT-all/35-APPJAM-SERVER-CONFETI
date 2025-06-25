@@ -4,8 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.auth.dto.request.LoginRequest;
 import org.sopt.confeti.api.auth.dto.request.OnboardRequest;
+import org.sopt.confeti.api.auth.dto.response.GetIsOnboardingResponse;
 import org.sopt.confeti.api.auth.facade.AuthFacade;
 import org.sopt.confeti.api.auth.facade.dto.request.OnboardDTO;
+import org.sopt.confeti.api.auth.facade.dto.response.GetIsOnboardingDTO;
 import org.sopt.confeti.auth.Token;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
@@ -18,6 +20,7 @@ import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -53,6 +56,13 @@ public class AuthController {
     public ResponseEntity<BaseResponse<?>> logout(@UserId Long userId) {
         authFacade.logout(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @Permission(role = {Role.ONBOARDING, Role.GENERAL, Role.ADMIN})
+    @GetMapping("/onboard")
+    public ResponseEntity<BaseResponse<?>> getIsOnboarding(@UserId Long userId) {
+        GetIsOnboardingDTO isOnboardingDTO = authFacade.getIsOnboarding(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, GetIsOnboardingResponse.from(isOnboardingDTO));
     }
 
     @Permission(role = {Role.ONBOARDING})

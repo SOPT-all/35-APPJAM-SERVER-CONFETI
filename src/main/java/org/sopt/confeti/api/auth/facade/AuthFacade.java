@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.auth.facade.dto.request.OnboardArtistDTO;
 import org.sopt.confeti.api.auth.facade.dto.request.OnboardDTO;
+import org.sopt.confeti.api.auth.facade.dto.response.GetIsOnboardingDTO;
 import org.sopt.confeti.auth.LoginService;
 import org.sopt.confeti.auth.LogoutService;
 import org.sopt.confeti.auth.OnboardService;
@@ -63,6 +64,12 @@ public class AuthFacade {
     @Transactional
     public void logout(Long userId) {
         logoutService.logout(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public GetIsOnboardingDTO getIsOnboarding(long userId) {
+        Role userRole = userService.getRole(userId);
+        return GetIsOnboardingDTO.from(userRole);
     }
 
     @Transactional
