@@ -1,9 +1,13 @@
 package org.sopt.confeti.restdocs.base;
 
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyUris;
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
+import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
@@ -11,6 +15,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
@@ -55,6 +60,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
@@ -210,7 +216,7 @@ public abstract class APIBaseTest {
                 .addFilter(documentationConfiguration(provider)
                         .operationPreprocessors()
                         .withRequestDefaults(
-                                modifyUris().scheme("http").host("localhost").port(8080),
+                                modifyHeaders().set("Authorization", "Bearer {access_token}"),
                                 prettyPrint()
                         )
                         .withResponseDefaults(prettyPrint())
@@ -430,5 +436,30 @@ public abstract class APIBaseTest {
         ).orElseThrow(
                 () -> new NotFoundException(ErrorMessage.NOT_FOUND)
         );
+    }
+
+    /**
+     * 문서 구성 함수
+     */
+    protected ResourceSnippetParametersBuilder tag(String name) {
+        return ResourceSnippetParameters.builder().tag(name);
+    }
+
+    protected RestDocumentationFilter APIDocument(ResourceSnippetParametersBuilder resourceSnippetParametersBuilder) {
+        return document(DEFAULT_RESTDOC_PATH,
+                resource(resourceSnippetParametersBuilder.build())
+        );
+    }
+
+    protected Object detail(Object obj) {
+        return obj;
+    }
+
+    protected Object detail(Object... objs) {
+        List<String> details = Arrays.stream(objs)
+                .map(String::valueOf)
+                .toList();
+
+        return String.join("<br>", details);
     }
 }
