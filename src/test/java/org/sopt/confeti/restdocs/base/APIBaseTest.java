@@ -3,7 +3,6 @@ package org.sopt.confeti.restdocs.base;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyUris;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
@@ -217,7 +216,6 @@ public abstract class APIBaseTest {
                 .addFilter(documentationConfiguration(provider)
                         .operationPreprocessors()
                         .withRequestDefaults(
-                                modifyUris().scheme("https").host("api.confeti.xyz").port(443),
                                 modifyHeaders().set("Authorization", "Bearer {access_token}"),
                                 prettyPrint()
                         )
