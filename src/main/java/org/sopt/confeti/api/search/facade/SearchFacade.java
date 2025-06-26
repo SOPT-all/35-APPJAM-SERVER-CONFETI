@@ -90,10 +90,10 @@ public class SearchFacade {
 
     @Transactional(readOnly = true)
     public SearchResultDTO getHomeSearchResultWithTerm(Long userId, String term) {
-        // 검색어 저장 추가
         PerformanceSearchTermAnalyzeResult analyzeResult = SearchTermAnalyzer.analyzePerformance(term);
 
         Optional<ConfetiArtist> artist = musicAPIHandler.findArtistByKeyword(analyzeResult.processedTerm());
+        searchTermService.write(artist);
         boolean artistFavorite = false;
 
         if (Objects.nonNull(userId) && artist.isPresent()) {
@@ -117,6 +117,7 @@ public class SearchFacade {
                 .toList();
 
         performances.addAll(searchedPerformances);
+        searchTermService.write(performances);
 
         Map<Long, Boolean> performanceFavorites = performances.stream()
                 .collect(Collectors.toMap(
