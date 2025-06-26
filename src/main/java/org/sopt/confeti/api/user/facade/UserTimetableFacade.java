@@ -154,26 +154,9 @@ public class UserTimetableFacade {
         );
     }
 
-    @Transactional(readOnly = true)
     public UserTimetableFestivalBasicDTO getTimetableInfo(final long userId, final long festivalDateId) {
-        validateUserExists(userId);
-
         FestivalDate festivalDate = festivalDateService.findFestivalDateId(festivalDateId);
-
-        List<Long> festivalTimeIds = festivalDate.getStages().stream()
-                .flatMap(festivalStage -> festivalStage.getTimes().stream())
-                .map(FestivalTime::getId)
-                .toList();
-        validateExistFestivalTimeIds(festivalTimeIds);
-
-        List<UserTimetable> userTimetables = userTimetableService.getUserTimetablesByFestivalTimeId(userId,
-                festivalTimeIds);
-        validateExistUserTimetables(userTimetables);
-
-        Map<Long, UserTimetable> userTimetableMapper = createUserTimetableMapper(userTimetables);
-        validateExistUserTimetableMapper(userTimetableMapper);
-
-        return UserTimetableFestivalBasicDTO.of(festivalDate, userTimetableMapper);
+        return getUserTimetableDTO(userId, festivalDate);
     }
 
     @Transactional(readOnly = true)
@@ -226,6 +209,22 @@ public class UserTimetableFacade {
         }
     }
 
+    private UserTimetableFestivalBasicDTO getUserTimetableDTO(final long userId, FestivalDate festivalDate) {
+        List<Long> festivalTimeIds = festivalDate.getStages().stream()
+                .flatMap(festivalStage -> festivalStage.getTimes().stream())
+                .map(FestivalTime::getId)
+                .toList();
+        validateExistFestivalTimeIds(festivalTimeIds);
+
+        List<UserTimetable> userTimetables = userTimetableService.getUserTimetablesByFestivalTimeId(userId, festivalTimeIds);
+        validateExistUserTimetables(userTimetables);
+
+        Map<Long, UserTimetable> userTimetableMapper = createUserTimetableMapper(userTimetables);
+        validateExistUserTimetableMapper(userTimetableMapper);
+
+        return UserTimetableFestivalBasicDTO.of(festivalDate, userTimetableMapper);
+    }
+
     private Map<Long, UserTimetable> createUserTimetableMapper(List<UserTimetable> userTimetables) {
         return userTimetables.stream()
                 .collect(Collectors.toMap(userTimetable ->
@@ -274,6 +273,11 @@ public class UserTimetableFacade {
     public UserTimetablePastFestivalDTO getPastFestivalInfo(long userId, long festivalId) {
         TimetableFestival festival = timetableFestivalService.getPastFestivalInfo(userId, festivalId);
         return UserTimetablePastFestivalDTO.from(festival);
+    }
+
+    public UserTimetableFestivalBasicDTO getPastFestivalDateInfo(final long userId, final long festivalDateId) {
+        FestivalDate festivalDate = festivalDateService.findAllFestivalDateById(festivalDateId);
+        return getUserTimetableDTO(userId, festivalDate);
     }
 }
 

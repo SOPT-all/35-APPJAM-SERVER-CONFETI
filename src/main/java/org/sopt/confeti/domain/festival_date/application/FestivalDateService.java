@@ -24,4 +24,13 @@ public class FestivalDateService {
 
         return festivalDate;
     }
+
+    @Transactional(readOnly = true)
+    public FestivalDate findAllFestivalDateById(final long festivalDateId) {
+        FestivalDate festivalDate = festivalDateRepository.findAllFestivalDateById(festivalDateId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+        musicAPIResolver.load(festivalDate);
+
+        return festivalDate;
+    }
 }

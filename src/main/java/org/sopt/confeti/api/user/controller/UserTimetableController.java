@@ -139,7 +139,7 @@ public class UserTimetableController {
                 UserTimetablesPreviewResponse.of(timetables, s3FileHandler));
     }
 
-    @GetMapping("/history/{festivalId}")
+    @GetMapping("/archive/{festivalId}")
     public ResponseEntity<BaseResponse<?>> getPastFestivalInfo(
             @UserId Long userId,
             @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId
@@ -147,5 +147,15 @@ public class UserTimetableController {
         UserTimetablePastFestivalDTO pastFestivalDTO = userTimetableFacade.getPastFestivalInfo(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 UserTimetablePastFestivalResponse.of(pastFestivalDTO, s3FileHandler));
+    }
+
+    @GetMapping("/archive/festival/{festivalDateId}")
+    public ResponseEntity<BaseResponse<?>> getPastFestivalDateInfo(
+            @UserId Long userId,
+            @PathVariable(name = "festivalDateId") @Min(RequestConstraint.ID) Long festivalDateId
+    ) {
+        UserTimetableFestivalBasicDTO festivalBasicDTO = userTimetableFacade.getPastFestivalDateInfo(userId, festivalDateId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                UserTimetableFestivalResponse.from(festivalBasicDTO));
     }
 }
