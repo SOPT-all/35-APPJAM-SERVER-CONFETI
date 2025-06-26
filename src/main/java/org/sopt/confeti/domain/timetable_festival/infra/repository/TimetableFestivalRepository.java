@@ -1,6 +1,7 @@
 package org.sopt.confeti.domain.timetable_festival.infra.repository;
 
 import java.util.List;
+import java.util.Optional;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,7 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
 
     @Query("SELECT tf.festival.id FROM TimetableFestival tf WHERE tf.user.id = :userId")
     List<Long> findFestivalIdsByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT tf FROM TimetableFestival tf JOIN FETCH tf.festival f LEFT JOIN FETCH f.dates d WHERE tf.user.id = :userId AND tf.festival.id = :festivalId")
+    Optional<TimetableFestival> findByUserIdAndFestivalId(@Param("userId") Long userId, final long festivalId);
 }

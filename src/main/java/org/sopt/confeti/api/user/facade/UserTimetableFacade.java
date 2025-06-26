@@ -7,15 +7,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalArtiestDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
-import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDetailFestivalsDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableHistoryDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetablesDTO;
+import org.sopt.confeti.api.user.facade.dto.response.*;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
@@ -37,6 +34,7 @@ import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Facade
 @RequiredArgsConstructor
 public class UserTimetableFacade {
@@ -274,6 +272,11 @@ public class UserTimetableFacade {
     public UserTimetableHistoryDTO getHasTimetableHistory(long userId) {
         boolean hasTimetableHistory = userService.getHasTimetableHistory(userId);
         return UserTimetableHistoryDTO.from(hasTimetableHistory);
+    }
+
+    public UserTimetablePastFestivalDTO getPastFestivalInfo(long userId, long festivalId) {
+        TimetableFestival festival = timetableFestivalService.getPastFestivalInfo(userId, festivalId);
+        return UserTimetablePastFestivalDTO.from(festival);
     }
 }
 
