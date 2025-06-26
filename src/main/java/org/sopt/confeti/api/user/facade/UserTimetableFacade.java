@@ -220,7 +220,6 @@ public class UserTimetableFacade {
         return UserTimetablesDTO.from(userTimetables);
     }
 
-    @Transactional(readOnly = true)
     protected void validateExistFestivalTimeIds(final List<Long> festivalTimeIds) {
         if (festivalTimeIds == null || festivalTimeIds.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
@@ -234,14 +233,12 @@ public class UserTimetableFacade {
                 );
     }
 
-    @Transactional(readOnly = true)
     protected void validateExistUserTimetableMapper(Map<Long, UserTimetable> userTimetables) {
         if (userTimetables.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
-    @Transactional(readOnly = true)
     protected void validateExistUserTimetables(List<UserTimetable> userTimetables) {
         if (userTimetables.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
