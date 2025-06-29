@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
+import org.sopt.confeti.api.user.facade.dto.response.onboard.GetIsOnboardingDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedArtistsDTO;
 import org.sopt.confeti.domain.user.application.UserOnboardService;
 import org.sopt.confeti.domain.user.application.UserService;
@@ -16,6 +17,7 @@ import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusicArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
+import org.springframework.transaction.annotation.Transactional;
 
 @Facade
 @RequiredArgsConstructor
@@ -91,5 +93,11 @@ public class UserOnboardFacade {
         topArtistIds.addAll(artistIds);
 
         userOnboardService.cacheTopArtists(userId, UserOnboardCacheTopArtistsDTO.from(topArtistIds));
+    }
+
+    @Transactional(readOnly = true)
+    public GetIsOnboardingDTO getIsOnboarding(long userId) {
+        Role userRole = userService.getRole(userId);
+        return GetIsOnboardingDTO.from(userRole);
     }
 }
