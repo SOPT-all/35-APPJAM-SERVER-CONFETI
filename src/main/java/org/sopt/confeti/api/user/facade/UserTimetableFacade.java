@@ -270,13 +270,13 @@ public class UserTimetableFacade {
         return UserTimetableHistoryDTO.from(hasTimetableHistory);
     }
 
-    public UserTimetablePastFestivalDTO getPastFestivalInfo(long userId, long festivalId) {
-        TimetableFestival festival = timetableFestivalService.getPastFestivalInfo(userId, festivalId);
-        return UserTimetablePastFestivalDTO.from(festival);
+    public UserTimetableEntireFestivalDTO getEntireFestivalInfo(long userId, long festivalId) {
+        TimetableFestival festival = timetableFestivalService.getEntireFestivalInfo(userId, festivalId);
+        return UserTimetableEntireFestivalDTO.from(festival);
     }
 
-    public UserTimetableFestivalBasicDTO getPastFestivalDateInfo(final long userId, final long festivalDateId) {
-        FestivalDate festivalDate = festivalDateService.findAllFestivalDateById(festivalDateId);
+    public UserTimetableFestivalBasicDTO getEntireFestivalDateInfo(final long userId, final long festivalDateId) {
+        FestivalDate festivalDate = festivalDateService.findEntireFestivalDateById(festivalDateId);
         return getUserTimetableDTO(userId, festivalDate);
     }
 }

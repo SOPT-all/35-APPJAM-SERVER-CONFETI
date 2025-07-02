@@ -65,7 +65,7 @@ public class TimetableFestivalService {
     }
 
     @Transactional(readOnly = true)
-    public TimetableFestival getPastFestivalInfo(final long userId, final long festivalId) {
+    public TimetableFestival getEntireFestivalInfo(final long userId, final long festivalId) {
         return timetableFestivalRepository.findByUserIdAndFestivalId(userId, festivalId)
                 .orElseThrow(()->new NotFoundException(ErrorMessage.NOT_FOUND));
     }

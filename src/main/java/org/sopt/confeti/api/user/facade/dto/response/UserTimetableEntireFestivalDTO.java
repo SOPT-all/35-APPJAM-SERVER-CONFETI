@@ -4,7 +4,7 @@ import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import java.time.LocalDate;
 import java.util.List;
 
-public record UserTimetablePastFestivalDTO (
+public record UserTimetableEntireFestivalDTO(
         String logoPath,
         String title,
         LocalDate startAt,
@@ -12,8 +12,8 @@ public record UserTimetablePastFestivalDTO (
         String area,
         List<UserTimetableDatesDTO> festivalDates
 ){
-    public static UserTimetablePastFestivalDTO from(TimetableFestival timetableFestival) {
-        return new UserTimetablePastFestivalDTO(
+    public static UserTimetableEntireFestivalDTO from(TimetableFestival timetableFestival) {
+        return new UserTimetableEntireFestivalDTO(
                 timetableFestival.getFestival().getLogoPath(),
                 timetableFestival.getFestival().getTitle(),
                 timetableFestival.getFestival().getStartAt(),
