@@ -1,4 +1,4 @@
-package org.sopt.confeti.api.auth.facade.dto.response;
+package org.sopt.confeti.api.user.facade.dto.response.onboard;
 
 import org.sopt.confeti.domain.user.constant.Role;
 
