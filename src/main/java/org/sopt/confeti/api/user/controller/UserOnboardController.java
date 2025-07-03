@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,7 +39,7 @@ public class UserOnboardController {
             @PathVariable String artistId,
             @RequestParam(defaultValue = "1") @Min(1) @Max(30) Integer limit
     ) {
-        UserOnboardRelatedArtistsDTO relatedArtists = userOnboardFacade.getRelatedArtists(artistId, limit);
+        UserOnboardRelatedArtistsDTO relatedArtists = userOnboardFacade.getRelatedArtists(userId, artistId, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserOnboardRelatedArtistsResponse.from(relatedArtists));
     }
 
@@ -48,7 +49,7 @@ public class UserOnboardController {
             @RequestParam String term,
             @RequestParam(defaultValue = "1") @Min(1) @Max(25) Integer limit
     ) {
-        UserOnboardRelatedArtistsDTO relatedArtistsDTO = userOnboardFacade.getArtistsRelatedTerm(term, limit);
+        UserOnboardRelatedArtistsDTO relatedArtistsDTO = userOnboardFacade.getArtistsRelatedTerm(userId, term, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 UserOnboardRelatedArtistsResponse.from(relatedArtistsDTO));
     }
@@ -60,6 +61,17 @@ public class UserOnboardController {
             @RequestParam(required = false, defaultValue = "100") @Min(1) @Max(200) int limit
     ) {
         UserOnboardTopArtistsDTO topArtists = userOnboardFacade.getTopArtists(limit);
+        userOnboardFacade.cacheTopArtistsToUser(userId, topArtists);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserOnboardTopArtistsResponse.from(topArtists));
+    }
+
+    @Permission(role = {Role.ONBOARDING})
+    @PostMapping("/artists/{artistId}")
+    public ResponseEntity<BaseResponse<?>> addArtist(
+            @UserId Long userId,
+            @PathVariable String artistId
+    ) {
+        userOnboardFacade.cacheTopArtist(userId, artistId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }
