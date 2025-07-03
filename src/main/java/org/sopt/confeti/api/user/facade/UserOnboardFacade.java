@@ -16,7 +16,6 @@ import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusicArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
-import org.springframework.transaction.annotation.Transactional;
 
 @Facade
 @RequiredArgsConstructor
@@ -69,7 +68,6 @@ public class UserOnboardFacade {
         return UserOnboardRelatedArtistsDTO.from(relatedArtists);
     }
 
-    @Transactional(readOnly = true)
     public void cacheTopArtistsToUser(Long userId, UserOnboardTopArtistsDTO topArtists) {
         if (!userService.existsById(userId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
