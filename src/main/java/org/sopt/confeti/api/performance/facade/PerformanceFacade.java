@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +21,13 @@ import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
@@ -262,14 +264,14 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public RecommendMusicsPerformanceDTO getRecommendPerformanceId(final Long userId) {
+    public Optional<RecommendMusicsPerformanceDTO> getRecommendPerformanceId(final Long userId) {
 
-        Performance performance = performanceService.getPerformanceByUserFavorites(userId);
-        if (userId == null || performance == null) {
+        Optional<Performance> performance = performanceService.getPerformanceByUserFavorites(userId);
+        if (Objects.isNull(userId) || performance.isEmpty()) {
             performance = performanceService.getPerformanceByRand();
         }
 
-        return RecommendMusicsPerformanceDTO.from(performance);
+        return performance.map(RecommendMusicsPerformanceDTO::from);
     }
 
     protected Set<String> setArtistsByRandom(Performance performance) {
