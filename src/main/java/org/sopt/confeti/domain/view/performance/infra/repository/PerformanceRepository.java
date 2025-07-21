@@ -82,7 +82,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     Optional<Performance> findPerformanceByIdAndEndAtGreaterThanEqual(long performanceId, LocalDate date);
 
     @Query(value = "SELECT p FROM Performance p WHERE p.endAt >= CURRENT_DATE ORDER BY RAND() LIMIT 1")
-    Performance findPerformanceByRand();
+    Optional<Performance> findPerformanceByRand();
 
     @Query(value = "SELECT p FROM Performance p " +
             "WHERE ((p.type = org.sopt.confeti.global.common.constant.PerformanceType.CONCERT " +
@@ -91,7 +91,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "        AND p.typeId IN (SELECT tf.festival.id FROM TimetableFestival tf WHERE tf.user.id = :userId))) " +
             "AND p.endAt >= CURRENT_DATE " +
             "ORDER BY RAND() ASC LIMIT 1 ")
-    Performance getPerformanceByUserFavorites(final @Param("userId") Long userId);
+    Optional<Performance> getPerformanceByUserFavorites(final @Param("userId") Long userId);
 
     List<Performance> findRecentPerformancesByEndAtGreaterThanEqual(LocalDate now, PageRequest pageRequest);
 
