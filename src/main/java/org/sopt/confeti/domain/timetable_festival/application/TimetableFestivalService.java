@@ -7,6 +7,8 @@ import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.domain.timetable_festival.infra.repository.TimetableFestivalRepository;
 import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.global.exception.NotFoundException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,5 +62,11 @@ public class TimetableFestivalService {
     @Transactional(readOnly = true)
     public List<Long> findFestivalIdsByUserId(final Long userId) {
         return timetableFestivalRepository.findFestivalIdsByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public TimetableFestival getEntireFestivalInfo(final long userId, final long festivalId) {
+        return timetableFestivalRepository.findByUserIdAndFestivalId(userId, festivalId)
+                .orElseThrow(()->new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 }

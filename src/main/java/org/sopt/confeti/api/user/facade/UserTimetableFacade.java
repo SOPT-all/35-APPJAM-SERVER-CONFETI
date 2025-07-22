@@ -7,15 +7,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalArtiestDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
-import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDetailFestivalsDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableHistoryDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetablesDTO;
+import org.sopt.confeti.api.user.facade.dto.response.*;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
@@ -156,26 +153,9 @@ public class UserTimetableFacade {
         );
     }
 
-    @Transactional(readOnly = true)
     public UserTimetableFestivalBasicDTO getTimetableInfo(final long userId, final long festivalDateId) {
-        validateUserExists(userId);
-
         FestivalDate festivalDate = festivalDateService.findFestivalDateId(festivalDateId);
-
-        List<Long> festivalTimeIds = festivalDate.getStages().stream()
-                .flatMap(festivalStage -> festivalStage.getTimes().stream())
-                .map(FestivalTime::getId)
-                .toList();
-        validateExistFestivalTimeIds(festivalTimeIds);
-
-        List<UserTimetable> userTimetables = userTimetableService.getUserTimetablesByFestivalTimeId(userId,
-                festivalTimeIds);
-        validateExistUserTimetables(userTimetables);
-
-        Map<Long, UserTimetable> userTimetableMapper = createUserTimetableMapper(userTimetables);
-        validateExistUserTimetableMapper(userTimetableMapper);
-
-        return UserTimetableFestivalBasicDTO.of(festivalDate, userTimetableMapper);
+        return getUserTimetableDTO(userId, festivalDate);
     }
 
     @Transactional(readOnly = true)
@@ -222,11 +202,26 @@ public class UserTimetableFacade {
         return UserTimetablesDTO.from(userTimetables);
     }
 
-    @Transactional(readOnly = true)
     protected void validateExistFestivalTimeIds(final List<Long> festivalTimeIds) {
         if (festivalTimeIds == null || festivalTimeIds.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
+    }
+
+    private UserTimetableFestivalBasicDTO getUserTimetableDTO(final long userId, FestivalDate festivalDate) {
+        List<Long> festivalTimeIds = festivalDate.getStages().stream()
+                .flatMap(festivalStage -> festivalStage.getTimes().stream())
+                .map(FestivalTime::getId)
+                .toList();
+        validateExistFestivalTimeIds(festivalTimeIds);
+
+        List<UserTimetable> userTimetables = userTimetableService.getUserTimetablesByFestivalTimeId(userId, festivalTimeIds);
+        validateExistUserTimetables(userTimetables);
+
+        Map<Long, UserTimetable> userTimetableMapper = createUserTimetableMapper(userTimetables);
+        validateExistUserTimetableMapper(userTimetableMapper);
+
+        return UserTimetableFestivalBasicDTO.of(festivalDate, userTimetableMapper);
     }
 
     private Map<Long, UserTimetable> createUserTimetableMapper(List<UserTimetable> userTimetables) {
@@ -236,14 +231,12 @@ public class UserTimetableFacade {
                 );
     }
 
-    @Transactional(readOnly = true)
     protected void validateExistUserTimetableMapper(Map<Long, UserTimetable> userTimetables) {
         if (userTimetables.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
-    @Transactional(readOnly = true)
     protected void validateExistUserTimetables(List<UserTimetable> userTimetables) {
         if (userTimetables.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
@@ -274,6 +267,16 @@ public class UserTimetableFacade {
     public UserTimetableHistoryDTO getHasTimetableHistory(long userId) {
         boolean hasTimetableHistory = userService.getHasTimetableHistory(userId);
         return UserTimetableHistoryDTO.from(hasTimetableHistory);
+    }
+
+    public UserTimetableEntireFestivalDTO getEntireFestivalInfo(long userId, long festivalId) {
+        TimetableFestival festival = timetableFestivalService.getEntireFestivalInfo(userId, festivalId);
+        return UserTimetableEntireFestivalDTO.from(festival);
+    }
+
+    public UserTimetableFestivalBasicDTO getEntireFestivalDateInfo(final long userId, final long festivalDateId) {
+        FestivalDate festivalDate = festivalDateService.findEntireFestivalDateById(festivalDateId);
+        return getUserTimetableDTO(userId, festivalDate);
     }
 }
 
