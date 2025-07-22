@@ -3,16 +3,23 @@ package org.sopt.confeti.restdocs.base;
 import java.time.Duration;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
+import org.testcontainers.junit.jupiter.Container;
 
 public final class SharedTestContainers {
 
     private static final String ELASTICSEARCH_IMAGE = "docker.elastic.co/elasticsearch/elasticsearch:9.0.1";
     private static final String MYSQL_IMAGE = "mysql:8.0";
-    private static final String REDIS_IMAGE = "redis:latest";
+    private static final String REDIS_IMAGE = "bitnami/redis:8.0.3";
 
     public static final int REDIS_PORT = 6379;
+
+    public static final String REDIS_MASTER_HOST = "redis-master";
+    public static final String REDIS_SLAVE_1_HOST = "redis-slave-1";
+    public static final String REDIS_SLAVE_2_HOST = "redis-slave-2";
+
     private static final int STARTUP_TIMEOUT = 120;
 
     public static final MySQLContainer<?> MYSQL_CONTAINER = new MySQLContainer<>(MYSQL_IMAGE)
@@ -38,8 +45,40 @@ public final class SharedTestContainers {
                     .withReuse(true)
                     .withStartupTimeout(Duration.ofSeconds(STARTUP_TIMEOUT));
 
-    public static final GenericContainer<?> REDIS_CONTAINER = new GenericContainer<>(REDIS_IMAGE)
+    private static final Network network = Network.newNetwork();
+
+    @Container
+    public static final GenericContainer<?> REDIS_MASTER = new GenericContainer<>(REDIS_IMAGE)
             .withExposedPorts(REDIS_PORT)
+            .withCommand("redis-server", "--enable-debug-command", "yes", "--protected-mode", "no")
+            .withNetwork(network)
+            .withNetworkAliases(REDIS_MASTER_HOST)
+            .withEnv("ALLOW_EMPTY_PASSWORD", "yes")
+            .withEnv("REDIS_REPLICATION_MODE", "master")
+            .waitingFor(Wait.forListeningPort())
+            .withStartupTimeout(Duration.ofSeconds(STARTUP_TIMEOUT))
+            .withReuse(true);
+
+    @Container
+    public static final GenericContainer<?> REDIS_SLAVE_1 = new GenericContainer<>(REDIS_IMAGE)
+            .withExposedPorts(REDIS_PORT)
+            .withNetwork(network)
+            .withNetworkAliases(REDIS_SLAVE_1_HOST)
+            .withEnv("ALLOW_EMPTY_PASSWORD", "yes")
+            .withEnv("REDIS_MASTER_HOST", REDIS_MASTER_HOST)
+            .withEnv("REDIS_REPLICATION_MODE", "slave")
+            .waitingFor(Wait.forListeningPort())
+            .withStartupTimeout(Duration.ofSeconds(STARTUP_TIMEOUT))
+            .withReuse(true);
+
+    @Container
+    public static final GenericContainer<?> REDIS_SLAVE_2 = new GenericContainer<>(REDIS_IMAGE)
+            .withExposedPorts(REDIS_PORT)
+            .withNetwork(network)
+            .withNetworkAliases(REDIS_SLAVE_2_HOST)
+            .withEnv("ALLOW_EMPTY_PASSWORD", "yes")
+            .withEnv("REDIS_MASTER_HOST", REDIS_MASTER_HOST)
+            .withEnv("REDIS_REPLICATION_MODE", "slave")
             .waitingFor(Wait.forListeningPort())
             .withStartupTimeout(Duration.ofSeconds(STARTUP_TIMEOUT))
             .withReuse(true);
@@ -47,6 +86,8 @@ public final class SharedTestContainers {
     static {
         MYSQL_CONTAINER.start();
         ELASTICSEARCH_CONTAINER.start();
-        REDIS_CONTAINER.start();
+        REDIS_MASTER.start();
+        REDIS_SLAVE_1.start();
+        REDIS_SLAVE_2.start();
     }
 }
