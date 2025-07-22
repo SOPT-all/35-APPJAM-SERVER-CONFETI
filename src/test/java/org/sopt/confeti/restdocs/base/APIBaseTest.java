@@ -156,7 +156,9 @@ public abstract class APIBaseTest {
 
     protected static MySQLContainer<?> mySQLContainer = SharedTestContainers.MYSQL_CONTAINER;
 
-    protected static GenericContainer<?> redisContainer = SharedTestContainers.REDIS_CONTAINER;
+    protected static GenericContainer<?> redisMaster = SharedTestContainers.REDIS_MASTER;
+    protected static GenericContainer<?> redisSlave1 = SharedTestContainers.REDIS_SLAVE_1;
+    protected static GenericContainer<?> redisSlave2 = SharedTestContainers.REDIS_SLAVE_2;
 
     protected static String accessToken = "Empty";
 
@@ -173,9 +175,15 @@ public abstract class APIBaseTest {
         registry.add("spring.elasticsearch.uris", elasticsearchContainer::getHttpHostAddress);
 
         // redis
-        registry.add("spring.data.redis.host", redisContainer::getHost);
-        registry.add("spring.data.redis.port",
-                () -> redisContainer.getMappedPort(SharedTestContainers.REDIS_PORT).toString());
+        registry.add("spring.redis.host", redisMaster::getHost);
+        registry.add("spring.redis.port",
+                () -> redisMaster.getMappedPort(SharedTestContainers.REDIS_PORT).toString());
+        registry.add("spring.redis.slaves[0].host", redisSlave1::getHost);
+        registry.add("spring.redis.slaves[0].port",
+                () -> redisSlave1.getMappedPort(SharedTestContainers.REDIS_PORT).toString());
+        registry.add("spring.redis.slaves[1].host", redisSlave2::getHost);
+        registry.add("spring.redis.slaves[1].port",
+                () -> redisSlave2.getMappedPort(SharedTestContainers.REDIS_PORT).toString());
     }
 
     @BeforeEach
