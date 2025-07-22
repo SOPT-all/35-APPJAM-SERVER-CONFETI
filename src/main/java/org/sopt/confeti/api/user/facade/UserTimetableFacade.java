@@ -34,7 +34,6 @@ import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Facade
 @RequiredArgsConstructor
 public class UserTimetableFacade {
