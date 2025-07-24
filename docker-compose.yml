@@ -1,0 +1,120 @@
+version: "3.8"
+
+networks:
+  confeti-network:
+    driver: bridge
+
+services:
+  redis-master:
+    image: "bitnami/redis:8.0.3"
+    hostname: redis-master
+    container_name: redis-master
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_REPLICATION_MODE=master
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-master-data:/bitnami/redis/data:rw
+    command: redis-server --enable-debug-command yes --protected-mode no
+    networks:
+      - confeti-network
+
+  redis-slave-1:
+    image: "bitnami/redis:8.0.3"
+    hostname: redis-slave-1
+    container_name: redis-slave-1
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_REPLICATION_MODE=slave
+    ports:
+      - "6479:6379"
+    volumes:
+      - redis-slave-1-data:/bitnami/redis/data:rw
+    depends_on:
+      - redis-master
+    networks:
+      - confeti-network
+
+  redis-slave-2:
+    image: "bitnami/redis:8.0.3"
+    hostname: redis-slave-2
+    container_name: redis-slave-2
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_REPLICATION_MODE=slave
+    ports:
+      - "6579:6379"
+    volumes:
+      - redis-slave-2-data:/bitnami/redis/data:rw
+    depends_on:
+      - redis-master
+      - redis-slave-1
+    networks:
+      - confeti-network
+
+  redis-sentinel-1:
+    image: "bitnami/redis-sentinel:8.0.3"
+    hostname: redis-sentinel-1
+    container_name: redis-entinel-1
+    environment:
+      - REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS=3000
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_MASTER_PORT_NUMBER=6379
+      - REDIS_MASTER_SET=mymaster
+      - REDIS_SENTINEL_QUORUM=2
+    depends_on:
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+    ports:
+      - "26379:26379"
+    networks:
+      - confeti-network
+
+  redis-sentinel-2:
+    image: "bitnami/redis-sentinel:8.0.3"
+    hostname: redis-sentinel-2
+    container_name: redis-entinel-2
+    environment:
+      - REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS=3000
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_MASTER_PORT_NUMBER=6379
+      - REDIS_MASTER_SET=mymaster
+      - REDIS_SENTINEL_QUORUM=2
+    depends_on:
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+    ports:
+      - "26380:26379"
+    networks:
+      - confeti-network
+
+  redis-sentinel-3:
+    image: "bitnami/redis-sentinel:8.0.3"
+    hostname: redis-sentinel-3
+    container_name: redis-entinel-3
+    environment:
+      - REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS=3000
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_MASTER_PORT_NUMBER=6379
+      - REDIS_MASTER_SET=mymaster
+      - REDIS_SENTINEL_QUORUM=2
+    depends_on:
+      - redis-master
+      - redis-slave-1
+      - redis-slave-2
+    ports:
+      - "26381:26379"
+    networks:
+      - confeti-network
+
+volumes:
+  mysql-data:
+  redis-master-data:
+  redis-slave-1-data:
+  redis-slave-2-data:
+  kafka-data:
