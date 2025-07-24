@@ -4,11 +4,11 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.response.UserOnboardTopArtistsResponse;
-import org.sopt.confeti.api.user.dto.response.onboard.GetIsOnboardingResponse;
+import org.sopt.confeti.api.user.dto.response.onboard.GetOnboardStatusResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardRelatedArtistsResponse;
 import org.sopt.confeti.api.user.facade.UserOnboardFacade;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
-import org.sopt.confeti.api.user.facade.dto.response.onboard.GetIsOnboardingDTO;
+import org.sopt.confeti.api.user.facade.dto.response.onboard.GetOnboardStatusDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedArtistsDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
@@ -79,8 +79,8 @@ public class UserOnboardController {
 
     @Permission(role = {Role.ONBOARDING, Role.GENERAL, Role.ADMIN})
     @GetMapping("/status")
-    public ResponseEntity<BaseResponse<?>> getIsOnboarding(@UserId Long userId) {
-        GetIsOnboardingDTO isOnboardingDTO = userOnboardFacade.getIsOnboarding(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, GetIsOnboardingResponse.from(isOnboardingDTO));
+    public ResponseEntity<BaseResponse<?>> getOnboardStatus(@UserId Long userId) {
+        GetOnboardStatusDTO onboardStatusDTO = userOnboardFacade.getOnboardStatus(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, GetOnboardStatusResponse.from(onboardStatusDTO));
     }
 }
