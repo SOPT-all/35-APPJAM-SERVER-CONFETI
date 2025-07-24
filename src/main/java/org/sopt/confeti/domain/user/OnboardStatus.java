@@ -7,10 +7,6 @@ public enum OnboardStatus {
     COMPLETED;
 
     public static OnboardStatus get(Role role) {
-        if (role.equals(Role.ONBOARDING)) {
-            return PROCESSING;
-        }
-
-        return COMPLETED;
+        return role == Role.ONBOARDING ? PROCESSING : COMPLETED;
     }
 }
