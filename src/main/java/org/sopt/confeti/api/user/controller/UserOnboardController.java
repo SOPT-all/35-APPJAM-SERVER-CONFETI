@@ -78,7 +78,7 @@ public class UserOnboardController {
     }
 
     @Permission(role = {Role.ONBOARDING, Role.GENERAL, Role.ADMIN})
-    @GetMapping("/state")
+    @GetMapping("/status")
     public ResponseEntity<BaseResponse<?>> getIsOnboarding(@UserId Long userId) {
         GetIsOnboardingDTO isOnboardingDTO = userOnboardFacade.getIsOnboarding(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, GetIsOnboardingResponse.from(isOnboardingDTO));
