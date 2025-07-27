@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 
 @TestConfiguration
 @EnableElasticsearchRepositories(basePackages = "org.sopt.confeti.domain.elastic_search.infra")
-public class ElasticsearchTestConfiguration extends ElasticsearchConfiguration {
+public class ElasticsearchTestConfig extends ElasticsearchConfiguration {
 
     @Bean
     @Primary

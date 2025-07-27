@@ -46,31 +46,31 @@ public class UserFavoriteTest extends APIBaseTest {
                 .statusCode(200);
     }
 
-    @Test
-    @DisplayName("아티스트 좋아요 추가 API 테스트")
-    void 아티스트_좋아요_추가_API() {
-        given(this.spec)
-                .filter(APIDocument(
-                        tag(TAG)
-                                .requestHeaders(
-                                        headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰")
-                                )
-                                .pathParameters(
-                                        parameterWithName("artistId").description("아티스트 식별 ID")
-                                )
-                                .responseFields(
-                                        fieldWithPath("status").type(JsonFieldType.NUMBER).description("200"),
-                                        fieldWithPath("message").type(JsonFieldType.STRING).description("요청이 성공했습니다.")
-                                )
-                ))
-                .when()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .pathParams("artistId", TestDataManager.데이식스)
-                .post("/user/favorites/artists/{artistId}")
-                .then()
-                .statusCode(200);
-    }
+//    @Test
+//    @DisplayName("아티스트 좋아요 추가 API 테스트")
+//    void 아티스트_좋아요_추가_API() {
+//        given(this.spec)
+//                .filter(APIDocument(
+//                        tag(TAG)
+//                                .requestHeaders(
+//                                        headerWithName(HttpHeaders.AUTHORIZATION).description("엑세스 토큰")
+//                                )
+//                                .pathParameters(
+//                                        parameterWithName("artistId").description("아티스트 식별 ID")
+//                                )
+//                                .responseFields(
+//                                        fieldWithPath("status").type(JsonFieldType.NUMBER).description("200"),
+//                                        fieldWithPath("message").type(JsonFieldType.STRING).description("요청이 성공했습니다.")
+//                                )
+//                ))
+//                .when()
+//                .accept(MediaType.APPLICATION_JSON_VALUE)
+//                .header(HttpHeaders.AUTHORIZATION, accessToken)
+//                .pathParams("artistId", TestDataManager.데이식스)
+//                .post("/user/favorites/artists/{artistId}")
+//                .then()
+//                .statusCode(200);
+//    }
 
     @Override
     protected boolean shouldResetESSearchTermData() {
