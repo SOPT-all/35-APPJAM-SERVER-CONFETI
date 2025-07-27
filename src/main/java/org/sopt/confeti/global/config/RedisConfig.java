@@ -3,9 +3,10 @@ package org.sopt.confeti.global.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.ReadFrom;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisStaticMasterReplicaConfiguration;
+import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,6 +14,7 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 @EnableRedisRepositories
@@ -22,18 +24,22 @@ public class RedisConfig {
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
+        log.info("Redis 연결 설정");
+        log.info("timeout : {}", redisInfo.getTimeout());
+
+        RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
+                .master(redisInfo.getSentinel().getMaster());
+
+        redisInfo.getSentinel().getNodes().forEach(node -> {
+            sentinelConfig.sentinel(node.getHost(), node.getPort());
+        });
+
         LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
                 .readFrom(ReadFrom.REPLICA_PREFERRED) // replica -> master read
+                .commandTimeout(redisInfo.getTimeout())
                 .build();
 
-        // replica 설정
-        RedisStaticMasterReplicaConfiguration slaveConfig = new RedisStaticMasterReplicaConfiguration(
-                redisInfo.getHost(), redisInfo.getPort()
-        );
-
-        // slave 설정 값 추가
-        redisInfo.getSlaves().forEach(slave -> slaveConfig.addNode(slave.getHost(), slave.getPort()));
-        return new LettuceConnectionFactory(slaveConfig, clientConfig);
+        return new LettuceConnectionFactory(sentinelConfig, clientConfig);
     }
 
     @Bean

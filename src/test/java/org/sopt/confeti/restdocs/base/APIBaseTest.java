@@ -69,7 +69,7 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(RestDocumentationExtension.class)
-@Import(ElasticsearchTestConfiguration.class)
+@Import(ElasticsearchTestConfig.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class APIBaseTest {
 
@@ -156,9 +156,9 @@ public abstract class APIBaseTest {
 
     protected static MySQLContainer<?> mySQLContainer = SharedTestContainers.MYSQL_CONTAINER;
 
-    protected static GenericContainer<?> redisMaster = SharedTestContainers.REDIS_MASTER;
-    protected static GenericContainer<?> redisSlave1 = SharedTestContainers.REDIS_SLAVE_1;
-    protected static GenericContainer<?> redisSlave2 = SharedTestContainers.REDIS_SLAVE_2;
+    protected static GenericContainer<?> redisSentinel1 = SharedTestContainers.REDIS_SENTINEL_1;
+    protected static GenericContainer<?> redisSentinel2 = SharedTestContainers.REDIS_SENTINEL_2;
+    protected static GenericContainer<?> redisSentinel3 = SharedTestContainers.REDIS_SENTINEL_3;
 
     protected static String accessToken = "Empty";
 
@@ -174,16 +174,31 @@ public abstract class APIBaseTest {
         registry.add("spring.data.elasticsearch.uris", elasticsearchContainer::getHttpHostAddress);
         registry.add("spring.elasticsearch.uris", elasticsearchContainer::getHttpHostAddress);
 
-        // redis
-        registry.add("spring.redis.host", redisMaster::getHost);
-        registry.add("spring.redis.port",
-                () -> redisMaster.getMappedPort(SharedTestContainers.REDIS_PORT).toString());
-        registry.add("spring.redis.slaves[0].host", redisSlave1::getHost);
-        registry.add("spring.redis.slaves[0].port",
-                () -> redisSlave1.getMappedPort(SharedTestContainers.REDIS_PORT).toString());
-        registry.add("spring.redis.slaves[1].host", redisSlave2::getHost);
-        registry.add("spring.redis.slaves[1].port",
-                () -> redisSlave2.getMappedPort(SharedTestContainers.REDIS_PORT).toString());
+        // redis sentinel
+        registry.add("spring.redis.timeout", () -> 5);
+        registry.add("spring.redis.sentinel.master", () -> SharedTestContainers.REDIS_SENTINEL_MASTER_GROUP);
+//        String nodes = String.format(
+//                "%s:%d,%s:%d,%s:%d",
+//                redisSentinel1.getHost(),
+//                redisSentinel1.getMappedPort(SharedTestContainers.REDIS_SENTINEL_PORT),
+//                redisSentinel2.getHost(),
+//                redisSentinel2.getMappedPort(SharedTestContainers.REDIS_SENTINEL_PORT),
+//                redisSentinel3.getHost(),
+//                redisSentinel3.getMappedPort(SharedTestContainers.REDIS_SENTINEL_PORT)
+//        );
+//        registry.add("spring.redis.sentinel.nodes", () -> nodes);
+        registry.add("spring.redis.sentinel.nodes[0].host", () -> redisSentinel1.getHost());
+        registry.add("spring.redis.sentinel.nodes[0].port",
+                () -> redisSentinel1.getMappedPort(SharedTestContainers.REDIS_SENTINEL_PORT)
+                        .toString());
+        registry.add("spring.redis.sentinel.nodes[1].host", () -> redisSentinel2.getHost());
+        registry.add("spring.redis.sentinel.nodes[1].port",
+                () -> redisSentinel2.getMappedPort(SharedTestContainers.REDIS_SENTINEL_PORT)
+                        .toString());
+        registry.add("spring.redis.sentinel.nodes[2].host", () -> redisSentinel3.getHost());
+        registry.add("spring.redis.sentinel.nodes[2].port",
+                () -> redisSentinel3.getMappedPort(SharedTestContainers.REDIS_SENTINEL_PORT)
+                        .toString());
     }
 
     @BeforeEach

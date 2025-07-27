@@ -7,7 +7,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class RedisProperty {
+public class SentinelProperty {
     private String host;
     private int port;
 }
