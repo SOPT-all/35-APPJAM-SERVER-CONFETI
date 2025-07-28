@@ -63,7 +63,7 @@ services:
       - REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS=3000
       - REDIS_MASTER_HOST=redis-master
       - REDIS_MASTER_PORT_NUMBER=6379
-      - REDIS_MASTER_SET=redis-master
+      - REDIS_MASTER_SET=mymaster
       - REDIS_SENTINEL_QUORUM=2
     depends_on:
       - redis-master
@@ -82,7 +82,7 @@ services:
       - REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS=3000
       - REDIS_MASTER_HOST=redis-master
       - REDIS_MASTER_PORT_NUMBER=6379
-      - REDIS_MASTER_SET=redis-master
+      - REDIS_MASTER_SET=mymaster
       - REDIS_SENTINEL_QUORUM=2
     depends_on:
       - redis-master
@@ -101,7 +101,7 @@ services:
       - REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS=3000
       - REDIS_MASTER_HOST=redis-master
       - REDIS_MASTER_PORT_NUMBER=6379
-      - REDIS_MASTER_SET=redis-master
+      - REDIS_MASTER_SET=mymaster
       - REDIS_SENTINEL_QUORUM=2
     depends_on:
       - redis-master
