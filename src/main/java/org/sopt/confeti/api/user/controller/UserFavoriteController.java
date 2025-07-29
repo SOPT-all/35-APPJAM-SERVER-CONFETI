@@ -91,12 +91,12 @@ public class UserFavoriteController {
     }
 
     @Permission(role = {Role.GENERAL})
-    @PostMapping("/concerts/{concertId}")
+    @PostMapping("/concerts/{performanceId}")
     public ResponseEntity<BaseResponse<?>> addConcertFavorite(
             @UserId Long userId,
-            @PathVariable(name = "concertId") Long concertId
+            @PathVariable Long performanceId
     ) {
-        userFavoriteFacade.addConcertFavorite(userId, concertId);
+        userFavoriteFacade.addPerformanceFavorite(userId, performanceId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 

@@ -1,6 +1,7 @@
 package org.sopt.confeti.global.common.constant;
 
 import java.util.Arrays;
+import org.sopt.confeti.domain.performance.PerformanceType;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 

@@ -51,4 +51,11 @@ public class PerformanceFavorite {
         this.performance = performance;
         this.createdAt = createdAt;
     }
+
+    public static PerformanceFavorite create(User user, Performance performance) {
+        return PerformanceFavorite.builder()
+                .user(user)
+                .performance(performance)
+                .build();
+    }
 }

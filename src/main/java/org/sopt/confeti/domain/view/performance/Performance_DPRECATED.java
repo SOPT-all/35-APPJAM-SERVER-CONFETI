@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -42,7 +42,7 @@ public class Performance_DPRECATED {
 
     @Column(length = 10, nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private PerformanceType type;
+    private PerformanceType_DEPRECATED type;
 
     @Column(length = 100, nullable = false)
     private String area;
@@ -73,7 +73,7 @@ public class Performance_DPRECATED {
     private List<PerformanceArtist_DPRECATED> artists = new ArrayList<>();
 
     @Builder
-    private Performance_DPRECATED(long typeId, PerformanceType type, String area, String title,
+    private Performance_DPRECATED(long typeId, PerformanceType_DEPRECATED type, String area, String title,
                                   String subtitle, LocalDate startAt, LocalDate endAt,
                                   String posterPath, List<PerformanceArtist_DPRECATED> artists) {
         this.typeId = typeId;
@@ -92,7 +92,7 @@ public class Performance_DPRECATED {
     public static Performance_DPRECATED create(final long festivalId, final CreateFestivalDTO festivalDTO) {
         return Performance_DPRECATED.builder()
                 .typeId(festivalId)
-                .type(PerformanceType.FESTIVAL)
+                .type(PerformanceType_DEPRECATED.FESTIVAL)
                 .area(festivalDTO.area())
                 .title(festivalDTO.title())
                 .subtitle(festivalDTO.subtitle())
@@ -113,7 +113,7 @@ public class Performance_DPRECATED {
     public static Performance_DPRECATED create(final long concertId, final CreateConcertDTO concertDTO) {
         return Performance_DPRECATED.builder()
                 .typeId(concertId)
-                .type(PerformanceType.CONCERT)
+                .type(PerformanceType_DEPRECATED.CONCERT)
                 .area(concertDTO.area())
                 .title(concertDTO.title())
                 .subtitle(concertDTO.subtitle())

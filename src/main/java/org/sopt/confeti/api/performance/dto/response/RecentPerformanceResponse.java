@@ -7,7 +7,6 @@ import org.sopt.confeti.global.util.S3FileHandler;
 
 public record RecentPerformanceResponse(
         long performanceId,
-        long typeId,
         String type,
         String title,
         String startAt,
@@ -19,8 +18,7 @@ public record RecentPerformanceResponse(
 
         return new RecentPerformanceResponse(
                 recentPerformanceDTO.performanceId(),
-                recentPerformanceDTO.typeId(),
-                recentPerformanceDTO.type().getType(),
+                recentPerformanceDTO.type().getName(),
                 recentPerformanceDTO.title(),
                 DateConvertor.convertToDefaultFormat(recentPerformanceDTO.startAt()),
                 s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER),

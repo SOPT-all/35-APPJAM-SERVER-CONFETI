@@ -3,12 +3,12 @@ package org.sopt.confeti.api.search.dto.response;
 import java.time.LocalDate;
 import org.sopt.confeti.api.search.facade.dto.response.SearchResultPerformanceDTO;
 import org.sopt.confeti.global.common.constant.FolderPath;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record SearchResultPerformanceResponse(
         long id,
-        PerformanceType type,
+        PerformanceType_DEPRECATED type,
         long typeId,
         String title,
         String posterUrl,

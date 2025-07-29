@@ -1,11 +1,11 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
 import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 
 public record RecommendPerformanceDTO(
         long typeId,
-        PerformanceType type,
+        PerformanceType_DEPRECATED type,
         String title,
         String posterPath
 ) {

@@ -1,15 +1,15 @@
 package org.sopt.confeti.global.util.analyzer.dto;
 
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 
 public record PerformanceSearchTermAnalyzeResult(
         String processedTerm,
-        PerformanceType performanceType
+        PerformanceType_DEPRECATED performanceTypeDEPRECATED
 ) {
-    public static PerformanceSearchTermAnalyzeResult of(String processedTerm, PerformanceType performanceType) {
+    public static PerformanceSearchTermAnalyzeResult of(String processedTerm, PerformanceType_DEPRECATED performanceTypeDEPRECATED) {
         return new PerformanceSearchTermAnalyzeResult(
                 processedTerm,
-                performanceType
+                performanceTypeDEPRECATED
         );
     }
 
@@ -17,7 +17,7 @@ public record PerformanceSearchTermAnalyzeResult(
     public static PerformanceSearchTermAnalyzeResult empty() {
         return new PerformanceSearchTermAnalyzeResult(
                 "",
-                PerformanceType.PERFORMANCE
+                PerformanceType_DEPRECATED.PERFORMANCE
         );
     }
 }

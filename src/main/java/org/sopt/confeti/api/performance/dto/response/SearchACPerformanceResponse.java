@@ -2,7 +2,7 @@ package org.sopt.confeti.api.performance.dto.response;
 
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformanceDTO;
 import org.sopt.confeti.global.common.constant.FolderPath;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record SearchACPerformanceResponse(
@@ -13,11 +13,11 @@ public record SearchACPerformanceResponse(
     public static SearchACPerformanceResponse of(SearchACPerformanceDTO performanceDTO, S3FileHandler s3FileHandler) {
         String folderPath = FolderPath.DEFAULT.getSingle();
 
-        if (performanceDTO.type() == PerformanceType.FESTIVAL) {
+        if (performanceDTO.type() == PerformanceType_DEPRECATED.FESTIVAL) {
             folderPath = FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER);
         }
 
-        if (performanceDTO.type() == PerformanceType.CONCERT) {
+        if (performanceDTO.type() == PerformanceType_DEPRECATED.CONCERT) {
             folderPath = FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER);
         }
 

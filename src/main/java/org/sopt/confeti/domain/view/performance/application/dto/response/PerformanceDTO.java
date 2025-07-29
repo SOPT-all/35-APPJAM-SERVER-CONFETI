@@ -5,12 +5,12 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import org.sopt.confeti.domain.elastic_search.application.dto.response.SearchPerformanceResult;
 import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 
 public record PerformanceDTO(
         long id,
         Long typeId,
-        PerformanceType type,
+        PerformanceType_DEPRECATED type,
         String area,
         String title,
         String subtitle,

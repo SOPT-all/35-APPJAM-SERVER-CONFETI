@@ -7,7 +7,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.elastic_search.PerformanceDocument;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -41,8 +41,8 @@ public class PerformanceSearchOperator {
             return new BoolQueryBuilder();
         }
 
-        public BoolQueryBuilder ifNotPerformanceType(PerformanceType type) {
-            if (type == PerformanceType.PERFORMANCE) {
+        public BoolQueryBuilder ifNotPerformanceType(PerformanceType_DEPRECATED type) {
+            if (type == PerformanceType_DEPRECATED.PERFORMANCE) {
                 isNotPerformanceType = false;
             }
 
@@ -68,7 +68,7 @@ public class PerformanceSearchOperator {
             return this;
         }
 
-        public BoolQueryBuilder matchType(PerformanceType type) {
+        public BoolQueryBuilder matchType(PerformanceType_DEPRECATED type) {
             if (isNotPerformanceType) {
                 boolQueryBuilder.must(must -> must
                         .match(match -> match
@@ -102,7 +102,7 @@ public class PerformanceSearchOperator {
         }
     }
 
-    public List<PerformanceDocument> searchByTitleAndTypePartialMatch(String term, PerformanceType type,
+    public List<PerformanceDocument> searchByTitleAndTypePartialMatch(String term, PerformanceType_DEPRECATED type,
                                                                       PerformanceStatus status) {
         Query partialMatchedQuery = NativeQuery.builder()
                 .withQuery(query -> query.bool(

@@ -1,12 +1,12 @@
 package org.sopt.confeti.domain.view.performance;
 
 import java.time.LocalDateTime;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 
 public record PerformanceTicketDTO(
         int index,
         long typeId,
-        PerformanceType type,
+        PerformanceType_DEPRECATED type,
         String title,
         LocalDateTime reserveAt
 ) {
@@ -20,7 +20,7 @@ public record PerformanceTicketDTO(
         return new PerformanceTicketDTO(
                 index,
                 performanceId,
-                PerformanceType.convert(type),
+                PerformanceType_DEPRECATED.convert(type),
                 title,
                 reserveAt
         );

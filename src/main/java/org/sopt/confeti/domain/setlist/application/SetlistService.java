@@ -23,7 +23,7 @@ import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -51,7 +51,7 @@ public class SetlistService {
         List<SetlistSummaryResponse> dtoList = setlists.stream()
                 .map(setlist -> {
                     Performance_DPRECATED performanceDPRECATED = performanceServiceDPRECATED.getPerformanceByTypeAndTypeId(
-                            PerformanceType.valueOf(setlist.getType().name()), setlist.getTypeId());
+                            PerformanceType_DEPRECATED.valueOf(setlist.getType().name()), setlist.getTypeId());
                     return SetlistSummaryResponse.of(setlist, performanceDPRECATED, s3FileHandler);
                 })
                 .sorted((a , b) -> sortType == SetlistSortType.OLDEST
@@ -68,7 +68,7 @@ public class SetlistService {
         return setlists.stream()
                 .map(setlist -> {
                     Performance_DPRECATED performanceDPRECATED = performanceServiceDPRECATED.getPerformanceByTypeAndTypeId(
-                            PerformanceType.valueOf(setlist.getType().name()), setlist.getTypeId());
+                            PerformanceType_DEPRECATED.valueOf(setlist.getType().name()), setlist.getTypeId());
                     return SetlistSummaryResponse.of(setlist, performanceDPRECATED, s3FileHandler);
                 })
                 .sorted(Comparator.comparing(SetlistSummaryResponse::endAt))

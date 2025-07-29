@@ -40,7 +40,7 @@ import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.Default;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -192,7 +192,7 @@ public class PerformanceController {
                     .map(item -> {
                         String[] performance = item.split(":");
                         return GetExpectedPerformanceRequest.of(
-                                PerformanceType.convert(performance[0].trim()),
+                                PerformanceType_DEPRECATED.convert(performance[0].trim()),
                                 Long.parseLong(performance[1].trim())
                         );
                     })

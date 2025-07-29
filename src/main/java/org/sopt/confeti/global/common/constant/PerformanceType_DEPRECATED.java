@@ -8,13 +8,13 @@ import org.sopt.confeti.global.message.ErrorMessage;
 
 @Getter
 @AllArgsConstructor
-public enum PerformanceType {
+public enum PerformanceType_DEPRECATED {
     CONCERT("concert"), FESTIVAL("festival"), PERFORMANCE("performance");
 
     private final String type;
 
-    public static PerformanceType convert(final String input) {
-        return Arrays.stream(PerformanceType.values())
+    public static PerformanceType_DEPRECATED convert(final String input) {
+        return Arrays.stream(PerformanceType_DEPRECATED.values())
                 .filter(performanceType -> performanceType.getType().equalsIgnoreCase(input))
                 .findFirst()
                 .orElseThrow(

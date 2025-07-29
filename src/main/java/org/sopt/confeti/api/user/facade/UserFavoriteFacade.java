@@ -16,6 +16,9 @@ import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteServi
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
+import org.sopt.confeti.domain.performance.Performance;
+import org.sopt.confeti.domain.performance.application.PerformanceService;
+import org.sopt.confeti.domain.performance_favorite.application.PerformanceFavoriteService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
@@ -23,7 +26,7 @@ import org.sopt.confeti.domain.view.performance.application.PerformanceService_D
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
 import org.sopt.confeti.global.annotation.Facade;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -46,6 +49,8 @@ public class UserFavoriteFacade {
     private final PerformanceService_DPRECATED performanceServiceDPRECATED;
 
     private static final String TYPE_ALL = "ALL";
+    private final PerformanceService performanceService;
+    private final PerformanceFavoriteService performanceFavoriteService;
 
     @Transactional
     public void addFestivalFavorite(long userId, long festivalId) {
@@ -137,6 +142,18 @@ public class UserFavoriteFacade {
     }
 
     @Transactional
+    public void addPerformanceFavorite(long userId, long performanceId) {
+        User user = userService.findById(userId);
+        Performance performance = performanceService.getPerformance(performanceId)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
+
+        performanceFavoriteService.validateNotExist(userId, performanceId);
+        performanceFavoriteService.addFavorite(user, performance);
+    }
+
+    @Transactional
     public void removeConcertFavorite(final long userId, final long concertId) {
         validateExistUser(userId);
         validateExistConcert(concertId);
@@ -149,7 +166,7 @@ public class UserFavoriteFacade {
     public UserFavoritePerformancesDTO getFavoritePerformances(final long userId) {
         validateExistUser(userId);
 
-        List<PerformancePreviewDTO> performances = performanceServiceDPRECATED.getFavoritePerformancesPreview(userId);
+        List<Performance> performances = performanceService.getFavoriteRecentPerformances(userId);
         return UserFavoritePerformancesDTO.from(performances);
     }
 
@@ -192,8 +209,8 @@ public class UserFavoriteFacade {
 
     @Transactional(readOnly = true)
     protected void validateType(final String type) {
-        if (!type.equalsIgnoreCase(PerformanceType.FESTIVAL.getType()) && !type.equalsIgnoreCase(
-                PerformanceType.CONCERT.getType()) && !type.equalsIgnoreCase(TYPE_ALL)) {
+        if (!type.equalsIgnoreCase(PerformanceType_DEPRECATED.FESTIVAL.getType()) && !type.equalsIgnoreCase(
+                PerformanceType_DEPRECATED.CONCERT.getType()) && !type.equalsIgnoreCase(TYPE_ALL)) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }

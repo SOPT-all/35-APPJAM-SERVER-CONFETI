@@ -10,7 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -37,8 +37,8 @@ public class PerformanceDTORepository {
 
         Query query = em.createNativeQuery(sql);
         query.setParameter("userId", userId);
-        query.setParameter("concertType", PerformanceType.CONCERT.getType());
-        query.setParameter("festivalType", PerformanceType.FESTIVAL.getType());
+        query.setParameter("concertType", PerformanceType_DEPRECATED.CONCERT.getType());
+        query.setParameter("festivalType", PerformanceType_DEPRECATED.FESTIVAL.getType());
         query.setParameter("performancePreviewCount", PREVIEW_FAVORITE_PERFORMANCE_COUNT);
 
         return convertToPerformanceDTOs(query.getResultList());
@@ -75,8 +75,8 @@ public class PerformanceDTORepository {
 
         Query query = em.createNativeQuery(sql)
                 .setParameter("userId", userId)
-                .setParameter("concertType", PerformanceType.CONCERT.getType())
-                .setParameter("festivalType", PerformanceType.FESTIVAL.getType())
+                .setParameter("concertType", PerformanceType_DEPRECATED.CONCERT.getType())
+                .setParameter("festivalType", PerformanceType_DEPRECATED.FESTIVAL.getType())
                 .setParameter("performanceReservationCount", RESERVE_FAVORITE_PERFORMANCE_COUNT);
 
         List<Object[]> results = query.getResultList();
@@ -100,8 +100,8 @@ public class PerformanceDTORepository {
                 """;
 
         Query query = em.createNativeQuery(sql)
-                .setParameter("concertType", PerformanceType.CONCERT.getType())
-                .setParameter("festivalType", PerformanceType.FESTIVAL.getType())
+                .setParameter("concertType", PerformanceType_DEPRECATED.CONCERT.getType())
+                .setParameter("festivalType", PerformanceType_DEPRECATED.FESTIVAL.getType())
                 .setParameter("performanceReservationCount", RESERVE_FAVORITE_PERFORMANCE_COUNT);
 
         List<Object[]> results = query.getResultList();

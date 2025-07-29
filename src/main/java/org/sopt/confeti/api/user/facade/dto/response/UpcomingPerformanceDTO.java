@@ -2,11 +2,11 @@ package org.sopt.confeti.api.user.facade.dto.response;
 
 import java.time.LocalDate;
 import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 
 public record UpcomingPerformanceDTO(
         long typeId,
-        PerformanceType type,
+        PerformanceType_DEPRECATED type,
         String title,
         String posterPath,
         LocalDate startAt,

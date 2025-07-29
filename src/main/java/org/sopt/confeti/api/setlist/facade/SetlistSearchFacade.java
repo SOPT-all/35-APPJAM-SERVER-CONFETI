@@ -15,7 +15,7 @@ import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchServi
 import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
@@ -91,7 +91,7 @@ public class SetlistSearchFacade {
 
             performances.addAll(
                     performanceSearchService.getPerformancesByTitleAndTypePartialMatched(analyzeResult.processedTerm(),
-                                    analyzeResult.performanceType()).stream()
+                                    analyzeResult.performanceTypeDEPRECATED()).stream()
                             .map(PerformanceDTO::from)
                             .toList()
             );
@@ -100,8 +100,8 @@ public class SetlistSearchFacade {
         PerformanceSearchTermAnalyzeResult finalAnalyzeResult = analyzeResult;
         Set<PerformanceDTO> searchedPerformances = performances.stream()
                 .filter(
-                        performance -> finalAnalyzeResult.performanceType() == PerformanceType.PERFORMANCE ||
-                                performance.type() == finalAnalyzeResult.performanceType()
+                        performance -> finalAnalyzeResult.performanceTypeDEPRECATED() == PerformanceType_DEPRECATED.PERFORMANCE ||
+                                performance.type() == finalAnalyzeResult.performanceTypeDEPRECATED()
                 )
                 .collect(Collectors.toSet());
 

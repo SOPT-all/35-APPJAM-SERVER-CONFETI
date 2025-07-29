@@ -18,7 +18,7 @@ import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteSer
 import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
@@ -53,7 +53,7 @@ public class SearchFacade {
         }
 
         List<PerformanceDTO> performances = performanceServiceDPRECATED.getPerformancesByArtistIdAndType(aid,
-                PerformanceType.PERFORMANCE);
+                PerformanceType_DEPRECATED.PERFORMANCE);
 
         Map<Long, Boolean> performanceFavorites = performances.stream()
                 .collect(Collectors.toMap(
@@ -76,11 +76,11 @@ public class SearchFacade {
         boolean performanceFavorite = false;
 
         if (Objects.nonNull(userId)) {
-            if (performance.type() == PerformanceType.FESTIVAL) {
+            if (performance.type() == PerformanceType_DEPRECATED.FESTIVAL) {
                 performanceFavorite = festivalFavoriteService.isFavorite(userId, performance.typeId());
             }
 
-            if (performance.type() == PerformanceType.CONCERT) {
+            if (performance.type() == PerformanceType_DEPRECATED.CONCERT) {
                 performanceFavorite = concertFavoriteService.isFavorite(userId, performance.typeId());
             }
         }
@@ -106,13 +106,13 @@ public class SearchFacade {
         // 아티스트 기반
         artist.ifPresent(confetiArtist -> performances.addAll(
                         performanceServiceDPRECATED.getPerformancesByArtistIdAndType(confetiArtist.getId(),
-                                analyzeResult.performanceType())
+                                analyzeResult.performanceTypeDEPRECATED())
                 )
         );
 
         // 검색어 기반
         List<PerformanceDTO> searchedPerformances = performanceSearchService.getExpectedPerformancesByTitleAndTypePartialMatched(
-                        analyzeResult.processedTerm(), analyzeResult.performanceType()).stream()
+                        analyzeResult.processedTerm(), analyzeResult.performanceTypeDEPRECATED()).stream()
                 .map(PerformanceDTO::from)
                 .toList();
 

@@ -18,7 +18,7 @@ import org.sopt.confeti.domain.view.performance.application.dto.response.Perform
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceCriteriaRepository_DPRECATED;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceDTORepository;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceRepository_DPRECATED;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.data.domain.PageRequest;
@@ -108,9 +108,10 @@ public class PerformanceService_DPRECATED {
     }
 
     @Transactional
-    public void addPerformanceArtists(PerformanceType performanceType, long festivalId,
+    public void addPerformanceArtists(PerformanceType_DEPRECATED performanceTypeDEPRECATED, long festivalId,
                                       List<PerformanceArtist_DPRECATED> performanceArtistDPRECATEDS) {
-        Performance_DPRECATED performanceDPRECATED = performanceRepositoryDPRECATED.findPerformanceByTypeAndTypeId(performanceType, festivalId)
+        Performance_DPRECATED performanceDPRECATED = performanceRepositoryDPRECATED.findPerformanceByTypeAndTypeId(
+                        performanceTypeDEPRECATED, festivalId)
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
@@ -149,8 +150,8 @@ public class PerformanceService_DPRECATED {
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceDTO> getPerformancesByArtistIdAndType(String artistId, PerformanceType type) {
-        if (type == PerformanceType.PERFORMANCE) {
+    public List<PerformanceDTO> getPerformancesByArtistIdAndType(String artistId, PerformanceType_DEPRECATED type) {
+        if (type == PerformanceType_DEPRECATED.PERFORMANCE) {
             return performanceRepositoryDPRECATED.findPerformancesByArtistId(artistId).stream()
                     .map(PerformanceDTO::from)
                     .toList();
@@ -181,11 +182,11 @@ public class PerformanceService_DPRECATED {
 
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getExpectedPerformances(GetExpectedPerformancesDTO expectedPerformancesDTO) {
-        List<Pair<PerformanceType, Long>> performancePairs = convertToPairs(expectedPerformancesDTO);
+        List<Pair<PerformanceType_DEPRECATED, Long>> performancePairs = convertToPairs(expectedPerformancesDTO);
         List<Performance_DPRECATED> performanceDPRECATEDS = performanceCriteriaRepositoryDPRECATED.findPerformancesByTypeAndTypeId(
                 performancePairs);
 
-        Map<Pair<PerformanceType, Long>, Performance_DPRECATED> performanceMapper = performanceDPRECATEDS.stream()
+        Map<Pair<PerformanceType_DEPRECATED, Long>, Performance_DPRECATED> performanceMapper = performanceDPRECATEDS.stream()
                 .collect(Collectors.toMap(
                         performance -> Pair.of(performance.getType(), performance.getTypeId()),
                         Function.identity()
@@ -199,12 +200,12 @@ public class PerformanceService_DPRECATED {
     }
 
     @Transactional(readOnly = true)
-    public Performance_DPRECATED getPerformanceByTypeAndTypeId(PerformanceType type, long typeId) {
+    public Performance_DPRECATED getPerformanceByTypeAndTypeId(PerformanceType_DEPRECATED type, long typeId) {
         return performanceRepositoryDPRECATED.findPerformanceByTypeAndTypeId(type, typeId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
-    private List<Pair<PerformanceType, Long>> convertToPairs(GetExpectedPerformancesDTO expectedPerformancesDTO) {
+    private List<Pair<PerformanceType_DEPRECATED, Long>> convertToPairs(GetExpectedPerformancesDTO expectedPerformancesDTO) {
         return expectedPerformancesDTO.expectedPerformanceDTOs().stream()
                 .map(performanceDTO -> Pair.of(performanceDTO.type(), performanceDTO.typeId()))
                 .toList();

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -41,7 +41,7 @@ public interface PerformanceRepository_DPRECATED extends JpaRepository<Performan
             final @Param("artistId") String artistId
     );
 
-    Optional<Performance_DPRECATED> findPerformanceByTypeAndTypeId(PerformanceType type, long typeId);
+    Optional<Performance_DPRECATED> findPerformanceByTypeAndTypeId(PerformanceType_DEPRECATED type, long typeId);
 
     @Query(
             "SELECT p"
@@ -50,15 +50,15 @@ public interface PerformanceRepository_DPRECATED extends JpaRepository<Performan
                     + " WHERE p.endAt >= CURRENT_DATE AND p.type = :type AND pa.artistId = :artistId"
                     + " ORDER BY p.startAt"
     )
-    List<Performance_DPRECATED> findPerformancesByTypeAndArtistId(@Param("type") PerformanceType type,
+    List<Performance_DPRECATED> findPerformancesByTypeAndArtistId(@Param("type") PerformanceType_DEPRECATED type,
                                                                   @Param("artistId") String artistId);
 
     @Query("SELECT p FROM Performance_DPRECATED p " +
             "WHERE ((:type = '" + TYPE_CONCERT + "' OR :type = '" + TYPE_ALL
-            + "') AND p.type = org.sopt.confeti.global.common.constant.PerformanceType.CONCERT " +
+            + "') AND p.type = org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED.CONCERT " +
             "       AND p.typeId IN (SELECT cf.concert.id FROM ConcertFavorite cf WHERE cf.user.id = :userId)) " +
             "OR ((:type = '" + TYPE_FESTIVAL + "' OR :type = '" + TYPE_ALL
-            + "') AND p.type = org.sopt.confeti.global.common.constant.PerformanceType.FESTIVAL " +
+            + "') AND p.type = org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED.FESTIVAL " +
             "    AND p.typeId IN (SELECT ff.festival.id FROM FestivalFavorite ff WHERE ff.user.id = :userId)) " +
             "AND p.endAt >= CURRENT_DATE " +
             "ORDER BY p.startAt ASC")
@@ -68,9 +68,9 @@ public interface PerformanceRepository_DPRECATED extends JpaRepository<Performan
     );
 
     @Query(value = "SELECT p FROM Performance_DPRECATED p " +
-            "WHERE ((p.type = org.sopt.confeti.global.common.constant.PerformanceType.CONCERT " +
+            "WHERE ((p.type = org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED.CONCERT " +
             "        AND p.typeId IN (SELECT cf.concert.id FROM ConcertFavorite cf WHERE cf.user.id = :userId)) " +
-            "    OR (p.type = org.sopt.confeti.global.common.constant.PerformanceType.FESTIVAL " +
+            "    OR (p.type = org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED.FESTIVAL " +
             "        AND p.typeId IN (SELECT tf.festival.id FROM TimetableFestival tf WHERE tf.user.id = :userId))) " +
             "AND p.endAt >= CURRENT_DATE " +
             "ORDER BY p.startAt ASC LIMIT 1 ")
@@ -85,9 +85,9 @@ public interface PerformanceRepository_DPRECATED extends JpaRepository<Performan
     Optional<Performance_DPRECATED> findPerformanceByRand();
 
     @Query(value = "SELECT p FROM Performance_DPRECATED p " +
-            "WHERE ((p.type = org.sopt.confeti.global.common.constant.PerformanceType.CONCERT " +
+            "WHERE ((p.type = org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED.CONCERT " +
             "        AND p.typeId IN (SELECT cf.concert.id FROM ConcertFavorite cf WHERE cf.user.id = :userId)) " +
-            "    OR (p.type = org.sopt.confeti.global.common.constant.PerformanceType.FESTIVAL " +
+            "    OR (p.type = org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED.FESTIVAL " +
             "        AND p.typeId IN (SELECT tf.festival.id FROM TimetableFestival tf WHERE tf.user.id = :userId))) " +
             "AND p.endAt >= CURRENT_DATE " +
             "ORDER BY RAND() ASC LIMIT 1 ")

@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Repository;
 
@@ -24,7 +24,7 @@ public class PerformanceCriteriaRepository_DPRECATED {
     @PersistenceContext
     private EntityManager em;
 
-    public List<Performance_DPRECATED> findPerformancesByTypeAndTypeId(List<Pair<PerformanceType, Long>> pairs) {
+    public List<Performance_DPRECATED> findPerformancesByTypeAndTypeId(List<Pair<PerformanceType_DEPRECATED, Long>> pairs) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Performance_DPRECATED> cq = cb.createQuery(Performance_DPRECATED.class);
         Root<Performance_DPRECATED> root = cq.from(Performance_DPRECATED.class);

@@ -20,7 +20,7 @@ import org.sopt.confeti.domain.view.performance.PerformanceArtist_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.FolderPath;
-import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -94,7 +94,7 @@ public class DummyFacade {
     @Transactional
     public void fixFestival(long festivalId, List<CreateFestivalDateDTO> dates) {
         festivalService.addDates(festivalId, dates);
-        performanceServiceDPRECATED.addPerformanceArtists(PerformanceType.FESTIVAL, festivalId, getPerformanceArtists(dates));
+        performanceServiceDPRECATED.addPerformanceArtists(PerformanceType_DEPRECATED.FESTIVAL, festivalId, getPerformanceArtists(dates));
     }
 
     private List<PerformanceArtist_DPRECATED> getPerformanceArtists(List<CreateFestivalDateDTO> dates) {

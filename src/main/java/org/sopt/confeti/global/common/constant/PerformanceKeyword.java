@@ -10,19 +10,19 @@ import org.sopt.confeti.global.message.ErrorMessage;
 public enum PerformanceKeyword {
     CONCERT(
             List.of("concert", "concerts", "콘서트"),
-            PerformanceType.CONCERT
+            PerformanceType_DEPRECATED.CONCERT
     ),
     FESTIVAL(
             List.of("festival", "festivals", "페스티벌", "패스티벌"),
-            PerformanceType.FESTIVAL
+            PerformanceType_DEPRECATED.FESTIVAL
     ),
     PERFORMANCE(
             List.of("performance", "performances", "공연"),
-            PerformanceType.PERFORMANCE
+            PerformanceType_DEPRECATED.PERFORMANCE
     );
 
     private final List<String> keywords;
-    private final PerformanceType performanceType;
+    private final PerformanceType_DEPRECATED performanceTypeDEPRECATED;
 
     public static boolean isValid(String input) {
         return Arrays.stream(PerformanceKeyword.values())
@@ -30,14 +30,14 @@ public enum PerformanceKeyword {
                 .anyMatch(keyword -> keyword.equalsIgnoreCase(input));
     }
 
-    public static PerformanceType getMatchingPerformanceType(String input) {
+    public static PerformanceType_DEPRECATED getMatchingPerformanceType(String input) {
         return Arrays.stream(PerformanceKeyword.values())
                 .filter(performanceKeyword ->
                         performanceKeyword.keywords.stream()
                                 .anyMatch(keyword -> keyword.equalsIgnoreCase(input))
                 )
                 .findFirst()
-                .map(performanceKeyword -> performanceKeyword.performanceType)
+                .map(performanceKeyword -> performanceKeyword.performanceTypeDEPRECATED)
                 .orElseThrow(
                         () -> new ConfetiException(ErrorMessage.BAD_REQUEST)
                 );
