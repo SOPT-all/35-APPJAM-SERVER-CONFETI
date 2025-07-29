@@ -1,14 +1,14 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
 import java.util.List;
-import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
 
 public record RecommendPerformancesDTO(
         List<RecommendPerformanceDTO> performances
 ) {
-    public static RecommendPerformancesDTO from(List<Performance> performances) {
+    public static RecommendPerformancesDTO from(List<Performance_DPRECATED> performanceDPRECATEDS) {
         return new RecommendPerformancesDTO(
-                performances.stream()
+                performanceDPRECATEDS.stream()
                         .map(RecommendPerformanceDTO::from)
                         .toList()
         );

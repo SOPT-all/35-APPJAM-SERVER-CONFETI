@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.sopt.confeti.domain.elastic_search.application.dto.response.SearchPerformanceResult;
-import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record PerformanceDTO(
@@ -20,19 +20,19 @@ public record PerformanceDTO(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
-    public static PerformanceDTO from(final Performance performance) {
+    public static PerformanceDTO from(final Performance_DPRECATED performanceDPRECATED) {
         return new PerformanceDTO(
-                performance.getId(),
-                performance.getTypeId(),
-                performance.getType(),
-                performance.getArea(),
-                performance.getTitle(),
-                performance.getSubtitle(),
-                performance.getStartAt(),
-                performance.getEndAt(),
-                performance.getPosterPath(),
-                performance.getCreatedAt(),
-                performance.getUpdatedAt()
+                performanceDPRECATED.getId(),
+                performanceDPRECATED.getTypeId(),
+                performanceDPRECATED.getType(),
+                performanceDPRECATED.getArea(),
+                performanceDPRECATED.getTitle(),
+                performanceDPRECATED.getSubtitle(),
+                performanceDPRECATED.getStartAt(),
+                performanceDPRECATED.getEndAt(),
+                performanceDPRECATED.getPosterPath(),
+                performanceDPRECATED.getCreatedAt(),
+                performanceDPRECATED.getUpdatedAt()
         );
     }
 

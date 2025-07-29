@@ -15,7 +15,7 @@ import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteServi
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
-import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceType;
@@ -37,7 +37,7 @@ public class SearchFacade {
     private final SearchTermService searchTermService;
     private final MusicAPIHandler musicAPIHandler;
     private final ArtistFavoriteService artistFavoriteService;
-    private final PerformanceService performanceService;
+    private final PerformanceService_DPRECATED performanceServiceDPRECATED;
     private final FestivalFavoriteService festivalFavoriteService;
     private final ConcertFavoriteService concertFavoriteService;
     private final PerformanceSearchService performanceSearchService;
@@ -52,7 +52,7 @@ public class SearchFacade {
             artistFavorite = artistFavoriteService.isFavorite(userId, aid);
         }
 
-        List<PerformanceDTO> performances = performanceService.getPerformancesByArtistIdAndType(aid,
+        List<PerformanceDTO> performances = performanceServiceDPRECATED.getPerformancesByArtistIdAndType(aid,
                 PerformanceType.PERFORMANCE);
 
         Map<Long, Boolean> performanceFavorites = performances.stream()
@@ -62,7 +62,7 @@ public class SearchFacade {
                 ));
 
         if (Objects.nonNull(userId)) {
-            List<PerformanceDTO> favoritePerformances = performanceService.getFavoritePerformancesAll(userId, TYPE_ALL);
+            List<PerformanceDTO> favoritePerformances = performanceServiceDPRECATED.getFavoritePerformancesAll(userId, TYPE_ALL);
             getPerformanceFavorites(performanceFavorites, favoritePerformances);
         }
 
@@ -71,7 +71,7 @@ public class SearchFacade {
 
     @Transactional(readOnly = true)
     public SearchResultDTO getHomeSearchResultWithPid(Long userId, long pid) {
-        PerformanceDTO performance = performanceService.getPerformance(pid);
+        PerformanceDTO performance = performanceServiceDPRECATED.getPerformance(pid);
         searchTermService.write(performance.title());
         boolean performanceFavorite = false;
 
@@ -105,7 +105,7 @@ public class SearchFacade {
 
         // 아티스트 기반
         artist.ifPresent(confetiArtist -> performances.addAll(
-                        performanceService.getPerformancesByArtistIdAndType(confetiArtist.getId(),
+                        performanceServiceDPRECATED.getPerformancesByArtistIdAndType(confetiArtist.getId(),
                                 analyzeResult.performanceType())
                 )
         );
@@ -126,7 +126,7 @@ public class SearchFacade {
                 ));
 
         if (Objects.nonNull(userId)) {
-            List<PerformanceDTO> favoritePerformances = performanceService.getFavoritePerformancesAll(userId, TYPE_ALL);
+            List<PerformanceDTO> favoritePerformances = performanceServiceDPRECATED.getFavoritePerformancesAll(userId, TYPE_ALL);
             getPerformanceFavorites(performanceFavorites, favoritePerformances);
         }
 

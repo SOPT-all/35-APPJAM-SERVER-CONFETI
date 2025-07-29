@@ -1,6 +1,6 @@
 package org.sopt.confeti.domain.view.performance.application.dto.response;
 
-import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record GetPerformanceIdResponse(
@@ -8,11 +8,11 @@ public record GetPerformanceIdResponse(
         long typeId,
         PerformanceType type
 ) {
-    public static GetPerformanceIdResponse from(final Performance performance) {
+    public static GetPerformanceIdResponse from(final Performance_DPRECATED performanceDPRECATED) {
         return new GetPerformanceIdResponse(
-                performance.getId(),
-                performance.getTypeId(),
-                performance.getType()
+                performanceDPRECATED.getId(),
+                performanceDPRECATED.getTypeId(),
+                performanceDPRECATED.getType()
         );
     }
 }

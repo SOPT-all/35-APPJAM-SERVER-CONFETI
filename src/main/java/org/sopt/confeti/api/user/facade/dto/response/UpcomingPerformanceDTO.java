@@ -1,7 +1,7 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
 import java.time.LocalDate;
-import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record UpcomingPerformanceDTO(
@@ -13,15 +13,15 @@ public record UpcomingPerformanceDTO(
         LocalDate endAt,
         String area
 ) {
-    public static UpcomingPerformanceDTO from(Performance performance) {
+    public static UpcomingPerformanceDTO from(Performance_DPRECATED performanceDPRECATED) {
         return new UpcomingPerformanceDTO(
-                performance.getTypeId(),
-                performance.getType(),
-                performance.getTitle(),
-                performance.getPosterPath(),
-                performance.getStartAt(),
-                performance.getEndAt(),
-                performance.getArea()
+                performanceDPRECATED.getTypeId(),
+                performanceDPRECATED.getType(),
+                performanceDPRECATED.getTitle(),
+                performanceDPRECATED.getPosterPath(),
+                performanceDPRECATED.getStartAt(),
+                performanceDPRECATED.getEndAt(),
+                performanceDPRECATED.getArea()
         );
     }
 

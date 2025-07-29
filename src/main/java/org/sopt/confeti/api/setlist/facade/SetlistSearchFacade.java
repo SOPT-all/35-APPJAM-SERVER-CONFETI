@@ -12,7 +12,7 @@ import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchPerformance
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArtistMusicsDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchMusicsDTO;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
-import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceType;
@@ -31,7 +31,7 @@ public class SetlistSearchFacade {
 
     private static final int SEARCH_ARTIST_BY_KEYWORD_LIMIT = 1;
 
-    private final PerformanceService performanceService;
+    private final PerformanceService_DPRECATED performanceServiceDPRECATED;
     private final MusicAPIHandler musicAPIHandler;
     private final PerformanceSearchService performanceSearchService;
 
@@ -76,18 +76,18 @@ public class SetlistSearchFacade {
         PerformanceSearchTermAnalyzeResult analyzeResult = PerformanceSearchTermAnalyzeResult.empty();
 
         if (isPresent(aid)) {
-            performances.addAll(performanceService.getAllPerformancesByArtistId(aid));
+            performances.addAll(performanceServiceDPRECATED.getAllPerformancesByArtistId(aid));
         }
 
         if (isPresent(pid)) {
-            performances.add(PerformanceDTO.from(performanceService.getPerformanceById(pid)));
+            performances.add(PerformanceDTO.from(performanceServiceDPRECATED.getPerformanceById(pid)));
         }
 
         if (isPresent(term)) {
             analyzeResult = SearchTermAnalyzer.analyzePerformance(term);
             Optional<String> artistId = getArtistId(analyzeResult.processedTerm());
 
-            artistId.ifPresent(s -> performances.addAll(performanceService.getAllPerformancesByArtistId(s)));
+            artistId.ifPresent(s -> performances.addAll(performanceServiceDPRECATED.getAllPerformancesByArtistId(s)));
 
             performances.addAll(
                     performanceSearchService.getPerformancesByTitleAndTypePartialMatched(analyzeResult.processedTerm(),

@@ -31,7 +31,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Performance {
+public class Performance_DPRECATED {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,13 +69,13 @@ public class Performance {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "performance", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PerformanceArtist> artists = new ArrayList<>();
+    @OneToMany(mappedBy = "performanceDPRECATED", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PerformanceArtist_DPRECATED> artists = new ArrayList<>();
 
     @Builder
-    private Performance(long typeId, PerformanceType type, String area, String title,
-                        String subtitle, LocalDate startAt, LocalDate endAt,
-                        String posterPath, List<PerformanceArtist> artists) {
+    private Performance_DPRECATED(long typeId, PerformanceType type, String area, String title,
+                                  String subtitle, LocalDate startAt, LocalDate endAt,
+                                  String posterPath, List<PerformanceArtist_DPRECATED> artists) {
         this.typeId = typeId;
         this.type = type;
         this.area = area;
@@ -86,11 +86,11 @@ public class Performance {
         this.posterPath = posterPath;
         this.artists = artists;
 
-        this.artists.forEach(artist -> artist.setPerformance(this));
+        this.artists.forEach(artist -> artist.setPerformanceDPRECATED(this));
     }
 
-    public static Performance create(final long festivalId, final CreateFestivalDTO festivalDTO) {
-        return Performance.builder()
+    public static Performance_DPRECATED create(final long festivalId, final CreateFestivalDTO festivalDTO) {
+        return Performance_DPRECATED.builder()
                 .typeId(festivalId)
                 .type(PerformanceType.FESTIVAL)
                 .area(festivalDTO.area())
@@ -104,14 +104,14 @@ public class Performance {
                                 .flatMap(date -> date.stages().stream())
                                 .flatMap(stage -> stage.times().stream())
                                 .flatMap(time -> time.artists().stream())
-                                .map(PerformanceArtist::create)
+                                .map(PerformanceArtist_DPRECATED::create)
                                 .toList()
                 )
                 .build();
     }
 
-    public static Performance create(final long concertId, final CreateConcertDTO concertDTO) {
-        return Performance.builder()
+    public static Performance_DPRECATED create(final long concertId, final CreateConcertDTO concertDTO) {
+        return Performance_DPRECATED.builder()
                 .typeId(concertId)
                 .type(PerformanceType.CONCERT)
                 .area(concertDTO.area())
@@ -122,14 +122,14 @@ public class Performance {
                 .posterPath(concertDTO.posterPath())
                 .artists(
                         concertDTO.artists().stream()
-                                .map(PerformanceArtist::create)
+                                .map(PerformanceArtist_DPRECATED::create)
                                 .toList()
                 )
                 .build();
     }
 
-    public void addArtists(List<PerformanceArtist> artists) {
+    public void addArtists(List<PerformanceArtist_DPRECATED> artists) {
         this.artists.addAll(artists);
-        artists.forEach(artist -> artist.setPerformance(this));
+        artists.forEach(artist -> artist.setPerformanceDPRECATED(this));
     }
 }

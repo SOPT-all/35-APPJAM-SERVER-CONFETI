@@ -22,7 +22,7 @@ import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.constant.Role;
-import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
 import org.sopt.confeti.global.common.constant.Default;
 
 public class TestDataManager {
@@ -665,13 +665,13 @@ public class TestDataManager {
                 .toList();
     }
 
-    public static List<Performance> createPerformances() {
+    public static List<Performance_DPRECATED> createPerformances() {
         return Stream.concat(
                 IntStream.range(1, createConcertDTOs.size() + 1).mapToObj(i ->
-                        Performance.create(i, createConcertDTOs.get(i - 1))
+                        Performance_DPRECATED.create(i, createConcertDTOs.get(i - 1))
                 ),
                 IntStream.range(1, createFestivalDTOs.size() + 1).mapToObj(i ->
-                        Performance.create(i, createFestivalDTOs.get(i - 1))
+                        Performance_DPRECATED.create(i, createFestivalDTOs.get(i - 1))
                 )
         ).toList();
     }

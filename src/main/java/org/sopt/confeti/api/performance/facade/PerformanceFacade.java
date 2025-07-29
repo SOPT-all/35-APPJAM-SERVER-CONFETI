@@ -41,10 +41,10 @@ import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteSer
 import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.application.UserService;
-import org.sopt.confeti.domain.view.performance.Performance;
-import org.sopt.confeti.domain.view.performance.PerformanceArtist;
+import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
+import org.sopt.confeti.domain.view.performance.PerformanceArtist_DPRECATED;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
-import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
@@ -70,7 +70,7 @@ public class PerformanceFacade {
     private final FestivalService festivalService;
     private final UserService userService;
     private final FestivalFavoriteService festivalFavoriteService;
-    private final PerformanceService performanceService;
+    private final PerformanceService_DPRECATED performanceServiceDPRECATED;
     private final ConcertFavoriteService concertFavoriteService;
     private final ArtistFavoriteService artistFavoriteService;
     private final PerformanceSearchService performanceSearchService;
@@ -136,12 +136,12 @@ public class PerformanceFacade {
         boolean isFFExist = isUserExist && festivalFavoriteService.existsUpcomingReservationByUserId(userId);
 
         if (isCFExist || isFFExist) {
-            List<PerformanceTicketDTO> performanceReserve = performanceService.getFavoritePerformancesReservation(
+            List<PerformanceTicketDTO> performanceReserve = performanceServiceDPRECATED.getFavoritePerformancesReservation(
                     userId);
             return PerformanceReservationDTO.from(performanceReserve);
         }
 
-        List<PerformanceTicketDTO> performanceReserve = performanceService.getPerformancesReservation();
+        List<PerformanceTicketDTO> performanceReserve = performanceServiceDPRECATED.getPerformancesReservation();
         return PerformanceReservationDTO.from(performanceReserve);
     }
 
@@ -166,7 +166,7 @@ public class PerformanceFacade {
 
         return RecentPerformancesDTO.of(
                 PERSONALIZED,
-                performanceService.getPerformancesByArtistIds(
+                performanceServiceDPRECATED.getPerformancesByArtistIds(
                         artistFavorites.stream()
                                 .map(artistFavorite -> artistFavorite.getArtist().getId())
                                 .toList(),
@@ -177,10 +177,10 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public RecentPerformancesDTO getRecentPerformancesWithoutFavorites() {
-        List<Performance> performances = performanceService.getRecentPerformances(RECENT_PERFORMANCES_SIZE);
+        List<Performance_DPRECATED> performanceDPRECATEDS = performanceServiceDPRECATED.getRecentPerformances(RECENT_PERFORMANCES_SIZE);
         return RecentPerformancesDTO.of(
                 UNPERSONALIZED,
-                performances
+                performanceDPRECATEDS
         );
     }
 
@@ -191,7 +191,7 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public ArtistPerformancesDTO getPerformancesByArtistId(final Long userId, final String artistId) {
-        List<PerformanceDTO> performances = performanceService.getPerformancesByArtistId(artistId);
+        List<PerformanceDTO> performances = performanceServiceDPRECATED.getPerformancesByArtistId(artistId);
 
         Map<String, Boolean> favoriteMap = getFavoriteMap(userId, performances);
         List<ArtistPerformancesDetailDTO> performanceList = performances.stream()
@@ -252,7 +252,7 @@ public class PerformanceFacade {
     @Transactional(readOnly = true)
     public RecommendPerformancesDTO getRecommendPerformances() {
         return RecommendPerformancesDTO.from(
-                performanceService.getRecommendPerformances()
+                performanceServiceDPRECATED.getRecommendPerformances()
         );
     }
 
@@ -266,23 +266,23 @@ public class PerformanceFacade {
     @Transactional(readOnly = true)
     public Optional<RecommendMusicsPerformanceDTO> getRecommendPerformanceId(final Long userId) {
 
-        Optional<Performance> performance = performanceService.getPerformanceByUserFavorites(userId);
+        Optional<Performance_DPRECATED> performance = performanceServiceDPRECATED.getPerformanceByUserFavorites(userId);
         if (Objects.isNull(userId) || performance.isEmpty()) {
-            performance = performanceService.getPerformanceByRand();
+            performance = performanceServiceDPRECATED.getPerformanceByRand();
         }
 
         return performance.map(RecommendMusicsPerformanceDTO::from);
     }
 
-    protected Set<String> setArtistsByRandom(Performance performance) {
-        List<PerformanceArtist> performanceArtists = performance.getArtists();
+    protected Set<String> setArtistsByRandom(Performance_DPRECATED performanceDPRECATED) {
+        List<PerformanceArtist_DPRECATED> performanceArtistDPRECATEDS = performanceDPRECATED.getArtists();
 
-        if (performanceArtists.isEmpty()) {
+        if (performanceArtistDPRECATEDS.isEmpty()) {
             return Collections.emptySet();
         }
 
-        List<String> artistList = performanceArtists.stream()
-                .map(PerformanceArtist::getArtistId).distinct().collect(Collectors.toList());
+        List<String> artistList = performanceArtistDPRECATEDS.stream()
+                .map(PerformanceArtist_DPRECATED::getArtistId).distinct().collect(Collectors.toList());
         Collections.shuffle(artistList);
 
         int artistCount = Math.min(artistList.size(), 3);
@@ -291,8 +291,8 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public RecommendMusicsDTO getNewRecommendMusics(long performanceId, List<String> musicIds) {
-        Performance performance = performanceService.getPerformanceById(performanceId);
-        Set<String> selectedArtistIds = setArtistsByRandom(performance);
+        Performance_DPRECATED performanceDPRECATED = performanceServiceDPRECATED.getPerformanceById(performanceId);
+        Set<String> selectedArtistIds = setArtistsByRandom(performanceDPRECATED);
         Set<String> existingMusicIds = (musicIds == null || musicIds.isEmpty())
                 ? Collections.emptySet()
                 : musicIds.stream().flatMap(ids -> Arrays.stream(ids.split(",")))
@@ -365,12 +365,12 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public ExpectedPerformancesDTO getExpectedPerformances(GetExpectedPerformancesDTO expectedPerformancesDTO) {
-        return ExpectedPerformancesDTO.from(performanceService.getExpectedPerformances(expectedPerformancesDTO));
+        return ExpectedPerformancesDTO.from(performanceServiceDPRECATED.getExpectedPerformances(expectedPerformancesDTO));
     }
 
     public PerformanceIdsDTO getPerformances() {
         return PerformanceIdsDTO.from(
-                performanceService.getPerformances()
+                performanceServiceDPRECATED.getPerformances()
         );
     }
 }

@@ -15,9 +15,9 @@ import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
-import org.sopt.confeti.domain.view.performance.Performance;
-import org.sopt.confeti.domain.view.performance.PerformanceArtist;
-import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
+import org.sopt.confeti.domain.view.performance.PerformanceArtist_DPRECATED;
+import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.common.constant.PerformanceType;
@@ -33,7 +33,7 @@ public class DummyFacade {
     private final S3FileHandler s3FileHandler;
     private final FestivalService festivalService;
     private final ConcertService concertService;
-    private final PerformanceService performanceService;
+    private final PerformanceService_DPRECATED performanceServiceDPRECATED;
 
     public FestivalFilePathsDTO uploadFestivalFiles(UploadFestivalFilesDTO files) {
         String posterPath = s3FileHandler.uploadFile(files.poster(),
@@ -51,7 +51,7 @@ public class DummyFacade {
     @Transactional
     public void createFestival(CreateFestivalDTO festivalDTO) {
         long festivalId = festivalService.create(Festival.create(festivalDTO));
-        performanceService.create(Performance.create(festivalId, festivalDTO));
+        performanceServiceDPRECATED.create(Performance_DPRECATED.create(festivalId, festivalDTO));
     }
 
     public ConcertFilePathsDTO uploadConcertFiles(UploadConcertFilesDTO files) {
@@ -68,7 +68,7 @@ public class DummyFacade {
     @Transactional
     public void createConcert(CreateConcertDTO concertDTO) {
         long concertId = concertService.create(Concert.create(concertDTO));
-        performanceService.create(Performance.create(concertId, concertDTO));
+        performanceServiceDPRECATED.create(Performance_DPRECATED.create(concertId, concertDTO));
     }
 
     @Transactional(readOnly = true)
@@ -94,15 +94,15 @@ public class DummyFacade {
     @Transactional
     public void fixFestival(long festivalId, List<CreateFestivalDateDTO> dates) {
         festivalService.addDates(festivalId, dates);
-        performanceService.addPerformanceArtists(PerformanceType.FESTIVAL, festivalId, getPerformanceArtists(dates));
+        performanceServiceDPRECATED.addPerformanceArtists(PerformanceType.FESTIVAL, festivalId, getPerformanceArtists(dates));
     }
 
-    private List<PerformanceArtist> getPerformanceArtists(List<CreateFestivalDateDTO> dates) {
+    private List<PerformanceArtist_DPRECATED> getPerformanceArtists(List<CreateFestivalDateDTO> dates) {
         return dates.stream()
                 .flatMap(date -> date.stages().stream())
                 .flatMap(stage -> stage.times().stream())
                 .flatMap(time -> time.artists().stream())
-                .map(PerformanceArtist::create)
+                .map(PerformanceArtist_DPRECATED::create)
                 .toList();
     }
 

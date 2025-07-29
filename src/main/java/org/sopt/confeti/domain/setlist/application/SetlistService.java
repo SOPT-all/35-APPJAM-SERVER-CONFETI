@@ -21,12 +21,10 @@ import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistMusicRepository;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
 import org.sopt.confeti.domain.user.User;
-import org.sopt.confeti.domain.user.infra.repository.UserRepository;
-import org.sopt.confeti.domain.view.performance.Performance;
-import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
+import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
-import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.stereotype.Service;
@@ -42,7 +40,7 @@ public class SetlistService {
     private final FestivalRepository festivalRepository;
     private final SetlistMusicRepository setlistMusicRepository;
     private final S3FileHandler s3FileHandler;
-    private final PerformanceService performanceService;
+    private final PerformanceService_DPRECATED performanceServiceDPRECATED;
 
     private static final int MAX_SETLIST_PREVIEW_COUNT = 3;
 
@@ -52,9 +50,9 @@ public class SetlistService {
 
         List<SetlistSummaryResponse> dtoList = setlists.stream()
                 .map(setlist -> {
-                    Performance performance = performanceService.getPerformanceByTypeAndTypeId(
+                    Performance_DPRECATED performanceDPRECATED = performanceServiceDPRECATED.getPerformanceByTypeAndTypeId(
                             PerformanceType.valueOf(setlist.getType().name()), setlist.getTypeId());
-                    return SetlistSummaryResponse.of(setlist, performance, s3FileHandler);
+                    return SetlistSummaryResponse.of(setlist, performanceDPRECATED, s3FileHandler);
                 })
                 .sorted((a , b) -> sortType == SetlistSortType.OLDEST
                         ? a.endAt().compareTo(b.endAt()) : b.endAt().compareTo(a.endAt()))
@@ -69,9 +67,9 @@ public class SetlistService {
 
         return setlists.stream()
                 .map(setlist -> {
-                    Performance performance = performanceService.getPerformanceByTypeAndTypeId(
+                    Performance_DPRECATED performanceDPRECATED = performanceServiceDPRECATED.getPerformanceByTypeAndTypeId(
                             PerformanceType.valueOf(setlist.getType().name()), setlist.getTypeId());
-                    return SetlistSummaryResponse.of(setlist, performance, s3FileHandler);
+                    return SetlistSummaryResponse.of(setlist, performanceDPRECATED, s3FileHandler);
                 })
                 .sorted(Comparator.comparing(SetlistSummaryResponse::endAt))
                 .limit(MAX_SETLIST_PREVIEW_COUNT)

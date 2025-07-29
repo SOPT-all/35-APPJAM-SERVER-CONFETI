@@ -16,7 +16,14 @@ services:
       - "6379:6379"
     volumes:
       - redis-master-data:/bitnami/redis/data:rw
-    command: redis-server --enable-debug-command yes --protected-mode no
+#    command: redis-server --enable-debug-command yes --protected-mode no
+    command: >
+      redis-server 
+      --enable-debug-command yes 
+      --protected-mode no
+      --bind 0.0.0.0
+      --replica-announce-ip 127.0.0.1
+      --replica-announce-port 6379
     networks:
       - confeti-network
 
@@ -30,6 +37,12 @@ services:
       - REDIS_REPLICATION_MODE=slave
     ports:
       - "6479:6379"
+    command: >
+      redis-server
+      --bind 0.0.0.0
+      --replica-announce-ip 127.0.0.1
+      --replica-announce-port 6479
+      --replicaof redis-master 6379
     volumes:
       - redis-slave-1-data:/bitnami/redis/data:rw
     depends_on:
@@ -47,6 +60,12 @@ services:
       - REDIS_REPLICATION_MODE=slave
     ports:
       - "6579:6379"
+    command: >
+      redis-server
+      --bind 0.0.0.0
+      --replica-announce-ip 127.0.0.1
+      --replica-announce-port 6579
+      --replicaof redis-master 6379
     volumes:
       - redis-slave-2-data:/bitnami/redis/data:rw
     depends_on:
@@ -65,6 +84,10 @@ services:
       - REDIS_MASTER_PORT_NUMBER=6379
       - REDIS_MASTER_SET=mymaster
       - REDIS_SENTINEL_QUORUM=2
+    command: >
+      redis-sentinel /opt/bitnami/redis-sentinel/etc/sentinel.conf
+      --sentinel announce-ip 127.0.0.1
+      --sentinel announce-port 26379
     depends_on:
       - redis-master
       - redis-slave-1
@@ -90,6 +113,10 @@ services:
       - redis-slave-2
     ports:
       - "26380:26379"
+    command: >
+      redis-sentinel /opt/bitnami/redis-sentinel/etc/sentinel.conf
+      --sentinel announce-ip 127.0.0.1
+      --sentinel announce-port 26380
     networks:
       - confeti-network
 
@@ -109,6 +136,10 @@ services:
       - redis-slave-2
     ports:
       - "26381:26379"
+    command: >
+      redis-sentinel /opt/bitnami/redis-sentinel/etc/sentinel.conf
+      --sentinel announce-ip 127.0.0.1
+      --sentinel announce-port 26381
     networks:
       - confeti-network
 

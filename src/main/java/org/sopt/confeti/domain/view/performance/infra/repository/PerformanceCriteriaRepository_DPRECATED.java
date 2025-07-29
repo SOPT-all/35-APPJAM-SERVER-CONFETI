@@ -9,13 +9,13 @@ import jakarta.persistence.criteria.Root;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PerformanceCriteriaRepository {
+public class PerformanceCriteriaRepository_DPRECATED {
 
     private static final String COLUMN_TYPE = "type";
     private static final String COLUMN_TYPE_ID = "typeId";
@@ -24,10 +24,10 @@ public class PerformanceCriteriaRepository {
     @PersistenceContext
     private EntityManager em;
 
-    public List<Performance> findPerformancesByTypeAndTypeId(List<Pair<PerformanceType, Long>> pairs) {
+    public List<Performance_DPRECATED> findPerformancesByTypeAndTypeId(List<Pair<PerformanceType, Long>> pairs) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Performance> cq = cb.createQuery(Performance.class);
-        Root<Performance> root = cq.from(Performance.class);
+        CriteriaQuery<Performance_DPRECATED> cq = cb.createQuery(Performance_DPRECATED.class);
+        Root<Performance_DPRECATED> root = cq.from(Performance_DPRECATED.class);
 
         // endAt >= CURRENT_DATE
         Predicate endAtPredicate = cb.greaterThanOrEqualTo(root.get(COLUMN_END_AT), LocalDate.now());

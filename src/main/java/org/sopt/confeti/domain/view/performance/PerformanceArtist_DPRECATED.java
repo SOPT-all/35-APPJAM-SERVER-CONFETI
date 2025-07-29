@@ -21,7 +21,7 @@ import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalArti
 @Table(name = "performance_artists")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PerformanceArtist {
+public class PerformanceArtist_DPRECATED {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,18 +33,18 @@ public class PerformanceArtist {
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "performance_id", nullable = false)
-    private Performance performance;
+    private Performance_DPRECATED performanceDPRECATED;
 
     @Builder
-    private PerformanceArtist(String artistId) {
+    private PerformanceArtist_DPRECATED(String artistId) {
         this.artistId = artistId;
     }
 
-    public static PerformanceArtist create(CreateFestivalArtistDTO festivalArtistDTO) {
-        return new PerformanceArtist(festivalArtistDTO.artistId());
+    public static PerformanceArtist_DPRECATED create(CreateFestivalArtistDTO festivalArtistDTO) {
+        return new PerformanceArtist_DPRECATED(festivalArtistDTO.artistId());
     }
 
-    public static PerformanceArtist create(CreateConcertArtistDTO concertArtistDTO) {
-        return new PerformanceArtist(concertArtistDTO.artistId());
+    public static PerformanceArtist_DPRECATED create(CreateConcertArtistDTO concertArtistDTO) {
+        return new PerformanceArtist_DPRECATED(concertArtistDTO.artistId());
     }
 }

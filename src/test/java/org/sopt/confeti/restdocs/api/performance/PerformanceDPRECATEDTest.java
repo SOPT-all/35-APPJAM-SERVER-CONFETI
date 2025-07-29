@@ -10,7 +10,7 @@ import org.sopt.confeti.restdocs.base.APIBaseTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
-public class PerformanceTest extends APIBaseTest {
+public class PerformanceDPRECATEDTest extends APIBaseTest {
 
     private static final String TAG = "performance";
 

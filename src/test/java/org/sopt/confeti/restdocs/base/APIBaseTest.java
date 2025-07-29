@@ -48,7 +48,7 @@ import org.sopt.confeti.domain.token.infra.RefreshTokenRepository;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
-import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceRepository;
+import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceRepository_DPRECATED;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,7 +138,7 @@ public abstract class APIBaseTest {
     protected PerformanceSearchRepository performanceSearchRepository;
 
     @Autowired
-    protected PerformanceRepository performanceRepository;
+    protected PerformanceRepository_DPRECATED performanceRepositoryDPRECATED;
 
     @Autowired
     protected UserRepository userRepository;
@@ -346,7 +346,7 @@ public abstract class APIBaseTest {
      * 공연 베이스 데이터
      */
     private void insertPerformanceTestData() {
-        performanceRepository.saveAll(TestDataManager.createPerformances());
+        performanceRepositoryDPRECATED.saveAll(TestDataManager.createPerformances());
     }
 
     /**
@@ -423,7 +423,7 @@ public abstract class APIBaseTest {
     private void insertPerformanceTestDataES() {
         if (existPerformanceIndex()) {
             performanceSearchRepository.saveAll(
-                    performanceRepository.findAll().stream()
+                    performanceRepositoryDPRECATED.findAll().stream()
                             .map(PerformanceDTO::from)
                             .map(PerformanceDocument::create)
                             .toList()

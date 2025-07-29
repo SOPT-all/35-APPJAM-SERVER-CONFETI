@@ -10,14 +10,14 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
-import org.sopt.confeti.domain.view.performance.Performance;
-import org.sopt.confeti.domain.view.performance.PerformanceArtist;
+import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
+import org.sopt.confeti.domain.view.performance.PerformanceArtist_DPRECATED;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
-import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceCriteriaRepository;
+import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceCriteriaRepository_DPRECATED;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceDTORepository;
-import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceRepository;
+import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceRepository_DPRECATED;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -31,14 +31,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PerformanceService {
+public class PerformanceService_DPRECATED {
 
     private static final int INIT_PAGE = 0;
     private static final String CREATED_AT_COLUMN = "createdAt";
 
     private final PerformanceDTORepository performanceDTORepository;
-    private final PerformanceRepository performanceRepository;
-    private final PerformanceCriteriaRepository performanceCriteriaRepository;
+    private final PerformanceRepository_DPRECATED performanceRepositoryDPRECATED;
+    private final PerformanceCriteriaRepository_DPRECATED performanceCriteriaRepositoryDPRECATED;
 
     @Transactional(readOnly = true)
     public List<PerformancePreviewDTO> getFavoritePerformancesPreview(final long userId) {
@@ -47,7 +47,7 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getFavoritePerformancesAll(final long userId, final String type) {
-        return performanceRepository.findPerformancesByUserFavorites(userId, type).stream()
+        return performanceRepositoryDPRECATED.findPerformancesByUserFavorites(userId, type).stream()
                 .map(PerformanceDTO::from)
                 .toList();
     }
@@ -63,13 +63,13 @@ public class PerformanceService {
     }
 
     @Transactional
-    public void create(final Performance performances) {
-        performanceRepository.save(performances);
+    public void create(final Performance_DPRECATED performances) {
+        performanceRepositoryDPRECATED.save(performances);
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getPerformancesByArtistIds(final List<String> artistIds, final int size) {
-        return performanceRepository.findPerformancesByArtistIds(
+    public List<Performance_DPRECATED> getPerformancesByArtistIds(final List<String> artistIds, final int size) {
+        return performanceRepositoryDPRECATED.findPerformancesByArtistIds(
                 artistIds,
                 getPageRequest(size, getRecentPerformancesSort())
         );
@@ -87,21 +87,21 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getPerformancesByArtistId(final String artistId) {
-        return performanceRepository.findPerformancesByArtistId(artistId).stream()
+        return performanceRepositoryDPRECATED.findPerformancesByArtistId(artistId).stream()
                 .map(PerformanceDTO::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getAllPerformancesByArtistId(final String artistId) {
-        return performanceRepository.findPerformancesByArtists_ArtistId(artistId).stream()
+        return performanceRepositoryDPRECATED.findPerformancesByArtists_ArtistId(artistId).stream()
                 .map(PerformanceDTO::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getRecentPerformances(final int recentPerformancesSize) {
-        return performanceRepository.findRecentPerformancesByEndAtGreaterThanEqual(
+    public List<Performance_DPRECATED> getRecentPerformances(final int recentPerformancesSize) {
+        return performanceRepositoryDPRECATED.findRecentPerformancesByEndAtGreaterThanEqual(
                 LocalDate.now(),
                 getPageRequest(recentPerformancesSize, getRecentPerformancesSort())
         ).stream().toList();
@@ -109,71 +109,71 @@ public class PerformanceService {
 
     @Transactional
     public void addPerformanceArtists(PerformanceType performanceType, long festivalId,
-                                      List<PerformanceArtist> performanceArtists) {
-        Performance performance = performanceRepository.findPerformanceByTypeAndTypeId(performanceType, festivalId)
+                                      List<PerformanceArtist_DPRECATED> performanceArtistDPRECATEDS) {
+        Performance_DPRECATED performanceDPRECATED = performanceRepositoryDPRECATED.findPerformanceByTypeAndTypeId(performanceType, festivalId)
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
 
-        performance.addArtists(performanceArtists);
+        performanceDPRECATED.addArtists(performanceArtistDPRECATEDS);
     }
 
     @Transactional
-    public Performance getUpcomingPerformanceByUserId(final Long userId) {
-        return performanceRepository.upcomingPerformanceByUserId(userId)
+    public Performance_DPRECATED getUpcomingPerformanceByUserId(final Long userId) {
+        return performanceRepositoryDPRECATED.upcomingPerformanceByUserId(userId)
                 .orElse(null);
     }
 
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getAllPerformances() {
-        return performanceRepository.findAll().stream()
+        return performanceRepositoryDPRECATED.findAll().stream()
                 .map(PerformanceDTO::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getRecommendPerformances() {
-        return performanceRepository.findTop5ByRand();
+    public List<Performance_DPRECATED> getRecommendPerformances() {
+        return performanceRepositoryDPRECATED.findTop5ByRand();
     }
 
     @Transactional(readOnly = true)
     public PerformanceDTO getPerformance(long performanceId) {
-        Performance performance = performanceRepository.findPerformanceByIdAndEndAtGreaterThanEqual(
+        Performance_DPRECATED performanceDPRECATED = performanceRepositoryDPRECATED.findPerformanceByIdAndEndAtGreaterThanEqual(
                         performanceId,
                         LocalDate.now())
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
 
-        return PerformanceDTO.from(performance);
+        return PerformanceDTO.from(performanceDPRECATED);
     }
 
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getPerformancesByArtistIdAndType(String artistId, PerformanceType type) {
         if (type == PerformanceType.PERFORMANCE) {
-            return performanceRepository.findPerformancesByArtistId(artistId).stream()
+            return performanceRepositoryDPRECATED.findPerformancesByArtistId(artistId).stream()
                     .map(PerformanceDTO::from)
                     .toList();
         }
 
-        return performanceRepository.findPerformancesByTypeAndArtistId(type, artistId).stream()
+        return performanceRepositoryDPRECATED.findPerformancesByTypeAndArtistId(type, artistId).stream()
                 .map(PerformanceDTO::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public Optional<Performance> getPerformanceByRand() {
-        return performanceRepository.findPerformanceByRand();
+    public Optional<Performance_DPRECATED> getPerformanceByRand() {
+        return performanceRepositoryDPRECATED.findPerformanceByRand();
     }
 
     @Transactional(readOnly = true)
-    public Optional<Performance> getPerformanceByUserFavorites(final Long userId) {
-        return performanceRepository.getPerformanceByUserFavorites(userId);
+    public Optional<Performance_DPRECATED> getPerformanceByUserFavorites(final Long userId) {
+        return performanceRepositoryDPRECATED.getPerformanceByUserFavorites(userId);
     }
 
     @Transactional(readOnly = true)
-    public Performance getPerformanceById(long performanceId) {
-        return performanceRepository.findById(performanceId)
+    public Performance_DPRECATED getPerformanceById(long performanceId) {
+        return performanceRepositoryDPRECATED.findById(performanceId)
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
@@ -182,10 +182,10 @@ public class PerformanceService {
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getExpectedPerformances(GetExpectedPerformancesDTO expectedPerformancesDTO) {
         List<Pair<PerformanceType, Long>> performancePairs = convertToPairs(expectedPerformancesDTO);
-        List<Performance> performances = performanceCriteriaRepository.findPerformancesByTypeAndTypeId(
+        List<Performance_DPRECATED> performanceDPRECATEDS = performanceCriteriaRepositoryDPRECATED.findPerformancesByTypeAndTypeId(
                 performancePairs);
 
-        Map<Pair<PerformanceType, Long>, Performance> performanceMapper = performances.stream()
+        Map<Pair<PerformanceType, Long>, Performance_DPRECATED> performanceMapper = performanceDPRECATEDS.stream()
                 .collect(Collectors.toMap(
                         performance -> Pair.of(performance.getType(), performance.getTypeId()),
                         Function.identity()
@@ -199,8 +199,8 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public Performance getPerformanceByTypeAndTypeId(PerformanceType type, long typeId) {
-        return performanceRepository.findPerformanceByTypeAndTypeId(type, typeId)
+    public Performance_DPRECATED getPerformanceByTypeAndTypeId(PerformanceType type, long typeId) {
+        return performanceRepositoryDPRECATED.findPerformanceByTypeAndTypeId(type, typeId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
@@ -211,7 +211,7 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getPerformances() {
-        return performanceRepository.findByEndAtGreaterThanEqual(LocalDate.now());
+    public List<Performance_DPRECATED> getPerformances() {
+        return performanceRepositoryDPRECATED.findByEndAtGreaterThanEqual(LocalDate.now());
     }
 }

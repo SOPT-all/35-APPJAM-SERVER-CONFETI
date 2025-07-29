@@ -1,0 +1,76 @@
+package org.sopt.confeti.domain.performance_schedule;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.sopt.confeti.domain.performance.Performance;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+@Entity
+@Table(name = "performance_schedules")
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class PerformanceSchedule {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "performance_id")
+    private Performance performance;
+
+    @Column(length = 50, nullable = false)
+    private String artistId;
+
+    @Column(nullable = false)
+    private LocalDate eventDate;
+
+    @Column(length = 30)
+    private String stageName;
+
+    @Column
+    private LocalTime startAt;
+
+    @Column
+    private LocalTime endAt;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
+    @Builder
+    public PerformanceSchedule(Performance performance, String artistId, LocalDate eventDate, String stageName,
+                               LocalTime startAt, LocalTime endAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.performance = performance;
+        this.artistId = artistId;
+        this.eventDate = eventDate;
+        this.stageName = stageName;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+}

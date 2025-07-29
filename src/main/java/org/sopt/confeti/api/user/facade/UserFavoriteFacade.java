@@ -18,8 +18,8 @@ import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
-import org.sopt.confeti.domain.view.performance.Performance;
-import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
+import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
 import org.sopt.confeti.global.annotation.Facade;
@@ -43,7 +43,7 @@ public class UserFavoriteFacade {
     private final ConcertFavoriteService concertFavoriteService;
     private final ConcertService concertService;
     private final MusicAPIHandler musicAPIHandler;
-    private final PerformanceService performanceService;
+    private final PerformanceService_DPRECATED performanceServiceDPRECATED;
 
     private static final String TYPE_ALL = "ALL";
 
@@ -149,7 +149,7 @@ public class UserFavoriteFacade {
     public UserFavoritePerformancesDTO getFavoritePerformances(final long userId) {
         validateExistUser(userId);
 
-        List<PerformancePreviewDTO> performances = performanceService.getFavoritePerformancesPreview(userId);
+        List<PerformancePreviewDTO> performances = performanceServiceDPRECATED.getFavoritePerformancesPreview(userId);
         return UserFavoritePerformancesDTO.from(performances);
     }
 
@@ -158,7 +158,7 @@ public class UserFavoriteFacade {
         validateExistUser(userId);
         validateType(type);
 
-        List<PerformanceDTO> performances = performanceService.getFavoritePerformancesAll(userId, type);
+        List<PerformanceDTO> performances = performanceServiceDPRECATED.getFavoritePerformancesAll(userId, type);
         return UserFavoritePerformancesAllDTO.from(performances);
     }
 
@@ -202,11 +202,11 @@ public class UserFavoriteFacade {
     public UpcomingPerformanceDTO getUpcomingPerformance(final long userId) {
         validateExistUser(userId);
 
-        Performance performance = performanceService.getUpcomingPerformanceByUserId(userId);
-        if (performance == null) {
+        Performance_DPRECATED performanceDPRECATED = performanceServiceDPRECATED.getUpcomingPerformanceByUserId(userId);
+        if (performanceDPRECATED == null) {
             return null;
         }
-        return UpcomingPerformanceDTO.from(performance);
+        return UpcomingPerformanceDTO.from(performanceDPRECATED);
     }
 
     @Transactional(readOnly = true)
