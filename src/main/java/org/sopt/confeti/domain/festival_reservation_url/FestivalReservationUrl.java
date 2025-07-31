@@ -32,7 +32,7 @@ public class FestivalReservationUrl {
     @JoinColumn(name = "festival_id")
     private Festival festival;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 200, nullable = false)
     private String reservationUrl;
 
     @Column(length = 50, nullable = false)
