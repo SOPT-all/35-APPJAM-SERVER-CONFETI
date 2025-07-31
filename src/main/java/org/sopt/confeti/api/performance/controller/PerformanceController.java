@@ -76,12 +76,12 @@ public class PerformanceController {
     }
 
     @Permission(role = {Role.GENERAL})
-    @GetMapping("/festivals/{festivalId}")
+    @GetMapping("/festivals/{performanceId}")
     public ResponseEntity<BaseResponse<?>> getFestivalInfo(
             @UserId(require = false) Long userId,
-            @PathVariable("festivalId") @Min(RequestConstraint.ID) Long festivalId
+            @PathVariable @Min(RequestConstraint.ID) Long performanceId
     ) {
-        FestivalDetailDTO festivalDetailDTO = performanceFacade.getFestivalDetailInfo(userId, festivalId);
+        FestivalDetailDTO festivalDetailDTO = performanceFacade.getFestivalDetail(userId, performanceId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 FestivalDetailResponse.of(festivalDetailDTO, s3FileHandler));
     }

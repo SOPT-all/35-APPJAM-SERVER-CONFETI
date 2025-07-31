@@ -107,16 +107,17 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public FestivalDetailDTO getFestivalDetailInfo(final Long userId, final long festivalId) {
-        boolean isFavorite = getIsFavorite(userId, festivalId);
+    public FestivalDetailDTO getFestivalDetail(final Long userId, final long performanceId) {
+        boolean isFavorite = getIsFavorite(userId, performanceId);
 
-        Festival festival = festivalService.getFestivalDetailByFestivalId(festivalId);
-        validateFestivalNotPassed(festival);
+        Performance performance = performanceService.getRecentPerformance(performanceId)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
 
-        return FestivalDetailDTO.of(festival, isFavorite);
+        return FestivalDetailDTO.of(performance, isFavorite);
     }
 
-    @Transactional(readOnly = true)
     protected boolean getIsFavorite(final Long userid, final long festivalId) {
         if (userid != null) {
             return festivalFavoriteService.isFavorite(userid, festivalId);

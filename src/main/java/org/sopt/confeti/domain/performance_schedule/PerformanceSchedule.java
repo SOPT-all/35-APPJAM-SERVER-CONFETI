@@ -1,6 +1,7 @@
 package org.sopt.confeti.domain.performance_schedule;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -19,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.domain.performance.Performance;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -39,14 +41,21 @@ public class PerformanceSchedule {
     @JoinColumn(name = "performance_id")
     private Performance performance;
 
-    @Column(length = 50, nullable = false)
-    private String artistId;
+    @Embedded
+    private ConfetiArtist artist;
+
 
     @Column(nullable = false)
-    private LocalDate eventDate;
+    private LocalDate performanceAt;
 
     @Column(length = 30)
     private String stageName;
+
+    @Column
+    private LocalTime openAt;
+
+    @Column(name = "orders")
+    private int order;
 
     @Column
     private LocalTime startAt;
@@ -62,12 +71,13 @@ public class PerformanceSchedule {
     private LocalDateTime updatedAt;
 
     @Builder
-    public PerformanceSchedule(Performance performance, String artistId, LocalDate eventDate, String stageName,
+    public PerformanceSchedule(Performance performance, String artistId, LocalDate performanceAt, String stageName, LocalTime openAt,
                                LocalTime startAt, LocalTime endAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.performance = performance;
         this.artistId = artistId;
-        this.eventDate = eventDate;
+        this.performanceAt = performanceAt;
         this.stageName = stageName;
+        this.openAt = openAt;
         this.startAt = startAt;
         this.endAt = endAt;
         this.createdAt = createdAt;

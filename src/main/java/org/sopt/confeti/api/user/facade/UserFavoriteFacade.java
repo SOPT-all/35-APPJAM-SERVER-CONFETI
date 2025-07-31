@@ -154,12 +154,12 @@ public class UserFavoriteFacade {
     }
 
     @Transactional
-    public void removeConcertFavorite(final long userId, final long concertId) {
+    public void removePerformanceFavorite(final long userId, final long performanceId) {
         validateExistUser(userId);
-        validateExistConcert(concertId);
-        validateExistConcertFavorite(userId, concertId);
+        validateExistPerformance(performanceId);
+        validateExistPerformanceFavorite(userId, performanceId);
 
-        concertFavoriteService.removeFavorite(userId, concertId);
+        performanceFavoriteService.removeFavorite(userId, performanceId);
     }
 
     @Transactional(readOnly = true)
@@ -179,10 +179,9 @@ public class UserFavoriteFacade {
         return UserFavoritePerformancesAllDTO.from(performances);
     }
 
-    @Transactional(readOnly = true)
-    protected void validateExistConcertFavorite(final long userId, final long concertId) {
-        if (!concertFavoriteService.isFavorite(userId, concertId)) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+    protected void validateExistPerformanceFavorite(long userId, long performanceId) {
+        if (!performanceFavoriteService.isFavorite(userId, performanceId)) {
+            throw new NotFoundException(ErrorMessage.CONFLICT);
         }
     }
 
@@ -200,9 +199,8 @@ public class UserFavoriteFacade {
         }
     }
 
-    @Transactional(readOnly = true)
-    protected void validateExistConcert(final long concertId) {
-        if (!concertService.existsById(concertId)) {
+    protected void validateExistPerformance(long performanceId) {
+        if (!performanceService.existsById(performanceId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }

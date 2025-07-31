@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.performance.Performance;
 
 public record FestivalDetailDTO(
         long festivalId,
@@ -23,26 +24,26 @@ public record FestivalDetailDTO(
         List<FestivalReservationDTO> reservations,
         List<FestivalDetailDateDTO> dates
 ) {
-    public static FestivalDetailDTO of(final Festival festival, boolean isFavorite) {
+    public static FestivalDetailDTO of(final Performance performance, boolean isFavorite) {
         return new FestivalDetailDTO(
-                festival.getId(),
-                festival.getTitle(),
-                festival.getSubtitle(),
-                festival.getStartAt(),
-                festival.getEndAt(),
-                festival.getArea(),
-                festival.getPosterPath(),
-                festival.getLogoPath(),
-                festival.getReserveAt(),
-                festival.getAgeRating(),
-                festival.getTime(),
-                festival.getPrice(),
+                performance.getId(),
+                performance.getTitle(),
+                performance.getSubtitle(),
+                performance.getStartAt(),
+                performance.getEndAt(),
+                performance.getArea(),
+                performance.getPosterPath(),
+                performance.getLogoPath(),
+                performance.getReserveAt(),
+                performance.getAgeRating(),
+                performance.getTime(),
+                performance.getPrice(),
                 isFavorite,
-                festival.getAddress(),
-                festival.getReservationUrls().stream()
+                performance.getAddress(),
+                performance.getReservationUrls().stream()
                         .map(FestivalReservationDTO::from)
                         .toList(),
-                festival.getDates().stream()
+                performance.getSchedules().stream()
                         .map(FestivalDetailDateDTO::from)
                         .toList()
         );

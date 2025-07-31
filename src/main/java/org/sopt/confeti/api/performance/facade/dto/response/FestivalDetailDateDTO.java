@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
+import org.sopt.confeti.domain.performance_schedule.PerformanceSchedule;
 
 public record FestivalDetailDateDTO(
         long festivalDateId,
@@ -11,12 +12,12 @@ public record FestivalDetailDateDTO(
         LocalTime openAt,
         List<FestivalDetailStageDTO> stages
 ) {
-    public static FestivalDetailDateDTO from(final FestivalDate festivalDate) {
+    public static FestivalDetailDateDTO from(final PerformanceSchedule schedule) {
         return new FestivalDetailDateDTO(
-                festivalDate.getId(),
-                festivalDate.getFestivalAt(),
-                festivalDate.getOpenAt(),
-                festivalDate.getStages().stream()
+                schedule.getId(),
+                schedule.getFestivalAt(),
+                schedule.getOpenAt(),
+                schedule.getStages().stream()
                         .map(FestivalDetailStageDTO::from)
                         .toList()
         );

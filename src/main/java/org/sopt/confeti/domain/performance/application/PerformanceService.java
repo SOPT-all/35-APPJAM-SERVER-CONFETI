@@ -29,6 +29,11 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<Performance> getRecentPerformance(long performanceId) {
+        return performanceRepository.findById(performanceId, getRecentPerformancesSort());
+    }
+
+    @Transactional(readOnly = true)
     public List<Performance> getRecentPerformances(int fetchSize) {
         return performanceRepository.findRecentPerformances(
                 LocalDate.now(),
@@ -50,6 +55,11 @@ public class PerformanceService {
                 userId,
                 getPageRequest(FAVORITE_PERFORMANCE_PREVIEW_COUNT, getRecentPerformancesSort())
         );
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsById(long performanceId) {
+        return performanceRepository.existsById(performanceId);
     }
 
     private PageRequest getPageRequest(final int size, final Sort sort) {

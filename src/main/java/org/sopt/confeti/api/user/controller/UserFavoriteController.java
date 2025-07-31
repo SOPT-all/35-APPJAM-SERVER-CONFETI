@@ -101,12 +101,12 @@ public class UserFavoriteController {
     }
 
     @Permission(role = {Role.GENERAL})
-    @DeleteMapping("/concerts/{concertId}")
+    @DeleteMapping("/concerts/{performanceId}")
     public ResponseEntity<BaseResponse<?>> removeConcertFavorite(
             @UserId Long userId,
-            @PathVariable(name = "concertId") Long concertId
+            @PathVariable Long performanceId
     ) {
-        userFavoriteFacade.removeConcertFavorite(userId, concertId);
+        userFavoriteFacade.removePerformanceFavorite(userId, performanceId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 

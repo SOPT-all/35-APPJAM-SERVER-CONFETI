@@ -32,4 +32,14 @@ public class PerformanceFavoriteService {
                 PerformanceFavorite.create(user, performance)
         );
     }
+
+    @Transactional(readOnly = true)
+    public boolean isFavorite(long userId, long performanceId) {
+        return performanceFavoriteRepository.existsByUser_IdAndPerformance_Id(userId, performanceId);
+    }
+
+    @Transactional
+    public void removeFavorite(long userId, long performanceId) {
+        performanceFavoriteRepository.deleteByUser_IdAndPerformance_Id(userId, performanceId);
+    }
 }

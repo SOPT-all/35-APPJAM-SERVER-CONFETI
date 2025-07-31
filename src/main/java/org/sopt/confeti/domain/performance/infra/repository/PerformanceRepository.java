@@ -2,8 +2,10 @@ package org.sopt.confeti.domain.performance.infra.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.sopt.confeti.domain.performance.Performance;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,4 +32,6 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "AND p.endAt >= CURRENT_DATE "
     )
     List<Performance> findFavoriteRecentPerformances(@Param("userId") long userId, PageRequest pageRequest);
+
+    Optional<Performance> findById(long performanceId, Sort sort);
 }
