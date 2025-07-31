@@ -7,7 +7,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalArtiestDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
@@ -19,6 +18,8 @@ import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.application.FestivalDateService;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
+import org.sopt.confeti.domain.performance.Performance;
+import org.sopt.confeti.domain.performance.application.PerformanceService;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.User;
@@ -47,6 +48,7 @@ public class UserTimetableFacade {
     private final FestivalService festivalService;
     private final FestivalDateService festivalDateService;
     private final UserTimetableService userTimetableService;
+    private final PerformanceService performanceService;
 
     @Transactional(readOnly = true)
     public UserTimetableDetailFestivalsDTO getTimetablesListAndDate(long userId) {
@@ -130,6 +132,7 @@ public class UserTimetableFacade {
     @Transactional(readOnly = true)
     public CursorPage<TimetableToAddDTO> getTimetablesToAdd(final long userId, final Long cursor) {
         if (cursor == null) {
+            List<Performance> performances = performanceService.getRecentPerformancesWithInitCursor(userId, TIMETABLE_FESTIVALS_TO_ADD_SIZE);
             List<Festival> festivals = festivalService.findFestivalsUsingInitCursor(userId,
                     TIMETABLE_FESTIVALS_TO_ADD_SIZE);
             return CursorPage.of(

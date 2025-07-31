@@ -6,7 +6,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.performance.Performance;
 import org.sopt.confeti.domain.performance.infra.repository.PerformanceRepository;
-import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -20,6 +19,7 @@ public class PerformanceService {
     private static final int INIT_PAGE = 0;
     private static final String CREATED_AT_COLUMN = "createdAt";
     private static final int FAVORITE_PERFORMANCE_PREVIEW_COUNT = 4;
+    private static final String TITLE_COLUMN = "title";
 
     private final PerformanceRepository performanceRepository;
 
@@ -62,8 +62,19 @@ public class PerformanceService {
         return performanceRepository.existsById(performanceId);
     }
 
+    @Transactional(readOnly = true)
+    public List<Performance> getRecentPerformancesWithInitCursor(long userId, int size) {
+        return performanceRepository.findRecentPerformances(userId, getPageRequest(size, getFestivalSort()));
+    }
+
     private PageRequest getPageRequest(final int size, final Sort sort) {
         return PageRequest.of(INIT_PAGE, size, sort);
+    }
+
+    private Sort getFestivalSort() {
+        return Sort.by(
+                Order.asc(TITLE_COLUMN)
+        );
     }
 
     private Sort getRecentPerformancesSort() {

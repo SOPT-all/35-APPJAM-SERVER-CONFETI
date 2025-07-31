@@ -29,9 +29,17 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "SELECT DISTINCT p " +
             "FROM Performance p JOIN FETCH p.favorites pf " +
             "WHERE pf.user.id = :userId " +
-            "AND p.endAt >= CURRENT_DATE "
+            "AND p.endAt >= CURRENT_DATE " +
+            "AND p."
     )
-    List<Performance> findFavoriteRecentPerformances(@Param("userId") long userId, PageRequest pageRequest);
+    List<Performance> findRecentPerformances(@Param("userId") long userId, PageRequest pageRequest);
 
     Optional<Performance> findById(long performanceId, Sort sort);
+
+    @Query(value = "" +
+            "SELECT p " +
+            "FROM Performance p JOIN FETCH p.favorites pf " +
+            "WHERE pf.user.id = :userId "
+    )
+    List<Performance> findPerformances(@Param("userId") long userId, PageRequest pageRequest);
 }
