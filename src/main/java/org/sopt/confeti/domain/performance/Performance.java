@@ -74,7 +74,7 @@ public class Performance {
     @Column(length = 250, nullable = false)
     private String posterPath;
 
-    @Column(length = 250, nullable = false)
+    @Column(length = 250)
     private String logoPath;
 
     @CreatedDate
