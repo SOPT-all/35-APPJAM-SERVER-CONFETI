@@ -10,13 +10,13 @@ public record ConcertDetailResponse(
         boolean isOpen,
         List<ConcertDetailArtistResponse> concertArtists
 ) {
-    public static ConcertDetailResponse of(final ConcertDetailDTO concertDetailDTO, final S3FileHandler s3FileHandler) {
+    public static ConcertDetailResponse from(ConcertDetailDTO concertDetailDTO) {
         List<ConcertDetailArtistResponse> concertArtists = concertDetailDTO.artists().stream()
                 .map(ConcertDetailArtistResponse::from)
                 .toList();
 
         return new ConcertDetailResponse(
-                ConcertDetailInfoResponse.of(concertDetailDTO, s3FileHandler),
+                ConcertDetailInfoResponse.from(concertDetailDTO),
                 concertArtists.size() > ArtistConstant.BOX_OPEN_CRITERIA,
                 concertArtists
         );

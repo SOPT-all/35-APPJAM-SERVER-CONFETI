@@ -3,7 +3,7 @@ package org.sopt.confeti.api.performance.facade.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.sopt.confeti.domain.concert.Concert;
+import org.sopt.confeti.global.mapper.dto.concert.Concert;
 
 public record ConcertDetailDTO(
         long concertId,
@@ -12,7 +12,7 @@ public record ConcertDetailDTO(
         LocalDate startAt,
         LocalDate endAt,
         String area,
-        String posterPath,
+        String posterUrl,
         LocalDateTime reserveAt,
         String ageRating,
         String time,
@@ -24,24 +24,24 @@ public record ConcertDetailDTO(
 ) {
     public static ConcertDetailDTO of(final Concert concert, final boolean isFavorite) {
         return new ConcertDetailDTO(
-                concert.getId(),
-                concert.getTitle(),
-                concert.getSubtitle(),
-                concert.getStartAt(),
-                concert.getEndAt(),
-                concert.getArea(),
-                concert.getPosterPath(),
-                concert.getReserveAt(),
-                concert.getAgeRating(),
-                concert.getTime(),
-                concert.getPrice(),
-                concert.getAddress(),
+                concert.performanceId(),
+                concert.title(),
+                concert.subtitle(),
+                concert.startAt(),
+                concert.endAt(),
+                concert.area(),
+                concert.posterUrl(),
+                concert.reserveAt(),
+                concert.ageRating(),
+                concert.time(),
+                concert.price(),
+                concert.address(),
                 isFavorite,
-                concert.getReservationUrls().stream()
+                concert.reservations().stream()
                         .map(ConcertReservationDTO::from)
                         .toList(),
-                concert.getArtists().stream()
-                        .map(ConcertArtistDTO::of)
+                concert.artists().stream()
+                        .map(ConcertArtistDTO::from)
                         .toList()
         );
     }

@@ -5,7 +5,6 @@ import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDateDT
 import org.sopt.confeti.global.common.constant.ArtistConstant;
 
 public record FestivalDetailDateResponse(
-        long festivalDateId,
         String festivalAt,
         boolean isOpen,
         List<FestivalDetailArtistResponse> artists
@@ -20,7 +19,6 @@ public record FestivalDetailDateResponse(
                 .toList();
 
         return new FestivalDetailDateResponse(
-                festivalDate.festivalDateId(),
                 FESTIVAL_AT_PREFIX + order,
                 artists.size() > ArtistConstant.BOX_OPEN_CRITERIA,
                 artists

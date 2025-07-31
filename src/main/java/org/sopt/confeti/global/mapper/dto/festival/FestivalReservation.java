@@ -8,7 +8,7 @@ import org.sopt.confeti.global.util.S3FileHandler;
 public record FestivalReservation(
         String url,
         String name,
-        String logoPath
+        String logoUrl
 ) {
     public static FestivalReservation of(PerformanceReservationUrl reservationUrl, S3FileHandler s3FileHandler) {
         return new FestivalReservation(

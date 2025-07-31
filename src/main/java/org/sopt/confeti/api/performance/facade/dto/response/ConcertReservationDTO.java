@@ -1,17 +1,17 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
-import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
+import org.sopt.confeti.global.mapper.dto.concert.ConcertReservation;
 
 public record ConcertReservationDTO(
         String url,
         String name,
-        String logoPath
+        String logoUrl
 ) {
-    public static ConcertReservationDTO from(ConcertReservationUrl reservation) {
+    public static ConcertReservationDTO from(ConcertReservation reservation) {
         return new ConcertReservationDTO(
-                reservation.getReservationUrl(),
-                reservation.getName(),
-                reservation.getLogoPath()
+                reservation.url(),
+                reservation.name(),
+                reservation.logoUrl()
         );
     }
 }

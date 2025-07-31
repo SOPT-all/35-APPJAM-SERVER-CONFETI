@@ -9,13 +9,11 @@ public record FestivalReservationResponse(
         String name,
         String logoUrl
 ) {
-    public static FestivalReservationResponse of(FestivalReservationDTO reservationDTO, S3FileHandler s3FileHandler) {
+    public static FestivalReservationResponse from(FestivalReservationDTO reservationDTO) {
         return new FestivalReservationResponse(
                 reservationDTO.url(),
                 reservationDTO.name(),
-                s3FileHandler.getFileUrl(
-                        FolderPath.combine(FolderPath.FESTIVAL, FolderPath.RESERVATION, FolderPath.LOGO),
-                        reservationDTO.logoPath()).toString()
+                reservationDTO.logoUrl()
         );
     }
 }

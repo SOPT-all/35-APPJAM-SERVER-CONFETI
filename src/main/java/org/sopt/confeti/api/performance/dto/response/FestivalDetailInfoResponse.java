@@ -22,11 +22,10 @@ public record FestivalDetailInfoResponse(
         String address,
         List<FestivalReservationResponse> reservations
 ) {
-    public static FestivalDetailInfoResponse of(final FestivalDetailDTO festival, final S3FileHandler s3FileHandler) {
+    public static FestivalDetailInfoResponse from(FestivalDetailDTO festival) {
         return new FestivalDetailInfoResponse(
                 festival.festivalId(),
-                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER),
-                        festival.posterPath()).toString(),
+                festival.posterUrl(),
                 festival.title(),
                 festival.subtitle(),
                 DateConvertor.convertToDefaultFormat(festival.startAt()),
@@ -39,7 +38,7 @@ public record FestivalDetailInfoResponse(
                 festival.isFavorite(),
                 festival.address(),
                 festival.reservations().stream()
-                        .map(reservation -> FestivalReservationResponse.of(reservation, s3FileHandler))
+                        .map(FestivalReservationResponse::from)
                         .toList()
         );
     }

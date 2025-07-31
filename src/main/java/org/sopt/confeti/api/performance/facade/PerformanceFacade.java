@@ -30,16 +30,15 @@ import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformance
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
-import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
-import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.performance.Performance;
 import org.sopt.confeti.domain.performance.application.PerformanceService;
+import org.sopt.confeti.domain.performance_favorite.application.PerformanceFavoriteService;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.application.UserService;
@@ -53,6 +52,9 @@ import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
+import org.sopt.confeti.global.mapper.PerformanceMapper;
+import org.sopt.confeti.global.mapper.dto.concert.Concert;
+import org.sopt.confeti.global.mapper.dto.festival.Festival;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
@@ -74,6 +76,7 @@ public class PerformanceFacade {
     private final FestivalFavoriteService festivalFavoriteService;
     private final PerformanceService_DPRECATED performanceServiceDPRECATED;
     private final PerformanceService performanceService;
+    private final PerformanceMapper performanceMapper;
     private final ConcertFavoriteService concertFavoriteService;
     private final ArtistFavoriteService artistFavoriteService;
     private final PerformanceSearchService performanceSearchService;
@@ -81,13 +84,19 @@ public class PerformanceFacade {
     private final TimetableFestivalService timetableFestivalService;
     private final SetlistService setlistService;
     private final SearchTermService searchTermService;
+    private final PerformanceFavoriteService performanceFavoriteService;
 
     @Transactional(readOnly = true)
-    public ConcertDetailDTO getConcertDetailInfo(final Long userId, final long concertId) {
-        Concert concert = concertService.getConcertDetailByConcertId(concertId);
-        validateConcertNotPassed(concert);
+    public ConcertDetailDTO getConcertDetail(final Long userId, final long performanceId) {
+        boolean isFavorite = getIsFavorite(userId, performanceId);
 
-        return ConcertDetailDTO.of(concert, getConcertFavorite(userId, concertId));
+        Performance performance = performanceService.getRecentPerformance(performanceId)
+                .orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                );
+        Concert concert = performanceMapper.toConcert(performance);
+
+        return ConcertDetailDTO.of(concert, isFavorite);
     }
 
     @Transactional(readOnly = true)
@@ -114,13 +123,14 @@ public class PerformanceFacade {
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
+        Festival festival = performanceMapper.toFestival(performance);
 
-        return FestivalDetailDTO.of(performance, isFavorite);
+        return FestivalDetailDTO.of(festival, isFavorite);
     }
 
-    protected boolean getIsFavorite(final Long userid, final long festivalId) {
+    protected boolean getIsFavorite(final Long userid, final long performanceId) {
         if (userid != null) {
-            return festivalFavoriteService.isFavorite(userid, festivalId);
+            return performanceFavoriteService.isFavorite(userid, performanceId);
         }
 
         return false;

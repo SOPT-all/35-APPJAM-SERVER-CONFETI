@@ -65,14 +65,14 @@ public class PerformanceController {
     private final S3FileHandler s3FileHandler;
 
     @Permission(role = {Role.GENERAL})
-    @GetMapping("/concerts/{concertId}")
+    @GetMapping("/concerts/{performanceId}")
     public ResponseEntity<BaseResponse<?>> getConcertInfo(
             @UserId(require = false) Long userId,
-            @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId
+            @PathVariable @Min(RequestConstraint.ID) long performanceId
     ) {
-        ConcertDetailDTO concertDetailDTO = performanceFacade.getConcertDetailInfo(userId, concertId);
+        ConcertDetailDTO concertDetailDTO = performanceFacade.getConcertDetail(userId, performanceId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                ConcertDetailResponse.of(concertDetailDTO, s3FileHandler));
+                ConcertDetailResponse.from(concertDetailDTO));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -83,7 +83,7 @@ public class PerformanceController {
     ) {
         FestivalDetailDTO festivalDetailDTO = performanceFacade.getFestivalDetail(userId, performanceId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                FestivalDetailResponse.of(festivalDetailDTO, s3FileHandler));
+                FestivalDetailResponse.from(festivalDetailDTO));
     }
 
     @Permission(role = {Role.GENERAL})

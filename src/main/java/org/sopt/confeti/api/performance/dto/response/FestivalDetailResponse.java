@@ -9,15 +9,13 @@ public record FestivalDetailResponse(
         FestivalDetailInfoResponse festival,
         List<FestivalDetailDateResponse> festivalDates
 ) {
-    private static final int SPACE_BETWEEN_DATE_AND_IDX = 1;
-
-    public static FestivalDetailResponse of(final FestivalDetailDTO festival, final S3FileHandler s3FileHandler) {
+    public static FestivalDetailResponse from(FestivalDetailDTO festival) {
         return new FestivalDetailResponse(
-                FestivalDetailInfoResponse.of(festival, s3FileHandler),
+                FestivalDetailInfoResponse.from(festival),
                 IntStream.range(0, festival.dates().size())
                         .mapToObj(idx ->
                                 FestivalDetailDateResponse.of(
-                                        festival.dates().get(idx), idx + SPACE_BETWEEN_DATE_AND_IDX)
+                                        festival.dates().get(idx), idx + 1)
                         )
                         .toList()
         );

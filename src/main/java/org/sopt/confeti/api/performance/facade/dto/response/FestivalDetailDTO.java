@@ -3,8 +3,7 @@ package org.sopt.confeti.api.performance.facade.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.sopt.confeti.domain.festival.Festival;
-import org.sopt.confeti.domain.performance.Performance;
+import org.sopt.confeti.global.mapper.dto.festival.Festival;
 
 public record FestivalDetailDTO(
         long festivalId,
@@ -13,8 +12,8 @@ public record FestivalDetailDTO(
         LocalDate startAt,
         LocalDate endAt,
         String area,
-        String posterPath,
-        String logoPath,
+        String posterUrl,
+        String logoUrl,
         LocalDateTime reserveAt,
         String ageRating,
         String time,
@@ -24,26 +23,26 @@ public record FestivalDetailDTO(
         List<FestivalReservationDTO> reservations,
         List<FestivalDetailDateDTO> dates
 ) {
-    public static FestivalDetailDTO of(final Performance performance, boolean isFavorite) {
+    public static FestivalDetailDTO of(final Festival festival, boolean isFavorite) {
         return new FestivalDetailDTO(
-                performance.getId(),
-                performance.getTitle(),
-                performance.getSubtitle(),
-                performance.getStartAt(),
-                performance.getEndAt(),
-                performance.getArea(),
-                performance.getPosterPath(),
-                performance.getLogoPath(),
-                performance.getReserveAt(),
-                performance.getAgeRating(),
-                performance.getTime(),
-                performance.getPrice(),
+                festival.performanceId(),
+                festival.title(),
+                festival.subtitle(),
+                festival.startAt(),
+                festival.endAt(),
+                festival.area(),
+                festival.posterUrl(),
+                festival.logoUrl(),
+                festival.reserveAt(),
+                festival.ageRating(),
+                festival.time(),
+                festival.price(),
                 isFavorite,
-                performance.getAddress(),
-                performance.getReservationUrls().stream()
+                festival.address(),
+                festival.reservations().stream()
                         .map(FestivalReservationDTO::from)
                         .toList(),
-                performance.getSchedules().stream()
+                festival.dates().stream()
                         .map(FestivalDetailDateDTO::from)
                         .toList()
         );

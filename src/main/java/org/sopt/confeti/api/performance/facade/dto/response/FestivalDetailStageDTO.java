@@ -1,20 +1,18 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
 import java.util.List;
-import org.sopt.confeti.domain.festival_stage.FestivalStage;
+import org.sopt.confeti.global.mapper.dto.festival.FestivalStage;
 
 public record FestivalDetailStageDTO(
-        long festivalStageId,
         String name,
         int order,
         List<FestivalDetailTimeDTO> times
 ) {
-    public static FestivalDetailStageDTO from(final FestivalStage festivalStage) {
+    public static FestivalDetailStageDTO from(FestivalStage festivalStage) {
         return new FestivalDetailStageDTO(
-                festivalStage.getId(),
-                festivalStage.getName(),
-                festivalStage.getOrder(),
-                festivalStage.getTimes().stream()
+                festivalStage.name(),
+                festivalStage.order(),
+                festivalStage.times().stream()
                         .map(FestivalDetailTimeDTO::from)
                         .toList()
         );
