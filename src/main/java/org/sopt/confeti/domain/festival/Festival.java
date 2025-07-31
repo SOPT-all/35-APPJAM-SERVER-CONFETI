@@ -38,10 +38,10 @@ public class Festival {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 100, nullable = false)
     private String title;
 
-    @Column(length = 80, nullable = false)
+    @Column(length = 100, nullable = false)
     private String subtitle;
 
     @Column(nullable = false)

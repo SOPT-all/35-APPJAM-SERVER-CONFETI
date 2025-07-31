@@ -47,10 +47,10 @@ public class Performance {
     @Column(length = 100, nullable = false)
     private String area;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 100, nullable = false)
     private String title;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 100, nullable = false)
     private String subtitle;
 
     @Column(nullable = false)
