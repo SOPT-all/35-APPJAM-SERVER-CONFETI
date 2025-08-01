@@ -103,6 +103,9 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:elasticsearch'
     testImplementation 'org.testcontainers:mysql'
+
+    // Slack
+    implementation("com.slack.api:slack-api-client:1.45.3")
 }
 
 dependencyManagement {
