@@ -11,7 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
-public class UserTimetableTest extends APIBaseTest {
+public class UserTimetableDEPRECATEDTest extends APIBaseTest {
 
     private static final String TAG = "user-timetable";
 

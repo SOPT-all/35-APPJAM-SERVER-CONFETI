@@ -24,8 +24,8 @@ import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
-import org.sopt.confeti.domain.user_timetable.UserTimetable;
-import org.sopt.confeti.domain.user_timetable.application.UserTimetableService;
+import org.sopt.confeti.domain.user_timetable.UserTimetable_DEPRECATED;
+import org.sopt.confeti.domain.user_timetable.application.UserTimetableService_DEPRECATED;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.exception.ConfetiException;
@@ -47,7 +47,7 @@ public class UserTimetableFacade {
     private final TimetableFestivalService timetableFestivalService;
     private final FestivalService festivalService;
     private final FestivalDateService festivalDateService;
-    private final UserTimetableService userTimetableService;
+    private final UserTimetableService_DEPRECATED userTimetableServiceDEPRECATED;
     private final PerformanceService performanceService;
 
     @Transactional(readOnly = true)
@@ -180,11 +180,11 @@ public class UserTimetableFacade {
     public void patchTimetableFestivals(final long userId, final PatchTimetableDTO timetableDTO) {
         validateUserExists(userId);
 
-        List<UserTimetable> userTimetables = userTimetableService.getUserTimeTables(userId);
-        validateExistUserTimetables(userTimetables);
-        validateExistTimetableIds(userTimetables, timetableDTO);
+        List<UserTimetable_DEPRECATED> userTimetableDEPRECATEDS = userTimetableServiceDEPRECATED.getUserTimeTables(userId);
+        validateExistUserTimetables(userTimetableDEPRECATEDS);
+        validateExistTimetableIds(userTimetableDEPRECATEDS, timetableDTO);
 
-        userTimetableService.patchTimetableFestival(userTimetables, timetableDTO);
+        userTimetableServiceDEPRECATED.patchTimetableFestival(userTimetableDEPRECATEDS, timetableDTO);
     }
 
     @Transactional(readOnly = true)
@@ -218,38 +218,38 @@ public class UserTimetableFacade {
                 .toList();
         validateExistFestivalTimeIds(festivalTimeIds);
 
-        List<UserTimetable> userTimetables = userTimetableService.getUserTimetablesByFestivalTimeId(userId, festivalTimeIds);
-        validateExistUserTimetables(userTimetables);
+        List<UserTimetable_DEPRECATED> userTimetableDEPRECATEDS = userTimetableServiceDEPRECATED.getUserTimetablesByFestivalTimeId(userId, festivalTimeIds);
+        validateExistUserTimetables(userTimetableDEPRECATEDS);
 
-        Map<Long, UserTimetable> userTimetableMapper = createUserTimetableMapper(userTimetables);
+        Map<Long, UserTimetable_DEPRECATED> userTimetableMapper = createUserTimetableMapper(userTimetableDEPRECATEDS);
         validateExistUserTimetableMapper(userTimetableMapper);
 
         return UserTimetableFestivalBasicDTO.of(festivalDate, userTimetableMapper);
     }
 
-    private Map<Long, UserTimetable> createUserTimetableMapper(List<UserTimetable> userTimetables) {
-        return userTimetables.stream()
+    private Map<Long, UserTimetable_DEPRECATED> createUserTimetableMapper(List<UserTimetable_DEPRECATED> userTimetableDEPRECATEDS) {
+        return userTimetableDEPRECATEDS.stream()
                 .collect(Collectors.toMap(userTimetable ->
                         userTimetable.getFestivalTime().getId(), Function.identity())
                 );
     }
 
-    protected void validateExistUserTimetableMapper(Map<Long, UserTimetable> userTimetables) {
+    protected void validateExistUserTimetableMapper(Map<Long, UserTimetable_DEPRECATED> userTimetables) {
         if (userTimetables.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
-    protected void validateExistUserTimetables(List<UserTimetable> userTimetables) {
-        if (userTimetables.isEmpty()) {
+    protected void validateExistUserTimetables(List<UserTimetable_DEPRECATED> userTimetableDEPRECATEDS) {
+        if (userTimetableDEPRECATEDS.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
     @Transactional(readOnly = true)
-    protected void validateExistTimetableIds(List<UserTimetable> userTimetables, PatchTimetableDTO timetableDTO) {
-        Set<Long> existingIds = userTimetables.stream()
-                .map(UserTimetable::getId)
+    protected void validateExistTimetableIds(List<UserTimetable_DEPRECATED> userTimetableDEPRECATEDS, PatchTimetableDTO timetableDTO) {
+        Set<Long> existingIds = userTimetableDEPRECATEDS.stream()
+                .map(UserTimetable_DEPRECATED::getId)
                 .collect(Collectors.toSet());
 
         for (PatchTimetableListDTO timetableListDTO : timetableDTO.userTimetables()) {

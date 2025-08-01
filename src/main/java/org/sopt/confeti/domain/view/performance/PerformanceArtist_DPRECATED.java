@@ -18,7 +18,7 @@ import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertArtist
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalArtistDTO;
 
 @Entity
-@Table(name = "performance_artists")
+@Table(name = "performance_artists_deprecated")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PerformanceArtist_DPRECATED {

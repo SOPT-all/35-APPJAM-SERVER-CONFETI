@@ -4,7 +4,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
-import org.sopt.confeti.domain.user_timetable.UserTimetable;
+import org.sopt.confeti.domain.user_timetable.UserTimetable_DEPRECATED;
 
 
 public record UserTimetableFestivalTimeDTO(
@@ -14,7 +14,7 @@ public record UserTimetableFestivalTimeDTO(
         boolean isSelected,
         List<UserTimetableFestivalArtistDTO> artists
 ) {
-    public static UserTimetableFestivalTimeDTO of(FestivalTime festivalTime, Map<Long, UserTimetable> userTimetables) {
+    public static UserTimetableFestivalTimeDTO of(FestivalTime festivalTime, Map<Long, UserTimetable_DEPRECATED> userTimetables) {
         return new UserTimetableFestivalTimeDTO(
                 userTimetables.get(festivalTime.getId()).getId(),
                 festivalTime.getStartAt(),

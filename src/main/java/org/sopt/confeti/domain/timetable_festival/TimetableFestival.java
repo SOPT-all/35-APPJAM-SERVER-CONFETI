@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.user.User;
-import org.sopt.confeti.domain.user_timetable.UserTimetable;
+import org.sopt.confeti.domain.user_timetable.UserTimetable_DEPRECATED;
 import org.springframework.data.annotation.CreatedDate;
 
 @Entity
@@ -40,7 +40,7 @@ public class TimetableFestival {
     private Festival festival;
 
     @OneToMany(mappedBy = "timetableFestival", cascade = CascadeType.ALL)
-    private List<UserTimetable> userTimetables;
+    private List<UserTimetable_DEPRECATED> userTimetableDEPRECATEDS;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -51,10 +51,10 @@ public class TimetableFestival {
         this.festival = festival;
         this.createdAt = LocalDateTime.now();
 
-        this.userTimetables = festival.getDates().stream()
+        this.userTimetableDEPRECATEDS = festival.getDates().stream()
                 .flatMap(festivalDate -> festivalDate.getStages().stream())
                 .flatMap(festivalStage -> festivalStage.getTimes().stream())
-                .map(festivalTime -> UserTimetable.create(this, festivalTime, false))
+                .map(festivalTime -> UserTimetable_DEPRECATED.create(this, festivalTime, false))
                 .toList();
     }
 

@@ -18,10 +18,10 @@ import org.sopt.confeti.domain.festival_time.FestivalTime;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 
 @Entity
-@Table(name = "user_timetables")
+@Table(name = "user_timetables_deprecated")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserTimetable {
+public class UserTimetable_DEPRECATED {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,15 +40,15 @@ public class UserTimetable {
     private boolean isSelected;
 
     @Builder
-    public UserTimetable(TimetableFestival timetableFestival, FestivalTime festivalTime, boolean isSelected) {
+    public UserTimetable_DEPRECATED(TimetableFestival timetableFestival, FestivalTime festivalTime, boolean isSelected) {
         this.timetableFestival = timetableFestival;
         this.festivalTime = festivalTime;
         this.isSelected = isSelected;
     }
 
-    public static UserTimetable create(TimetableFestival timetableFestival, FestivalTime festivalTime,
-                                       boolean isSelected) {
-        return UserTimetable.builder()
+    public static UserTimetable_DEPRECATED create(TimetableFestival timetableFestival, FestivalTime festivalTime,
+                                                  boolean isSelected) {
+        return UserTimetable_DEPRECATED.builder()
                 .timetableFestival(timetableFestival)
                 .festivalTime(festivalTime)
                 .isSelected(isSelected)
