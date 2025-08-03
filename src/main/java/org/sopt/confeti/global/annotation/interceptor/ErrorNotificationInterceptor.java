@@ -29,6 +29,9 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor {
             return;
         }
 
+        if (slackNotificationAgent == null) {
+            return;
+        }
 
         boolean shouldNotify = ex != null || response.getStatus() >= 400;
 
