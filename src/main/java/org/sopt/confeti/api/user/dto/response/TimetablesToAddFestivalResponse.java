@@ -5,16 +5,14 @@ import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record TimetablesToAddFestivalResponse(
-        long festivalId,
+        long performanceId,
         String posterUrl,
         String title
 ) {
-    public static TimetablesToAddFestivalResponse of(final TimetableToAddDTO timetableToAddDTO,
-                                                     final S3FileHandler s3FileHandler) {
+    public static TimetablesToAddFestivalResponse from(TimetableToAddDTO timetableToAddDTO) {
         return new TimetablesToAddFestivalResponse(
-                timetableToAddDTO.festivalId(),
-                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER),
-                        timetableToAddDTO.posterPath()).toString(),
+                timetableToAddDTO.performanceId(),
+                timetableToAddDTO.posterUrl(),
                 timetableToAddDTO.title()
         );
     }

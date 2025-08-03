@@ -63,8 +63,8 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getRecentPerformancesWithInitCursor(long userId, int size) {
-        return performanceRepository.findRecentPerformances(userId, getPageRequest(size, getFestivalSort()));
+    public List<Performance> getRecentPerformancesToAddTimetable(long userId, int size, List<Long> excludePerformanceIds) {
+        return performanceRepository.findRecentPerformancesToAddTimetable(userId, excludePerformanceIds, getPageRequest(size, getFestivalSort()));
     }
 
     private PageRequest getPageRequest(final int size, final Sort sort) {

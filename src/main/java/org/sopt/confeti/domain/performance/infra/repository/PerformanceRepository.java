@@ -27,12 +27,15 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
 
     @Query(value = "" +
             "SELECT DISTINCT p " +
-            "FROM Performance p JOIN FETCH p.favorites pf " +
+            "FROM Performance p LEFT JOIN p.favorites pf " +
+            "ON p.id = pf.performance.id " +
             "WHERE pf.user.id = :userId " +
             "AND p.endAt >= CURRENT_DATE " +
-            "AND p."
+            "AND p.id NOT IN :excludePerformanceIds " +
+            "ORDER BY CASE WHEN pf.id IS NULL THEN 0 ELSE 1 END DESC, p.startAt ASC"
+
     )
-    List<Performance> findRecentPerformances(@Param("userId") long userId, PageRequest pageRequest);
+    List<Performance> findRecentPerformancesToAddTimetable(@Param("userId") long userId, @Param("excludePerformanceIds") List<Long> excludePerformanceIds, PageRequest pageRequest);
 
     Optional<Performance> findById(long performanceId, Sort sort);
 

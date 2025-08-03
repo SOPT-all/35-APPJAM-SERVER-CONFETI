@@ -1,17 +1,18 @@
 package org.sopt.confeti.api.user.facade.dto.response;
 
-import org.sopt.confeti.domain.festival.Festival;
+
+import org.sopt.confeti.global.mapper.dto.festival.Festival;
 
 public record TimetableToAddDTO(
-        long festivalId,
-        String posterPath,
+        long performanceId,
+        String posterUrl,
         String title
 ) {
-    public static TimetableToAddDTO from(final Festival festival) {
+    public static TimetableToAddDTO from(Festival festival) {
         return new TimetableToAddDTO(
-                festival.getId(),
-                festival.getPosterPath(),
-                festival.getTitle()
+                festival.performanceId(),
+                festival.posterUrl(),
+                festival.title()
         );
     }
 }

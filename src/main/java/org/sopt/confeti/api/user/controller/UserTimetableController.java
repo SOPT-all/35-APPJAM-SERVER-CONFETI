@@ -76,9 +76,9 @@ public class UserTimetableController {
             @UserId Long userId,
             @RequestParam(name = "cursor", required = false) Long cursor
     ) {
-        CursorPage<TimetableToAddDTO> timetablesToAdd = userTimetableFacade.getTimetablesToAdd(userId, cursor);
+        CursorPage<TimetableToAddDTO> timetablesToAddCursor = userTimetableFacade.getTimetablesToAdd(userId, cursor);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                TimetablesToAddResponse.of(timetablesToAdd, s3FileHandler));
+                TimetablesToAddResponse.from(timetablesToAddCursor));
     }
 
     @Permission(role = {Role.GENERAL})

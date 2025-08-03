@@ -12,7 +12,6 @@ import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
 import org.sopt.confeti.api.user.facade.dto.response.*;
-import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
@@ -24,7 +23,9 @@ import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
+import org.sopt.confeti.domain.user_timetable.UserTimetable;
 import org.sopt.confeti.domain.user_timetable.UserTimetable_DEPRECATED;
+import org.sopt.confeti.domain.user_timetable.application.UserTimetableService;
 import org.sopt.confeti.domain.user_timetable.application.UserTimetableService_DEPRECATED;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.CursorPage;
@@ -32,6 +33,8 @@ import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
+import org.sopt.confeti.global.mapper.PerformanceMapper;
+import org.sopt.confeti.global.mapper.dto.festival.Festival;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +51,9 @@ public class UserTimetableFacade {
     private final FestivalService festivalService;
     private final FestivalDateService festivalDateService;
     private final UserTimetableService_DEPRECATED userTimetableServiceDEPRECATED;
+    private final UserTimetableService userTimetableService;
     private final PerformanceService performanceService;
+    private final PerformanceMapper performanceMapper;
 
     @Transactional(readOnly = true)
     public UserTimetableDetailFestivalsDTO getTimetablesListAndDate(long userId) {
@@ -130,11 +135,18 @@ public class UserTimetableFacade {
     }
 
     @Transactional(readOnly = true)
-    public CursorPage<TimetableToAddDTO> getTimetablesToAdd(final long userId, final Long cursor) {
+    public CursorPage<TimetableToAddDTO> getTimetablesToAdd(long userId, Long cursor) {
+        List<Long> timetablePerformanceIds = userTimetableService.getUserTimetables(userId).stream()
+                .map(UserTimetable::getPerformance)
+                .map(Performance::getId)
+                .toList();
+
         if (cursor == null) {
-            List<Performance> performances = performanceService.getRecentPerformancesWithInitCursor(userId, TIMETABLE_FESTIVALS_TO_ADD_SIZE);
-            List<Festival> festivals = festivalService.findFestivalsUsingInitCursor(userId,
-                    TIMETABLE_FESTIVALS_TO_ADD_SIZE);
+            List<Performance> performances = performanceService.getRecentPerformancesToAddTimetable(userId, TIMETABLE_FESTIVALS_TO_ADD_SIZE, timetablePerformanceIds);
+            List<Festival> festivals = performances.stream()
+                    .map(performanceMapper::toFestival)
+                    .toList();
+
             return CursorPage.of(
                     festivals.stream()
                             .map(TimetableToAddDTO::from)

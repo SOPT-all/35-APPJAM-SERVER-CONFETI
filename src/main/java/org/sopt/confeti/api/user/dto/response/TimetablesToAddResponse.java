@@ -11,18 +11,17 @@ public record TimetablesToAddResponse(
 ) {
     private static final long DEFAULT_NEXT_CURSOR = -1L;
 
-    public static TimetablesToAddResponse of(final CursorPage<TimetableToAddDTO> cursorPage,
-                                             final S3FileHandler s3FileHandler) {
+    public static TimetablesToAddResponse from(CursorPage<TimetableToAddDTO> cursorPage) {
         Long nextCursor = DEFAULT_NEXT_CURSOR;
 
         if (!cursorPage.isLast()) {
-            nextCursor = cursorPage.getNextCursor().festivalId();
+            nextCursor = cursorPage.getNextCursor().performanceId();
         }
 
         return new TimetablesToAddResponse(
                 nextCursor,
                 cursorPage.getItems().stream()
-                        .map(timetableToAddDTO -> TimetablesToAddFestivalResponse.of(timetableToAddDTO, s3FileHandler))
+                        .map(TimetablesToAddFestivalResponse::from)
                         .toList()
         );
     }
