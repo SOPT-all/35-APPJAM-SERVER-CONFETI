@@ -1,4 +1,4 @@
-package org.sopt.confeti.global.annotation.interceptor;
+package org.sopt.confeti.global.interceptor;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

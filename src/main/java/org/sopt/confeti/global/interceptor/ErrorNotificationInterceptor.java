@@ -1,4 +1,4 @@
-package org.sopt.confeti.global.annotation.interceptor;
+package org.sopt.confeti.global.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
