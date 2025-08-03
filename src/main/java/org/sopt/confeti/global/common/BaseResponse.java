@@ -1,31 +1,24 @@
 package org.sopt.confeti.global.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.message.SuccessMessage;
 
+@Getter
 public class BaseResponse<T> {
     private final int status;
     private final String message;
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private final T data;
+    @JsonInclude(value = JsonInclude.Include.NON_DEFAULT)
+    private final Exception exception;
 
     private BaseResponse(Builder<T> builder) {
         this.status = builder.status;
         this.message = builder.message;
         this.data = builder.data;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public T getData() {
-        return data;
+        this.exception = builder.exception;
     }
 
     public static BaseResponse<?> of(SuccessMessage successMessage) {
@@ -58,6 +51,7 @@ public class BaseResponse<T> {
         private int status;
         private String message;
         private T data;
+        private Exception exception;
 
         public Builder<T> status(int status) {
             this.status = status;
@@ -71,6 +65,11 @@ public class BaseResponse<T> {
 
         public Builder<T> data(T data) {
             this.data = data;
+            return this;
+        }
+
+        public Builder<T> exception(Exception exception) {
+            this.exception = exception;
             return this;
         }
 

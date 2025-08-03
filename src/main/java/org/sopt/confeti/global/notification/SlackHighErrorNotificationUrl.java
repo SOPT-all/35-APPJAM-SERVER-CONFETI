@@ -6,16 +6,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile(
-        value = "prod"
+        value = { "prod", "dev" }
 )
 public class SlackHighErrorNotificationUrl implements SlackNotificationUrl {
 
-    @Value("${slack.notification.error.high.url}")
+    @Value("${notification.slack.error.high.url}")
     private String webhookUrl;
     
     @Override
     public SlackNotificationType getType() {
-        return SlackNotificationType.CRITICAL_ERROR;
+        return SlackNotificationType.HIGH_ERROR;
     }
 
     @Override

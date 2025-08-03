@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile(
-        value = "prod"
+        value = { "prod", "dev" }
 )
 public class SlackCriticalErrorNotificationUrl implements SlackNotificationUrl {
 
-    @Value("${slack.notification.error.critical.url}")
+    @Value("${notification.slack.error.critical.url}")
     private String webhookUrl;
 
     @Override
