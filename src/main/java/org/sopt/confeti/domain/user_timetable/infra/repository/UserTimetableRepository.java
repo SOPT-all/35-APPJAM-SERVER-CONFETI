@@ -8,4 +8,8 @@ import java.util.List;
 public interface UserTimetableRepository extends JpaRepository<UserTimetable, Long> {
 
     List<UserTimetable> findAllByUserId(long userId);
+
+    void deleteByUser_IdAndPerformance_Id(long userId, long performanceId);
+
+    boolean existsByUser_IdAndPerformance_Id(long userId, long performanceId);
 }

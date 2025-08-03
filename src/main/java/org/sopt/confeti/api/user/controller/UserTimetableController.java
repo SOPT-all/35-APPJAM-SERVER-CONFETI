@@ -92,12 +92,12 @@ public class UserTimetableController {
     }
 
     @Permission(role = {Role.GENERAL})
-    @DeleteMapping("/festivals/{festivalId}")
+    @DeleteMapping("/festivals/{performanceId}")
     public ResponseEntity<BaseResponse<?>> removeTimetableFestival(
             @UserId Long userId,
-            @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) long festivalId
+            @PathVariable @Min(RequestConstraint.ID) long performanceId
     ) {
-        userTimetableFacade.removeTimetableFestival(userId, festivalId);
+        userTimetableFacade.deleteTimetable(userId, performanceId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 

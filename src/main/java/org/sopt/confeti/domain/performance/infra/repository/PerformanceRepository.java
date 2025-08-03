@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.sopt.confeti.domain.performance.Performance;
+import org.sopt.confeti.domain.performance.PerformanceType;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,9 +16,21 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     List<Performance> findRecentPerformances(LocalDate now, PageRequest pageRequest);
 
     @Query(value = "" +
-            "SELECT DISTINCT p " +
-            "FROM Performance p JOIN FETCH p.schedules ps " +
-            "WHERE ps.artistId IN :artistIds " +
+            "SELECT p " +
+            "FROM Performance p JOIN p.schedules ps " +
+            "ON p.id = ps.performance.id " +
+            "WHERE ps.artist.id = :artistId " +
+            "AND p.endAt >= CURRENT_DATE "
+    )
+    List<Performance> findRecentPerformancesByArtistId(
+            @Param("artistId") String artistId
+    );
+
+    @Query(value = "" +
+            "SELECT p " +
+            "FROM Performance p JOIN p.schedules ps " +
+            "ON p.id = ps.performance.id " +
+            "WHERE ps.artist.id IN :artistIds " +
             "AND p.endAt >= CURRENT_DATE "
     )
     List<Performance> findRecentPerformancesByArtistIds(
@@ -26,7 +39,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     );
 
     @Query(value = "" +
-            "SELECT DISTINCT p " +
+            "SELECT p " +
             "FROM Performance p LEFT JOIN p.favorites pf " +
             "ON p.id = pf.performance.id " +
             "WHERE pf.user.id = :userId " +
@@ -45,4 +58,9 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "WHERE pf.user.id = :userId "
     )
     List<Performance> findPerformances(@Param("userId") long userId, PageRequest pageRequest);
+
+    @Query(value = "" +
+            "SELECT p"
+    )
+    List<Performance> findRecentPerformancesByArtistId(@Param("aid") String aid, @Param("type") PerformanceType type);
 }

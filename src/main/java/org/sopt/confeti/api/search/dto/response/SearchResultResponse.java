@@ -10,7 +10,7 @@ public record SearchResultResponse(
         int performanceCount,
         List<SearchResultPerformanceResponse> performances
 ) {
-    public static SearchResultResponse of(SearchResultDTO searchResult, S3FileHandler s3FileHandler) {
+    public static SearchResultResponse from(SearchResultDTO searchResult) {
         SearchResultArtistResponse artist = null;
         if (Objects.nonNull(searchResult.artist())) {
             artist = SearchResultArtistResponse.from(searchResult.artist());
@@ -20,7 +20,7 @@ public record SearchResultResponse(
                 artist,
                 searchResult.performances().size(),
                 searchResult.performances().stream()
-                        .map(performance -> SearchResultPerformanceResponse.of(performance, s3FileHandler))
+                        .map(SearchResultPerformanceResponse::from)
                         .toList()
         );
     }

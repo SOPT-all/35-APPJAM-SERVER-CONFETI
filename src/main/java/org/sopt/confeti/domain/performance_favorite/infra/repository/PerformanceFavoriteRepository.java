@@ -10,6 +10,8 @@ public interface PerformanceFavoriteRepository extends JpaRepository<Performance
 
     Optional<PerformanceFavorite> findByUser_idAndPerformance_id(long userId, long performanceId);
 
+    List<PerformanceFavorite> findAllByUser_IdAndPerformance_IdIn(long userId, List<Long> performanceId);
+
     List<PerformanceFavorite> user(User user);
 
     boolean existsByUser_IdAndPerformance_Id(long userId, long performanceId);

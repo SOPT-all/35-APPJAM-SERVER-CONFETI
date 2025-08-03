@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.search.facade.dto.response.PopularTermsDTO;
@@ -15,6 +16,11 @@ import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteServi
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
+import org.sopt.confeti.domain.performance.Performance;
+import org.sopt.confeti.domain.performance.PerformanceType;
+import org.sopt.confeti.domain.performance.application.PerformanceService;
+import org.sopt.confeti.domain.performance_favorite.PerformanceFavorite;
+import org.sopt.confeti.domain.performance_favorite.application.PerformanceFavoriteService;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
@@ -22,6 +28,7 @@ import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.sopt.confeti.global.util.analyzer.SearchTermAnalyzer;
 import org.sopt.confeti.global.util.analyzer.dto.PerformanceSearchTermAnalyzeResult;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
@@ -41,7 +48,18 @@ public class SearchFacade {
     private final FestivalFavoriteService festivalFavoriteService;
     private final ConcertFavoriteService concertFavoriteService;
     private final PerformanceSearchService performanceSearchService;
+    private final PerformanceService performanceService;
+    private final PerformanceFavoriteService performanceFavoriteService;
+    private final S3FileHandler s3FileHandler;
 
+    /**
+     * 특정 아티스트 검색
+     * 검색 결과 : 특정 아티스트 정보, 해당 아티스트와 관련한 공연 목록
+     * 유저 아이디에 따라 좋아요 여부를 함께 반환
+     * @param userId
+     * @param aid
+     * @return SearchResultDTO
+     */
     @Transactional(readOnly = true)
     public SearchResultDTO getHomeSearchResultWithAid(Long userId, String aid) {
         ConfetiArtist artist = getArtistById(aid);
@@ -52,21 +70,18 @@ public class SearchFacade {
             artistFavorite = artistFavoriteService.isFavorite(userId, aid);
         }
 
-        List<PerformanceDTO> performances = performanceServiceDPRECATED.getPerformancesByArtistIdAndType(aid,
-                PerformanceType_DEPRECATED.PERFORMANCE);
+        List<Performance> performances = performanceService.getRecentPerformancesByArtistId(aid);
+        List<Long> performanceIds = performances.stream()
+                .map(Performance::getId)
+                .toList();
 
-        Map<Long, Boolean> performanceFavorites = performances.stream()
-                .collect(Collectors.toMap(
-                        PerformanceDTO::id,
-                        p -> false
-                ));
+        Set<Long> favoritePerformanceIds = new HashSet<>();
 
         if (Objects.nonNull(userId)) {
-            List<PerformanceDTO> favoritePerformances = performanceServiceDPRECATED.getFavoritePerformancesAll(userId, TYPE_ALL);
-            getPerformanceFavorites(performanceFavorites, favoritePerformances);
+            favoritePerformanceIds.addAll(performanceFavoriteService.getFavoritePerformanceIdsByPerformanceIds(userId, performanceIds));
         }
 
-        return SearchResultDTO.of(artist, artistFavorite, performances, performanceFavorites);
+        return SearchResultDTO.of(artist, artistFavorite, performances, favoritePerformanceIds, s3FileHandler);
     }
 
     @Transactional(readOnly = true)

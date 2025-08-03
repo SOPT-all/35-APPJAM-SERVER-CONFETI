@@ -1,6 +1,10 @@
 package org.sopt.confeti.domain.performance_favorite.application;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.performance.Performance;
 import org.sopt.confeti.domain.performance_favorite.PerformanceFavorite;
@@ -41,5 +45,12 @@ public class PerformanceFavoriteService {
     @Transactional
     public void removeFavorite(long userId, long performanceId) {
         performanceFavoriteRepository.deleteByUser_IdAndPerformance_Id(userId, performanceId);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Long> getFavoritePerformanceIdsByPerformanceIds(long userId, List<Long> performanceIds) {
+        return performanceFavoriteRepository.findAllByUser_IdAndPerformance_IdIn(userId, performanceIds).stream()
+                .map(performanceFavorite -> performanceFavorite.getPerformance().getId())
+                .collect(Collectors.toSet());
     }
 }

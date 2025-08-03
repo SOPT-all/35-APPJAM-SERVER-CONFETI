@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.performance.Performance;
+import org.sopt.confeti.domain.performance.PerformanceType;
 import org.sopt.confeti.domain.performance.infra.repository.PerformanceRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -58,6 +59,11 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
+    public List<Performance> getPerformancesByIds(List<Long> performanceIds) {
+        return performanceRepository.findAllById(performanceIds);
+    }
+
+    @Transactional(readOnly = true)
     public boolean existsById(long performanceId) {
         return performanceRepository.existsById(performanceId);
     }
@@ -65,6 +71,11 @@ public class PerformanceService {
     @Transactional(readOnly = true)
     public List<Performance> getRecentPerformancesToAddTimetable(long userId, int size, List<Long> excludePerformanceIds) {
         return performanceRepository.findRecentPerformancesToAddTimetable(userId, excludePerformanceIds, getPageRequest(size, getFestivalSort()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getRecentPerformancesByArtistId(String aid) {
+        return performanceRepository.findRecentPerformancesByArtistId(aid);
     }
 
     private PageRequest getPageRequest(final int size, final Sort sort) {

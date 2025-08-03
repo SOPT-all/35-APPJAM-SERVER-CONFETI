@@ -64,72 +64,61 @@ public class UserTimetableFacade {
     }
 
     @Transactional
-    public void removeTimetableFestival(final long userId, final long festivalId) {
+    public void deleteTimetable(long userId, long performanceId) {
         validateExistUser(userId);
-        validateExistFestival(festivalId);
-        validateExistTimetableFestival(userId, festivalId);
+        validateExistPerformance(performanceId);
+        validateExistUserTimetable(userId, performanceId);
 
-        timetableFestivalService.removeTimetableFestival(userId, festivalId);
+        userTimetableService.deleteTimetable(userId, performanceId);
     }
 
     @Transactional
-    public void addTimetableFestivals(final long userId, final AddTimetableFestivalDTO from) {
-        User user = userService.findUserTimetablesById(userId);
-        List<Festival> addFestivals = festivalService.findFestivalsByIdIn(
-                from.festivals().stream()
-                        .distinct()
-                        .map(AddTimetableFestivalArtiestDTO::festivalId)
-                        .toList()
-        );
+    public void addTimetableFestivals(long userId, AddTimetableFestivalDTO addToTimetableTargets) {
+        User user = userService.findById(userId);
 
-        validateDuplicateTimetableFestival(
-                user.getTimetableFestivals().stream()
-                        .map(TimetableFestival::getFestival)
-                        .toList(),
-                addFestivals
-        );
-        validateCountTimetableFestival(user.getTimetableFestivals().size(), addFestivals.size());
+        List<Long> excludePerformanceIds = userTimetableService.getUserTimetables(userId).stream()
+                .map(UserTimetable::getPerformance)
+                .map(Performance::getId)
+                .toList();
 
-        timetableFestivalService.addTimetableFestivals(user, addFestivals);
+        List<Long> targetPerformanceIds = addToTimetableTargets.festivals().stream()
+                .map(AddTimetableFestivalArtiestDTO::festivalId)
+                .distinct()
+                .filter(Predicate.not(excludePerformanceIds::contains))
+                .toList();
+
+        validateCountUserTimetable(excludePerformanceIds.size(), targetPerformanceIds.size());
+
+        List<Performance> performances = performanceService.getPerformancesByIds(targetPerformanceIds);
+        userTimetableService.addTimetables(user, performances);
+
         userService.updateHasTimetableHistory(userId);
     }
 
-    @Transactional
-    protected void validateDuplicateTimetableFestival(final List<Festival> currentFestivals,
-                                                      final List<Festival> addFestivals) {
-        if (
-                currentFestivals.stream()
-                        .anyMatch(currentFestival -> addFestivals.stream()
-                                .anyMatch(Predicate.isEqual(currentFestival)))
-        ) {
-            throw new ConflictException(ErrorMessage.CONFLICT);
-        }
-    }
-
     @Transactional(readOnly = true)
-    protected void validateExistUser(final long userId) {
+    protected void validateExistUser(long userId) {
         if (!userService.existsById(userId)) {
             throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
         }
     }
 
     @Transactional(readOnly = true)
-    protected void validateExistFestival(final long festivalId) {
-        if (!festivalService.existsById(festivalId)) {
+    protected void validateExistPerformance(long performanceId) {
+        if (!performanceService.existsById(performanceId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
     @Transactional(readOnly = true)
-    protected void validateCountTimetableFestival(final long currentCount, final int addCount) {
+    protected void validateCountUserTimetable(long currentCount, int addCount) {
         if (currentCount + addCount > TIMETABLE_FESTIVAL_COUNT_MAXIMUM) {
             throw new ConflictException(ErrorMessage.TIMETABLE_FESTIVAL_IS_FULL);
         }
     }
 
     @Transactional(readOnly = true)
-    protected void validateExistTimetableFestival(final long userId, final long festivalId) {
-        if (!timetableFestivalService.existsByUserIdAndFestivalId(userId, festivalId)) {
+    protected void validateExistUserTimetable(long userId, long performanceId) {
+        if (!userTimetableService.existByUserIdAndPerformanceId(userId, performanceId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }

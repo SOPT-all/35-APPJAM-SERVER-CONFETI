@@ -42,7 +42,7 @@ public class SearchController {
         SearchType searchType = SearchType.resolve(aid, pid, term);
         SearchResultDTO searchResult = searchType.search(searchFacade, userId, aid, pid, term);
 
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, SearchResultResponse.of(searchResult, s3FileHandler));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, SearchResultResponse.from(searchResult));
     }
 
     @Permission(role = {Role.GENERAL})
