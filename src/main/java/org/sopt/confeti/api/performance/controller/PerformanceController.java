@@ -34,6 +34,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
+import org.sopt.confeti.domain.performance.PerformanceType;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -177,29 +178,20 @@ public class PerformanceController {
     @GetMapping("/expected")
     public ResponseEntity<BaseResponse<?>> getExpectedPerformances(
             @UserId(require = false) Long userId,
-            @RequestParam String items
+            @RequestParam String performanceIds
     ) {
-        List<GetExpectedPerformanceRequest> performanceRequests = decodeToExpectedPerformancesRequest(items);
+        List<GetExpectedPerformanceRequest> performanceRequests = decodeToExpectedPerformancesRequest(performanceIds);
         ExpectedPerformancesDTO expectedPerformances = performanceFacade.getExpectedPerformances(
                 GetExpectedPerformancesDTO.from(performanceRequests));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                ExpectedPerformancesResponse.of(expectedPerformances, s3FileHandler));
+                ExpectedPerformancesResponse.from(expectedPerformances));
     }
 
-    private List<GetExpectedPerformanceRequest> decodeToExpectedPerformancesRequest(String request) {
-        try {
-            return Arrays.stream(request.split(","))
-                    .map(item -> {
-                        String[] performance = item.split(":");
-                        return GetExpectedPerformanceRequest.of(
-                                PerformanceType_DEPRECATED.convert(performance[0].trim()),
-                                Long.parseLong(performance[1].trim())
-                        );
-                    })
-                    .toList();
-        } catch (Exception e) {
-            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
-        }
+    private List<GetExpectedPerformanceRequest> decodeToExpectedPerformancesRequest(String performanceIds) {
+        return Arrays.stream(performanceIds.split(","))
+                .map(Long::valueOf)
+                .map(GetExpectedPerformanceRequest::from)
+                .toList();
     }
 
     @Permission(role = {Role.GENERAL})

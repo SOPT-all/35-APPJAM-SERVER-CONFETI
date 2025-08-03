@@ -7,21 +7,15 @@ import org.sopt.confeti.global.util.S3FileHandler;
 public record ExpectedPerformanceResponse(
         long performanceId,
         String type,
-        long typeId,
         String title,
         String posterUrl
 ) {
-    public static ExpectedPerformanceResponse of(ExpectedPerformanceDTO expectedPerformanceDTO,
-                                                 S3FileHandler s3FileHandler) {
+    public static ExpectedPerformanceResponse from(ExpectedPerformanceDTO expectedPerformanceDTO) {
         return new ExpectedPerformanceResponse(
                 expectedPerformanceDTO.id(),
-                expectedPerformanceDTO.type().getType(),
-                expectedPerformanceDTO.typeId(),
+                expectedPerformanceDTO.type().getName(),
                 expectedPerformanceDTO.title(),
-                s3FileHandler.getFileUrl(
-                        FolderPath.combine(FolderPath.getFolderPathByPerformanceType(expectedPerformanceDTO.type()),
-                                FolderPath.POSTER),
-                        expectedPerformanceDTO.posterPath()).toString()
+                expectedPerformanceDTO.posterUrl()
         );
     }
 }

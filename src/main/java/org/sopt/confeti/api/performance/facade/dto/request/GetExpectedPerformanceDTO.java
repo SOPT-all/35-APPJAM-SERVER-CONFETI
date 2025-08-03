@@ -4,13 +4,9 @@ import org.sopt.confeti.api.performance.dto.request.GetExpectedPerformanceReques
 import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 
 public record GetExpectedPerformanceDTO(
-        PerformanceType_DEPRECATED type,
-        long typeId
+        long performanceId
 ) {
     public static GetExpectedPerformanceDTO from(GetExpectedPerformanceRequest expectedPerformanceRequest) {
-        return new GetExpectedPerformanceDTO(
-                expectedPerformanceRequest.type(),
-                expectedPerformanceRequest.typeId()
-        );
+        return new GetExpectedPerformanceDTO(expectedPerformanceRequest.performanceId());
     }
 }

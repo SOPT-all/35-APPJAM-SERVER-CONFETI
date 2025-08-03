@@ -7,12 +7,10 @@ import org.sopt.confeti.global.util.S3FileHandler;
 public record ExpectedPerformancesResponse(
         List<ExpectedPerformanceResponse> performances
 ) {
-    public static ExpectedPerformancesResponse of(ExpectedPerformancesDTO expectedPerformancesDTO,
-                                                  S3FileHandler s3FileHandler) {
+    public static ExpectedPerformancesResponse from(ExpectedPerformancesDTO expectedPerformancesDTO) {
         return new ExpectedPerformancesResponse(
                 expectedPerformancesDTO.performances().stream()
-                        .map(expectedPerformanceDTO -> ExpectedPerformanceResponse.of(expectedPerformanceDTO,
-                                s3FileHandler))
+                        .map(ExpectedPerformanceResponse::from)
                         .toList()
         );
     }

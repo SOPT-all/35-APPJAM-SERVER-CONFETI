@@ -14,20 +14,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.*;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.application.ConcertService;
@@ -57,6 +46,7 @@ import org.sopt.confeti.global.mapper.dto.concert.Concert;
 import org.sopt.confeti.global.mapper.dto.festival.Festival;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,12 +75,13 @@ public class PerformanceFacade {
     private final SetlistService setlistService;
     private final SearchTermService searchTermService;
     private final PerformanceFavoriteService performanceFavoriteService;
+    private final S3FileHandler s3FileHandler;
 
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetail(final Long userId, final long performanceId) {
         boolean isFavorite = getIsFavorite(userId, performanceId);
 
-        Performance performance = performanceService.getRecentPerformance(performanceId)
+        Performance performance = performanceService.getExpectedPerformance(performanceId)
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
@@ -119,7 +110,7 @@ public class PerformanceFacade {
     public FestivalDetailDTO getFestivalDetail(final Long userId, final long performanceId) {
         boolean isFavorite = getIsFavorite(userId, performanceId);
 
-        Performance performance = performanceService.getRecentPerformance(performanceId)
+        Performance performance = performanceService.getExpectedPerformance(performanceId)
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
@@ -181,14 +172,14 @@ public class PerformanceFacade {
                 .map(artistFavorite -> artistFavorite.getArtist().getId())
                 .toList();
 
-        List<Performance> performances = performanceService.getRecentPerformancesWithFavoriteArtists(artistIds, RECENT_PERFORMANCES_SIZE);
+        List<Performance> performances = performanceService.getExpectedPerformancesWithFavoriteArtists(artistIds, RECENT_PERFORMANCES_SIZE);
 
         return RecentPerformancesDTO.of(PERSONALIZED, performances);
     }
 
     @Transactional(readOnly = true)
     public RecentPerformancesDTO getRecentPerformancesWithoutFavorites() {
-        List<Performance> performances = performanceService.getRecentPerformances(RECENT_PERFORMANCES_SIZE);
+        List<Performance> performances = performanceService.getExpectedPerformances(RECENT_PERFORMANCES_SIZE);
         return RecentPerformancesDTO.of(
                 UNPERSONALIZED,
                 performances
@@ -376,7 +367,13 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public ExpectedPerformancesDTO getExpectedPerformances(GetExpectedPerformancesDTO expectedPerformancesDTO) {
-        return ExpectedPerformancesDTO.from(performanceServiceDPRECATED.getExpectedPerformances(expectedPerformancesDTO));
+        List<Long> performanceIds = expectedPerformancesDTO.expectedPerformanceDTOs().stream()
+                .map(GetExpectedPerformanceDTO::performanceId)
+                .toList();
+
+        List<Performance> performances = performanceService.getExpectedPerformancesIn(performanceIds);
+
+        return ExpectedPerformancesDTO.of(performances, s3FileHandler);
     }
 
     public PerformanceIdsDTO getPerformances() {

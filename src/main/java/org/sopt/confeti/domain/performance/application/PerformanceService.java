@@ -1,11 +1,9 @@
 package org.sopt.confeti.domain.performance.application;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.performance.Performance;
-import org.sopt.confeti.domain.performance.PerformanceType;
 import org.sopt.confeti.domain.performance.infra.repository.PerformanceRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -30,21 +28,25 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Performance> getRecentPerformance(long performanceId) {
+    public Optional<Performance> getExpectedPerformance(long performanceId) {
         return performanceRepository.findById(performanceId, getRecentPerformancesSort());
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getRecentPerformances(int fetchSize) {
-        return performanceRepository.findRecentPerformances(
-                LocalDate.now(),
+    public List<Performance> getExpectedPerformances(int fetchSize) {
+        return performanceRepository.findExpectedPerformances(
                 getPageRequest(fetchSize, getRecentPerformancesSort())
         ).stream().toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getRecentPerformancesWithFavoriteArtists(List<String> artistIds, int fetchSize) {
-        return performanceRepository.findRecentPerformancesByArtistIds(
+    public List<Performance> getExpectedPerformancesIn(List<Long> performanceIds) {
+        return performanceRepository.findExpectedPerformancesByIdIn(performanceIds);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getExpectedPerformancesWithFavoriteArtists(List<String> artistIds, int fetchSize) {
+        return performanceRepository.findExpectedPerformancesByArtistIds(
                 artistIds,
                 getPageRequest(fetchSize, getRecentPerformancesSort())
         );
@@ -70,12 +72,12 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public List<Performance> getRecentPerformancesToAddTimetable(long userId, int size, List<Long> excludePerformanceIds) {
-        return performanceRepository.findRecentPerformancesToAddTimetable(userId, excludePerformanceIds, getPageRequest(size, getFestivalSort()));
+        return performanceRepository.findExpectedPerformancesToAddTimetable(userId, excludePerformanceIds, getPageRequest(size, getFestivalSort()));
     }
 
     @Transactional(readOnly = true)
     public List<Performance> getRecentPerformancesByArtistId(String aid) {
-        return performanceRepository.findRecentPerformancesByArtistId(aid);
+        return performanceRepository.findExpectedPerformancesByArtistId(aid);
     }
 
     private PageRequest getPageRequest(final int size, final Sort sort) {
