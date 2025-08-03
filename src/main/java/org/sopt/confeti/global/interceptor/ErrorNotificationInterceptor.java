@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.annotation.Interceptor;
 import org.sopt.confeti.global.notification.SlackNotificationAgent;
 import org.sopt.confeti.global.notification.SlackNotificationType;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
@@ -17,7 +18,10 @@ import java.io.StringWriter;
 @Slf4j
 @Interceptor
 @RequiredArgsConstructor
-public class ErrorNotificationInterceptor implements HandlerInterceptor {
+@Profile(
+        value = { "prod" }
+)
+public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomInterceptor {
 
     private static final int MAX_STACK_TRACE_LENGTH = 3000;
     private final SlackNotificationAgent slackNotificationAgent;
@@ -26,10 +30,6 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
                                 Object handler, Exception ex) {
         if (handler instanceof ResourceHttpRequestHandler) {
-            return;
-        }
-
-        if (slackNotificationAgent == null) {
             return;
         }
 

@@ -2,16 +2,13 @@ package org.sopt.confeti.global.config;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.auth.jwt.JwtTokenExtractor;
-import org.sopt.confeti.auth.jwt.TokenParser;
-import org.sopt.confeti.global.interceptor.ErrorNotificationInterceptor;
-import org.sopt.confeti.global.interceptor.PermissionInterceptor;
+import org.sopt.confeti.global.interceptor.CustomInterceptor;
 import org.sopt.confeti.global.converter.StringToPerformanceTypeConverter;
-import org.sopt.confeti.global.notification.SlackNotificationAgent;
 import org.sopt.confeti.global.resolver.user.UserIdArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -21,9 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final UserIdArgumentResolver userIdArgumentResolver;
-    private final SlackNotificationAgent slackNotificationAgent;
-    private final JwtTokenExtractor jwtTokenExtractor;
-    private final TokenParser tokenParser;
+    private final List<CustomInterceptor> customInterceptors;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
@@ -37,8 +32,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new ErrorNotificationInterceptor(slackNotificationAgent));
-        registry.addInterceptor(new PermissionInterceptor(jwtTokenExtractor, tokenParser));
+        customInterceptors.forEach(interceptor -> {
+            registry.addInterceptor((HandlerInterceptor) interceptor);
+        });
     }
 
     @Override

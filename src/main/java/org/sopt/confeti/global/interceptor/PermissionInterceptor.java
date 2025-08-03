@@ -22,7 +22,7 @@ import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 @Interceptor
 @RequiredArgsConstructor
-public class PermissionInterceptor implements HandlerInterceptor {
+public class PermissionInterceptor implements HandlerInterceptor, CustomInterceptor {
 
     private final JwtTokenExtractor jwtTokenExtractor;
     private final TokenParser tokenParser;
