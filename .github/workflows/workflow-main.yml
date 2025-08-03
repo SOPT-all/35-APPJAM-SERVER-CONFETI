@@ -108,6 +108,20 @@ jobs:
           echo "${{ secrets.APPLICATION_APPLE_YML }}" > ./src/main/resources/oauth/application-apple.yml
         shell: bash
 
+      # notification 폴더 생성
+      - name: Create notification folder if not exist
+        run: |
+          if [ ! -d "./src/main/resources/notification" ]; then
+               mkdir -p ./src/main/resources/notification
+          fi
+
+      # application-notification.yml 파일 생성
+      - name: make application-notification.yml
+        run: |
+          touch ./src/main/resources/notification/application-notification.yml
+          echo "${{ secrets.APPLICATION_NOTIFICATION_YML }}" > ./src/main/resources/notification/application-notification.yml
+        shell: bash
+
       # test/resources 폴더 생성
       - name: Create test/resources folder if not exist
         run: |
