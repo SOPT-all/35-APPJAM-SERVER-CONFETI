@@ -19,6 +19,7 @@ import java.io.StringWriter;
 @RequiredArgsConstructor
 public class ErrorNotificationInterceptor implements HandlerInterceptor {
 
+    private static final int MAX_STACK_TRACE_LENGTH = 3000;
     private final SlackNotificationAgent slackNotificationAgent;
 
     @Override
@@ -90,8 +91,8 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor {
 
         // 스택트레이스가 너무 길면 앞 부분만 잘라서 반환
         String fullStackTrace = sw.toString();
-        if (fullStackTrace.length() > 2000) {
-            return fullStackTrace.substring(0, 2000) + "\n... (truncated)";
+        if (fullStackTrace.length() > MAX_STACK_TRACE_LENGTH) {
+            return fullStackTrace.substring(0, MAX_STACK_TRACE_LENGTH) + "\n... (truncated)";
         }
         return fullStackTrace;
     }
