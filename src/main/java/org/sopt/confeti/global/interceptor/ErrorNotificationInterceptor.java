@@ -1,4 +1,4 @@
-package org.sopt.confeti.global.annotation.interceptor;
+package org.sopt.confeti.global.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.annotation.Interceptor;
 import org.sopt.confeti.global.notification.SlackNotificationAgent;
 import org.sopt.confeti.global.notification.SlackNotificationType;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
@@ -17,7 +18,10 @@ import java.io.StringWriter;
 @Slf4j
 @Interceptor
 @RequiredArgsConstructor
-public class ErrorNotificationInterceptor implements HandlerInterceptor {
+@Profile(
+        value = { "prod" }
+)
+public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomInterceptor {
 
     private static final int MAX_STACK_TRACE_LENGTH = 3000;
     private final SlackNotificationAgent slackNotificationAgent;
@@ -29,13 +33,10 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor {
             return;
         }
 
-        log.info("인터셉터 진입");
-
         boolean shouldNotify = ex != null || response.getStatus() >= 400;
 
         if (shouldNotify) {
 
-            log.info("에러 발생, Slack 알림 전송");
             if (ex != null) {
                 String errorDetails = buildErrorDetails(request, ex, response.getStatus());
                 slackNotificationAgent.notify(SlackNotificationType.CRITICAL_ERROR, errorDetails);
@@ -46,11 +47,9 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor {
 
             int status = response.getStatus();
             if (status >= 500) {
-                log.info("서버 에러 발생, Slack 알림 전송");
                 String errorDetails = buildErrorDetails(request, exception, status);
                 slackNotificationAgent.notify(SlackNotificationType.CRITICAL_ERROR, errorDetails);
             } else if (status >= 400) {
-                log.info("클라이언트 에러 발생, Slack 알림 전송");
                 String errorDetails = buildErrorDetails(request, exception, status);
                 slackNotificationAgent.notify(SlackNotificationType.HIGH_ERROR, errorDetails);
             }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile(
-        value = { "prod", "dev" }
+        value = { "prod" }
 )
 public class SlackHighErrorNotificationUrl implements SlackNotificationUrl {
 

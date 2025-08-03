@@ -14,7 +14,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @Profile(
-        value = { "prod", "dev" }
+        value = { "prod" }
 )
 public class SlackNotificationAgent implements NotificationAgent {
 
