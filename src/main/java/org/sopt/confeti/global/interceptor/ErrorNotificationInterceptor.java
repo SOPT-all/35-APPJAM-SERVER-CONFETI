@@ -24,6 +24,7 @@ import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -43,6 +44,18 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomI
 
     private static final int MAX_STACK_TRACE_LENGTH = 3000;
     private final SlackNotificationAgent slackNotificationAgent;
+
+    private static final List<Integer> excludeErrorStatusCodes = List.of(
+            400, // Bad Request
+            401, // Unauthorized
+            403, // Forbidden
+            405, // Method Not Allowed
+            408, // Request Timeout
+            501, // Not Implemented
+            502, // Bad Gateway
+            503, // Service Unavailable
+            504  // Gateway Timeout
+    );
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
@@ -67,7 +80,7 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomI
             if (status >= 500) {
                 String errorDetails = buildErrorDetails(request, exception, status);
                 slackNotificationAgent.notify(SlackNotificationType.CRITICAL_ERROR, errorDetails);
-            } else if (status >= 400) {
+            } else if (status >= 400 && !excludeErrorStatusCodes.contains(status)) {
                 String errorDetails = buildErrorDetails(request, exception, status);
                 slackNotificationAgent.notify(SlackNotificationType.HIGH_ERROR, errorDetails);
             }
