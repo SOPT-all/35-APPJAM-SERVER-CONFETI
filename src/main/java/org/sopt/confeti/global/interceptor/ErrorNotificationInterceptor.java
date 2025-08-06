@@ -1,19 +1,31 @@
 package org.sopt.confeti.global.interceptor;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.auth.jwt.JwtTokenExtractor;
+import org.sopt.confeti.auth.jwt.TokenParser;
+import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.global.annotation.Interceptor;
+import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.exception.UnauthorizedException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.notification.SlackNotificationAgent;
 import org.sopt.confeti.global.notification.SlackNotificationType;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Interceptor
@@ -22,6 +34,12 @@ import java.io.StringWriter;
         value = { "prod" }
 )
 public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomInterceptor {
+
+    private static final String USER_EMPTY_MESSAGE = "• User 사용자 정보가 없습니다.";
+
+    private final UserRepository userRepository;
+    private final JwtTokenExtractor jwtTokenExtractor;
+    private final TokenParser tokenParser;
 
     private static final int MAX_STACK_TRACE_LENGTH = 3000;
     private final SlackNotificationAgent slackNotificationAgent;
@@ -60,6 +78,7 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomI
         StringBuilder info = new StringBuilder();
         info.append("🔍 요청 정보\n");
         info.append("• URL: ").append(request.getMethod()).append(" ").append(request.getRequestURI()).append("\n");
+        info.append(getUserInfo(request));
         info.append("• Query: ").append(request.getQueryString()).append("\n");
         info.append("• Remote IP: ").append(getClientIpAddress(request)).append("\n");
 
@@ -69,6 +88,32 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomI
         }
 
         return info.toString();
+    }
+
+    private String getUserInfo(HttpServletRequest request) {
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (Objects.isNull(token)) {
+            return USER_EMPTY_MESSAGE;
+        }
+
+        String userId;
+        try {
+            userId = jwtTokenExtractor.getSubject(tokenParser.getToken(token));
+        } catch (ExpiredJwtException e) {
+            return "• User: 사용자 정보가 만료되었습니다.";
+        } catch (JwtException | IllegalArgumentException e) {
+            return "• User: 사용자 정보가 잘못되었습니다.";
+        }
+
+        Optional<User> user = userRepository.findById(Long.valueOf(userId));
+
+        if (user.isEmpty()) {
+            return USER_EMPTY_MESSAGE;
+        }
+
+        User foundedUser = user.get();
+        return String.format("• User ID: %d\n• User Name: %s\n", foundedUser.getId(), foundedUser.getName());
     }
 
     private String buildErrorDetails(HttpServletRequest request, Exception ex, int status) {
