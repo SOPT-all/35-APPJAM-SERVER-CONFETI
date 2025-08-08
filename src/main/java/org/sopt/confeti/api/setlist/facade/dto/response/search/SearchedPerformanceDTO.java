@@ -1,22 +1,22 @@
 package org.sopt.confeti.api.setlist.facade.dto.response.search;
 
+import org.sopt.confeti.domain.performance.PerformanceType;
+import org.sopt.confeti.domain.performance.SearchedPerformance;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 
-public record SearchPerformanceDTO(
+public record SearchedPerformanceDTO(
         long id,
-        PerformanceType_DEPRECATED type,
-        long typeId,
+        PerformanceType type,
         String title,
-        String posterPath
+        String posterUrl
 ) {
-    public static SearchPerformanceDTO from(PerformanceDTO performance) {
-        return new SearchPerformanceDTO(
+    public static SearchedPerformanceDTO from(SearchedPerformance performance) {
+        return new SearchedPerformanceDTO(
                 performance.id(),
                 performance.type(),
-                performance.typeId(),
                 performance.title(),
-                performance.posterPath()
+                performance.posterUrl()
         );
     }
 }

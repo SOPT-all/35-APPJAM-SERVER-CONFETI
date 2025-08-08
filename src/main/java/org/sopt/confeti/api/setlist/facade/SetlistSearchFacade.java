@@ -8,17 +8,20 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchPerformancesDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchedPerformancesDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArtistMusicsDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchMusicsDTO;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
+import org.sopt.confeti.domain.performance.PerformanceType;
+import org.sopt.confeti.domain.performance.SearchedPerformance;
+import org.sopt.confeti.domain.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
-import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
-import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.sopt.confeti.global.util.analyzer.SearchTermAnalyzer;
 import org.sopt.confeti.global.util.analyzer.dto.PerformanceSearchTermAnalyzeResult;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
@@ -34,6 +37,8 @@ public class SetlistSearchFacade {
     private final PerformanceService_DPRECATED performanceServiceDPRECATED;
     private final MusicAPIHandler musicAPIHandler;
     private final PerformanceSearchService performanceSearchService;
+    private final PerformanceService performanceService;
+    private final S3FileHandler s3FileHandler;
 
     private boolean isPresent(Object that) {
         return Objects.nonNull(that);
@@ -71,43 +76,55 @@ public class SetlistSearchFacade {
     }
 
     @Transactional(readOnly = true)
-    public SearchPerformancesDTO searchPerformances(String aid, Long pid, String term) {
-        List<PerformanceDTO> performances = new ArrayList<>();
+    public SearchedPerformancesDTO searchPerformances(String aid, Long pid, String term) {
+        List<SearchedPerformance> performances = new ArrayList<>();
         PerformanceSearchTermAnalyzeResult analyzeResult = PerformanceSearchTermAnalyzeResult.empty();
 
         if (isPresent(aid)) {
-            performances.addAll(performanceServiceDPRECATED.getAllPerformancesByArtistId(aid));
+            performances.addAll(
+                    performanceService.getPerformancesByArtistId(aid).stream()
+                            .map(performance -> SearchedPerformance.of(performance, s3FileHandler))
+                            .toList()
+            );
         }
 
         if (isPresent(pid)) {
-            performances.add(PerformanceDTO.from(performanceServiceDPRECATED.getPerformanceById(pid)));
+            performances.add(
+                    performanceService.getPerformance(pid)
+                            .map(performance -> SearchedPerformance.of(performance, s3FileHandler))
+                            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND))
+            );
         }
 
         if (isPresent(term)) {
             analyzeResult = SearchTermAnalyzer.analyzePerformance(term);
             Optional<String> artistId = getArtistId(analyzeResult.processedTerm());
 
-            artistId.ifPresent(s -> performances.addAll(performanceServiceDPRECATED.getAllPerformancesByArtistId(s)));
+            artistId.ifPresent(presentedAid -> performances.addAll(
+                    performanceService.getPerformancesByArtistId(presentedAid).stream()
+                            .map(performance -> SearchedPerformance.of(performance, s3FileHandler))
+                            .toList()
+            ));
 
             performances.addAll(
                     performanceSearchService.getPerformancesByTitleAndTypePartialMatched(analyzeResult.processedTerm(),
-                                    analyzeResult.performanceTypeDEPRECATED()).stream()
-                            .map(PerformanceDTO::from)
+                                    analyzeResult.performanceType()).stream()
+                            .map(searchResult -> SearchedPerformance.of(searchResult, s3FileHandler))
                             .toList()
             );
         }
 
         PerformanceSearchTermAnalyzeResult finalAnalyzeResult = analyzeResult;
-        Set<PerformanceDTO> searchedPerformances = performances.stream()
+        Set<SearchedPerformance> searchedPerformances = performances.stream()
                 .filter(
-                        performance -> finalAnalyzeResult.performanceTypeDEPRECATED() == PerformanceType_DEPRECATED.PERFORMANCE ||
-                                performance.type() == finalAnalyzeResult.performanceTypeDEPRECATED()
+                        searchedPerformance -> finalAnalyzeResult.performanceType() == PerformanceType.PERFORMANCE ||
+                                searchedPerformance.type() == finalAnalyzeResult.performanceType()
                 )
                 .collect(Collectors.toSet());
 
-        return SearchPerformancesDTO.from(
+        return SearchedPerformancesDTO.from(
                 searchedPerformances.stream()
-                        .sorted(Comparator.comparing(PerformanceDTO::startAt).reversed())
+                        .sorted(Comparator.comparing(SearchedPerformance::startAt).reversed())
                         .toList()
         );
     }

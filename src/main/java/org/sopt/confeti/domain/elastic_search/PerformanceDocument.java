@@ -21,9 +21,6 @@ public record PerformanceDocument(
         @Field(type = FieldType.Keyword)
         String type,
 
-        @Field(type = FieldType.Long)
-        long typeId,
-
         @MultiField(
                 mainField = @Field(type = FieldType.Text, analyzer = "search_analyzer"),
                 otherFields = {
@@ -52,7 +49,6 @@ public record PerformanceDocument(
         return PerformanceDocument.builder()
                 .id(performance.id())
                 .type(performance.type().getType())
-                .typeId(performance.typeId())
                 .title(performance.title())
                 .startAt(performance.startAt())
                 .endAt(performance.endAt())

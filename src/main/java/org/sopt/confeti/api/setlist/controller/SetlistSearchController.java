@@ -8,7 +8,7 @@ import org.sopt.confeti.api.setlist.dto.response.search.SetlistSearchArtistMusic
 import org.sopt.confeti.api.setlist.dto.response.search.SetlistSearchMusicsResponse;
 import org.sopt.confeti.api.setlist.dto.response.search.SetlistSearchPerformancesResponse;
 import org.sopt.confeti.api.setlist.facade.SetlistSearchFacade;
-import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchPerformancesDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchedPerformancesDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArtistMusicsDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchMusicsDTO;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -42,9 +42,9 @@ public class SetlistSearchController {
             @RequestParam(required = false) Long pid,
             @RequestParam(required = false) String term
     ) {
-        SearchPerformancesDTO searchResult = setlistSearchFacade.searchPerformances(aid, pid, term);
+        SearchedPerformancesDTO searchResult = setlistSearchFacade.searchPerformances(aid, pid, term);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                SetlistSearchPerformancesResponse.of(searchResult, s3FileHandler));
+                SetlistSearchPerformancesResponse.from(searchResult));
     }
 
     @Permission(role = {Role.GENERAL})

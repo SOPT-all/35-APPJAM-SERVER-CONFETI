@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.sopt.confeti.domain.performance.Performance;
 import org.sopt.confeti.domain.performance.PerformanceType;
+import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -75,4 +76,6 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "SELECT p"
     )
     List<Performance> findExpectedPerformancesByArtistId(@Param("aid") String aid, @Param("type") PerformanceType type);
+
+    List<Performance> findPerformancesBySchedules_ArtistId(String artistId);
 }

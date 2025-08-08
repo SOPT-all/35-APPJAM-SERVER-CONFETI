@@ -80,6 +80,11 @@ public class PerformanceService {
         return performanceRepository.findExpectedPerformancesByArtistId(aid);
     }
 
+    @Transactional(readOnly = true)
+    public List<Performance> getPerformancesByArtistId(String aid) {
+        return performanceRepository.findPerformancesBySchedules_ArtistId(aid);
+    }
+
     private PageRequest getPageRequest(final int size, final Sort sort) {
         return PageRequest.of(INIT_PAGE, size, sort);
     }

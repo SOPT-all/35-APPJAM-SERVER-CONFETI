@@ -8,6 +8,7 @@ import kr.co.shineware.nlp.komoran.model.KomoranResult;
 import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.sopt.confeti.domain.performance.PerformanceType;
 import org.sopt.confeti.global.common.constant.PerformanceKeyword;
 import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 
@@ -20,7 +21,7 @@ public class MorphemeAnalyzer {
         return komoran.analyze(sentence);
     }
 
-    public static PerformanceType_DEPRECATED getFirstMatchingPerformanceType(KomoranResult analyzeResult) {
+    public static PerformanceType getFirstMatchingPerformanceType(KomoranResult analyzeResult) {
         List<Token> tokens = analyzeResult.getTokenList();
 
         for (Token token : tokens) {
@@ -29,7 +30,7 @@ public class MorphemeAnalyzer {
             }
         }
 
-        return PerformanceType_DEPRECATED.PERFORMANCE;
+        return PerformanceType.PERFORMANCE;
     }
 
     public static String getRemovedPerformanceTypesTerm(String sentence, KomoranResult analyzeResult) {

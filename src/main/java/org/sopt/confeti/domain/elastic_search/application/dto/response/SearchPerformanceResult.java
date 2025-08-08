@@ -8,7 +8,6 @@ import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 public record SearchPerformanceResult(
         long id,
         PerformanceType type,
-        long typeId,
         String title,
         LocalDate startAt,
         LocalDate endAt,
@@ -19,7 +18,6 @@ public record SearchPerformanceResult(
         return new SearchPerformanceResult(
                 performanceDocument.id(),
                 PerformanceType.convert(performanceDocument.type()),
-                performanceDocument.typeId(),
                 performanceDocument.title(),
                 performanceDocument.startAt(),
                 performanceDocument.endAt(),

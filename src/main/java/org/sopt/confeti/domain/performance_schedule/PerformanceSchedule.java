@@ -70,14 +70,15 @@ public class PerformanceSchedule {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+
     @Builder
-    public PerformanceSchedule(Performance performance, String artistId, LocalDate performanceAt, String stageName, LocalTime openAt,
-                               LocalTime startAt, LocalTime endAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public PerformanceSchedule(Performance performance, ConfetiArtist artist, LocalDate performanceAt, String stageName, LocalTime openAt, int order, LocalTime startAt, LocalTime endAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.performance = performance;
-        this.artistId = artistId;
+        this.artist = artist;
         this.performanceAt = performanceAt;
         this.stageName = stageName;
         this.openAt = openAt;
+        this.order = order;
         this.startAt = startAt;
         this.endAt = endAt;
         this.createdAt = createdAt;
