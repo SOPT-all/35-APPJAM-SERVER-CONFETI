@@ -34,7 +34,6 @@ public class UserOnboardController {
     private final UserOnboardFacade userOnboardFacade;
 
     @Permission(role = {Role.ONBOARDING})
-
     @GetMapping("/artists/{artistId}/related")
     public ResponseEntity<BaseResponse<?>> getRelatedArtists(
             @UserId Long userId,
