@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.search.facade.dto.response.PopularTermsDTO;
@@ -18,6 +17,7 @@ import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.performance.Performance;
 import org.sopt.confeti.domain.performance.PerformanceType;
+import org.sopt.confeti.domain.performance.SearchedPerformance;
 import org.sopt.confeti.domain.performance.application.PerformanceService;
 import org.sopt.confeti.domain.performance_favorite.PerformanceFavorite;
 import org.sopt.confeti.domain.performance_favorite.application.PerformanceFavoriteService;
@@ -70,9 +70,11 @@ public class SearchFacade {
             artistFavorite = artistFavoriteService.isFavorite(userId, aid);
         }
 
-        List<Performance> performances = performanceService.getRecentPerformancesByArtistId(aid);
+        List<SearchedPerformance> performances = performanceService.getExpectedPerformancesByArtistId(aid).stream()
+                .map(performance -> SearchedPerformance.of(performance, s3FileHandler))
+                .toList();
         List<Long> performanceIds = performances.stream()
-                .map(Performance::getId)
+                .map(SearchedPerformance::id)
                 .toList();
 
         Set<Long> favoritePerformanceIds = new HashSet<>();
@@ -81,28 +83,41 @@ public class SearchFacade {
             favoritePerformanceIds.addAll(performanceFavoriteService.getFavoritePerformanceIdsByPerformanceIds(userId, performanceIds));
         }
 
-        return SearchResultDTO.of(artist, artistFavorite, performances, favoritePerformanceIds, s3FileHandler);
+        return SearchResultDTO.of(artist, artistFavorite, performances, favoritePerformanceIds);
     }
 
+    /**
+     * 특정 공연 정보 검색
+     * 검색 결과 : 특정 공연 정보
+     * 유저 아이디에 따라 좋아요 여부를 함께 반환
+     * @param userId
+     * @param pid
+     * @return SearchResultDTO
+     */
     @Transactional(readOnly = true)
     public SearchResultDTO getHomeSearchResultWithPid(Long userId, long pid) {
-        PerformanceDTO performance = performanceServiceDPRECATED.getPerformance(pid);
+        SearchedPerformance performance = SearchedPerformance.of(performanceService.getExistExpectedPerformance(pid), s3FileHandler);
+
         searchTermService.write(performance.title());
         boolean performanceFavorite = false;
 
         if (Objects.nonNull(userId)) {
-            if (performance.type() == PerformanceType_DEPRECATED.FESTIVAL) {
-                performanceFavorite = festivalFavoriteService.isFavorite(userId, performance.typeId());
-            }
-
-            if (performance.type() == PerformanceType_DEPRECATED.CONCERT) {
-                performanceFavorite = concertFavoriteService.isFavorite(userId, performance.typeId());
-            }
+            performanceFavorite = performanceFavoriteService.isFavorite(userId, pid);
         }
 
         return SearchResultDTO.of(performance, performanceFavorite);
     }
 
+    /**
+     * 홈 화면에서 검색어로 공연 검색
+     * 검색 결과 : 아티스트 정보, 공연 목록
+     * 유저 아이디에 따라 아티스트 좋아요 여부와 공연 좋아요 여부를 함께 반환
+     *
+     * 검색 흐름은 검색어 분석 -> 아티스트 검색 -> 아티스트 연관 공연 검색 -> 검색어 기반 공연 검색
+     * @param userId
+     * @param term
+     * @return SearchResultDTO
+     */
     @Transactional(readOnly = true)
     public SearchResultDTO getHomeSearchResultWithTerm(Long userId, String term) {
         PerformanceSearchTermAnalyzeResult analyzeResult = SearchTermAnalyzer.analyzePerformance(term);
@@ -116,37 +131,33 @@ public class SearchFacade {
         }
 
         // 공연은 아티스트 + 검색어 기반
-        Set<PerformanceDTO> performances = new HashSet<>();
+        Set<SearchedPerformance> performances = new HashSet<>();
 
         // 아티스트 기반
         artist.ifPresent(confetiArtist -> performances.addAll(
-                        performanceServiceDPRECATED.getPerformancesByArtistIdAndType(confetiArtist.getId(),
-                                analyzeResult.performanceTypeDEPRECATED())
-                )
-        );
+                performanceService.getExpectedPerformancesByArtistIdAndType(confetiArtist.getId(), analyzeResult.performanceType()).stream()
+                        .map(performance -> SearchedPerformance.of(performance, s3FileHandler))
+                        .toList()
+        ));
 
         // 검색어 기반
-        List<PerformanceDTO> searchedPerformances = performanceSearchService.getExpectedPerformancesByTitleAndTypePartialMatched(
-                        analyzeResult.processedTerm(), analyzeResult.performanceTypeDEPRECATED()).stream()
-                .map(PerformanceDTO::from)
-                .toList();
+        performances.addAll(
+                performanceSearchService.getExpectedPerformancesByTitleAndTypePartialMatched(
+                        analyzeResult.processedTerm(), analyzeResult.performanceType()).stream()
+                .map(performance -> SearchedPerformance.of(performance, s3FileHandler))
+                .toList()
+        );
 
-        performances.addAll(searchedPerformances);
         searchTermService.write(performances);
 
-        Map<Long, Boolean> performanceFavorites = performances.stream()
-                .collect(Collectors.toMap(
-                        PerformanceDTO::id,
-                        p -> false
-                ));
+        Set<Long> favoritePerformanceIds = new HashSet<>();
 
         if (Objects.nonNull(userId)) {
-            List<PerformanceDTO> favoritePerformances = performanceServiceDPRECATED.getFavoritePerformancesAll(userId, TYPE_ALL);
-            getPerformanceFavorites(performanceFavorites, favoritePerformances);
+            favoritePerformanceIds.addAll(performanceFavoriteService.getFavoritePerformanceIdsByPerformanceIds(userId, performances.stream().map(SearchedPerformance::id).toList()));
         }
 
         return SearchResultDTO.of(artist.orElse(null), artistFavorite, performances.stream().toList(),
-                performanceFavorites);
+                favoritePerformanceIds);
     }
 
     public PopularTermsDTO getPopularSearchTerms(int limit) {
@@ -158,12 +169,5 @@ public class SearchFacade {
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 );
-    }
-
-    private void getPerformanceFavorites(Map<Long, Boolean> performanceFavorites,
-                                         List<PerformanceDTO> favoritePerformances) {
-        favoritePerformances.forEach(performance -> {
-            performanceFavorites.replace(performance.id(), true);
-        });
     }
 }

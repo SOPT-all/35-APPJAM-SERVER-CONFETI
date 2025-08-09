@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.user.facade.dto.PerformanceCursorDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalArtiestDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
@@ -19,6 +20,8 @@ import org.sopt.confeti.domain.festival_date.application.FestivalDateService;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
 import org.sopt.confeti.domain.performance.Performance;
 import org.sopt.confeti.domain.performance.application.PerformanceService;
+import org.sopt.confeti.domain.performance_favorite.PerformanceFavorite;
+import org.sopt.confeti.domain.performance_favorite.application.PerformanceFavoriteService;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.User;
@@ -54,6 +57,7 @@ public class UserTimetableFacade {
     private final UserTimetableService userTimetableService;
     private final PerformanceService performanceService;
     private final PerformanceMapper performanceMapper;
+    private final PerformanceFavoriteService performanceFavoriteService;
 
     @Transactional(readOnly = true)
     public UserTimetableDetailFestivalsDTO getTimetablesListAndDate(long userId) {
@@ -145,16 +149,26 @@ public class UserTimetableFacade {
         }
 
         // 커서 값 조회
-        FestivalCursorDTO festivalCursorDTO = getFestivalCursor(userId, cursor);
+        PerformanceCursorDTO performanceCursor = getPerformanceCursor(userId, cursor);
 
-        List<Festival> festivals = festivalService.findFestivalsUsingCursor(userId, festivalCursorDTO.cursorTitle(),
-                festivalCursorDTO.cursorIsFavorite(), TIMETABLE_FESTIVALS_TO_ADD_SIZE);
+        List<Performance> performances = performanceService.getPerformancesUsingCursor(performanceCursor, userId, TIMETABLE_FESTIVALS_TO_ADD_SIZE, timetablePerformanceIds);
+        List<Festival> festivals = performances.stream()
+                .map(performanceMapper::toFestival)
+                .toList();
+
         return CursorPage.of(
                 festivals.stream()
                         .map(TimetableToAddDTO::from)
                         .toList(),
                 TIMETABLE_FESTIVALS_TO_ADD_SIZE
         );
+    }
+
+    private PerformanceCursorDTO getPerformanceCursor(final long userId, final long cursor) {
+        Performance performance = performanceService.getExistExpectedPerformance(cursor);
+        boolean isFavorite = performanceFavoriteService.isFavorite(userId, performance.getId());
+
+        return PerformanceCursorDTO.of(performance, isFavorite);
     }
 
     public UserTimetableFestivalBasicDTO getTimetableInfo(final long userId, final long festivalDateId) {
@@ -169,8 +183,7 @@ public class UserTimetableFacade {
         }
     }
 
-    @Transactional(readOnly = true)
-    public FestivalCursorDTO getFestivalCursor(final long userId, final long cursor) {
+    private FestivalCursorDTO getFestivalCursor(final long userId, final long cursor) {
         return festivalService.findFestivalCursor(userId, cursor)
                 .orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)

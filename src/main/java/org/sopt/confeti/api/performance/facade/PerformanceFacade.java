@@ -100,13 +100,6 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    protected void validateConcertNotPassed(final Concert concert) {
-        if (LocalDate.now().isAfter(concert.getEndAt())) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
-    }
-
-    @Transactional(readOnly = true)
     public FestivalDetailDTO getFestivalDetail(final Long userId, final long performanceId) {
         boolean isFavorite = getIsFavorite(userId, performanceId);
 
@@ -125,13 +118,6 @@ public class PerformanceFacade {
         }
 
         return false;
-    }
-
-    @Transactional(readOnly = true)
-    protected void validateFestivalNotPassed(final Festival festival) {
-        if (LocalDate.now().isAfter(festival.getEndAt())) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
     }
 
     @Transactional(readOnly = true)

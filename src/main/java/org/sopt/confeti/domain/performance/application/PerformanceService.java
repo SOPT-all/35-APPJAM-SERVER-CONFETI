@@ -4,7 +4,11 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.performance.Performance;
+import org.sopt.confeti.api.user.facade.dto.PerformanceCursorDTO;
+import org.sopt.confeti.domain.performance.PerformanceType;
 import org.sopt.confeti.domain.performance.infra.repository.PerformanceRepository;
+import org.sopt.confeti.global.exception.NotFoundException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -25,6 +29,12 @@ public class PerformanceService {
     @Transactional(readOnly = true)
     public Optional<Performance> getPerformance(long performanceId) {
         return performanceRepository.findById(performanceId);
+    }
+
+    @Transactional(readOnly = true)
+    public Performance getExistExpectedPerformance(long performanceId) {
+        return performanceRepository.findById(performanceId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
@@ -54,7 +64,7 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public List<Performance> getFavoriteRecentPerformances(long userId) {
-        return performanceRepository.findFavoriteRecentPerformances(
+        return performanceRepository.findExpectedFavoritePerformances(
                 userId,
                 getPageRequest(FAVORITE_PERFORMANCE_PREVIEW_COUNT, getRecentPerformancesSort())
         );
@@ -76,13 +86,29 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getRecentPerformancesByArtistId(String aid) {
-        return performanceRepository.findExpectedPerformancesByArtistId(aid);
+    public List<Performance> getExpectedPerformancesByArtistId(String artistId) {
+        return performanceRepository.findExpectedPerformancesByArtistId(artistId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getExpectedPerformancesByArtistIdAndType(String artistId, PerformanceType type) {
+        return performanceRepository.findExpectedPerformancesByArtistIdAndType(artistId, type);
     }
 
     @Transactional(readOnly = true)
     public List<Performance> getPerformancesByArtistId(String aid) {
         return performanceRepository.findPerformancesBySchedules_ArtistId(aid);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getPerformancesUsingCursor(PerformanceCursorDTO performanceCursorDTO, long userId, int fetchSize, List<Long> excludePerformanceIds) {
+        return performanceRepository.findPerformancesUsingCursor(
+                performanceCursorDTO.title(),
+                performanceCursorDTO.isFavorite(),
+                userId,
+                excludePerformanceIds,
+                getPageRequest(fetchSize, getRecentPerformancesSort())
+        );
     }
 
     private PageRequest getPageRequest(final int size, final Sort sort) {

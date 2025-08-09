@@ -8,6 +8,7 @@ import org.sopt.confeti.domain.elastic_search.SearchTermDocument;
 import org.sopt.confeti.domain.elastic_search.application.dto.response.PopularTermResult;
 import org.sopt.confeti.domain.elastic_search.infra.SearchTermOperator;
 import org.sopt.confeti.domain.elastic_search.infra.SearchTermRepository;
+import org.sopt.confeti.domain.performance.SearchedPerformance;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.springframework.stereotype.Service;
@@ -33,10 +34,10 @@ public class SearchTermService {
         );
     }
     
-    public void write(Set<PerformanceDTO> performances) {
+    public void write(Set<SearchedPerformance> performances) {
         searchTermRepository.saveAll(
                 performances.stream()
-                        .map(PerformanceDTO::title)
+                        .map(SearchedPerformance::title)
                         .map(SearchTermDocument::create)
                         .toList()
         );

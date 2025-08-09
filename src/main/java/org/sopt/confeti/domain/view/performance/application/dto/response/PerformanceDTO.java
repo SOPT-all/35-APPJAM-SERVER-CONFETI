@@ -4,13 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.sopt.confeti.domain.elastic_search.application.dto.response.SearchPerformanceResult;
+import org.sopt.confeti.domain.performance.PerformanceType;
 import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
 import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 
 public record PerformanceDTO(
         long id,
-        Long typeId,
-        PerformanceType_DEPRECATED type,
+        PerformanceType type,
         String area,
         String title,
         String subtitle,
@@ -23,7 +23,6 @@ public record PerformanceDTO(
     public static PerformanceDTO from(final Performance_DPRECATED performanceDPRECATED) {
         return new PerformanceDTO(
                 performanceDPRECATED.getId(),
-                performanceDPRECATED.getTypeId(),
                 performanceDPRECATED.getType(),
                 performanceDPRECATED.getArea(),
                 performanceDPRECATED.getTitle(),
@@ -39,7 +38,6 @@ public record PerformanceDTO(
     public static PerformanceDTO from(final SearchPerformanceResult searchedPerformance) {
         return new PerformanceDTO(
                 searchedPerformance.id(),
-                searchedPerformance.typeId(),
                 searchedPerformance.type(),
                 searchedPerformance.area(),
                 searchedPerformance.title(),

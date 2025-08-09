@@ -17,8 +17,7 @@ public record RecentPerformanceDTO(
     public static RecentPerformanceDTO of(final Concert concert, final long performanceId) {
         return new RecentPerformanceDTO(
                 performanceId,
-                concert.getId(),
-                PerformanceType_DEPRECATED.CONCERT,
+                PerformanceType.CONCERT,
                 concert.getTitle(),
                 concert.getStartAt(),
                 concert.getPosterPath()
@@ -28,8 +27,7 @@ public record RecentPerformanceDTO(
     public static RecentPerformanceDTO of(final Festival festival, final long performanceId) {
         return new RecentPerformanceDTO(
                 performanceId,
-                festival.getId(),
-                PerformanceType_DEPRECATED.FESTIVAL,
+                PerformanceType.FESTIVAL,
                 festival.getTitle(),
                 festival.getStartAt(),
                 festival.getPosterPath()

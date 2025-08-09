@@ -181,34 +181,9 @@ public class PerformanceService_DPRECATED {
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceDTO> getExpectedPerformances(GetExpectedPerformancesDTO expectedPerformancesDTO) {
-        List<Pair<PerformanceType_DEPRECATED, Long>> performancePairs = convertToPairs(expectedPerformancesDTO);
-        List<Performance_DPRECATED> performanceDPRECATEDS = performanceCriteriaRepositoryDPRECATED.findPerformancesByTypeAndTypeId(
-                performancePairs);
-
-        Map<Pair<PerformanceType_DEPRECATED, Long>, Performance_DPRECATED> performanceMapper = performanceDPRECATEDS.stream()
-                .collect(Collectors.toMap(
-                        performance -> Pair.of(performance.getType(), performance.getTypeId()),
-                        Function.identity()
-                ));
-
-        return performancePairs.stream()
-                .map(performanceMapper::get)
-                .filter(Objects::nonNull)
-                .map(PerformanceDTO::from)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
     public Performance_DPRECATED getPerformanceByTypeAndTypeId(PerformanceType_DEPRECATED type, long typeId) {
         return performanceRepositoryDPRECATED.findPerformanceByTypeAndTypeId(type, typeId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-    }
-
-    private List<Pair<PerformanceType_DEPRECATED, Long>> convertToPairs(GetExpectedPerformancesDTO expectedPerformancesDTO) {
-        return expectedPerformancesDTO.expectedPerformanceDTOs().stream()
-                .map(performanceDTO -> Pair.of(performanceDTO.type(), performanceDTO.typeId()))
-                .toList();
     }
 
     @Transactional(readOnly = true)

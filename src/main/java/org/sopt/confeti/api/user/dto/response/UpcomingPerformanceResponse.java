@@ -1,6 +1,7 @@
 package org.sopt.confeti.api.user.dto.response;
 
 import org.sopt.confeti.api.user.facade.dto.response.UpcomingPerformanceDTO;
+import org.sopt.confeti.domain.performance.PerformanceType;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.util.DateConvertor;
@@ -8,7 +9,7 @@ import org.sopt.confeti.global.util.S3FileHandler;
 
 public record UpcomingPerformanceResponse(
         long typeId,
-        PerformanceType_DEPRECATED type,
+        PerformanceType type,
         String title,
         String posterUrl,
         String startAt,

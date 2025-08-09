@@ -75,21 +75,6 @@ public class FestivalService {
     }
 
     @Transactional(readOnly = true)
-    public List<Festival> findFestivalsUsingCursor(
-            final long userId,
-            final String cursorTitle,
-            final boolean cursorIsFavorite,
-            final int size
-    ) {
-        return festivalRepository.findFestivalsUsingCursor(
-                userId,
-                cursorTitle,
-                cursorIsFavorite,
-                getPageRequestWithSort(size, getFestivalSort())
-        );
-    }
-
-    @Transactional(readOnly = true)
     public Optional<FestivalCursorDTO> findFestivalCursor(final long userId, final long festivalId) {
         return festivalRepository.findFestivalCursor(userId, festivalId);
     }

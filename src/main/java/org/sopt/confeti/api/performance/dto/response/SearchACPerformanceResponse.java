@@ -11,15 +11,7 @@ public record SearchACPerformanceResponse(
         String posterUrl
 ) {
     public static SearchACPerformanceResponse of(SearchACPerformanceDTO performanceDTO, S3FileHandler s3FileHandler) {
-        String folderPath = FolderPath.DEFAULT.getSingle();
-
-        if (performanceDTO.type() == PerformanceType_DEPRECATED.FESTIVAL) {
-            folderPath = FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER);
-        }
-
-        if (performanceDTO.type() == PerformanceType_DEPRECATED.CONCERT) {
-            folderPath = FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER);
-        }
+        String folderPath = FolderPath.combine(FolderPath.getFolderPathByPerformanceType(performanceDTO.type()), FolderPath.POSTER);
 
         return new SearchACPerformanceResponse(
                 performanceDTO.id(),

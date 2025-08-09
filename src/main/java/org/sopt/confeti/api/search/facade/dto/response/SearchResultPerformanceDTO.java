@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.sopt.confeti.domain.performance.Performance;
 import org.sopt.confeti.domain.performance.PerformanceType;
+import org.sopt.confeti.domain.performance.SearchedPerformance;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
@@ -19,18 +20,15 @@ public record SearchResultPerformanceDTO(
         String area,
         boolean isFavorite
 ) {
-    public static SearchResultPerformanceDTO of(Performance performance, boolean performanceFavorite, S3FileHandler s3FileHandler) {
+    public static SearchResultPerformanceDTO of(SearchedPerformance performance, boolean performanceFavorite) {
         return new SearchResultPerformanceDTO(
-                performance.getId(),
-                performance.getType(),
-                performance.getTitle(),
-                s3FileHandler.getFileUrl(
-                        FolderPath.combine(FolderPath.getFolderPathByPerformanceType(performance.getType()), FolderPath.POSTER),
-                        performance.getPosterPath()
-                ).toString(),
-                performance.getStartAt(),
-                performance.getEndAt(),
-                performance.getArea(),
+                performance.id(),
+                performance.type(),
+                performance.title(),
+                performance.posterUrl(),
+                performance.startAt(),
+                performance.endAt(),
+                performance.area(),
                 performanceFavorite
         );
     }

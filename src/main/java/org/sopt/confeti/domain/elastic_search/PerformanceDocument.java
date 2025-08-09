@@ -48,7 +48,7 @@ public record PerformanceDocument(
     public static PerformanceDocument create(PerformanceDTO performance) {
         return PerformanceDocument.builder()
                 .id(performance.id())
-                .type(performance.type().getType())
+                .type(performance.type().getName())
                 .title(performance.title())
                 .startAt(performance.startAt())
                 .endAt(performance.endAt())
