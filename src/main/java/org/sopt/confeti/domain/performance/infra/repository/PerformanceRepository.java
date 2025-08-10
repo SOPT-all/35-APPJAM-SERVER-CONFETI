@@ -84,10 +84,19 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
 
     @Query(value = "" +
             "SELECT p " +
+            "FROM Performance p JOIN p.favorites pf " +
+            "ON p.id = pf.performance.id " +
+            "WHERE pf.user.id = :userId " +
+            "AND p.endAt >= CURRENT_DATE "
+    )
+    Optional<Performance> findUpcomingFavoritePerformance(@Param("userId") long userId, PageRequest pageRequest);
+
+    @Query(value = "" +
+            "SELECT p " +
             "FROM Performance p JOIN FETCH p.favorites pf " +
             "WHERE pf.user.id = :userId "
     )
-    List<Performance> findExpectedFavoritePerformances(@Param("userId") long userId, PageRequest pageRequest);
+    List<Performance> findUpcomingFavoritePerformances(@Param("userId") long userId, PageRequest pageRequest);
 
     List<Performance> findPerformancesBySchedules_ArtistId(String artistId);
 
@@ -166,4 +175,13 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "WHERE p.endAt >= CURRENT_DATE "
     )
     List<Performance> findUpcomingPerformancesReservation(PageRequest pageRequest);
+
+    @Query(value = "" +
+            "SELECT p " +
+            "FROM Performance p JOIN p.userTimetables pu " +
+            "ON p.id = pu.performance.id " +
+            "WHERE pu.user.id = :userId " +
+            "AND p.endAt >= CURRENT_DATE "
+    )
+    Optional<Performance> findUpcomingTimetablePerformance(long userId, PageRequest pageRequest);
 }

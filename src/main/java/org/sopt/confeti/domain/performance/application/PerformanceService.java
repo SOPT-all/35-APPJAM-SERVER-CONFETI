@@ -22,10 +22,12 @@ public class PerformanceService {
     private static final int INIT_PAGE = 0;
     private static final String TITLE_COLUMN = "title";
     private static final String CREATED_AT_COLUMN = "createdAt";
+    private static final String START_AT_COLUMN = "startAt";
 
     private static final int FAVORITE_PERFORMANCE_PREVIEW_COUNT = 4;
     private static final int CONFETI_PICK_RECOMMEND_PERFORMANCE_COUNT = 5;
     private static final int FAVORITE_PERFORMANCES_RESERVATION_COUNT = 5;
+    private static final int USER_FAVORITE_UPCOMING_PERFORMANCE_COUNT = 1;
 
     private final PerformanceRepository performanceRepository;
 
@@ -72,8 +74,16 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getFavoriteRecentPerformances(long userId) {
-        return performanceRepository.findExpectedFavoritePerformances(
+    public Optional<Performance> getUpcomingFavoritePerformance(long userId) {
+        return performanceRepository.findUpcomingFavoritePerformance(
+                userId,
+                getPageRequest(USER_FAVORITE_UPCOMING_PERFORMANCE_COUNT, getStartAtAscSort())
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getUpcomingFavoritePerformances(long userId) {
+        return performanceRepository.findUpcomingFavoritePerformances(
                 userId,
                 getPageRequest(FAVORITE_PERFORMANCE_PREVIEW_COUNT, getUpcomingPerformancesSort())
         );
@@ -121,7 +131,7 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Performance> getRecommentExpectedPerformance() {
+    public Optional<Performance> getRecommendExpectedPerformance() {
         return performanceRepository.findRecommendExpectedPerformance();
     }
 
@@ -150,6 +160,14 @@ public class PerformanceService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public Optional<Performance> getUpcomingTimetablePerformance(long userId) {
+        return performanceRepository.findUpcomingTimetablePerformance(
+                userId,
+                getPageRequest(USER_FAVORITE_UPCOMING_PERFORMANCE_COUNT, getStartAtAscSort())
+        );
+    }
+
     private PageRequest getPageRequest(final int size, final Sort sort) {
         return PageRequest.of(INIT_PAGE, size, sort);
     }
@@ -163,6 +181,12 @@ public class PerformanceService {
     private Sort getUpcomingPerformancesSort() {
         return Sort.by(
                 Order.desc(CREATED_AT_COLUMN)
+        );
+    }
+
+    private Sort getStartAtAscSort() {
+        return Sort.by(
+                Order.asc(START_AT_COLUMN)
         );
     }
 

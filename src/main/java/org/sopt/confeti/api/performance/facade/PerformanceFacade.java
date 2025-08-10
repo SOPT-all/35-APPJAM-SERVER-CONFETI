@@ -21,8 +21,6 @@ import org.sopt.confeti.domain.performance_favorite.application.PerformanceFavor
 import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.application.UserService;
-import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
-import org.sopt.confeti.domain.view.performance.PerformanceArtist_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
@@ -259,7 +257,7 @@ public class PerformanceFacade {
     }
 
     private Optional<Performance> getRecommentExpectedPerformance() {
-        return performanceService.getRecommentExpectedPerformance();
+        return performanceService.getRecommendExpectedPerformance();
     }
 
     protected Set<String> setArtistsByRandom(Performance performance) {

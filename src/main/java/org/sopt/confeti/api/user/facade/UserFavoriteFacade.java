@@ -32,6 +32,7 @@ import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +52,7 @@ public class UserFavoriteFacade {
     private static final String TYPE_ALL = "ALL";
     private final PerformanceService performanceService;
     private final PerformanceFavoriteService performanceFavoriteService;
+    private final S3FileHandler s3FileHandler;
 
     @Transactional
     public void addFestivalFavorite(long userId, long festivalId) {
@@ -166,7 +168,7 @@ public class UserFavoriteFacade {
     public UserFavoritePerformancesDTO getFavoritePerformances(final long userId) {
         validateExistUser(userId);
 
-        List<Performance> performances = performanceService.getFavoriteRecentPerformances(userId);
+        List<Performance> performances = performanceService.getUpcomingFavoritePerformances(userId);
         return UserFavoritePerformancesDTO.from(performances);
     }
 
@@ -213,15 +215,38 @@ public class UserFavoriteFacade {
         }
     }
 
+    /**
+     * 선호하는 공연 또는 타임테이블에 등록된 공연 중 가장 가까운 공연을 조회합니다.
+     */
     @Transactional(readOnly = true)
-    public UpcomingPerformanceDTO getUpcomingPerformance(final long userId) {
-        validateExistUser(userId);
+    public Optional<UpcomingPerformanceDTO> getUpcomingPerformance(long userId) {
+        Optional<Performance> timetablePerformance = performanceService.getUpcomingTimetablePerformance(userId);
+        Optional<Performance> favoritePerformance = performanceService.getUpcomingFavoritePerformance(userId);
+        Optional<Performance> upcomingPerformance = getMostUpcomingPerformance(
+                timetablePerformance, favoritePerformance
+        );
 
-        Performance_DPRECATED performanceDPRECATED = performanceServiceDPRECATED.getUpcomingPerformanceByUserId(userId);
-        if (performanceDPRECATED == null) {
-            return null;
+        return upcomingPerformance.map(performance -> UpcomingPerformanceDTO.of(
+                performance, s3FileHandler
+        ));
+    }
+
+    private Optional<Performance> getMostUpcomingPerformance(Optional<Performance> timetablePerformance, Optional<Performance> favoritePerformance) {
+        if (timetablePerformance.isEmpty() && favoritePerformance.isEmpty()) {
+            return Optional.empty();
         }
-        return UpcomingPerformanceDTO.from(performanceDPRECATED);
+
+        if (timetablePerformance.isEmpty()) {
+            return favoritePerformance;
+        }
+
+        if (favoritePerformance.isEmpty()) {
+            return timetablePerformance;
+        }
+
+        return timetablePerformance.get().getStartAt().isBefore(favoritePerformance.get().getStartAt())
+                ? timetablePerformance
+                : favoritePerformance;
     }
 
     @Transactional(readOnly = true)

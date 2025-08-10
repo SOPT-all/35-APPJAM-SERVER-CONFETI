@@ -1,10 +1,7 @@
 package org.sopt.confeti.domain.user_timetable;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.performance.Performance;
 import org.sopt.confeti.domain.user.User;
@@ -31,6 +28,7 @@ public class UserTimetable {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "performance_id")
     private Performance performance;

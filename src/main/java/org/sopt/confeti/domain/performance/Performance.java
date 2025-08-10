@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.performance_favorite.PerformanceFavorite;
 import org.sopt.confeti.domain.performance_reservation_url.PerformanceReservationUrl;
 import org.sopt.confeti.domain.performance_schedule.PerformanceSchedule;
+import org.sopt.confeti.domain.user_timetable.UserTimetable;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -94,12 +95,15 @@ public class Performance {
     @OneToMany(mappedBy = "performance", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<PerformanceFavorite> favorites = new ArrayList<>();
 
+    @OneToMany(mappedBy = "performance", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<UserTimetable> userTimetables = new ArrayList<>();
+
     @Builder
     public Performance(PerformanceType type, String title, String subtitle, String area, String address,
                        LocalDate startAt, LocalDate endAt, String ageRating, String time, String price,
                        LocalDateTime reserveAt, String posterPath, String logoPath, LocalDateTime createdAt,
                        LocalDateTime updatedAt, List<PerformanceSchedule> schedules, List<PerformanceReservationUrl> reservationUrls,
-                       List<PerformanceFavorite> favorites) {
+                       List<PerformanceFavorite> favorites, List<UserTimetable> userTimetables) {
         this.type = type;
         this.title = title;
         this.subtitle = subtitle;
@@ -118,10 +122,12 @@ public class Performance {
         this.schedules = schedules;
         this.reservationUrls = reservationUrls;
         this.favorites = favorites;
+        this.userTimetables = userTimetables;
 
         this.schedules.forEach(schedule -> schedule.setPerformance(this));
         this.reservationUrls.forEach(reservationUrl -> reservationUrl.setPerformance(this));
         this.favorites.forEach(favorite -> favorite.setPerformance(this));
+        this.userTimetables.forEach(userTimetable -> userTimetable.setPerformance(this));
     }
 
     public List<ConfetiArtist> getArtists() {
