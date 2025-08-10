@@ -15,6 +15,14 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     @Query(value = "" +
             "SELECT p " +
             "FROM Performance p " +
+            "WHERE p.id = :performanceId " +
+            "AND p.endAt >= CURRENT_DATE"
+    )
+    Optional<Performance> findExpectedPerformanceById(long performanceId);
+
+    @Query(value = "" +
+            "SELECT p " +
+            "FROM Performance p " +
             "WHERE p.endAt >= CURRENT_DATE "
     )
     List<Performance> findExpectedPerformances(PageRequest pageRequest);

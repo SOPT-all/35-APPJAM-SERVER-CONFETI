@@ -34,6 +34,7 @@ import org.sopt.confeti.global.mapper.PerformanceMapper;
 import org.sopt.confeti.global.mapper.dto.concert.Concert;
 import org.sopt.confeti.global.mapper.dto.festival.Festival;
 import org.sopt.confeti.global.message.ErrorMessage;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
@@ -261,15 +262,15 @@ public class PerformanceFacade {
         return performanceService.getRecommentExpectedPerformance();
     }
 
-    protected Set<String> setArtistsByRandom(Performance_DPRECATED performanceDPRECATED) {
-        List<PerformanceArtist_DPRECATED> performanceArtistDPRECATEDS = performanceDPRECATED.getArtists();
+    protected Set<String> setArtistsByRandom(Performance performance) {
+        List<ConfetiArtist> artists = performance.getArtists();
 
-        if (performanceArtistDPRECATEDS.isEmpty()) {
+        if (artists.isEmpty()) {
             return Collections.emptySet();
         }
 
-        List<String> artistList = performanceArtistDPRECATEDS.stream()
-                .map(PerformanceArtist_DPRECATED::getArtistId).distinct().collect(Collectors.toList());
+        List<String> artistList = artists.stream()
+                .map(ConfetiArtist::getId).distinct().collect(Collectors.toList());
         Collections.shuffle(artistList);
 
         int artistCount = Math.min(artistList.size(), 3);
@@ -278,8 +279,8 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public RecommendMusicsDTO getNewRecommendMusics(long performanceId, List<String> musicIds) {
-        Performance_DPRECATED performanceDPRECATED = performanceServiceDPRECATED.getPerformanceById(performanceId);
-        Set<String> selectedArtistIds = setArtistsByRandom(performanceDPRECATED);
+        Performance performance = performanceService.getExistPerformance(performanceId);
+        Set<String> selectedArtistIds = setArtistsByRandom(performance);
         Set<String> existingMusicIds = (musicIds == null || musicIds.isEmpty())
                 ? Collections.emptySet()
                 : musicIds.stream().flatMap(ids -> Arrays.stream(ids.split(",")))

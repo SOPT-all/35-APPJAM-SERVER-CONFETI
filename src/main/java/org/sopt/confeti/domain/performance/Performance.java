@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.performance_favorite.PerformanceFavorite;
 import org.sopt.confeti.domain.performance_reservation_url.PerformanceReservationUrl;
 import org.sopt.confeti.domain.performance_schedule.PerformanceSchedule;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -121,5 +122,11 @@ public class Performance {
         this.schedules.forEach(schedule -> schedule.setPerformance(this));
         this.reservationUrls.forEach(reservationUrl -> reservationUrl.setPerformance(this));
         this.favorites.forEach(favorite -> favorite.setPerformance(this));
+    }
+
+    public List<ConfetiArtist> getArtists() {
+        return schedules.stream()
+                .map(PerformanceSchedule::getArtist)
+                .toList();
     }
 }

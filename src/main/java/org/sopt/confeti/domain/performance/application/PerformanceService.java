@@ -34,9 +34,15 @@ public class PerformanceService {
         return performanceRepository.findById(performanceId);
     }
 
+    @Transactional
+    public Performance getExistPerformance(long performanceId) {
+        return performanceRepository.findById(performanceId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+    }
+
     @Transactional(readOnly = true)
     public Performance getExistExpectedPerformance(long performanceId) {
-        return performanceRepository.findById(performanceId)
+        return performanceRepository.findExpectedPerformanceById(performanceId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
