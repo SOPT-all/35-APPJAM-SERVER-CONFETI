@@ -53,4 +53,9 @@ public class PerformanceFavoriteService {
                 .map(performanceFavorite -> performanceFavorite.getPerformance().getId())
                 .collect(Collectors.toSet());
     }
+
+    @Transactional(readOnly = true)
+    public boolean hasUpcomingPerformanceFavorite(long userId) {
+        return performanceFavoriteRepository.hasUpcomingPerformanceFavorite(userId);
+    }
 }

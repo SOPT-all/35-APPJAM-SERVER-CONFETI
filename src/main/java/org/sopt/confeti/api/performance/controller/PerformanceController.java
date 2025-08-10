@@ -14,7 +14,7 @@ import org.sopt.confeti.api.performance.dto.response.ConfetiRecordResponse;
 import org.sopt.confeti.api.performance.dto.response.ExpectedPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceIdsResponse;
-import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
+import org.sopt.confeti.api.performance.dto.response.PerformanceReservationsResponse;
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendMusicsPerformanceResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendMusicsResponse;
@@ -28,23 +28,19 @@ import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
-import org.sopt.confeti.domain.performance.PerformanceType;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.Default;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
-import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
-import org.sopt.confeti.global.exception.ConfetiException;
-import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -92,9 +88,9 @@ public class PerformanceController {
     public ResponseEntity<BaseResponse<?>> getPerformReservationInfo(
             @UserId(require = false) Long userId
     ) {
-        PerformanceReservationDTO performanceReservationDTO = performanceFacade.getPerformReservationInfo(userId);
+        PerformanceReservationsDTO performanceReservationsDTO = performanceFacade.getPerformReservationInfo(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                PerformanceReservationResponse.from(performanceReservationDTO));
+                PerformanceReservationsResponse.from(performanceReservationsDTO));
     }
 
     @Permission(role = {Role.GENERAL})

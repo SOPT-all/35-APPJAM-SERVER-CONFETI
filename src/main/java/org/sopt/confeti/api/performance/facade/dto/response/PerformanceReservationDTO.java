@@ -1,16 +1,22 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
-import java.util.List;
-import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
+import java.time.LocalDateTime;
+
+import org.sopt.confeti.domain.performance.Performance;
+import org.sopt.confeti.domain.performance.PerformanceType;
 
 public record PerformanceReservationDTO(
-        List<PerformanceReservationDetailDTO> performanceReservation
+        long id,
+        PerformanceType type,
+        String title,
+        LocalDateTime reserveAt
 ) {
-    public static PerformanceReservationDTO from(List<PerformanceTicketDTO> performanceTickets) {
+    public static PerformanceReservationDTO from(Performance performance) {
         return new PerformanceReservationDTO(
-                performanceTickets.stream()
-                        .map(PerformanceReservationDetailDTO::from)
-                        .toList()
+                performance.getId(),
+                performance.getType(),
+                performance.getTitle(),
+                performance.getReserveAt()
         );
     }
 }

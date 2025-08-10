@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import org.sopt.confeti.domain.performance.Performance;
 import org.sopt.confeti.domain.performance.PerformanceType;
-import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -140,4 +139,23 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "LIMIT :fetchSize"
     )
     List<Performance> findRecommendExpectedPerformances(@Param("fetchSize") int fetchSize);
+
+    @Query(value = "" +
+            "SELECT p " +
+            "FROM Performance p JOIN p.favorites pf " +
+            "ON p.id = pf.performance.id " +
+            "WHERE pf.user.id = :userId " +
+            "AND p.endAt >= CURRENT_DATE "
+    )
+    List<Performance> findUpcomingFavoritePerformancesReservation(
+            @Param("userId") long userId,
+            PageRequest pageRequest
+    );
+
+    @Query(value = "" +
+            "SELECT p " +
+            "FROM Performance p " +
+            "WHERE p.endAt >= CURRENT_DATE "
+    )
+    List<Performance> findUpcomingPerformancesReservation(PageRequest pageRequest);
 }

@@ -24,7 +24,8 @@ public class PerformanceService {
     private static final String CREATED_AT_COLUMN = "createdAt";
 
     private static final int FAVORITE_PERFORMANCE_PREVIEW_COUNT = 4;
-    private static final int CONFETI_PICK_RECOMMENT_PERFORMANCE_COUNT = 5;
+    private static final int CONFETI_PICK_RECOMMEND_PERFORMANCE_COUNT = 5;
+    private static final int FAVORITE_PERFORMANCES_RESERVATION_COUNT = 5;
 
     private final PerformanceRepository performanceRepository;
 
@@ -41,13 +42,13 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public Optional<Performance> getExpectedPerformance(long performanceId) {
-        return performanceRepository.findById(performanceId, getRecentPerformancesSort());
+        return performanceRepository.findById(performanceId, getUpcomingPerformancesSort());
     }
 
     @Transactional(readOnly = true)
     public List<Performance> getExpectedPerformances(int fetchSize) {
         return performanceRepository.findExpectedPerformances(
-                getPageRequest(fetchSize, getRecentPerformancesSort())
+                getPageRequest(fetchSize, getUpcomingPerformancesSort())
         ).stream().toList();
     }
 
@@ -60,7 +61,7 @@ public class PerformanceService {
     public List<Performance> getExpectedPerformancesWithFavoriteArtists(List<String> artistIds, int fetchSize) {
         return performanceRepository.findExpectedPerformancesByArtistIds(
                 artistIds,
-                getPageRequest(fetchSize, getRecentPerformancesSort())
+                getPageRequest(fetchSize, getUpcomingPerformancesSort())
         );
     }
 
@@ -68,7 +69,7 @@ public class PerformanceService {
     public List<Performance> getFavoriteRecentPerformances(long userId) {
         return performanceRepository.findExpectedFavoritePerformances(
                 userId,
-                getPageRequest(FAVORITE_PERFORMANCE_PREVIEW_COUNT, getRecentPerformancesSort())
+                getPageRequest(FAVORITE_PERFORMANCE_PREVIEW_COUNT, getUpcomingPerformancesSort())
         );
     }
 
@@ -109,7 +110,7 @@ public class PerformanceService {
                 performanceCursorDTO.isFavorite(),
                 userId,
                 excludePerformanceIds,
-                getPageRequest(fetchSize, getRecentPerformancesSort())
+                getPageRequest(fetchSize, getUpcomingPerformancesSort())
         );
     }
 
@@ -125,7 +126,22 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public List<Performance> getRecommendExpectedPerformances() {
-        return performanceRepository.findRecommendExpectedPerformances(CONFETI_PICK_RECOMMENT_PERFORMANCE_COUNT);
+        return performanceRepository.findRecommendExpectedPerformances(CONFETI_PICK_RECOMMEND_PERFORMANCE_COUNT);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getUpcomingFavoritePerformancesReservation(long userId) {
+        return performanceRepository.findUpcomingFavoritePerformancesReservation(
+                userId,
+                getPageRequest(FAVORITE_PERFORMANCES_RESERVATION_COUNT, getUpcomingReservationPerformancesSort())
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getUpcomingPerformancesReservation() {
+        return performanceRepository.findUpcomingPerformancesReservation(
+                getPageRequest(FAVORITE_PERFORMANCES_RESERVATION_COUNT, getUpcomingReservationPerformancesSort())
+        );
     }
 
     private PageRequest getPageRequest(final int size, final Sort sort) {
@@ -138,9 +154,15 @@ public class PerformanceService {
         );
     }
 
-    private Sort getRecentPerformancesSort() {
+    private Sort getUpcomingPerformancesSort() {
         return Sort.by(
                 Order.desc(CREATED_AT_COLUMN)
+        );
+    }
+
+    private Sort getUpcomingReservationPerformancesSort() {
+        return Sort.by(
+                Order.asc(CREATED_AT_COLUMN)
         );
     }
 }

@@ -23,7 +23,6 @@ import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalS
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist_DPRECATED;
-import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
@@ -68,7 +67,7 @@ public class PerformanceFacade {
     private final S3FileHandler s3FileHandler;
 
     @Transactional(readOnly = true)
-    public ConcertDetailDTO getConcertDetail(final Long userId, final long performanceId) {
+    public ConcertDetailDTO getConcertDetail(Long userId, long performanceId) {
         boolean isFavorite = getIsFavorite(userId, performanceId);
 
         Performance performance = performanceService.getExpectedPerformance(performanceId)
@@ -81,16 +80,7 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public boolean getConcertFavorite(final Long userId, final long concertId) {
-        if (userId == null) {
-            return false;
-        }
-
-        return concertFavoriteService.isFavorite(userId, concertId);
-    }
-
-    @Transactional(readOnly = true)
-    public FestivalDetailDTO getFestivalDetail(final Long userId, final long performanceId) {
+    public FestivalDetailDTO getFestivalDetail(Long userId, long performanceId) {
         boolean isFavorite = getIsFavorite(userId, performanceId);
 
         Performance performance = performanceService.getExpectedPerformance(performanceId)
@@ -102,7 +92,7 @@ public class PerformanceFacade {
         return FestivalDetailDTO.of(festival, isFavorite);
     }
 
-    protected boolean getIsFavorite(final Long userid, final long performanceId) {
+    protected boolean getIsFavorite(Long userid, long performanceId) {
         if (userid != null) {
             return performanceFavoriteService.isFavorite(userid, performanceId);
         }
@@ -111,23 +101,28 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public PerformanceReservationDTO getPerformReservationInfo(final Long userId) {
-        boolean isUserExist = userId != null && userService.existsById(userId);
-        boolean isCFExist = isUserExist && concertFavoriteService.existsUpcomingReservationByUserId(userId);
-        boolean isFFExist = isUserExist && festivalFavoriteService.existsUpcomingReservationByUserId(userId);
-
-        if (isCFExist || isFFExist) {
-            List<PerformanceTicketDTO> performanceReserve = performanceServiceDPRECATED.getFavoritePerformancesReservation(
-                    userId);
-            return PerformanceReservationDTO.from(performanceReserve);
+    public PerformanceReservationsDTO getPerformReservationInfo(Long userId) {
+        if (hasUpcomingPerformanceFavorite(userId)) {
+            return PerformanceReservationsDTO.from(
+                    performanceService.getUpcomingFavoritePerformancesReservation(userId)
+            );
         }
 
-        List<PerformanceTicketDTO> performanceReserve = performanceServiceDPRECATED.getPerformancesReservation();
-        return PerformanceReservationDTO.from(performanceReserve);
+        return PerformanceReservationsDTO.from(
+                performanceService.getUpcomingPerformancesReservation()
+        );
+    }
+
+    private boolean hasUpcomingPerformanceFavorite(Long userId) {
+        if (userId == null) {
+            return false;
+        }
+
+        return performanceFavoriteService.hasUpcomingPerformanceFavorite(userId);
     }
 
     @Transactional(readOnly = true)
-    public RecentPerformancesDTO getRecentPerformances(final Long userId) {
+    public RecentPerformancesDTO getRecentPerformances(Long userId) {
         if (userId == null || !hasFavoriteArtists(userId)) {
             return getRecentPerformancesWithoutFavorites();
         }
@@ -142,7 +137,7 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public RecentPerformancesDTO getRecentPerformancesWithFavoriteArtists(final long userId) {
+    public RecentPerformancesDTO getRecentPerformancesWithFavoriteArtists(long userId) {
         List<ArtistFavorite> artistFavorites = artistFavoriteService.getArtistIdsByUserId(userId);
         List<String> artistIds = artistFavorites.stream()
                 .map(artistFavorite -> artistFavorite.getArtist().getId())
@@ -163,12 +158,12 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public boolean hasFavoriteArtists(final long userId) {
+    public boolean hasFavoriteArtists(long userId) {
         return artistFavoriteService.existsByUserId(userId);
     }
 
     @Transactional(readOnly = true)
-    public ArtistPerformancesDTO getPerformancesByArtistId(final Long userId, final String artistId) {
+    public ArtistPerformancesDTO getPerformancesByArtistId(Long userId, String artistId) {
         List<PerformanceDTO> performances = performanceServiceDPRECATED.getPerformancesByArtistId(artistId);
 
         Map<String, Boolean> favoriteMap = getFavoriteMap(userId, performances);
@@ -184,7 +179,7 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Boolean> getFavoriteMap(final Long userId, List<PerformanceDTO> performances) {
+    public Map<String, Boolean> getFavoriteMap(Long userId, List<PerformanceDTO> performances) {
         if (userId == null || performances.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -243,7 +238,7 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public Optional<RecommendMusicsPerformanceDTO> getRecommendExpectedPerformanceId(final Long userId) {
+    public Optional<RecommendMusicsPerformanceDTO> getRecommendExpectedPerformanceId(Long userId) {
 
         Optional<Performance> recommendPerformance = getRecommendExpectedFavoritePerformance(userId);
 
@@ -254,7 +249,7 @@ public class PerformanceFacade {
         return recommendPerformance.map(RecommendMusicsPerformanceDTO::from);
     }
 
-    private Optional<Performance> getRecommendExpectedFavoritePerformance(final Long userId) {
+    private Optional<Performance> getRecommendExpectedFavoritePerformance(Long userId) {
         if (Objects.nonNull(userId)) {
             return performanceService.getRecommendExpectedFavoritePerformance(userId);
         }
@@ -332,7 +327,7 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public ConfetiRecordDTO getConfetiRecord(final long userId) {
+    public ConfetiRecordDTO getConfetiRecord(long userId) {
         validateExistUser(userId);
 
         List<Long> timetableFestivalIds = timetableFestivalService.findFestivalIdsByUserId(userId);
@@ -349,7 +344,7 @@ public class PerformanceFacade {
                 setListFestivalIds.size() + setListConcertIds.size());
     }
 
-    protected void validateExistUser(final long userId) {
+    protected void validateExistUser(long userId) {
         if (!userService.existsById(userId)) {
             throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
         }
