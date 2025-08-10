@@ -29,7 +29,7 @@ public class UserInfoController {
             @UserId Long userId
     ) {
         UserInfoDTO userInfo = userInfoFacade.getUserInfo(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserInfoResponse.of(userInfo, s3FileHandler));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserInfoResponse.from(userInfo));
     }
 
     @Permission(role = {Role.GENERAL})

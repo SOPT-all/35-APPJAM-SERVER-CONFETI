@@ -8,6 +8,7 @@ import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
@@ -20,11 +21,13 @@ public class UserInfoFacade {
     private static final int MAXIMUM_NAME_LENGTH = 10;
 
     private final UserService userService;
+    private final S3FileHandler s3FileHandler;
 
     @Transactional
     public UserInfoDTO getUserInfo(Long userId) {
-        return UserInfoDTO.from(
-                userService.findById(userId)
+        return UserInfoDTO.of(
+                userService.findById(userId),
+                s3FileHandler
         );
     }
 
