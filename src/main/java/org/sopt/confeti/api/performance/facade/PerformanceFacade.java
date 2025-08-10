@@ -229,8 +229,9 @@ public class PerformanceFacade {
 
     @Transactional(readOnly = true)
     public RecommendPerformancesDTO getRecommendPerformances() {
-        return RecommendPerformancesDTO.from(
-                performanceServiceDPRECATED.getRecommendPerformances()
+        return RecommendPerformancesDTO.of(
+                performanceService.getRecommendExpectedPerformances(),
+                s3FileHandler
         );
     }
 

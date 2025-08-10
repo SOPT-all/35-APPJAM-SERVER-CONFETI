@@ -20,9 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class PerformanceService {
 
     private static final int INIT_PAGE = 0;
-    private static final String CREATED_AT_COLUMN = "createdAt";
-    private static final int FAVORITE_PERFORMANCE_PREVIEW_COUNT = 4;
     private static final String TITLE_COLUMN = "title";
+    private static final String CREATED_AT_COLUMN = "createdAt";
+
+    private static final int FAVORITE_PERFORMANCE_PREVIEW_COUNT = 4;
+    private static final int CONFETI_PICK_RECOMMENT_PERFORMANCE_COUNT = 5;
 
     private final PerformanceRepository performanceRepository;
 
@@ -119,6 +121,11 @@ public class PerformanceService {
     @Transactional(readOnly = true)
     public Optional<Performance> getRecommendExpectedFavoritePerformance(long userId) {
         return performanceRepository.findRecommendExpectedFavoritePerformance(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getRecommendExpectedPerformances() {
+        return performanceRepository.findRecommendExpectedPerformances(CONFETI_PICK_RECOMMENT_PERFORMANCE_COUNT);
     }
 
     private PageRequest getPageRequest(final int size, final Sort sort) {

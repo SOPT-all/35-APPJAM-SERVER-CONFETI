@@ -124,7 +124,7 @@ public class PerformanceController {
     ) {
         RecommendPerformancesDTO recommendPerformances = performanceFacade.getRecommendPerformances();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                RecommendPerformancesResponse.of(recommendPerformances, s3FileHandler));
+                RecommendPerformancesResponse.from(recommendPerformances));
     }
 
     @Permission(role = {Role.GENERAL})

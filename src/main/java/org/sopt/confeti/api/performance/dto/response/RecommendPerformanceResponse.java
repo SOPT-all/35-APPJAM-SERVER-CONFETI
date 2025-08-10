@@ -5,21 +5,17 @@ import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record RecommendPerformanceResponse(
-        long typeId,
+        long performanceId,
         String type,
         String title,
         String posterUrl
 ) {
-    public static RecommendPerformanceResponse of(final RecommendPerformanceDTO recommendPerformanceDTO,
-                                                  final S3FileHandler s3FileHandler) {
-        FolderPath topFolder = FolderPath.getFolderPathByPerformanceType(recommendPerformanceDTO.type());
-
+    public static RecommendPerformanceResponse from(RecommendPerformanceDTO recommendPerformanceDTO) {
         return new RecommendPerformanceResponse(
-                recommendPerformanceDTO.typeId(),
+                recommendPerformanceDTO.id(),
                 recommendPerformanceDTO.type().getName(),
                 recommendPerformanceDTO.title(),
-                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER),
-                        recommendPerformanceDTO.posterPath()).toString()
+                recommendPerformanceDTO.posterUrl()
         );
     }
 }

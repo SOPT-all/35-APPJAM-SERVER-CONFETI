@@ -7,12 +7,10 @@ import org.sopt.confeti.global.util.S3FileHandler;
 public record RecommendPerformancesResponse(
         List<RecommendPerformanceResponse> performances
 ) {
-    public static RecommendPerformancesResponse of(final RecommendPerformancesDTO recommendPerformancesDTO,
-                                                   final S3FileHandler s3FileHandler) {
+    public static RecommendPerformancesResponse from(RecommendPerformancesDTO recommendPerformancesDTO) {
         return new RecommendPerformancesResponse(
                 recommendPerformancesDTO.performances().stream()
-                        .map(recommendPerformanceDTO -> RecommendPerformanceResponse.of(recommendPerformanceDTO,
-                                s3FileHandler))
+                        .map(RecommendPerformanceResponse::from)
                         .toList()
         );
     }

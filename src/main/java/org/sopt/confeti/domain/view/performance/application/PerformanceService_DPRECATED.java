@@ -133,11 +133,6 @@ public class PerformanceService_DPRECATED {
     }
 
     @Transactional(readOnly = true)
-    public List<Performance_DPRECATED> getRecommendPerformances() {
-        return performanceRepositoryDPRECATED.findTop5ByRand();
-    }
-
-    @Transactional(readOnly = true)
     public PerformanceDTO getPerformance(long performanceId) {
         Performance_DPRECATED performanceDPRECATED = performanceRepositoryDPRECATED.findPerformanceByIdAndEndAtGreaterThanEqual(
                         performanceId,

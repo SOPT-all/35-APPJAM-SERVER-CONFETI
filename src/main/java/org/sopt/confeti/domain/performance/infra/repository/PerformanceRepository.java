@@ -131,4 +131,13 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "LIMIT 1"
     )
     Optional<Performance> findRecommendExpectedFavoritePerformance(long userId);
+
+    @Query(value = "" +
+            "SELECT p " +
+            "FROM Performance p " +
+            "WHERE p.endAt >= CURRENT_DATE " +
+            "ORDER BY RAND() " +
+            "LIMIT :fetchSize"
+    )
+    List<Performance> findRecommendExpectedPerformances(@Param("fetchSize") int fetchSize);
 }

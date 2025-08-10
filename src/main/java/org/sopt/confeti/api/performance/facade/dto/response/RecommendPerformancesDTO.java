@@ -1,15 +1,17 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
 import java.util.List;
-import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
+
+import org.sopt.confeti.domain.performance.Performance;
+import org.sopt.confeti.global.util.S3FileHandler;
 
 public record RecommendPerformancesDTO(
         List<RecommendPerformanceDTO> performances
 ) {
-    public static RecommendPerformancesDTO from(List<Performance_DPRECATED> performanceDPRECATEDS) {
+    public static RecommendPerformancesDTO of(List<Performance> performances, S3FileHandler s3FileHandler) {
         return new RecommendPerformancesDTO(
-                performanceDPRECATEDS.stream()
-                        .map(RecommendPerformanceDTO::from)
+                performances.stream()
+                        .map(performance ->  RecommendPerformanceDTO.of(performance, s3FileHandler))
                         .toList()
         );
     }
