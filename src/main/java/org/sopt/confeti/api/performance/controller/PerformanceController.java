@@ -143,10 +143,10 @@ public class PerformanceController {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend/performance")
-    public ResponseEntity<BaseResponse<?>> getRecommendPerformanceId(
+    public ResponseEntity<BaseResponse<?>> getRecommendExpectedPerformanceId(
             @UserId(require = false) Long userId
     ) {
-        Optional<RecommendMusicsPerformanceDTO> recommendMusicsDTO = performanceFacade.getRecommendPerformanceId(
+        Optional<RecommendMusicsPerformanceDTO> recommendMusicsDTO = performanceFacade.getRecommendExpectedPerformanceId(
                 userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 recommendMusicsDTO.map(RecommendMusicsPerformanceResponse::from).orElse(null)

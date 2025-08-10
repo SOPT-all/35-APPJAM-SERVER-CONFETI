@@ -1,16 +1,6 @@
 package org.sopt.confeti.api.performance.facade;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -252,14 +242,27 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public Optional<RecommendMusicsPerformanceDTO> getRecommendPerformanceId(final Long userId) {
+    public Optional<RecommendMusicsPerformanceDTO> getRecommendExpectedPerformanceId(final Long userId) {
 
-        Optional<Performance_DPRECATED> performance = performanceServiceDPRECATED.getPerformanceByUserFavorites(userId);
-        if (Objects.isNull(userId) || performance.isEmpty()) {
-            performance = performanceServiceDPRECATED.getPerformanceByRand();
+        Optional<Performance> recommendPerformance = getRecommendExpectedFavoritePerformance(userId);
+
+        if (recommendPerformance.isEmpty()) {
+            recommendPerformance = getRecommentExpectedPerformance();
         }
 
-        return performance.map(RecommendMusicsPerformanceDTO::from);
+        return recommendPerformance.map(RecommendMusicsPerformanceDTO::from);
+    }
+
+    private Optional<Performance> getRecommendExpectedFavoritePerformance(final Long userId) {
+        if (Objects.nonNull(userId)) {
+            return performanceService.getRecommendExpectedFavoritePerformance(userId);
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<Performance> getRecommentExpectedPerformance() {
+        return performanceService.getRecommentExpectedPerformance();
     }
 
     protected Set<String> setArtistsByRandom(Performance_DPRECATED performanceDPRECATED) {

@@ -111,6 +111,16 @@ public class PerformanceService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public Optional<Performance> getRecommentExpectedPerformance() {
+        return performanceRepository.findRecommendExpectedPerformance();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Performance> getRecommendExpectedFavoritePerformance(long userId) {
+        return performanceRepository.findRecommendExpectedFavoritePerformance(userId);
+    }
+
     private PageRequest getPageRequest(final int size, final Sort sort) {
         return PageRequest.of(INIT_PAGE, size, sort);
     }

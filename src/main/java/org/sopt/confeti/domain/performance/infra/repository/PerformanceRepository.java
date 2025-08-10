@@ -111,4 +111,24 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             List<Long> excludePerformanceIds,
             PageRequest pageRequest
     );
+
+    @Query(value = "" +
+            "SELECT p " +
+            "FROM Performance p " +
+            "WHERE p.endAt >= CURRENT_DATE " +
+            "ORDER BY RAND() " +
+            "LIMIT 1"
+    )
+    Optional<Performance> findRecommendExpectedPerformance();
+
+    @Query(value = "" +
+            "SELECT p " +
+            "FROM Performance p JOIN p.favorites pf " +
+            "ON p.id = pf.performance.id " +
+            "WHERE pf.user.id = :userId " +
+            "AND p.endAt >= CURRENT_DATE " +
+            "ORDER BY RAND() " +
+            "LIMIT 1"
+    )
+    Optional<Performance> findRecommendExpectedFavoritePerformance(long userId);
 }
