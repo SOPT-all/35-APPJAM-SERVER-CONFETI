@@ -251,7 +251,6 @@ public class UserFavoriteFacade {
 
     @Transactional(readOnly = true)
     public UserFavoriteArtistsDTO getFavoriteArtists(long userId, String sortBy) {
-        validateExistUser(userId);
         validateSortType(sortBy);
 
         List<ArtistFavorite> artists = artistFavoriteService.getFavoriteArtists(userId, sortBy);
