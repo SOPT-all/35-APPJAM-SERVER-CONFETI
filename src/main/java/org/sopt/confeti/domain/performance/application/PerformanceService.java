@@ -85,7 +85,16 @@ public class PerformanceService {
     public List<Performance> getUpcomingFavoritePerformances(long userId) {
         return performanceRepository.findUpcomingFavoritePerformances(
                 userId,
-                getPageRequest(FAVORITE_PERFORMANCE_PREVIEW_COUNT, getUpcomingPerformancesSort())
+                getPageRequest(FAVORITE_PERFORMANCE_PREVIEW_COUNT, getStartAtAscSort())
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getUpcomingFavoritePerformances(long userId, PerformanceType type) {
+        return performanceRepository.findUpcomingFavoritePerformances(
+                userId,
+                type,
+                getPageRequest(FAVORITE_PERFORMANCE_PREVIEW_COUNT, getStartAtAscSort())
         );
     }
 

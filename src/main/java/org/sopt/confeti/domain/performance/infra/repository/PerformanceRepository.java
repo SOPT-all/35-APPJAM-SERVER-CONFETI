@@ -98,6 +98,14 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     )
     List<Performance> findUpcomingFavoritePerformances(@Param("userId") long userId, PageRequest pageRequest);
 
+    @Query(value = "" +
+            "SELECT p " +
+            "FROM Performance p JOIN FETCH p.favorites pf " +
+            "WHERE pf.user.id = :userId " +
+            "AND p.type = :type"
+    )
+    List<Performance> findUpcomingFavoritePerformances(@Param("userId") long userId, @Param("type") PerformanceType type, PageRequest pageRequest);
+
     List<Performance> findPerformancesBySchedules_ArtistId(String artistId);
 
     /**

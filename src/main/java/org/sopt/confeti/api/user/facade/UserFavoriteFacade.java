@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.facade.dto.response.UpcomingPerformanceDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistsPreviewDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesAllDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UpcomingFavoritePerformancesDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
@@ -17,14 +17,12 @@ import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.performance.Performance;
+import org.sopt.confeti.domain.performance.PerformanceType;
 import org.sopt.confeti.domain.performance.application.PerformanceService;
 import org.sopt.confeti.domain.performance_favorite.application.PerformanceFavoriteService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
-import org.sopt.confeti.domain.view.performance.Performance_DPRECATED;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService_DPRECATED;
-import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
-import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceType_DEPRECATED;
 import org.sopt.confeti.global.exception.ConfetiException;
@@ -173,12 +171,9 @@ public class UserFavoriteFacade {
     }
 
     @Transactional(readOnly = true)
-    public UserFavoritePerformancesAllDTO getFavoritePerformancesAll(final long userId, final String type) {
-        validateExistUser(userId);
-        validateType(type);
-
-        List<PerformanceDTO> performances = performanceServiceDPRECATED.getFavoritePerformancesAll(userId, type);
-        return UserFavoritePerformancesAllDTO.from(performances);
+    public UpcomingFavoritePerformancesDTO getUpcomingFavoritePerformances(long userId, PerformanceType type) {
+        List<Performance> performances = performanceService.getUpcomingFavoritePerformances(userId, type);
+        return UpcomingFavoritePerformancesDTO.of(performances, s3FileHandler);
     }
 
     protected void validateExistPerformanceFavorite(long userId, long performanceId) {
