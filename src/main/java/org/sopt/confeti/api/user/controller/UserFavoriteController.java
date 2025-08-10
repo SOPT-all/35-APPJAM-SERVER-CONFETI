@@ -45,20 +45,20 @@ public class UserFavoriteController {
     private final S3FileHandler s3FileHandler;
 
     @Permission(role = {Role.GENERAL})
-    @PostMapping("/festivals/{festivalId}")
+    @PostMapping("/festivals/{performanceId}")
     public ResponseEntity<BaseResponse<?>> postFavoriteFestival(
             @UserId Long userId,
-            @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId) {
-        userFavoriteFacade.addFestivalFavorite(userId, festivalId);
+            @PathVariable @Min(RequestConstraint.ID) Long performanceId) {
+        userFavoriteFacade.addPerformanceFavorite(userId, performanceId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Permission(role = {Role.GENERAL})
-    @DeleteMapping("/festivals/{festivalId}")
+    @DeleteMapping("/festivals/{performanceId}")
     public ResponseEntity<BaseResponse<?>> deleteFavoriteFestival(
             @UserId Long userId,
-            @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId) {
-        userFavoriteFacade.removeFestivalFavorite(userId, festivalId);
+            @PathVariable @Min(RequestConstraint.ID) Long performanceId) {
+        userFavoriteFacade.removePerformanceFavorite(userId, performanceId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
