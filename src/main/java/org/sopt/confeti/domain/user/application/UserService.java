@@ -29,7 +29,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final AllUserRepository allUserRepository;
     private final S3FileHandler s3FileHandler;
-    private final FileDownloader fileDownloader;
 
     @Transactional(readOnly = true)
     public User findById(Long userId) {
@@ -43,14 +42,6 @@ public class UserService {
     @Transactional(readOnly = true)
     public boolean existsById(Long userId) {
         return userRepository.existsById(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public User findUserTimetablesById(final long userId) {
-        return userRepository.findUserTimetablesById(userId)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
     }
 
     @Transactional
@@ -97,16 +88,6 @@ public class UserService {
 
         if (Objects.nonNull(patchUserInfoRequest.name())) {
             user.setName(patchUserInfoRequest.name());
-        }
-    }
-
-    public String uploadProfile(String profileImgUrl) {
-        Path profileImg = fileDownloader.downloadFile(profileImgUrl);
-        try {
-            return s3FileHandler.uploadFile(profileImg.toFile(),
-                    FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
-        } finally {
-            fileDownloader.deleteTempFile(profileImg);
         }
     }
 
