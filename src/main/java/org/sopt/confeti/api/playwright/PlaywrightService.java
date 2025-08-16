@@ -46,8 +46,47 @@ public class PlaywrightService implements PlaywrightUseCase{
             page.waitForLoadState(LoadState.DOMCONTENTLOADED);
             log.info("[PNG] 페이지 로드 완료. ({} ms)", elapsed(loadStart));
 
-            page.waitForTimeout(4000);
-            log.info("[PNG] waitForTimeout(2000) 완료");
+            page.waitForLoadState(LoadState.LOAD);
+
+            // 콘솔 메시지 대기를 위한 플래그
+            final boolean[] isContentReady = {false};
+            final Object lock = new Object();
+
+            page.onConsoleMessage(consoleMessage -> {
+                String messageText = consoleMessage.text();
+                log.info("[PNG] 콘솔 메시지: {}", messageText);
+
+                // 특정 메시지 패턴 확인 (사이트에 맞게 수정)
+                if (messageText.contains("페이지 로딩 완료") ||
+                        messageText.contains("content-loaded") ||
+                        messageText.contains("render-complete")) {
+
+                    synchronized (lock) {
+                        isContentReady[0] = true;
+                        lock.notify();
+                    }
+                    log.info("[PNG] 페이지 준비 완료 메시지 감지");
+                }
+            });
+
+            long waitStart = System.nanoTime();
+            synchronized (lock) {
+                try {
+                    if (!isContentReady[0]) {
+                        lock.wait(10000); // 10초 타임아웃
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.warn("[PNG] 콘솔 메시지 대기 중 인터럽트 발생");
+                }
+            }
+
+            if (isContentReady[0]) {
+                log.info("[PNG] 콘솔 메시지 대기 완료. ({} ms)", elapsed(waitStart));
+            } else {
+                log.warn("[PNG] 콘솔 메시지 타임아웃, 기본 대기로 진행. ({} ms)", elapsed(waitStart));
+                page.waitForTimeout(2000); // 대체 대기
+            }
 
             long pngGenStart = System.nanoTime();
             byte[] pngBytes = page.screenshot(
@@ -55,7 +94,7 @@ public class PlaywrightService implements PlaywrightUseCase{
                             .setType(ScreenshotType.PNG)
                             .setFullPage(false)
                             .setOmitBackground(false)
-                            .setClip(0, 0, command.getWidth(), command.getHeight())
+                            .setClip(command.getX(), command.getY(), command.getWidth(), command.getHeight())
             );
 
             log.info("[PNG] PNG 생성 완료. ({} ms)", elapsed(pngGenStart));

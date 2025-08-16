@@ -16,7 +16,7 @@ public record RecommendPerformanceResponse(
 
         return new RecommendPerformanceResponse(
                 recommendPerformanceDTO.typeId(),
-                recommendPerformanceDTO.type().getType(),
+                recommendPerformanceDTO.type().getName(),
                 recommendPerformanceDTO.title(),
                 s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER),
                         recommendPerformanceDTO.posterPath()).toString()

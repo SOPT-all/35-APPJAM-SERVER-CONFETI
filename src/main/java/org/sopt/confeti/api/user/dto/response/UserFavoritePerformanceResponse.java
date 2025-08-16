@@ -18,7 +18,7 @@ public record UserFavoritePerformanceResponse(
         return new UserFavoritePerformanceResponse(
                 index,
                 performanceDTO.typeId(),
-                performanceDTO.type().getType(),
+                performanceDTO.type().getName(),
                 performanceDTO.title(),
                 s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), performanceDTO.posterPath())
                         .toString()
