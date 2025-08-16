@@ -15,7 +15,7 @@ public record SetlistSearchPerformanceResponse(
                                                       S3FileHandler s3FileHandler) {
         return new SetlistSearchPerformanceResponse(
                 performanceDTO.id(),
-                performanceDTO.type().getType().toUpperCase(),
+                performanceDTO.type().getName().toUpperCase(),
                 performanceDTO.typeId(),
                 performanceDTO.title(),
                 s3FileHandler.getFileUrl(

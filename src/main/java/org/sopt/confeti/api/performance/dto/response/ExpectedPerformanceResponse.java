@@ -15,7 +15,7 @@ public record ExpectedPerformanceResponse(
                                                  S3FileHandler s3FileHandler) {
         return new ExpectedPerformanceResponse(
                 expectedPerformanceDTO.id(),
-                expectedPerformanceDTO.type().getType(),
+                expectedPerformanceDTO.type().getName(),
                 expectedPerformanceDTO.typeId(),
                 expectedPerformanceDTO.title(),
                 s3FileHandler.getFileUrl(

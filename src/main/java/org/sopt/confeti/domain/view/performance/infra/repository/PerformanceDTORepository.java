@@ -37,8 +37,8 @@ public class PerformanceDTORepository {
 
         Query query = em.createNativeQuery(sql);
         query.setParameter("userId", userId);
-        query.setParameter("concertType", PerformanceType.CONCERT.getType());
-        query.setParameter("festivalType", PerformanceType.FESTIVAL.getType());
+        query.setParameter("concertType", PerformanceType.CONCERT.getName());
+        query.setParameter("festivalType", PerformanceType.FESTIVAL.getName());
         query.setParameter("performancePreviewCount", PREVIEW_FAVORITE_PERFORMANCE_COUNT);
 
         return convertToPerformanceDTOs(query.getResultList());
@@ -75,8 +75,8 @@ public class PerformanceDTORepository {
 
         Query query = em.createNativeQuery(sql)
                 .setParameter("userId", userId)
-                .setParameter("concertType", PerformanceType.CONCERT.getType())
-                .setParameter("festivalType", PerformanceType.FESTIVAL.getType())
+                .setParameter("concertType", PerformanceType.CONCERT.getName())
+                .setParameter("festivalType", PerformanceType.FESTIVAL.getName())
                 .setParameter("performanceReservationCount", RESERVE_FAVORITE_PERFORMANCE_COUNT);
 
         List<Object[]> results = query.getResultList();
@@ -100,8 +100,8 @@ public class PerformanceDTORepository {
                 """;
 
         Query query = em.createNativeQuery(sql)
-                .setParameter("concertType", PerformanceType.CONCERT.getType())
-                .setParameter("festivalType", PerformanceType.FESTIVAL.getType())
+                .setParameter("concertType", PerformanceType.CONCERT.getName())
+                .setParameter("festivalType", PerformanceType.FESTIVAL.getName())
                 .setParameter("performanceReservationCount", RESERVE_FAVORITE_PERFORMANCE_COUNT);
 
         List<Object[]> results = query.getResultList();

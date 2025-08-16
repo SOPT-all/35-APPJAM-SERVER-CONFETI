@@ -21,7 +21,7 @@ public class PerformanceSearchOperator {
 
     private static final String TITLE_PARTIAL = "title.partial";
     private static final String TYPE = "type";
-    private static final String END_AT = "type";
+    private static final String END_AT = "endAt";
     private static final String CURRENT_DATE = LocalDate.now().toString();
 
     private final ElasticsearchOperations elasticsearchOperations;
@@ -73,7 +73,7 @@ public class PerformanceSearchOperator {
                 boolQueryBuilder.must(must -> must
                         .match(match -> match
                                 .field(TYPE)
-                                .query(type.getType())
+                                .query(type.getName())
                         )
                 );
             }

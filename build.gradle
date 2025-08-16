@@ -19,6 +19,14 @@ openapi3 {
     format = "yaml"
 }
 
+ext {
+    set('confetiApplication', 'org.sopt.confeti.ConfetiApplication')
+}
+
+bootRun {
+    mainClass = "${confetiApplication}"
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
