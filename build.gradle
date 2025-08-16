@@ -114,9 +114,6 @@ dependencies {
 
     // Slack
     implementation("com.slack.api:slack-api-client:1.45.3")
-
-    // playwright
-    implementation 'com.microsoft.playwright:playwright:1.51.0'
 }
 
 dependencyManagement {
@@ -127,13 +124,6 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
-}
-
-tasks.register('installPlaywright', JavaExec) {
-    description = 'Install Playwright browsers'
-    mainClass = 'com.microsoft.playwright.CLI'
-    args = ['install-deps']
-    classpath = configurations.runtimeClasspath
 }
 
 tasks.register('copySwaggerDocument', Copy) {
