@@ -60,4 +60,7 @@ public class JwtTokenGenerator {
                 .compact();
     }
 
+    public int getRefreshTokenValidTime() {
+        return jwtProperties.refreshTokenValidTime();
+    }
 }

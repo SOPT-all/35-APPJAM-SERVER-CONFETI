@@ -11,16 +11,15 @@ import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
+import org.sopt.confeti.global.annotation.RefreshToken;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,7 +41,7 @@ public class AuthController {
     @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/reissue")
     public ResponseEntity<BaseResponse<?>> reissue(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String refreshToken
+            @RefreshToken String refreshToken
     ) {
         Token token = authFacade.reissue(refreshToken);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, token);
