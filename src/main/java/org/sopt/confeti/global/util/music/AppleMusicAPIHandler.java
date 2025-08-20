@@ -26,6 +26,8 @@ import org.sopt.confeti.global.module.rest_client.builder.ApiRestClientBuilder;
 import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
+import org.sopt.confeti.global.util.RedisHandler;
+import org.sopt.confeti.global.util.RedisKey;
 import org.sopt.confeti.global.util.music.dto.album.AppleMusicAlbumsResponse;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistsResponse;
 import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartSongResponse;
@@ -35,7 +37,6 @@ import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicsResponse;
 import org.sopt.confeti.global.util.music.dto.music.MusicPage;
 import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 
@@ -52,17 +53,6 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     // Redis
     private static final int REDIS_TTL_DAY = 1;
-    private static final String REDIS_KEY_BASE = "apple-music-api:";
-    private static final String REDIS_KEY_ARTISTS = REDIS_KEY_BASE + "artists:";
-    private static final String REDIS_KEY_ARTISTS_RELATED = REDIS_KEY_BASE + "artists-related:%s:%d";
-    private static final String REDIS_KEY_ARTISTS_TOP_MUSICS = REDIS_KEY_BASE + "artists:top-musics:";
-    private static final String REDIS_KEY_MUSICS = REDIS_KEY_BASE + "musics:";
-    private static final String REDIS_KEY_TOP_MUSICS = REDIS_KEY_BASE + "top-musics";
-    private static final String REDIS_KEY_MUSIC_PAGE_ARTIST_OFFSET_LIMIT =
-            REDIS_KEY_BASE + "music-page:artists:%s:%d:%d";
-    private static final String REDIS_KEY_MUSIC_PAGE_KEYWORD_OFFSET_LIMIT =
-            REDIS_KEY_BASE + "music-page:keyword:%s:%d:%d";
-    private static final String REDIS_KEY_ALBUMS = REDIS_KEY_BASE + "albums:";
 
     // Fetch Limit 목록
     private static final int ARTISTS_FETCH_LIMIT = 25;
@@ -73,7 +63,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     private final AppleMusicAPITokenGenerator tokenGenerator;
     private final AppleMusicAPIURL appleMusicAPIURL;
     private final ApiRestClientBuilder restClient;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisHandler redisHandler;
     private final ObjectMapper objectMapper;
 
     private final Map<String, String> headers = new ConcurrentHashMap<>();
@@ -94,9 +84,9 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiArtist> getCachedArtists(final Set<String> artistIds) {
-        Object raw = redisTemplate.opsForValue().multiGet(
+        Object raw = redisHandler.multiGet(
                 artistIds.stream()
-                        .map(artistId -> REDIS_KEY_ARTISTS + artistId)
+                        .map(RedisKey.MUSIC_ARTISTS::get)
                         .collect(Collectors.toSet())
         );
 
@@ -117,7 +107,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     private void cachingArtists(final List<ConfetiArtist> artists) {
         artists.forEach(artist -> {
-            redisTemplate.opsForValue().set(REDIS_KEY_ARTISTS + artist.getId(), artist, REDIS_TTL_DAY, TimeUnit.DAYS);
+            redisHandler.set(RedisKey.MUSIC_ARTISTS.get(artist.getId()), artist, REDIS_TTL_DAY, TimeUnit.DAYS);
         });
     }
 
@@ -160,8 +150,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiArtist> getCachedRelatedArtists(final String artistId, final int limit) {
-        String key = String.format(REDIS_KEY_ARTISTS_RELATED, artistId, limit);
-        Object raw = redisTemplate.opsForValue().get(key);
+        Object raw = redisHandler.get(RedisKey.MUSIC_ARTISTS_RELATED.get(artistId, limit));
         if (Objects.isNull(raw)) {
             return List.of();
         }
@@ -175,9 +164,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private void cacheRelatedArtists(final String artistId, final int limit, final List<ConfetiArtist> artists) {
-        String key = String.format(REDIS_KEY_ARTISTS_RELATED, artistId, limit);
-        redisTemplate.opsForValue()
-                .set(key, artists, REDIS_TTL_DAY, TimeUnit.DAYS);
+        redisHandler.set(RedisKey.MUSIC_ARTISTS_RELATED.get(artistId, limit), artists, REDIS_TTL_DAY, TimeUnit.DAYS);
     }
 
     @Override
@@ -236,7 +223,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private Optional<ConfetiArtist> getCachedArtist(final String artistId) {
-        Object raw = redisTemplate.opsForValue().get(REDIS_KEY_ARTISTS + artistId);
+        Object raw = redisHandler.get(RedisKey.MUSIC_ARTISTS.get(artistId));
 
         if (Objects.isNull(raw)) {
             return Optional.empty();
@@ -246,7 +233,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private void cachingArtist(final ConfetiArtist artist) {
-        redisTemplate.opsForValue().set(REDIS_KEY_ARTISTS + artist.getId(), artist, REDIS_TTL_DAY, TimeUnit.DAYS);
+        redisHandler.set(RedisKey.MUSIC_ARTISTS.get(artist.getId()), artist, REDIS_TTL_DAY, TimeUnit.DAYS);
     }
 
     @Override
@@ -308,9 +295,9 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiAlbum> getCachedAlbums(final Set<String> albumIds) {
-        Object raw = redisTemplate.opsForValue().multiGet(
+        Object raw = redisHandler.multiGet(
                 albumIds.stream()
-                        .map(albumId -> REDIS_KEY_ALBUMS + albumId)
+                        .map(RedisKey.MUSIC_ALBUMS::get)
                         .collect(Collectors.toSet())
         );
 
@@ -331,7 +318,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     private void cachingAlbums(List<ConfetiAlbum> albums) {
         albums.forEach(album -> {
-            redisTemplate.opsForValue().set(REDIS_KEY_ALBUMS + album.getId(), album, REDIS_TTL_DAY, TimeUnit.DAYS);
+            redisHandler.set(RedisKey.MUSIC_ALBUMS.get(album.getId()), album, REDIS_TTL_DAY, TimeUnit.DAYS);
         });
     }
 
@@ -380,9 +367,9 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiMusic> getCachedMusics(final Set<String> musicIds) {
-        Object raw = redisTemplate.opsForValue().multiGet(
+        Object raw = redisHandler.multiGet(
                 musicIds.stream()
-                        .map(musicId -> REDIS_KEY_MUSICS + musicId)
+                        .map(RedisKey.MUSIC_MUSICS::get)
                         .collect(Collectors.toSet())
         );
 
@@ -403,7 +390,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     private void cachingMusics(final List<ConfetiMusic> musics) {
         musics.forEach(music -> {
-            redisTemplate.opsForValue().set(REDIS_KEY_MUSICS + music.getId(), music, REDIS_TTL_DAY, TimeUnit.DAYS);
+            redisHandler.set(RedisKey.MUSIC_MUSICS.get(music.getId()), music, REDIS_TTL_DAY, TimeUnit.DAYS);
         });
     }
 
@@ -452,7 +439,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiMusic> getCachedTopMusics(final int fetchSize) {
-        Object raw = redisTemplate.opsForValue().get(REDIS_KEY_TOP_MUSICS);
+        Object raw = redisHandler.get(RedisKey.MUSIC_TOP_MUSICS.get());
 
         if (Objects.isNull(raw)) {
             return List.of();
@@ -471,7 +458,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private void cachingTopMusics(final List<ConfetiMusic> musics) {
-        redisTemplate.opsForValue().set(REDIS_KEY_TOP_MUSICS, musics, REDIS_TTL_DAY, TimeUnit.DAYS);
+        redisHandler.set(RedisKey.MUSIC_TOP_MUSICS.get(), musics, REDIS_TTL_DAY, TimeUnit.DAYS );
     }
 
     @Override
@@ -521,7 +508,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiMusic> getCachedTopMusicsByArtistId(final String artistId, final int fetchSize) {
-        Object raw = redisTemplate.opsForValue().get(REDIS_KEY_ARTISTS_TOP_MUSICS + artistId);
+        Object raw = redisHandler.get(RedisKey.MUSIC_ARTISTS_TOP_MUSICS.get(artistId));
 
         if (Objects.isNull(raw)) {
             return List.of();
@@ -540,7 +527,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private void cachingTopMusicsByArtistId(final String artistId, final List<ConfetiMusic> musics) {
-        redisTemplate.opsForValue().set(REDIS_KEY_ARTISTS_TOP_MUSICS + artistId, musics, REDIS_TTL_DAY, TimeUnit.DAYS);
+        redisHandler.set(RedisKey.MUSIC_ARTISTS_TOP_MUSICS.get(artistId), musics, REDIS_TTL_DAY, TimeUnit.DAYS) ;
     }
 
     public List<ConfetiMusic> getTopSongsByArtistId(final String artistId, final int fetchSize) {
@@ -594,8 +581,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     private Optional<MusicPage> getCachedMusicPageByArtistId(String artistId, int offset, int limit) {
         // check exists artist
-        Object raw = redisTemplate.opsForValue()
-                .get(String.format(REDIS_KEY_MUSIC_PAGE_ARTIST_OFFSET_LIMIT, artistId, offset, limit));
+        Object raw = redisHandler.get(RedisKey.MUSIC_PAGE_ARTIST_OFFSET_LIMIT.get(artistId, offset, limit));
 
         if (Objects.isNull(raw)) {
             return Optional.empty();
@@ -605,9 +591,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private void cachingMusicPageByArtistId(String artistId, int offset, int limit, MusicPage musicPage) {
-        redisTemplate.opsForValue()
-                .set(String.format(REDIS_KEY_MUSIC_PAGE_ARTIST_OFFSET_LIMIT, artistId, offset, limit), musicPage,
-                        REDIS_TTL_DAY, TimeUnit.DAYS);
+        redisHandler.set(RedisKey.MUSIC_PAGE_ARTIST_OFFSET_LIMIT.get(artistId, offset, limit), musicPage, REDIS_TTL_DAY, TimeUnit.DAYS);
     }
 
     @Override
@@ -651,8 +635,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private Optional<MusicPage> getCachedMusicPageByKeyword(String term, int offset, int limit) {
-        Object raw = redisTemplate.opsForValue()
-                .get(String.format(REDIS_KEY_MUSIC_PAGE_KEYWORD_OFFSET_LIMIT, term, offset, limit));
+        Object raw = redisHandler.get(RedisKey.MUSIC_PAGE_KEYWORD_OFFSET_LIMIT.get(term, offset, limit));
 
         if (Objects.isNull(raw)) {
             return Optional.empty();
@@ -662,9 +645,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private void cachingMusicPageByKeyword(String term, int offset, int limit, MusicPage musicPage) {
-        redisTemplate.opsForValue()
-                .set(String.format(REDIS_KEY_MUSIC_PAGE_KEYWORD_OFFSET_LIMIT, term, offset, limit), musicPage,
-                        REDIS_TTL_DAY, TimeUnit.DAYS);
+        redisHandler.set(RedisKey.MUSIC_PAGE_KEYWORD_OFFSET_LIMIT.get(term, offset, limit), musicPage, REDIS_TTL_DAY, TimeUnit.DAYS);
     }
 
     @Override
