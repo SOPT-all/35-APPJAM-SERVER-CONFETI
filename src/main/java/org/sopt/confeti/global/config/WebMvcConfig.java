@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.interceptor.CustomInterceptor;
 import org.sopt.confeti.global.converter.StringToPerformanceTypeConverter;
-import org.sopt.confeti.global.resolver.user.UserIdArgumentResolver;
+import org.sopt.confeti.global.resolver.auth.UserIdArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

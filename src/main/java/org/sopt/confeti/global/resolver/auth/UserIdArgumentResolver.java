@@ -1,4 +1,5 @@
-package org.sopt.confeti.global.resolver.user;
+
+package org.sopt.confeti.global.resolver.auth;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
