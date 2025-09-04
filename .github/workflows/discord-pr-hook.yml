@@ -25,7 +25,7 @@ jobs:
           DESCRIPTION_MESSAGE="PR 생성"
 
           if [[ "$ACTION" == "opened" ]]; then
-            DESCRIPTION_MESSAGE="[ OPENED ] 리뷰 달아주세여"
+            DESCRIPTION_MESSAGE="{[ OPENED ] 리뷰 달아주세여"
           elif [[ "$ACTION" == "closed" && "$MERGED" == "true" ]]; then
             DESCRIPTION_MESSAGE="[ MERGED ] 💯💯💯"
           else
@@ -36,7 +36,7 @@ jobs:
           -d '{
               "embeds": [
                 {
-                  "title": "서버 Level Up + 1 🔥",
+                  "title": [confeti-server] "서버 Level Up + 1 🔥",
                   "description": "**🔥 '"$DESCRIPTION_MESSAGE"' 🔥**\n👤 '"$USERNAME"'\n🔊 '"$TITLE"'\n🔗 '"$URL"'",
                   "color": 6847432
                 }
