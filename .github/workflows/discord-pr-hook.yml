@@ -22,21 +22,21 @@ jobs:
           TITLE: ${{ github.event.pull_request.title }}
           URL: ${{ github.event.pull_request.html_url }}
         run: |
-          DESCRIPTION_MESSAGE="temp"
+          DESCRIPTION_MESSAGE="PR 생성"
 
           if [[ "$ACTION" == "opened" ]]; then
-            DESCRIPTION_MESSAGE="[ OPENED ] 리뷰 달아주셔요"
+            DESCRIPTION_MESSAGE="[ OPENED ] 리뷰 달아주세여"
           elif [[ "$ACTION" == "closed" && "$MERGED" == "true" ]]; then
             DESCRIPTION_MESSAGE="[ MERGED ] 💯💯💯"
           else
-            DESCRIPTION_MESSAGE="[ CLOSED ] 머함요?"
+            DESCRIPTION_MESSAGE="[ CLOSED ] 마음을 불태워라"
           fi
           
           curl -X POST -H "Content-Type: application/json" \
           -d '{
               "embeds": [
                 {
-                  "title": "😵 서버는 열일 중... 😵",
+                  "title": "서버 Level Up + 1 🔥",
                   "description": "**🔥 '"$DESCRIPTION_MESSAGE"' 🔥**\n👤 '"$USERNAME"'\n🔊 '"$TITLE"'\n🔗 '"$URL"'",
                   "color": 6847432
                 }
