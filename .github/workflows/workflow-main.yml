@@ -224,7 +224,8 @@ jobs:
           script: |
             cd ~
             docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
-            ./server/service-deploy.sh
+            cd server
+            ./service-deploy.sh
 
       # 보안 규칙에 ssh IP 삭제
       - name: Remove Github Actions IP from security group
