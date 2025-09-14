@@ -36,7 +36,7 @@ jobs:
           -d '{
               "embeds": [
                 {
-                  "title": [confeti-server] "서버 Level Up + 1 🔥",
+                  "title": "[confeti-server] 서버 Level Up + 1 🔥",
                   "description": "**🔥 '"$DESCRIPTION_MESSAGE"' 🔥**\n👤 '"$USERNAME"'\n🔊 '"$TITLE"'\n🔗 '"$URL"'",
                   "color": 6847432
                 }
