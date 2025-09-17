@@ -17,7 +17,7 @@ import org.sopt.confeti.domain.artist.Artist;
 import org.sopt.confeti.domain.song.Song;
 
 @Entity
-@Table
+@Table(name = "artist_songs")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArtistSong {
