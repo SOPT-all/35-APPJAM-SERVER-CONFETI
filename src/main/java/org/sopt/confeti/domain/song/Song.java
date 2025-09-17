@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 public class Song {
 
     @Id
-    @Column(name = "song_id")
     private String id;
 
     @Column(nullable = false)

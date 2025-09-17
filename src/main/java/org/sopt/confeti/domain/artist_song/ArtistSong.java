@@ -1,6 +1,5 @@
 package org.sopt.confeti.domain.artist_song;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -24,7 +23,6 @@ public class ArtistSong {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "artist_song_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

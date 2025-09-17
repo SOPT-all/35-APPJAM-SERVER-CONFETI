@@ -21,7 +21,6 @@ import org.sopt.confeti.domain.artist.Artist;
 public class TopArtist {
 
     @Id
-    @Column(name = "top_artist_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
