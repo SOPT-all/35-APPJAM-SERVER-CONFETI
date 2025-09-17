@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.artist_song.infra;
+package org.sopt.confeti.domain.artist_song.infra.repository;
 
 import org.sopt.confeti.domain.artist_song.ArtistSong;
 import org.springframework.data.jpa.repository.JpaRepository;
