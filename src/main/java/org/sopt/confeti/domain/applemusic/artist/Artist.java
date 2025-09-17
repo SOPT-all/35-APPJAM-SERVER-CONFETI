@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.song;
+package org.sopt.confeti.domain.applemusic.artist;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,10 +13,10 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
-@Table(name = "songs")
+@Table(name = "artists")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Song {
+public class Artist {
 
     @Id
     private String id;
@@ -31,25 +31,19 @@ public class Song {
 
     private Integer artworkHeight;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-    public static Song create(String id, String name, String artworkUrl, Integer artworkWidth,
+    public static Artist create(String id, String name, String artworkUrl, Integer artworkWidth,
         Integer artworkHeight) {
-        return Song.builder()
+        return Artist.builder()
             .id(id)
             .name(name)
             .artworkUrl(artworkUrl)
-            .artworkHeight(artworkHeight)
             .artworkWidth(artworkWidth)
+            .artworkHeight(artworkHeight)
             .build();
     }
 
     @Builder
-    private Song(String id, String name, String artworkUrl, Integer artworkWidth,
+    private Artist(String id, String name, String artworkUrl, Integer artworkWidth,
         Integer artworkHeight) {
         this.id = id;
         this.name = name;
@@ -57,4 +51,10 @@ public class Song {
         this.artworkWidth = artworkWidth;
         this.artworkHeight = artworkHeight;
     }
+
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 }
