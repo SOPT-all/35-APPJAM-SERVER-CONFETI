@@ -11,6 +11,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.artist.Artist;
@@ -28,7 +29,7 @@ public class TopArtist {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "artist_id")
+    @JoinColumn(name = "artist_id", unique = true)
     private Artist artist;
 
     @Column(nullable = false)
@@ -39,4 +40,18 @@ public class TopArtist {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @Builder
+    private TopArtist(Long id, Artist artist, int rank) {
+        this.id = id;
+        this.artist = artist;
+        this.rank = rank;
+    }
+
+    public static TopArtist create(Artist artist, int rank) {
+        return TopArtist.builder()
+            .artist(artist)
+            .rank(rank)
+            .build();
+    }
 }
