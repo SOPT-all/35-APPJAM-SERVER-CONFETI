@@ -2,22 +2,10 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'com.epages.restdocs-api-spec' version '0.18.2'
 }
 
 group = 'org.sopt'
-version = '0.0.1-SNAPSHOT'
-
-openapi3 {
-    servers = [
-            { url = "https://api.confeti.xyz" },
-            { url = "http://localhost:8080" }
-    ]
-    title = "CONFETI Server API Document"
-    description = "응답 테스트 검증이 완료된 명세서입니다."
-    version = "0.0.1"
-    format = "yaml"
-}
+version = '0.0.1'
 
 ext {
     set('confetiApplication', 'org.sopt.confeti.ConfetiApplication')
@@ -100,35 +88,10 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
-    // Spring Rest Docs
-    testImplementation "com.epages:restdocs-api-spec-restassured:0.18.2"
-    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
-    testImplementation 'io.rest-assured:rest-assured'
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
-
-    // Test Containers
-    testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation 'org.testcontainers:elasticsearch'
-    testImplementation 'org.testcontainers:mysql'
-
     // Slack
     implementation("com.slack.api:slack-api-client:1.45.3")
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.testcontainers:testcontainers-bom:1.17.4"
-    }
-}
-
-tasks.named('test') {
+test {
     useJUnitPlatform()
-}
-
-tasks.register('copySwaggerDocument', Copy) {
-    delete "src/main/resources/static/swagger-ui/openapi3.yaml"
-    from "${buildDir}/api-spec/openapi3.yaml"
-    into "src/main/resources/static/swagger-ui/"
-    dependsOn "openapi3"
 }
