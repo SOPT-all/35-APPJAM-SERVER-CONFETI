@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.applemusic.artist_song;
+package org.sopt.confeti.domain.applemusic.artistsong;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
