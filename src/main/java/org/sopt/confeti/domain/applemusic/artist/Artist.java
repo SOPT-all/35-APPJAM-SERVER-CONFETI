@@ -3,6 +3,8 @@ package org.sopt.confeti.domain.applemusic.artist;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -22,7 +24,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Artist {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String artistId;
 
     @Column(nullable = false)
     private String name;
@@ -34,10 +39,11 @@ public class Artist {
 
     private Integer artworkHeight;
 
-    public static Artist create(String id, String name, String artworkUrl, Integer artworkWidth,
+    public static Artist create(String artistId, String name, String artworkUrl,
+        Integer artworkWidth,
         Integer artworkHeight) {
         return Artist.builder()
-            .id(id)
+            .artistId(artistId)
             .name(name)
             .artworkUrl(artworkUrl)
             .artworkWidth(artworkWidth)
@@ -46,9 +52,9 @@ public class Artist {
     }
 
     @Builder
-    private Artist(String id, String name, String artworkUrl, Integer artworkWidth,
+    private Artist(String artistId, String name, String artworkUrl, Integer artworkWidth,
         Integer artworkHeight) {
-        this.id = id;
+        this.artistId = artistId;
         this.name = name;
         this.artworkUrl = artworkUrl;
         this.artworkWidth = artworkWidth;

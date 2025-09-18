@@ -3,6 +3,8 @@ package org.sopt.confeti.domain.applemusic.song;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -22,7 +24,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Song {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String songId;
 
     @Column(nullable = false)
     private String name;
@@ -40,10 +45,10 @@ public class Song {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public static Song create(String id, String name, String artworkUrl, Integer artworkWidth,
+    public static Song create(String songId, String name, String artworkUrl, Integer artworkWidth,
         Integer artworkHeight) {
         return Song.builder()
-            .id(id)
+            .songId(songId)
             .name(name)
             .artworkUrl(artworkUrl)
             .artworkHeight(artworkHeight)
@@ -52,9 +57,9 @@ public class Song {
     }
 
     @Builder
-    private Song(String id, String name, String artworkUrl, Integer artworkWidth,
+    private Song(String songId, String name, String artworkUrl, Integer artworkWidth,
         Integer artworkHeight) {
-        this.id = id;
+        this.songId = songId;
         this.name = name;
         this.artworkUrl = artworkUrl;
         this.artworkWidth = artworkWidth;
