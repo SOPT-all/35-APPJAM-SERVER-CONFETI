@@ -36,7 +36,7 @@ public class TopArtist {
     private Artist artist;
 
     @Column(nullable = false)
-    private int rank;
+    private int ranking;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -45,16 +45,16 @@ public class TopArtist {
     private LocalDateTime updatedAt;
 
     @Builder
-    private TopArtist(Long id, Artist artist, int rank) {
+    private TopArtist(Long id, Artist artist, int ranking) {
         this.id = id;
         this.artist = artist;
-        this.rank = rank;
+        this.ranking = ranking;
     }
 
-    public static TopArtist create(Artist artist, int rank) {
+    public static TopArtist create(Artist artist, int ranking) {
         return TopArtist.builder()
             .artist(artist)
-            .rank(rank)
+            .ranking(ranking)
             .build();
     }
 }
