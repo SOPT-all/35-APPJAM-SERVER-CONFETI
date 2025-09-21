@@ -92,6 +92,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation 'io.github.openfeign:feign-okhttp:11.10'
     implementation 'io.github.openfeign:feign-jackson:11.10'
+    implementation 'com.playtika.reactivefeign:feign-reactor-spring-cloud-starter:4.2.1'
 
     // Slack
     implementation("com.slack.api:slack-api-client:1.45.3")

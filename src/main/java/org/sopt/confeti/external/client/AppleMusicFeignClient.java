@@ -6,12 +6,12 @@ import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartsResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicArtistMusicsResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicsResponse;
 import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import reactivefeign.spring.config.ReactiveFeignClient;
 
-@FeignClient(
+@ReactiveFeignClient(
         name = "AppleMusicFeignClient",
         url = "${apple-music.api.host}",
         path = "${apple-music.api.path}",
@@ -30,14 +30,27 @@ public interface AppleMusicFeignClient {
     );
 
     @GetMapping("/artists/{id}/view/{view}")
+    @Deprecated
     AppleMusicArtistsResponse getRelatedArtistsById(
             @PathVariable String id,
             @PathVariable String view,
             @RequestParam String limit
     );
 
+    @GetMapping("/artists/{id}/view/similar-artists")
+    AppleMusicArtistsResponse getRelatedArtistsById(
+            @PathVariable String id,
+            @RequestParam String limit
+    );
+
+    @GetMapping("/artists/{id}/view/top-songs")
+    AppleMusicMusicsResponse getArtistTopSongsById(
+            @PathVariable String id,
+            @RequestParam String limit
+    );
+
     @GetMapping("/artists/{id}/songs")
-    AppleMusicArtistMusicsResponse getArtistMusicsById(
+    AppleMusicArtistMusicsResponse getArtistSongsById(
             @PathVariable String id,
             @RequestParam String limit,
             @RequestParam String offset
