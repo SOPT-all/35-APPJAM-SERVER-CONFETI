@@ -13,7 +13,7 @@ import org.sopt.confeti.global.common.BaseResponse;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
-    responseCode = "400",
+    responseCode = "422",
     description = "Type Mismatch",
     content = @Content(
         schema = @Schema(implementation = BaseResponse.class),
@@ -21,7 +21,7 @@ import org.sopt.confeti.global.common.BaseResponse;
         @ExampleObject(
             value =
                 "{\n"
-                    + "  \"status\": 400,\n"
+                    + "  \"status\": 422,\n"
                     + "  \"message\": \"올바르지 않은 쿼리 파라미터 형식입니다.\"\n"
                     + "}"
         )

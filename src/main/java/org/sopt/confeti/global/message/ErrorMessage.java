@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 public enum ErrorMessage {
     /* 400 Bad Request */
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "요청 형식이 올바르지 않습니다."),
-    TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "올바르지 않은 쿼리 파라미터 형식입니다."),
 
     /* 401 Unauthorized */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "사용자의 로그인 검증을 실패했습니다."),
@@ -31,6 +30,9 @@ public enum ErrorMessage {
     /* 409 Conflict */
     CONFLICT(HttpStatus.CONFLICT, "이미 존재하는 리소스입니다."),
     TIMETABLE_FESTIVAL_IS_FULL(HttpStatus.CONFLICT, "더 이상 등록할 수 없습니다."),
+
+    /* 422 Unprocessable Entity */
+    TYPE_MISMATCH(HttpStatus.UNPROCESSABLE_ENTITY, "올바르지 않은 쿼리 파라미터 형식입니다."),
 
     /* 500 Internal Server Error*/
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
