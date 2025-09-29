@@ -2,7 +2,11 @@ package org.sopt.confeti.global.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,14 +16,30 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI openAPI() {
-        return new OpenAPI()
-                .components(new Components())
-                .info(
-                        new Info()
-                                .title("CONFETI Server API Document")
-                                .version("v1.0.0")
-                                .description("서버 API Swagger 명세서입니다.")
+        Info info = new Info()
+                .title("CONFETI Server API Document")
+                .version("v1.0.0")
+                .description("서버 API Swagger 명세서입니다.")
+                .contact(
+                        new Contact().email("confetiserver@gmail.com")
                 );
+
+        String jwtScheme = "jwtAuth";
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwtScheme);
+        Components components = new Components()
+                .addSecuritySchemes(jwtScheme, new SecurityScheme()
+                        .name("Authorization")
+                        .type(SecurityScheme.Type.HTTP)
+                        .in(SecurityScheme.In.HEADER)
+                        .scheme("Bearer")
+                        .bearerFormat("JWT"));
+
+        return new OpenAPI()
+                .addServersItem(new Server().url("http://localhost:8080"))
+                .addServersItem(new Server().url("https://api.confeti.xyz"))
+                .components(components)
+                .info(info)
+                .addSecurityItem(securityRequirement);
     }
 
     /** 아티스트 그룹 */
