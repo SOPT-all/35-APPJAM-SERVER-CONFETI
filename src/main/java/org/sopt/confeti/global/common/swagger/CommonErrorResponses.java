@@ -14,38 +14,39 @@ import org.sopt.confeti.global.common.BaseResponse;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponses(
-        value = {
-                @ApiResponse(
-                        responseCode = "404",
-                        description = "Not Found",
-                        content = @Content(
-                                schema = @Schema(implementation = BaseResponse.class),
-                                examples =
-                                        @ExampleObject(
-                                                value =
-                                                        "{\n"
-                                                                  + "  \"status\": 404,\n"
-                                                                  + "  \"message\": \"요청하는 리소스가 존재하지 않습니다.\"\n"
-                                                        + "}"
-                                        )
-                        )
-                ),
-                @ApiResponse(
-                        responseCode = "500",
-                        description = "Internal Server Error",
-                        content = @Content(
-                                schema = @Schema(implementation = BaseResponse.class),
-                                examples =
-                                @ExampleObject(
-                                        value =
-                                                "{\n"
-                                                        + "  \"status\": 500,\n"
-                                                        + "  \"message\": \"서버 내부 오류입니다.\"\n"
-                                                        + "}"
-                                )
-                        )
+    value = {
+        @ApiResponse(
+            responseCode = "404",
+            description = "Not Found",
+            content = @Content(
+                schema = @Schema(implementation = BaseResponse.class),
+                examples =
+                @ExampleObject(
+                    value =
+                        "{\n"
+                            + "  \"status\": 404,\n"
+                            + "  \"message\": \"요청하는 리소스가 존재하지 않습니다.\"\n"
+                            + "}"
                 )
-        }
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content(
+                schema = @Schema(implementation = BaseResponse.class),
+                examples =
+                @ExampleObject(
+                    value =
+                        "{\n"
+                            + "  \"status\": 500,\n"
+                            + "  \"message\": \"서버 내부 오류입니다.\"\n"
+                            + "}"
+                )
+            )
+        )
+    }
 )
 public @interface CommonErrorResponses {
+
 }

@@ -13,19 +13,20 @@ import org.sopt.confeti.global.common.BaseResponse;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
-        responseCode = "400",
-        description = "Type Mismatch",
-        content = @Content(
-                schema = @Schema(implementation = BaseResponse.class),
-                examples =
-                @ExampleObject(
-                        value =
-                                "{\n"
-                                        + "  \"status\": 400,\n"
-                                        + "  \"message\": \"올바르지 않은 쿼리 파라미터 형식입니다.\"\n"
-                                        + "}"
-                )
+    responseCode = "400",
+    description = "Type Mismatch",
+    content = @Content(
+        schema = @Schema(implementation = BaseResponse.class),
+        examples =
+        @ExampleObject(
+            value =
+                "{\n"
+                    + "  \"status\": 400,\n"
+                    + "  \"message\": \"올바르지 않은 쿼리 파라미터 형식입니다.\"\n"
+                    + "}"
         )
+    )
 )
 public @interface TypeMismatchErrorResponse {
+
 }

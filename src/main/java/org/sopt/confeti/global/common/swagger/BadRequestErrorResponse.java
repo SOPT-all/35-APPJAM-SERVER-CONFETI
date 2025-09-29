@@ -13,19 +13,20 @@ import org.sopt.confeti.global.common.BaseResponse;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
-        responseCode = "400",
-        description = "Bad Request",
-        content = @Content(
-                schema = @Schema(implementation = BaseResponse.class),
-                examples =
-                @ExampleObject(
-                        value =
-                                "{\n"
-                                        + "  \"status\": 400,\n"
-                                        + "  \"message\": \"요청 형식이 올바르지 않습니다.\"\n"
-                                        + "}"
-                )
+    responseCode = "400",
+    description = "Bad Request",
+    content = @Content(
+        schema = @Schema(implementation = BaseResponse.class),
+        examples =
+        @ExampleObject(
+            value =
+                "{\n"
+                    + "  \"status\": 400,\n"
+                    + "  \"message\": \"요청 형식이 올바르지 않습니다.\"\n"
+                    + "}"
         )
+    )
 )
 public @interface BadRequestErrorResponse {
+
 }

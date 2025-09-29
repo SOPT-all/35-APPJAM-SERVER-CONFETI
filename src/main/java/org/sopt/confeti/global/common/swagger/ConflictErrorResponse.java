@@ -13,19 +13,20 @@ import org.sopt.confeti.global.common.BaseResponse;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponse(
-        responseCode = "409",
-        description = "Conflict",
-        content = @Content(
-                schema = @Schema(implementation = BaseResponse.class),
-                examples =
-                @ExampleObject(
-                        value =
-                                "{\n"
-                                        + "  \"status\": 409,\n"
-                                        + "  \"message\": \"이미 존재하는 리소스입니다.\"\n"
-                                        + "}"
-                )
+    responseCode = "409",
+    description = "Conflict",
+    content = @Content(
+        schema = @Schema(implementation = BaseResponse.class),
+        examples =
+        @ExampleObject(
+            value =
+                "{\n"
+                    + "  \"status\": 409,\n"
+                    + "  \"message\": \"이미 존재하는 리소스입니다.\"\n"
+                    + "}"
         )
+    )
 )
 public @interface ConflictErrorResponse {
+
 }
