@@ -1,5 +1,7 @@
 package org.sopt.confeti.global.common.swagger;
 
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.*;
+
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,37 +12,38 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.exception.ErrorResponseConstant;
 
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponses(
     value = {
         @ApiResponse(
-            responseCode = "401",
-            description = "Unauthorized",
+            responseCode = UNAUTHORIZED_STATUS,
+            description = UNAUTHORIZED_DESCRIPTION,
             content = @Content(
                 schema = @Schema(implementation = BaseResponse.class),
                 examples =
                 @ExampleObject(
                     value =
                         "{\n"
-                            + "  \"status\": 401,\n"
-                            + "  \"message\": \"사용자의 로그인 검증을 실패했습니다. | 잘못된 토큰입니다. | 만료된 토큰입니다. | 토큰이 없습니다. | 잘못된 토큰 형식입니다.\"\n"
+                            + "  \"status\": " + UNAUTHORIZED_STATUS + ",\n"
+                            + "  \"message\": \"" + UNAUTHORIZED_MESSAGE + " | " + WRONG_TOKEN_MESSAGE + " | " + WRONG_TOKEN_REQUEST_MESSAGE + " | " + EXPIRED_TOKEN_MESSAGE + " | " + EMPTY_TOKEN_MESSAGE + "\"\n"
                             + "}"
                 )
             )
         ),
         @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden",
+            responseCode = FORBIDDEN_STATUS,
+            description = FORBIDDEN_DESCRIPTION,
             content = @Content(
                 schema = @Schema(implementation = BaseResponse.class),
                 examples =
                 @ExampleObject(
                     value =
                         "{\n"
-                            + "  \"status\": 403,\n"
-                            + "  \"message\": \"리소스 접근 권한이 없습니다.\"\n"
+                            + "  \"status\": " + FORBIDDEN_STATUS + ",\n"
+                            + "  \"message\": \"" + FORBIDDEN_MESSAGE + "\"\n"
                             + "}"
                 )
             )
