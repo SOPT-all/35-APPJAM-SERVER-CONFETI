@@ -1,39 +1,44 @@
 package org.sopt.confeti.global.message;
 
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.sopt.confeti.global.exception.ErrorResponseConstant;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
 public enum ErrorMessage {
     /* 400 Bad Request */
-    BAD_REQUEST(HttpStatus.BAD_REQUEST, "요청 형식이 올바르지 않습니다."),
-    TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "올바르지 않은 쿼리 파라미터 형식입니다."),
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, BAD_REQUEST_MESSAGE),
 
     /* 401 Unauthorized */
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "사용자의 로그인 검증을 실패했습니다."),
-    WRONG_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다."),
-    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
-    EMPTY_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 없습니다."),
-    WRONG_TOKEN_REQUEST(HttpStatus.UNAUTHORIZED, "잘못된 토큰 형식입니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_MESSAGE),
+    WRONG_TOKEN(HttpStatus.UNAUTHORIZED, WRONG_TOKEN_MESSAGE),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, EXPIRED_TOKEN_MESSAGE),
+    EMPTY_TOKEN(HttpStatus.UNAUTHORIZED, EMPTY_TOKEN_MESSAGE),
+    WRONG_TOKEN_REQUEST(HttpStatus.UNAUTHORIZED, WRONG_TOKEN_REQUEST_MESSAGE),
 
 
     /* 403 Forbidden*/
-    FORBIDDEN(HttpStatus.FORBIDDEN, "리소스 접근 권한이 없습니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, FORBIDDEN_MESSAGE),
 
     /* 404 Not Found */
-    NOT_FOUND(HttpStatus.NOT_FOUND, "요청하는 리소스가 존재하지 않습니다."),
+    NOT_FOUND(HttpStatus.NOT_FOUND, NOT_FOUND_MESSAGE),
 
     /* 405 Method Not Allowed */
-    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "잘못된 HTTP Method 요청입니다."),
+    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, METHOD_NOT_ALLOWED_MESSAGE),
 
     /* 409 Conflict */
-    CONFLICT(HttpStatus.CONFLICT, "이미 존재하는 리소스입니다."),
-    TIMETABLE_FESTIVAL_IS_FULL(HttpStatus.CONFLICT, "더 이상 등록할 수 없습니다."),
+    CONFLICT(HttpStatus.CONFLICT, CONFLICT_MESSAGE),
+    TIMETABLE_FESTIVAL_IS_FULL(HttpStatus.CONFLICT, TIMETABLE_FESTIVAL_IS_FULL_MESSAGE),
+
+    /* 422 Unprocessable Entity */
+    TYPE_MISMATCH(HttpStatus.UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY_MESSAGE),
 
     /* 500 Internal Server Error*/
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MESSAGE),
     ;
 
     private final HttpStatus httpStatus;

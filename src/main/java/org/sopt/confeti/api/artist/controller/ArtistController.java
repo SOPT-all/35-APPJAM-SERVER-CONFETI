@@ -6,6 +6,8 @@ import org.sopt.confeti.api.artist.facade.ArtistFacade;
 import org.sopt.confeti.api.artist.facade.dto.response.SearchACArtistsDTO;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.common.swagger.BadRequestErrorResponse;
+import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,8 @@ public class ArtistController {
     private final ArtistFacade artistFacade;
 
     @GetMapping("/search/ac")
+    @BadRequestErrorResponse
+    @CommonErrorResponses
     public ResponseEntity<BaseResponse<?>> searchAutoComplete(
             @UserId(require = false) Long userId,
             @RequestParam String term,
