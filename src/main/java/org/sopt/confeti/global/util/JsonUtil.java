@@ -1,0 +1,36 @@
+package org.sopt.confeti.global.util;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.message.ErrorMessage;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class JsonUtil {
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    public static <T> String toJson(T data) {
+        try {
+            return objectMapper.writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+            throw new ConfetiException(ErrorMessage.FAIL_JSON_SERIALIZATION);
+        }
+    }
+
+    public static <T> T fromJson(Class<T> tClass, String content) {
+        try {
+            return objectMapper.readValue(content, tClass);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+            throw new ConfetiException(ErrorMessage.FAIL_JSON_DESERIALIZATION);
+        }
+    }
+}
