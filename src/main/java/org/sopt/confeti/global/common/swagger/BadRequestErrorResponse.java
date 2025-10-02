@@ -1,0 +1,34 @@
+package org.sopt.confeti.global.common.swagger;
+
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.*;
+
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.exception.ErrorResponseConstant;
+
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@ApiResponse(
+    responseCode = BAD_REQUEST_STATUS,
+    description = BAD_REQUEST_DESCRIPTION,
+    content = @Content(
+        schema = @Schema(implementation = BaseResponse.class),
+        examples =
+        @ExampleObject(
+            value =
+                "{\n"
+                    + "  \"status\": " + BAD_REQUEST_STATUS + ",\n"
+                    + "  \"message\": \"" + BAD_REQUEST_MESSAGE + "\"\n"
+                    + "}"
+        )
+    )
+)
+public @interface BadRequestErrorResponse {
+}

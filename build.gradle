@@ -89,6 +89,10 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     // Slack
+    implementation "com.slack.api:slack-api-client:1.45.3"
+
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13'
     implementation("com.slack.api:slack-api-client:1.45.3")
 
     // Spring Cloud AWS SQS Starter
