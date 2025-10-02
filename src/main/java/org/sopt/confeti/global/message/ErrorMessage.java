@@ -37,7 +37,6 @@ public enum ErrorMessage {
 
     /* 404 Not Found */
     NOT_FOUND(HttpStatus.NOT_FOUND, NOT_FOUND_MESSAGE),
-    EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 이벤트 타입입니다."),
 
     /* 405 Method Not Allowed */
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, METHOD_NOT_ALLOWED_MESSAGE),
@@ -50,9 +49,7 @@ public enum ErrorMessage {
     TYPE_MISMATCH(HttpStatus.UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY_MESSAGE),
 
     /* 500 Internal Server Error*/
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MESSAGE),
-    FAIL_JSON_SERIALIZATION(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 직렬화에 실패했습니다."),
-    FAIL_JSON_DESERIALIZATION(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 역직렬화에 실패했습니다.");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MESSAGE);
 
     private final HttpStatus httpStatus;
     private final String message;

@@ -1,6 +1,6 @@
 package org.sopt.confeti.global.messagebroker;
 
-import static org.sopt.confeti.global.message.ErrorMessage.EVENT_NOT_FOUND;
+import static org.sopt.confeti.global.message.ErrorMessage.INTERNAL_SERVER_ERROR;
 
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
@@ -117,7 +117,7 @@ public class SqsService implements MessageBroker {
         Consumer<String> typeConsumer = eventHandlers.get(type);
         if (typeConsumer == null) {
             log.error("Cannot find event handler: {}. Payload: {}", type, payload);
-            throw new ConfetiException(EVENT_NOT_FOUND);
+            throw new ConfetiException(INTERNAL_SERVER_ERROR);
         }
 
         typeConsumer.accept(payload);

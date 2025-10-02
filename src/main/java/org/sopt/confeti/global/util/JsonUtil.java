@@ -20,8 +20,8 @@ public class JsonUtil {
         try {
             return objectMapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
-            throw new ConfetiException(ErrorMessage.FAIL_JSON_SERIALIZATION);
+            log.error("json 직렬화 실패: {}", e.getMessage(), e);
+            throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -29,8 +29,8 @@ public class JsonUtil {
         try {
             return objectMapper.readValue(content, tClass);
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
-            throw new ConfetiException(ErrorMessage.FAIL_JSON_DESERIALIZATION);
+            log.error("json 역직렬화 실패: {}", e.getMessage(), e);
+            throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
     }
 }
