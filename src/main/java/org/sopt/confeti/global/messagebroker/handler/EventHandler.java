@@ -1,0 +1,13 @@
+package org.sopt.confeti.global.messagebroker.handler;
+
+import org.sopt.confeti.global.messagebroker.Event;
+
+public interface EventHandler<T extends Event> {
+
+    void handle(T event);
+
+    Class<T> getSupportedEventType();
+
+    String getSupportedTypeId();
+
+}
