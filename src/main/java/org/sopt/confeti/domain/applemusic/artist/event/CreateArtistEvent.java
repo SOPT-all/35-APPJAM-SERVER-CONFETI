@@ -2,6 +2,7 @@ package org.sopt.confeti.domain.applemusic.artist.event;
 
 
 import org.sopt.confeti.domain.applemusic.artist.Artist;
+import org.sopt.confeti.global.messagebroker.Event;
 
 public record CreateArtistEvent(
     String artistId,
@@ -9,7 +10,7 @@ public record CreateArtistEvent(
     String artworkUrl,
     Integer artworkWidth,
     Integer artworkHeight
-) {
+) implements Event {
 
     public Artist toArtist() {
         return Artist.builder()
