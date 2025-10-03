@@ -4,18 +4,15 @@ import static org.sopt.confeti.global.message.ErrorMessage.INTERNAL_SERVER_ERROR
 
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
-import jakarta.annotation.PostConstruct;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
-import lombok.RequiredArgsConstructor;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.domain.applemusic.artist.application.ArtistService;
 import org.sopt.confeti.domain.applemusic.artist.event.CreateArtistEvent;
-import org.sopt.confeti.domain.applemusic.song.application.SongService;
 import org.sopt.confeti.domain.applemusic.song.event.CreateSongEvent;
 import org.sopt.confeti.global.exception.ConfetiException;
+import org.sopt.confeti.global.messagebroker.handler.EventHandler;
 import org.sopt.confeti.global.notification.NotificationAgent;
 import org.sopt.confeti.global.notification.SlackNotificationType;
 import org.sopt.confeti.global.util.JsonUtil;
@@ -27,7 +24,6 @@ import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class SqsService implements MessageBroker {
 
     @Value("${event.queues.confeti-server}")
@@ -38,19 +34,20 @@ public class SqsService implements MessageBroker {
     private static final String ATTRIBUTE_TRACE_ID = "traceId";
     private static final String ATTRIBUTE_TYPE_ID = "confetiEventType";
 
-    private final ArtistService artistService;
-    private final SongService songService;
-
     private final SqsTemplate sqsTemplate;
     private final NotificationAgent notificationAgent;
 
-    private final Map<String, Consumer<String>> eventHandlers = new HashMap<>();
+    private final Map<String, EventHandler<? extends Event>> eventHandlers;
 
-
-    @PostConstruct
-    private void init() {
-        eventHandlers.put(getTypeId(CreateSongEvent.class), this::handleCreateSongEvent);
-        eventHandlers.put(getTypeId(CreateArtistEvent.class), this::handleCreateArtistEvent);
+    public SqsService(
+        List<EventHandler<? extends Event>> allEventHandlers,
+        SqsTemplate sqsTemplate,
+        NotificationAgent notificationAgent
+    ) {
+        this.eventHandlers = allEventHandlers.stream().collect(Collectors.toUnmodifiableMap(
+            EventHandler::getSupportedTypeId, eventHandler -> eventHandler));
+        this.sqsTemplate = sqsTemplate;
+        this.notificationAgent = notificationAgent;
     }
 
     @Override
@@ -65,17 +62,17 @@ public class SqsService implements MessageBroker {
 
     @Transactional
     @SqsListener(value = "${event.queues.confeti-server}")
-    public void handleEvent(Message message) {
+    public void consumeEvent(Message message) {
         String payload = message.body();
         Map<String, MessageAttributeValue> messageAttributes = message.messageAttributes();
         String type = messageAttributes.get(ATTRIBUTE_TYPE_ID).stringValue();
 
-        consumeEvent(type, payload);
+        handleEvent(type, payload);
     }
 
-    private <T> void asyncSend(String queueName, T data) {
-        Map<String, Object> messageAttributes = createMessageAttributes(data);
-        String serializedData = JsonUtil.toJson(data);
+    private void asyncSend(String queueName, Event event) {
+        Map<String, Object> messageAttributes = createMessageAttributes(event);
+        String serializedData = JsonUtil.toJson(event);
 
         sqsTemplate.sendAsync(to -> to
                 .queue(queueName)
@@ -83,15 +80,15 @@ public class SqsService implements MessageBroker {
                 .headers(messageAttributes)
             )
             .exceptionally(exception -> {
-                String errorMessage = extractExceptionMessage(exception, data);
+                String errorMessage = extractExceptionMessage(exception, event);
                 notificationAgent.notify(SlackNotificationType.HIGH_ERROR, errorMessage);
                 log.error("[SqsService send exception] {}", errorMessage, exception);
                 return null;
             });
     }
 
-    private <T> Map<String, Object> createMessageAttributes(T data) {
-        String eventType = data.getClass().getSimpleName();
+    private Map<String, Object> createMessageAttributes(Event event) {
+        String eventType = event.getClass().getSimpleName();
         String eventTraceId = UUID.randomUUID().toString();
 
         return Map.of(
@@ -103,7 +100,7 @@ public class SqsService implements MessageBroker {
                 .stringValue(eventTraceId)
                 .dataType(SqsService.ATTRIBUTE_DATA_TYPE_STRING)
                 .build(),
-            ATTRIBUTE_TYPE_ID, getTypeId(data)
+            ATTRIBUTE_TYPE_ID, event.getTypeId()
         );
     }
 
@@ -113,35 +110,21 @@ public class SqsService implements MessageBroker {
             data.toString());
     }
 
-    private void consumeEvent(String type, String payload) {
-        Consumer<String> typeConsumer = eventHandlers.get(type);
-        if (typeConsumer == null) {
+    private void handleEvent(String type, String payload) {
+        EventHandler<? extends Event> eventHandler = eventHandlers.get(type);
+        if (eventHandler == null) {
             log.error("Cannot find event handler: {}. Payload: {}", type, payload);
             throw new ConfetiException(INTERNAL_SERVER_ERROR);
         }
 
-        typeConsumer.accept(payload);
+        processEvent(eventHandler, payload);
     }
 
-    private void handleCreateSongEvent(String payload) {
-        CreateSongEvent event = JsonUtil.fromJson(CreateSongEvent.class, payload);
-        if (!songService.isExistBySongId(event.songId())) {
-            songService.create(event.toSong());
-        }
+    private <T extends Event> void processEvent(EventHandler<T> eventHandler, String payload) {
+        Class<T> supportedEventType = eventHandler.getSupportedEventType();
+        T event = JsonUtil.fromJson(supportedEventType, payload);
+
+        eventHandler.handle(event);
     }
 
-    private void handleCreateArtistEvent(String payload) {
-        CreateArtistEvent event = JsonUtil.fromJson(CreateArtistEvent.class, payload);
-        if (!artistService.isExistByArtistId(event.artistId())) {
-            artistService.create(event.toArtist());
-        }
-    }
-
-    private static <T> String getTypeId(T data) {
-        return getTypeId(data.getClass());
-    }
-
-    private static <T> String getTypeId(Class<T> clazz) {
-        return clazz.getName();
-    }
 }
