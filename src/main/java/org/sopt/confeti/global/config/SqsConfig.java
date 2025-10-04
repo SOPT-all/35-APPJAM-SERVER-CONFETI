@@ -43,8 +43,7 @@ public class SqsConfig {
         return SqsMessageListenerContainerFactory
             .builder()
             .configure(options -> options
-                .componentsTaskExecutor(consumerExecutor)
-                .maxConcurrentMessages(30)
+                .maxConcurrentMessages(2)
                 .maxMessagesPerPoll(10)
                 .pollTimeout(Duration.ofSeconds(20)))
             .sqsAsyncClient(sqsAsyncClient)
