@@ -1,12 +1,15 @@
 package org.sopt.confeti.global.messagebroker;
 
+import static org.sopt.confeti.global.config.ThreadPoolConfig.MESSAGE_CONSUMER_POOL;
 import static org.sopt.confeti.global.message.ErrorMessage.INTERNAL_SERVER_ERROR;
 
 import io.awspring.cloud.sqs.annotation.SqsListener;
+import io.awspring.cloud.sqs.listener.acknowledgement.Acknowledgement;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.domain.applemusic.artist.event.CreateArtistEvent;
@@ -16,10 +19,11 @@ import org.sopt.confeti.global.messagebroker.handler.EventHandler;
 import org.sopt.confeti.global.notification.NotificationAgent;
 import org.sopt.confeti.global.notification.SlackNotificationType;
 import org.sopt.confeti.global.util.JsonUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
 @Slf4j
@@ -38,14 +42,17 @@ public class SqsService implements MessageBroker {
     private final NotificationAgent notificationAgent;
 
     private final Map<String, EventHandler<? extends Event>> eventHandlers;
+    private final TaskExecutor messageConsumeExecutor;
 
     public SqsService(
         List<EventHandler<? extends Event>> allEventHandlers,
+        @Qualifier(MESSAGE_CONSUMER_POOL) TaskExecutor messageConsumeExecutor,
         SqsTemplate sqsTemplate,
         NotificationAgent notificationAgent
     ) {
         this.eventHandlers = allEventHandlers.stream().collect(Collectors.toUnmodifiableMap(
             EventHandler::getSupportedTypeId, eventHandler -> eventHandler));
+        this.messageConsumeExecutor = messageConsumeExecutor;
         this.sqsTemplate = sqsTemplate;
         this.notificationAgent = notificationAgent;
     }
@@ -60,15 +67,26 @@ public class SqsService implements MessageBroker {
         asyncSend(queueName, event);
     }
 
-    @Transactional
     @SqsListener(value = "${event.queues.confeti-server}")
-    public void consumeEvent(Message message) {
-        String payload = message.body();
-        Map<String, MessageAttributeValue> messageAttributes = message.messageAttributes();
-        String type = messageAttributes.get(ATTRIBUTE_TYPE_ID).stringValue();
+    public CompletableFuture<Void> consumeEvent(List<Message<String>> messages) {
+        List<CompletableFuture<Void>> futures = messages.stream()
+            .map(message -> {
+                return CompletableFuture.runAsync(() -> {
+                        String type = message.getHeaders().get(ATTRIBUTE_TYPE_ID, String.class);
+                        String payload = message.getPayload().toString();
+                        handleEvent(type, payload);
+                    }, messageConsumeExecutor)
+                    .thenRun(() -> Acknowledgement.acknowledge(message))
+                    .exceptionally(e -> {
+                        log.error("message: {}", message.toString(), e);
+                        return null;
+                    });
+            })
+            .toList();
 
-        handleEvent(type, payload);
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
+
 
     private void asyncSend(String queueName, Event event) {
         Map<String, Object> messageAttributes = createMessageAttributes(event);
