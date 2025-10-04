@@ -30,8 +30,8 @@ public class ThreadPoolConfig {
         threadFactory.setThreadNamePrefix(SQS_WORKER_PREFIX);
         executor.setThreadFactory(threadFactory);
 
-        executor.setCorePoolSize(30);
-        executor.setMaxPoolSize(50);
+        executor.setCorePoolSize(20);
+        executor.setMaxPoolSize(40);
         executor.setQueueCapacity(50);
         executor.initialize();
         return executor;
