@@ -177,4 +177,4 @@ jobs:
             cd ~
             docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
             cd server
-            ./deploy.sh
+            bash deploy.sh
