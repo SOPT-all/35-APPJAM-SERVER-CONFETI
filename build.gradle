@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.1'
+    id 'org.springframework.boot' version '3.5.5'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -92,7 +92,6 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation 'io.github.openfeign:feign-okhttp:11.10'
     implementation 'io.github.openfeign:feign-jackson:11.10'
-    implementation 'com.playtika.reactivefeign:feign-reactor-spring-cloud-starter:4.2.1'
 
     // Slack
     implementation("com.slack.api:slack-api-client:1.45.3")
