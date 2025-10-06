@@ -14,11 +14,9 @@ import org.sopt.confeti.global.annotation.Generator;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 
 @Slf4j
 @Generator
-@Profile("apple-music")
 @RequiredArgsConstructor
 public class AppleMusicAPITokenGenerator {
 
