@@ -1,21 +1,22 @@
 package org.sopt.confeti.external.client;
 
+import org.sopt.confeti.global.config.AppleMusicFeignConfig;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistResponse;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistsResponse;
 import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartsResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicArtistMusicsResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicsResponse;
 import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import reactivefeign.spring.config.ReactiveFeignClient;
 
-@ReactiveFeignClient(
+@FeignClient(
         name = "AppleMusicFeignClient",
         url = "${apple-music.api.host}",
         path = "${apple-music.api.path}",
-        configuration = AppleMusicFeignClient.class
+        configuration = AppleMusicFeignConfig.class
 )
 public interface AppleMusicFeignClient {
 
@@ -66,8 +67,8 @@ public interface AppleMusicFeignClient {
             @RequestParam String term,
             @RequestParam String types,
             @RequestParam String limit,
-            @RequestParam String offset,
-            @RequestParam String with
+            @RequestParam(required = false) String offset,
+            @RequestParam(required = false) String with
     );
 
     @GetMapping("/charts")
