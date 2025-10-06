@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RateLimiterFeignConfig {
+public class AppleMusicFeignConfig {
 
     @Bean
     public Decoder feignDecoder() {
@@ -39,7 +39,7 @@ public class RateLimiterFeignConfig {
         return new OkHttpClient(
                 new okhttp3.OkHttpClient.Builder()
                         .connectTimeout(Duration.ofSeconds(5))
-                        .callTimeout(Duration.ofSeconds(2))
+                        .callTimeout(Duration.ofSeconds(4))
                         .build()
         );
     }
