@@ -4,15 +4,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Transient;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.global.common.constant.ArtistConstant;
-import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
-import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistAlbumResponse;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistResponse;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -33,24 +30,11 @@ public class ConfetiArtist {
     @Transient
     private String profileUrl;
 
-    @Setter
-    @Transient
-    private ConfetiAlbum latestReleaseAlbum;
-
     private ConfetiArtist(String artistId) {
         this.id = artistId;
     }
 
     public static ConfetiArtist from(final AppleMusicArtistResponse artist) {
-        Optional<AppleMusicArtistAlbumResponse> album = Optional.empty();
-
-        if (Objects.nonNull(artist.relationships())) {
-            album = artist.relationships()
-                    .albums()
-                    .data()
-                    .stream().findFirst();
-        }
-
         String profileUrl = null;
 
         if (Objects.nonNull(artist.attributes().artwork())) {
@@ -62,8 +46,7 @@ public class ConfetiArtist {
         return new ConfetiArtist(
                 artist.id(),
                 artist.attributes().name(),
-                profileUrl,
-                album.map(ConfetiAlbum::from).orElse(null)
+                profileUrl
         );
     }
 
@@ -73,7 +56,6 @@ public class ConfetiArtist {
 
     public static ConfetiArtist empty() {
         ConfetiArtist artist = new ConfetiArtist();
-        artist.setLatestReleaseAlbum(ConfetiAlbum.empty());
 
         return artist;
     }
