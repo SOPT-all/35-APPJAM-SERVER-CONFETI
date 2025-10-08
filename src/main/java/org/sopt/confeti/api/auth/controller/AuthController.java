@@ -32,7 +32,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<?>> login(
-            @Valid @RequestBody LoginRequest request
+        @Valid @RequestBody LoginRequest request
     ) {
         LoginResult result = authFacade.login(LoginCommand.from(request));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, result);
@@ -41,7 +41,7 @@ public class AuthController {
     @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/reissue")
     public ResponseEntity<BaseResponse<?>> reissue(
-            @RefreshToken String refreshToken
+        @RefreshToken String refreshToken
     ) {
         Token token = authFacade.reissue(refreshToken);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, token);
@@ -54,11 +54,14 @@ public class AuthController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
-    @Permission(role = {Role.ONBOARDING})
+    /**
+     * 개발을 위해 임시로 Role.GENERAL 접근 허용
+     */
+    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/onboard")
     public ResponseEntity<BaseResponse<?>> onboard(
-            @UserId Long userId,
-            @Valid @RequestBody OnboardRequest request
+        @UserId Long userId,
+        @Valid @RequestBody OnboardRequest request
     ) {
         authFacade.onboard(userId, OnboardDTO.from(request));
         authFacade.flushCachedTopArtists(userId);
@@ -68,7 +71,7 @@ public class AuthController {
     @Permission(role = {Role.GENERAL})
     @DeleteMapping("/withdraw")
     public ResponseEntity<BaseResponse<?>> withdraw(
-            @UserId Long userId
+        @UserId Long userId
     ) {
         authFacade.withdraw(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
