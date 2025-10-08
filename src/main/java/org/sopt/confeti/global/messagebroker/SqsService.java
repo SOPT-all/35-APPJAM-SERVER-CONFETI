@@ -12,8 +12,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.domain.applemusic.artist.event.CreateArtistEvent;
-import org.sopt.confeti.domain.applemusic.song.event.CreateSongEvent;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.messagebroker.handler.EventHandler;
 import org.sopt.confeti.global.notification.NotificationAgent;
@@ -58,12 +56,7 @@ public class SqsService implements MessageBroker {
     }
 
     @Override
-    public void sendCreateArtistEvent(CreateArtistEvent event) {
-        asyncSend(queueName, event);
-    }
-
-    @Override
-    public void sendCreateSongEvent(CreateSongEvent event) {
+    public void sendEvent(Event event) {
         asyncSend(queueName, event);
     }
 
