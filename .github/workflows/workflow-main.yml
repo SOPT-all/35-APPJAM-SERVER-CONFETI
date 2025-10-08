@@ -164,32 +164,7 @@ jobs:
     runs-on: ubuntu-24.04
     environment: production
 
-    # Action을 사용하여 Step을 구성
     steps:
-      # Github Action 환경의 Public IP 가져오기
-      - name: Get Github action IP
-        id: ip
-        uses: haythem/public-ip@v1.2
-
-      # AWS 인증
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_NAME }}
-          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-
-      # AWS ECR 로그인
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          mask-password: true
-
-      # 보안 규칙에 ssh IP 추가
-      - name: Add Github Actions IP to Security group
-        run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-
       # 원격 서버에 배포
       - name: docker container deploy
         uses: appleboy/ssh-action@master
@@ -202,9 +177,4 @@ jobs:
             cd ~
             docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
             cd server
-            ./service-deploy.sh
-
-      # 보안 규칙에 ssh IP 삭제
-      - name: Remove Github Actions IP from security group
-        run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            bash deploy.sh
