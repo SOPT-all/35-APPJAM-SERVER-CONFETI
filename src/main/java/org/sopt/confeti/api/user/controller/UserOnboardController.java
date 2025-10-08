@@ -33,45 +33,57 @@ public class UserOnboardController {
 
     private final UserOnboardFacade userOnboardFacade;
 
-    @Permission(role = {Role.ONBOARDING})
-
+    /**
+     * 개발을 위해 임시로 Role.GENERAL 접근 허용
+     */
+    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @GetMapping("/artists/{artistId}/related")
     public ResponseEntity<BaseResponse<?>> getRelatedArtists(
-            @UserId Long userId,
-            @PathVariable String artistId,
-            @RequestParam(defaultValue = "1") @Min(1) @Max(30) Integer limit
+        @UserId Long userId,
+        @PathVariable String artistId,
+        @RequestParam(defaultValue = "1") @Min(1) @Max(30) Integer limit
     ) {
-        UserOnboardRelatedArtistsDTO relatedArtists = userOnboardFacade.getRelatedArtists(userId, artistId, limit);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserOnboardRelatedArtistsResponse.from(relatedArtists));
+        UserOnboardRelatedArtistsDTO relatedArtists = userOnboardFacade.getRelatedArtists(userId,
+            artistId, limit);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            UserOnboardRelatedArtistsResponse.from(relatedArtists));
     }
 
     @GetMapping("/artists/search")
     public ResponseEntity<BaseResponse<?>> getArtistsRelatedTerm(
-            @UserId Long userId,
-            @RequestParam String term,
-            @RequestParam(defaultValue = "1") @Min(1) @Max(25) Integer limit
+        @UserId Long userId,
+        @RequestParam String term,
+        @RequestParam(defaultValue = "1") @Min(1) @Max(25) Integer limit
     ) {
-        UserOnboardRelatedArtistsDTO relatedArtistsDTO = userOnboardFacade.getArtistsRelatedTerm(userId, term, limit);
+        UserOnboardRelatedArtistsDTO relatedArtistsDTO = userOnboardFacade.getArtistsRelatedTerm(
+            userId, term, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                UserOnboardRelatedArtistsResponse.from(relatedArtistsDTO));
+            UserOnboardRelatedArtistsResponse.from(relatedArtistsDTO));
     }
 
-    @Permission(role = {Role.ONBOARDING})
+    /**
+     * 개발을 위해 임시로 Role.GENERAL 접근 허용
+     */
+    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @GetMapping("/artists")
     public ResponseEntity<BaseResponse<?>> getTopArtists(
-            @UserId Long userId,
-            @RequestParam(required = false, defaultValue = "100") @Min(1) @Max(200) int limit
+        @UserId Long userId,
+        @RequestParam(required = false, defaultValue = "100") @Min(1) @Max(200) int limit
     ) {
         UserOnboardTopArtistsDTO topArtists = userOnboardFacade.getTopArtists(limit);
         userOnboardFacade.cacheTopArtistsToUser(userId, topArtists);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserOnboardTopArtistsResponse.from(topArtists));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            UserOnboardTopArtistsResponse.from(topArtists));
     }
 
-    @Permission(role = {Role.ONBOARDING})
+    /**
+     * 개발을 위해 임시로 Role.GENERAL 접근 허용
+     */
+    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/artists/{artistId}")
     public ResponseEntity<BaseResponse<?>> addArtist(
-            @UserId Long userId,
-            @PathVariable String artistId
+        @UserId Long userId,
+        @PathVariable String artistId
     ) {
         userOnboardFacade.cacheTopArtist(userId, artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
@@ -81,6 +93,7 @@ public class UserOnboardController {
     @GetMapping("/status")
     public ResponseEntity<BaseResponse<?>> getOnboardStatus(@UserId Long userId) {
         GetOnboardStatusDTO onboardStatusDTO = userOnboardFacade.getOnboardStatus(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, GetOnboardStatusResponse.from(onboardStatusDTO));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            GetOnboardStatusResponse.from(onboardStatusDTO));
     }
 }
