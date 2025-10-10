@@ -237,6 +237,10 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
         List<ConfetiMusic> musics = new ArrayList<>(getCachedMusics(musicIds));
 
+        if (musicIds.isEmpty()) {
+            return musics;
+        }
+
         List<ConfetiMusic> fetchedMusics = convertToConfetiMusics(
                 client.getSongsByIds(String.join(QUERY_PARAMETER_IDS_DELIMITER, musicIds))
         );
