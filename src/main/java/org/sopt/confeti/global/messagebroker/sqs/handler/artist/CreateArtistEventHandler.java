@@ -1,16 +1,18 @@
-package org.sopt.confeti.global.messagebroker.handler.artist;
+package org.sopt.confeti.global.messagebroker.sqs.handler.artist;
 
 
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.applemusic.artist.application.ArtistService;
 import org.sopt.confeti.domain.applemusic.artist.event.CreateArtistEvent;
-import org.sopt.confeti.global.messagebroker.handler.EventHandler;
+import org.sopt.confeti.global.messagebroker.handler.CreateEventHandler;
+import org.sopt.confeti.global.messagebroker.sqs.handler.SqsEventHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class CreateArtistEventHandler implements EventHandler<CreateArtistEvent> {
+public class CreateArtistEventHandler implements CreateEventHandler<CreateArtistEvent>,
+    SqsEventHandler {
 
     private final ArtistService artistService;
 
@@ -23,12 +25,12 @@ public class CreateArtistEventHandler implements EventHandler<CreateArtistEvent>
     }
 
     @Override
-    public Class<CreateArtistEvent> getSupportedEventType() {
+    public Class<CreateArtistEvent> getSupportedType() {
         return CreateArtistEvent.class;
     }
 
-    @Override
-    public String getSupportedTypeId() {
-        return CreateArtistEvent.class.getName();
-    }
+//    @Override
+//    public String getSupportedTypeId() {
+//        return CreateArtistEvent.class.getName();
+//    }
 }

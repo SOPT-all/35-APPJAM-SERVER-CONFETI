@@ -1,15 +1,17 @@
-package org.sopt.confeti.global.messagebroker.handler.song;
+package org.sopt.confeti.global.messagebroker.sqs.handler.song;
 
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.applemusic.song.application.SongService;
 import org.sopt.confeti.domain.applemusic.song.event.CreateSongEvent;
-import org.sopt.confeti.global.messagebroker.handler.EventHandler;
+import org.sopt.confeti.global.messagebroker.handler.CreateEventHandler;
+import org.sopt.confeti.global.messagebroker.sqs.handler.SqsEventHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class CreateSongEventHandler implements EventHandler<CreateSongEvent> {
+public class CreateSongEventHandler implements CreateEventHandler<CreateSongEvent>,
+    SqsEventHandler {
 
     private final SongService songService;
 
@@ -22,12 +24,8 @@ public class CreateSongEventHandler implements EventHandler<CreateSongEvent> {
     }
 
     @Override
-    public Class<CreateSongEvent> getSupportedEventType() {
+    public Class<CreateSongEvent> getSupportedType() {
         return CreateSongEvent.class;
     }
 
-    @Override
-    public String getSupportedTypeId() {
-        return CreateSongEvent.class.getName();
-    }
 }

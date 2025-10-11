@@ -6,8 +6,14 @@ public interface EventHandler<T extends Event> {
 
     void handle(T event);
 
-    Class<T> getSupportedEventType();
+    Class<T> getSupportedType();
 
-    String getSupportedTypeId();
+    default String getSupportedTypeId() {
+        return getSupportedType().getName();
+    }
+
+    default boolean isSupported(Class<?> clazz) {
+        return getSupportedType().equals(clazz);
+    }
 
 }
