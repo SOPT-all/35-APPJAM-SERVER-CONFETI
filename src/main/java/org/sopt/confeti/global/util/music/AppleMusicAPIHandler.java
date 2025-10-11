@@ -45,6 +45,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     // Fetch Limit 목록
     private static final int CHARTS_FETCH_LIMIT = 200;
+    private static final int ARTIST_TOP_SONGS_MULTIPLIER = 5;
 
     private final RedisHandler redisHandler;
     private final ObjectMapper objectMapper;
@@ -352,7 +353,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     @Override
     public List<ConfetiMusic> getFilteredTopSongsByArtist(String artistId, int limit, Set<String> excludedMusicIds) {
-        List<ConfetiMusic> songs = getTopSongsByArtistId(artistId, limit * 5);
+        List<ConfetiMusic> songs = getTopSongsByArtistId(artistId, limit * ARTIST_TOP_SONGS_MULTIPLIER);
 
         List<ConfetiMusic> filteredSongs = songs.stream()
                 .filter(song -> !excludedMusicIds.contains(song.getId()))

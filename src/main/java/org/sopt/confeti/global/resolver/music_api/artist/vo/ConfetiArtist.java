@@ -55,8 +55,6 @@ public class ConfetiArtist {
     }
 
     public static ConfetiArtist empty() {
-        ConfetiArtist artist = new ConfetiArtist();
-
-        return artist;
+        return new ConfetiArtist();
     }
 }
