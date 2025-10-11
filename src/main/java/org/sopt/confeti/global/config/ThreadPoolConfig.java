@@ -15,6 +15,11 @@ public class ThreadPoolConfig {
     @Bean(MESSAGE_PROVIDER_POOL)
     public ThreadPoolTaskExecutor messageProvider() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+
+        MessageExecutionThreadFactory threadFactory = new MessageExecutionThreadFactory();
+        threadFactory.setThreadNamePrefix(SQS_WORKER_PREFIX);
+        executor.setThreadFactory(threadFactory);
+
         executor.setCorePoolSize(20);
         executor.setMaxPoolSize(40);
         executor.setQueueCapacity(50);
