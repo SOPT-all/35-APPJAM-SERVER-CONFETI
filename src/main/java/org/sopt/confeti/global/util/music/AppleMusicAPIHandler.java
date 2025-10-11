@@ -126,7 +126,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         List<ConfetiArtist> fetchedArtists = convertToConfetiArtists(
                 client.getRelatedArtistsById(artistId, String.valueOf(limit))
         );
-        cacheRelatedArtists(artistId, limit, artists);
+        cacheRelatedArtists(artistId, limit, fetchedArtists);
         artists.addAll(fetchedArtists);
 
         return artists;
