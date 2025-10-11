@@ -2,7 +2,10 @@ package org.sopt.confeti.global.messagebroker.sqs.strategy;
 
 import static org.sopt.confeti.global.message.ErrorMessage.INTERNAL_SERVER_ERROR;
 
+import io.awspring.cloud.sqs.listener.SqsHeaders;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
+import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -18,17 +21,21 @@ import org.sopt.confeti.global.notification.SlackNotificationType;
 import org.sopt.confeti.global.util.JsonUtil;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.messaging.Message;
+import org.springframework.scheduling.annotation.Scheduled;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
 
 @Slf4j
 @Getter
 public abstract class SqsStrategy extends MessageBrokerStrategy {
 
-    private final String queueName;
+    private final String queueUrl;
 
     private final SqsTemplate sqsTemplate;
     private final NotificationAgent notificationAgent;
     private final TaskExecutor messageConsumeExecutor;
+    private final SqsAsyncClient sqsAsyncClient;
 
     private static final String ATTRIBUTE_DATA_TYPE_STRING = "string";
     private static final String ATTRIBUTE_EVENT_TYPE = "event";
@@ -37,25 +44,23 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
 
     protected SqsStrategy(
         List<? extends EventHandler<? extends Event>> eventHandlers,
-        String queueName,
+        String queueUrl,
         SqsTemplate sqsTemplate,
         NotificationAgent notificationAgent,
-        TaskExecutor messageConsumeExecutor
+        TaskExecutor messageConsumeExecutor,
+        SqsAsyncClient sqsAsyncClient
     ) {
         super(eventHandlers);
-        this.queueName = queueName;
+        this.queueUrl = queueUrl;
         this.sqsTemplate = sqsTemplate;
         this.notificationAgent = notificationAgent;
         this.messageConsumeExecutor = messageConsumeExecutor;
+        this.sqsAsyncClient = sqsAsyncClient;
     }
 
     protected void asyncSend(String queueName, Event event) {
         Map<String, Object> messageAttributes = createMessageAttributes(event);
         String serializedData = JsonUtil.toJson(event);
-
-        log.info(event.toString());
-
-        log.info("serializedData: {}", serializedData);
 
         sqsTemplate.sendAsync(to -> to
                 .queue(queueName)
@@ -103,9 +108,7 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
             data.toString());
     }
 
-    protected abstract CompletableFuture<Void> listen(List<Message<String>> messages);
-
-    protected CompletableFuture<Void> processMessage(List<Message<String>> messages) {
+    protected CompletableFuture<Void> processMessage(Collection<Message<?>> messages) {
         List<CompletableFuture<Void>> futures = messages.stream()
             .map(message -> {
                 return CompletableFuture.runAsync(() -> {
@@ -113,7 +116,6 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
                         String payload = message.getPayload().toString();
                         handleEvent(type, payload);
                     }, messageConsumeExecutor)
-//                    .thenRun(() -> Acknowledgement.acknowledge(message))
                     .exceptionally(e -> {
                         log.error("message: {}", message.toString(), e);
                         return null;
@@ -136,10 +138,43 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
 
     protected <T extends Event> void processEvent(EventHandler<T> eventHandler, String payload) {
         Class<T> supportedEventType = eventHandler.getSupportedType();
-        log.info(payload);
         T event = JsonUtil.fromJson(supportedEventType, payload);
 
         eventHandler.handle(event);
+    }
+
+    @Scheduled(fixedDelay = 1000)
+    public void pollSqsMessages() {
+
+        Collection<Message<?>> receivedMessages = sqsTemplate.receiveMany(options -> options
+            .queue(queueUrl)
+            .maxNumberOfMessages(10)
+            .pollTimeout(Duration.ofSeconds(20))
+        );
+
+        if (receivedMessages.isEmpty()) {
+            return;
+        }
+
+        processMessage(receivedMessages)
+            .thenRun(() -> {
+                receivedMessages.forEach(this::deleteMessage);
+            })
+            .exceptionally(e -> {
+                log.error("[SQS Polling Exception] message: {}", receivedMessages, e);
+                return null;
+            });
+    }
+
+    private void deleteMessage(Message<?> message) {
+        String receiptHandle = (String) message.getHeaders()
+            .get(SqsHeaders.SQS_RECEIPT_HANDLE_HEADER);
+
+        DeleteMessageRequest deleteMessageRequest = DeleteMessageRequest.builder()
+            .queueUrl(queueUrl)
+            .receiptHandle(receiptHandle)
+            .build();
+        sqsAsyncClient.deleteMessage(deleteMessageRequest);
     }
 
 }

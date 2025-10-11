@@ -2,10 +2,8 @@ package org.sopt.confeti.global.messagebroker.sqs.strategy;
 
 import static org.sopt.confeti.global.config.ThreadPoolConfig.MESSAGE_CONSUMER_POOL;
 
-import io.awspring.cloud.sqs.annotation.SqsListener;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.messagebroker.handler.CreateEventHandler;
 import org.sopt.confeti.global.messagebroker.message.CreateEvent;
@@ -15,8 +13,8 @@ import org.sopt.confeti.global.notification.NotificationAgent;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
 @Slf4j
 @Component
@@ -28,21 +26,16 @@ public class CreateSqsStrategy<T extends CreateEventHandler<? extends CreateEven
         @Value("${event.queues.confeti-server}") String queueName,
         SqsTemplate sqsTemplate,
         NotificationAgent notificationAgent,
-        @Qualifier(MESSAGE_CONSUMER_POOL) TaskExecutor messageConsumeExecutor
+        @Qualifier(MESSAGE_CONSUMER_POOL) TaskExecutor messageConsumeExecutor,
+        SqsAsyncClient sqsAsyncClient
     ) {
         super(createEventHandlers, queueName, sqsTemplate, notificationAgent,
-            messageConsumeExecutor);
+            messageConsumeExecutor, sqsAsyncClient);
     }
 
     @Override
     public void sendEvent(Event event) {
-        asyncSend(super.getQueueName(), event);
-    }
-
-    @Override
-    @SqsListener(value = "${event.queues.confeti-server}")
-    protected CompletableFuture<Void> listen(List<Message<String>> messages) {
-        return super.processMessage(messages);
+        asyncSend(super.getQueueUrl(), event);
     }
 
 }

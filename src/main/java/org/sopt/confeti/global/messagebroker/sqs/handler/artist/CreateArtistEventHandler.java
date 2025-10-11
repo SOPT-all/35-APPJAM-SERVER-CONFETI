@@ -29,8 +29,4 @@ public class CreateArtistEventHandler implements CreateEventHandler<CreateArtist
         return CreateArtistEvent.class;
     }
 
-//    @Override
-//    public String getSupportedTypeId() {
-//        return CreateArtistEvent.class.getName();
-//    }
 }
