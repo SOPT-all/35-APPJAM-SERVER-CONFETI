@@ -38,7 +38,7 @@ public class AppleMusicFeignConfig {
     public OkHttpClient client() {
         return new OkHttpClient(
                 new okhttp3.OkHttpClient.Builder()
-                        .connectTimeout(Duration.ofSeconds(5))
+                        .connectTimeout(Duration.ofSeconds(2))
                         .callTimeout(Duration.ofSeconds(4))
                         .build()
         );
