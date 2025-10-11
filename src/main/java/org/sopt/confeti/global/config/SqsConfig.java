@@ -44,7 +44,7 @@ public class SqsConfig {
             .builder()
             .configure(options -> options
                 .maxConcurrentMessages(2)
-                .maxMessagesPerPoll(10)
+                .maxMessagesPerPoll(2)
                 .pollTimeout(Duration.ofSeconds(20)))
             .sqsAsyncClient(sqsAsyncClient)
             .build();
