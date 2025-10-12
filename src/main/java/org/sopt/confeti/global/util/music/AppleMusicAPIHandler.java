@@ -23,6 +23,7 @@ import org.sopt.confeti.global.util.RedisHandler;
 import org.sopt.confeti.global.util.RedisKey;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistResponse;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistsResponse;
+import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartResponse;
 import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartSongResponse;
 import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartsResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicArtistMusicsResponse;
@@ -30,6 +31,7 @@ import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicsResponse;
 import org.sopt.confeti.global.util.music.dto.music.MusicPage;
 import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
+import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResultsResponse;
 
 @Slf4j
 @Handler
@@ -176,33 +178,29 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiArtist> convertToConfetiArtists(final AppleMusicArtistsResponse artists) {
-        if (Objects.isNull(artists)) {
-            return List.of();
-        }
-
-        return artists.data().stream()
-                .map(ConfetiArtist::from)
-                .toList();
+        return Optional.ofNullable(artists)
+                .map(AppleMusicArtistsResponse::data)
+                .map(data ->
+                        data.stream()
+                                .map(ConfetiArtist::from)
+                                .toList()
+                ).orElseGet(List::of);
     }
 
     private List<ConfetiArtist> convertToConfetiArtists(final AppleMusicSearchResponse searchResult) {
-        if (Objects.isNull(searchResult)) {
-            return List.of();
-        }
-
-        if (Objects.isNull(searchResult.results())) {
-            return List.of();
-        }
-
-        return convertToConfetiArtists(searchResult.results().artists());
+        return Optional.ofNullable(searchResult)
+                .map(AppleMusicSearchResponse::results)
+                .map(AppleMusicSearchResultsResponse::artists)
+                .map(this::convertToConfetiArtists)
+                .orElseGet(List::of);
     }
 
     private Optional<ConfetiArtist> convertToConfetiArtist(final AppleMusicArtistResponse artist) {
-        if (Objects.isNull(artist)) {
-            return Optional.of(ConfetiArtist.empty());
-        }
-
-        return Optional.of(ConfetiArtist.from(artist));
+        return Optional.of(
+                Optional.ofNullable(artist)
+                    .map(ConfetiArtist::from)
+                    .orElse(ConfetiArtist.empty())
+        );
     }
 
     private List<ConfetiMusic> getCachedMusics(final Set<String> musicIds) {
@@ -252,9 +250,13 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiMusic> convertToConfetiMusics(final AppleMusicMusicsResponse musics) {
-        return musics.data().stream()
-                .map(ConfetiMusic::from)
-                .toList();
+        return Optional.ofNullable(musics)
+                .map(AppleMusicMusicsResponse::data)
+                .map(data ->
+                        data.stream()
+                                .map(ConfetiMusic::from)
+                                .toList()
+                ).orElseGet(List::of);
     }
 
     private List<ConfetiMusic> getCachedTopMusics(final int fetchSize) {
@@ -298,14 +300,20 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiMusic> convertToConfetiMusics(final AppleMusicChartsResponse charts) {
-        List<AppleMusicMusicResponse> musics = charts.results().songs().stream()
-                .findFirst()
-                .map(AppleMusicChartSongResponse::data)
-                .orElseGet(List::of);
-
-        return musics.stream()
-                .map(ConfetiMusic::from)
-                .toList();
+        return Optional.ofNullable(charts)
+                .map(AppleMusicChartsResponse::results)
+                .map(AppleMusicChartResponse::songs)
+                .map(songs ->
+                        songs.stream()
+                                .findFirst()
+                                .map(AppleMusicChartSongResponse::data)
+                                .orElseGet(List::of)
+                )
+                .map(musics ->
+                        musics.stream()
+                                .map(ConfetiMusic::from)
+                                .toList()
+                ).orElseGet(List::of);
     }
 
     private void validateFetchSize(int fetchSize) {
@@ -406,16 +414,16 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private MusicPage convertToConfetiMusicPage(AppleMusicArtistMusicsResponse artistMusics) {
-        if (Objects.isNull(artistMusics.data())) {
-            return MusicPage.empty();
-        }
-
-        return MusicPage.of(
-                artistMusics.next(),
-                artistMusics.data().stream()
-                        .map(ConfetiMusic::from)
-                        .toList()
-        );
+        return Optional.ofNullable(artistMusics)
+                .map(musics -> MusicPage.of(
+                        musics.next(),
+                        Optional.ofNullable(musics.data())
+                                .map(data ->
+                                        data.stream()
+                                                .map(ConfetiMusic::from)
+                                                .toList()
+                                ).orElseGet(List::of)
+                )).orElseGet(MusicPage::empty);
     }
 
     private Optional<MusicPage> getCachedMusicPageByKeyword(String term, int offset, int limit) {
@@ -448,17 +456,17 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private MusicPage convertToConfetiMusicPage(AppleMusicSearchResponse searchResult) {
-        if (Objects.isNull(searchResult.results().songs())) {
-            return MusicPage.empty();
-        }
-
-        AppleMusicMusicsResponse musics = searchResult.results().songs();
-
-        return MusicPage.of(
-                musics.next(),
-                musics.data().stream()
-                        .map(ConfetiMusic::from)
-                        .toList()
-        );
+        return Optional.ofNullable(searchResult)
+                .map(AppleMusicSearchResponse::results)
+                .map(AppleMusicSearchResultsResponse::songs)
+                .map(musics -> MusicPage.of(
+                        musics.next(),
+                        Optional.ofNullable(musics.data())
+                                .map(data ->
+                                        data.stream()
+                                                .map(ConfetiMusic::from)
+                                                .toList()
+                                ).orElseGet(List::of)
+                )).orElseGet(MusicPage::empty);
     }
 }

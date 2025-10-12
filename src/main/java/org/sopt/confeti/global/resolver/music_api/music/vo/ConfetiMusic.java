@@ -6,13 +6,17 @@ import jakarta.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.global.common.constant.MusicConstant;
+import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicArtistsResponse;
+import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicAttributesResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicPreviewResponse;
+import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicRelationshipsResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicResponse;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -53,30 +57,35 @@ public class ConfetiMusic {
     }
 
     public static ConfetiMusic from(final AppleMusicMusicResponse music) {
-        List<ConfetiMusicArtist> artists = new ArrayList<>();
+        Optional<AppleMusicMusicAttributesResponse> optAttributes = Optional.ofNullable(music.attributes());
+        String trackName = optAttributes.map(AppleMusicMusicAttributesResponse::name).orElse(null);
+        String artworkUrl = optAttributes.map(attributes ->
+                        UriComponentsBuilder.fromUriString(attributes.artwork().url())
+                        .buildAndExpand(MusicConstant.ARTWORK_IMG_SIZE)
+                        .toUriString()
+        ).orElse(null);
+        String artistName = optAttributes.map(AppleMusicMusicAttributesResponse::artistName).orElse(null);
+        String previewUrl = optAttributes.flatMap(attributes -> attributes.previews().stream()
+                .findFirst()
+                .map(AppleMusicMusicPreviewResponse::url)
+        ).orElse(null);
 
-        if (Objects.nonNull(music.relationships())) {
-            artists = music.relationships().artists().data().stream()
-                    .map(ConfetiMusicArtist::from)
-                    .toList();
-        }
+        List<ConfetiMusicArtist> artists = Optional.ofNullable(music.relationships())
+                .map(AppleMusicMusicRelationshipsResponse::artists)
+                .map(AppleMusicMusicArtistsResponse::data)
+                .map(data ->
+                        data.stream()
+                                .map(ConfetiMusicArtist::from)
+                                .toList()
+                ).orElseGet(List::of);
 
         return new ConfetiMusic(
                 music.id(),
-                music.attributes().name(),
-                UriComponentsBuilder.fromUriString(music.attributes().artwork().url())
-                        .buildAndExpand(MusicConstant.ARTWORK_IMG_SIZE)
-                        .toUriString(),
-                music.attributes().artistName(),
-                music.attributes().previews().stream()
-                        .findFirst()
-                        .map(AppleMusicMusicPreviewResponse::url)
-                        .orElse(null),
-                artists
+                trackName,
+                artworkUrl,
+                artistName,
+                previewUrl
+                ,artists
         );
-    }
-
-    public static ConfetiMusic empty() {
-        return new ConfetiMusic();
     }
 }
