@@ -11,8 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.global.common.constant.ArtistConstant;
-import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
-import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistAlbumResponse;
+import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistArtworkResponse;
+import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistAttributesResponse;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistResponse;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -33,37 +33,24 @@ public class ConfetiArtist {
     @Transient
     private String profileUrl;
 
-    @Setter
-    @Transient
-    private ConfetiAlbum latestReleaseAlbum;
-
     private ConfetiArtist(String artistId) {
         this.id = artistId;
     }
 
     public static ConfetiArtist from(final AppleMusicArtistResponse artist) {
-        Optional<AppleMusicArtistAlbumResponse> album = Optional.empty();
-
-        if (Objects.nonNull(artist.relationships())) {
-            album = artist.relationships()
-                    .albums()
-                    .data()
-                    .stream().findFirst();
-        }
-
-        String profileUrl = null;
-
-        if (Objects.nonNull(artist.attributes().artwork())) {
-            profileUrl = UriComponentsBuilder.fromUriString(artist.attributes().artwork().url())
-                    .buildAndExpand(ArtistConstant.PROFILE_IMG_SIZE)
-                    .toUriString();
-        }
+        Optional<AppleMusicArtistAttributesResponse> optAttributes = Optional.ofNullable(artist.attributes());
+        String name = optAttributes.map(AppleMusicArtistAttributesResponse::name).orElse(null);
+        String profileUrl = optAttributes.map(AppleMusicArtistAttributesResponse::artwork)
+                .map(AppleMusicArtistArtworkResponse::url)
+                .map(url -> UriComponentsBuilder.fromUriString(url)
+                        .buildAndExpand(ArtistConstant.PROFILE_IMG_SIZE)
+                        .toUriString()
+                ).orElse(null);
 
         return new ConfetiArtist(
                 artist.id(),
-                artist.attributes().name(),
-                profileUrl,
-                album.map(ConfetiAlbum::from).orElse(null)
+                name,
+                profileUrl
         );
     }
 
@@ -72,9 +59,6 @@ public class ConfetiArtist {
     }
 
     public static ConfetiArtist empty() {
-        ConfetiArtist artist = new ConfetiArtist();
-        artist.setLatestReleaseAlbum(ConfetiAlbum.empty());
-
-        return artist;
+        return new ConfetiArtist();
     }
 }

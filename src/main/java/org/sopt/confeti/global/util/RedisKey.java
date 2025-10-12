@@ -15,7 +15,6 @@ public enum RedisKey {
     MUSIC_TOP_MUSICS("apple-music-api:top-musics"),
     MUSIC_PAGE_ARTIST_OFFSET_LIMIT("apple-music-api:music-page:artists:%s:%d:%d"),
     MUSIC_PAGE_KEYWORD_OFFSET_LIMIT("apple-music-api:music-page:keyword:%s:%d:%d"),
-    MUSIC_ALBUMS("apple-music-api:albums:%s"),
 
     // user refresh token
     USER_REFRESH_TOKEN("user:refresh-token:%d"),

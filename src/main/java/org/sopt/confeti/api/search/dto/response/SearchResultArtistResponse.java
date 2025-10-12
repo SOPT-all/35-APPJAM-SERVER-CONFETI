@@ -6,7 +6,6 @@ public record SearchResultArtistResponse(
         String artistId,
         String name,
         String profileUrl,
-        String recentAlbumName,
         boolean isFavorite
 ) {
     public static SearchResultArtistResponse from(SearchResultArtistDTO artist) {
@@ -14,7 +13,6 @@ public record SearchResultArtistResponse(
                 artist.artistId(),
                 artist.name(),
                 artist.profileUrl(),
-                artist.recentAlbumName(),
                 artist.isFavorite()
         );
     }

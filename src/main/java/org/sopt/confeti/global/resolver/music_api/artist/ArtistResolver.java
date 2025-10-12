@@ -8,7 +8,6 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.global.annotation.Resolver;
 import org.sopt.confeti.global.resolver.music_api.AbstractMusicAPISpecificResolver;
-import org.sopt.confeti.global.resolver.music_api.album.vo.ConfetiAlbum;
 import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategy;
 import org.sopt.confeti.global.resolver.music_api.artist.strategy.ArtistStrategyRegistry;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
@@ -88,9 +87,6 @@ public class ArtistResolver extends AbstractMusicAPISpecificResolver {
 
                 mappedConfetiArtist.setName(confetiArtist.getName());
                 mappedConfetiArtist.setProfileUrl(confetiArtist.getProfileUrl());
-                mappedConfetiArtist.setLatestReleaseAlbum(
-                        ConfetiAlbum.from(confetiArtist.getLatestReleaseAlbum().getId())
-                );
             }
         }));
     }
