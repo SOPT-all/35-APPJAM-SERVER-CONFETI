@@ -87,6 +87,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
         List<ConfetiArtist> artists = new ArrayList<>(getCachedArtists(artistIds));
 
+        // Cache Hit된 아이디는 제거되므로 Apple Music API 서버 조회 전 목록 확인
         if (artistIds.isEmpty()) {
             return artists;
         }
@@ -236,6 +237,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
         List<ConfetiMusic> musics = new ArrayList<>(getCachedMusics(musicIds));
 
+        // Cache Hit된 아이디는 제거되므로 Apple Music API 서버 조회 전 목록 확인
         if (musicIds.isEmpty()) {
             return musics;
         }
