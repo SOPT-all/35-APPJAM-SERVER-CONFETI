@@ -25,47 +25,47 @@ public class SetlistEditController {
     private final SetlistFacade setlistFacade;
 
     @PostMapping("/{setlistId}/edit/start")
-    public ResponseEntity<BaseResponse<?>> startEdit(
-            @UserId Long userId,
-            @PathVariable Long setlistId
+    public ResponseEntity<BaseResponse<Void>> startEdit(
+        @UserId Long userId,
+        @PathVariable Long setlistId
     ) {
         setlistFacade.startEdit(userId, setlistId);
         return ApiResponseUtil.success(SuccessMessage.CREATED);
     }
 
     @PatchMapping("/{setlistId}/edit/musics/order")
-    public ResponseEntity<BaseResponse<?>> updateMusicOrder(
-            @UserId Long userId,
-            @PathVariable Long setlistId,
-            @RequestBody List<SetlistUpdateMusicOrderDTO> request
+    public ResponseEntity<BaseResponse<Void>> updateMusicOrder(
+        @UserId Long userId,
+        @PathVariable Long setlistId,
+        @RequestBody List<SetlistUpdateMusicOrderDTO> request
     ) {
         setlistFacade.updateMusicOrder(userId, setlistId, request);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @DeleteMapping("/{setlistId}/musics/{orders}")
-    public ResponseEntity<BaseResponse<?>> deleteMusic(
-            @UserId Long userId,
-            @PathVariable Long setlistId,
-            @PathVariable int orders
+    public ResponseEntity<BaseResponse<String>> deleteMusic(
+        @UserId Long userId,
+        @PathVariable Long setlistId,
+        @PathVariable int orders
     ) {
         String deleteTrackId = setlistFacade.deleteMusic(userId, setlistId, orders);
         return ApiResponseUtil.success(SuccessMessage.DELETED, deleteTrackId);
     }
 
     @PatchMapping("/{setlistId}/edit/complete")
-    public ResponseEntity<BaseResponse<?>> completeEdit(
-            @UserId Long userId,
-            @PathVariable Long setlistId
+    public ResponseEntity<BaseResponse<Void>> completeEdit(
+        @UserId Long userId,
+        @PathVariable Long setlistId
     ) {
         setlistFacade.completeEdit(userId, setlistId);
         return ApiResponseUtil.success(SuccessMessage.UPDATED);
     }
 
     @DeleteMapping("/{setlistId}/edit/cancel")
-    public ResponseEntity<BaseResponse<?>> cancelEdit(
-            @UserId Long userId,
-            @PathVariable Long setlistId
+    public ResponseEntity<BaseResponse<Void>> cancelEdit(
+        @UserId Long userId,
+        @PathVariable Long setlistId
     ) {
         setlistFacade.cancelEdit(userId, setlistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);

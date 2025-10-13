@@ -22,8 +22,8 @@ public class PerformanceSearchController {
 
     @Permission(role = {Role.ADMIN})
     @PatchMapping("${api.endpoints.es.batch}")
-    public ResponseEntity<BaseResponse<?>> batch(
-            @UserId Long userId
+    public ResponseEntity<BaseResponse<Void>> batch(
+        @UserId Long userId
     ) {
         performanceSearchFacade.batch();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);

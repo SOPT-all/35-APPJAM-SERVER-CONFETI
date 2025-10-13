@@ -38,7 +38,7 @@ public class UserOnboardController {
      */
     @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @GetMapping("/artists/{artistId}/related")
-    public ResponseEntity<BaseResponse<?>> getRelatedArtists(
+    public ResponseEntity<BaseResponse<UserOnboardRelatedArtistsResponse>> getRelatedArtists(
         @UserId Long userId,
         @PathVariable String artistId,
         @RequestParam(defaultValue = "1") @Min(1) @Max(30) Integer limit
@@ -50,7 +50,7 @@ public class UserOnboardController {
     }
 
     @GetMapping("/artists/search")
-    public ResponseEntity<BaseResponse<?>> getArtistsRelatedTerm(
+    public ResponseEntity<BaseResponse<UserOnboardRelatedArtistsResponse>> getArtistsRelatedTerm(
         @UserId Long userId,
         @RequestParam String term,
         @RequestParam(defaultValue = "1") @Min(1) @Max(25) Integer limit
@@ -66,7 +66,7 @@ public class UserOnboardController {
      */
     @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @GetMapping("/artists")
-    public ResponseEntity<BaseResponse<?>> getTopArtists(
+    public ResponseEntity<BaseResponse<UserOnboardTopArtistsResponse>> getTopArtists(
         @UserId Long userId,
         @RequestParam(required = false, defaultValue = "100") @Min(1) @Max(200) int limit
     ) {
@@ -81,7 +81,7 @@ public class UserOnboardController {
      */
     @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/artists/{artistId}")
-    public ResponseEntity<BaseResponse<?>> addArtist(
+    public ResponseEntity<BaseResponse<Void>> addArtist(
         @UserId Long userId,
         @PathVariable String artistId
     ) {
@@ -91,7 +91,8 @@ public class UserOnboardController {
 
     @Permission(role = {Role.ONBOARDING, Role.GENERAL, Role.ADMIN})
     @GetMapping("/status")
-    public ResponseEntity<BaseResponse<?>> getOnboardStatus(@UserId Long userId) {
+    public ResponseEntity<BaseResponse<GetOnboardStatusResponse>> getOnboardStatus(
+        @UserId Long userId) {
         GetOnboardStatusDTO onboardStatusDTO = userOnboardFacade.getOnboardStatus(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             GetOnboardStatusResponse.from(onboardStatusDTO));
