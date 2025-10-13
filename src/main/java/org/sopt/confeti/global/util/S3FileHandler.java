@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.annotation.Handler;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
 
+@Slf4j
 @Handler
 @RequiredArgsConstructor
 public class S3FileHandler {
@@ -120,7 +122,7 @@ public class S3FileHandler {
      * Public 설정이 된 파일 조회 URL 생성
      */
     public URL getFileUrl(String folderPath, String key) {
-//        checkFileExist(folderPath, key);
+        checkFileExist(folderPath, key);
 
         try {
             return new URI(host + folderPath + URLEncoder.encode(key, StandardCharsets.UTF_8)).toURL();
@@ -144,6 +146,7 @@ public class S3FileHandler {
      */
     private void checkFileExist(String folderPath, String key) {
         if (!s3Operations.objectExists(bucket, folderPath + key)) {
+            log.error("S3FileHandler.checkFileExist: Not exist file. folderPath: {}, key: {}", folderPath, key);
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
