@@ -26,8 +26,8 @@ public interface ApiResponseUtil {
         );
     }
 
-    static ResponseEntity<BaseResponse<?>> failure(ErrorMessage errorMessage) {
+    static ResponseEntity<BaseResponse<Void>> failure(ErrorMessage errorMessage) {
         return ResponseEntity.status(errorMessage.getHttpStatus())
-                .body(BaseResponse.of(errorMessage));
+            .body(BaseResponse.of(errorMessage));
     }
 }
