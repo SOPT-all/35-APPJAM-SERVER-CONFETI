@@ -131,9 +131,15 @@ public class PerformanceService {
                 .toList();
     }
 
+    @Deprecated
     @Transactional(readOnly = true)
     public List<Performance> getRecommendPerformances() {
         return performanceRepository.findTop5ByRand();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getRecommendPerformances(int limit) {
+        return performanceRepository.findTopByRand(limit);
     }
 
     @Transactional(readOnly = true)

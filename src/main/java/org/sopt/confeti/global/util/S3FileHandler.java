@@ -120,7 +120,7 @@ public class S3FileHandler {
      * Public 설정이 된 파일 조회 URL 생성
      */
     public URL getFileUrl(String folderPath, String key) {
-        checkFileExist(folderPath, key);
+//        checkFileExist(folderPath, key);
 
         try {
             return new URI(host + folderPath + URLEncoder.encode(key, StandardCharsets.UTF_8)).toURL();
