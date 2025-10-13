@@ -249,10 +249,18 @@ public class PerformanceFacade {
         };
     }
 
+    @Deprecated
     @Transactional(readOnly = true)
     public RecommendPerformancesDTO getRecommendPerformances() {
         return RecommendPerformancesDTO.from(
                 performanceService.getRecommendPerformances()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public RecommendPerformancesDTO getRecommendPerformances(int limit) {
+        return RecommendPerformancesDTO.from(
+                performanceService.getRecommendPerformances(limit)
         );
     }
 
