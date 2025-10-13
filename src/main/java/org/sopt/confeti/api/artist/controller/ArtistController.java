@@ -26,12 +26,13 @@ public class ArtistController {
     @GetMapping("/search/ac")
     @BadRequestErrorResponse
     @CommonErrorResponses
-    public ResponseEntity<BaseResponse<?>> searchAutoComplete(
-            @UserId(require = false) Long userId,
-            @RequestParam String term,
-            @RequestParam(required = false, defaultValue = "1") Integer limit
+    public ResponseEntity<BaseResponse<SearchACArtistsResponse>> searchAutoComplete(
+        @UserId(require = false) Long userId,
+        @RequestParam String term,
+        @RequestParam(required = false, defaultValue = "1") Integer limit
     ) {
         SearchACArtistsDTO artistsDTO = artistFacade.searchACArtists(term, limit);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, SearchACArtistsResponse.from(artistsDTO));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            SearchACArtistsResponse.from(artistsDTO));
     }
 }

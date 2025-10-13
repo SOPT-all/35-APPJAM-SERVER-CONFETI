@@ -13,7 +13,11 @@ import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,18 +29,19 @@ public class UserInfoController {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping
-    public ResponseEntity<BaseResponse<?>> getUserInfo(
-            @UserId Long userId
+    public ResponseEntity<BaseResponse<UserInfoResponse>> getUserInfo(
+        @UserId Long userId
     ) {
         UserInfoDTO userInfo = userInfoFacade.getUserInfo(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, UserInfoResponse.of(userInfo, s3FileHandler));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            UserInfoResponse.of(userInfo, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
     @PatchMapping
-    public ResponseEntity<BaseResponse<?>> patchUserInfo(
-            @UserId Long userId,
-            @ModelAttribute PatchUserInfoRequest patchUserInfoRequest
+    public ResponseEntity<BaseResponse<Void>> patchUserInfo(
+        @UserId Long userId,
+        @ModelAttribute PatchUserInfoRequest patchUserInfoRequest
     ) {
         userInfoFacade.patchUserInfo(userId, patchUserInfoRequest);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);

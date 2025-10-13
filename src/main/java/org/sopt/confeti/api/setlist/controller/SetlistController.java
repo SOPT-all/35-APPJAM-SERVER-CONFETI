@@ -2,14 +2,14 @@ package org.sopt.confeti.api.setlist.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
+import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
+import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.api.setlist.facade.SetlistFacade;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddMusicResponseDTO;
-import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
-import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponseDTO;
-import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -34,9 +34,9 @@ public class SetlistController {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/all")
-    public ResponseEntity<BaseResponse<?>> getAllMySetlists(
-            @UserId Long userId,
-            @RequestParam(name = "sortBy", required = false) String sortBy
+    public ResponseEntity<BaseResponse<GetAllSetlistsResponse>> getAllMySetlists(
+        @UserId Long userId,
+        @RequestParam(name = "sortBy", required = false) String sortBy
     ) {
         GetAllSetlistsResponse data = setlistFacade.getAllMySetlists(userId, sortBy);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
@@ -44,8 +44,8 @@ public class SetlistController {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/preview")
-    public ResponseEntity<BaseResponse<?>> getPreviewMySetlists(
-            @UserId Long userId
+    public ResponseEntity<BaseResponse<List<SetlistSummaryResponse>>> getPreviewMySetlists(
+        @UserId Long userId
     ) {
         List<SetlistSummaryResponse> data = setlistFacade.getPreviewMySetlists(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
@@ -53,9 +53,9 @@ public class SetlistController {
 
     @Permission(role = {Role.GENERAL})
     @PostMapping
-    public ResponseEntity<BaseResponse<?>> createSetlists(
-            @UserId Long userId,
-            @RequestBody List<SetlistCreateRequestDTO> requests
+    public ResponseEntity<BaseResponse<SetlistCreateResponseDTO>> createSetlists(
+        @UserId Long userId,
+        @RequestBody List<SetlistCreateRequestDTO> requests
     ) {
         SetlistCreateResponseDTO data = setlistFacade.createSetLists(userId, requests);
         return ApiResponseUtil.success(SuccessMessage.CREATED, data);
@@ -63,10 +63,10 @@ public class SetlistController {
 
     @Permission(role = {Role.GENERAL})
     @PostMapping("/{setlistId}/musics")
-    public ResponseEntity<BaseResponse<?>> addMusicsToSetlist(
-            @UserId Long userId,
-            @PathVariable Long setlistId,
-            @RequestBody List<SetlistAddMusicDTO> requests
+    public ResponseEntity<BaseResponse<SetlistAddMusicResponseDTO>> addMusicsToSetlist(
+        @UserId Long userId,
+        @PathVariable Long setlistId,
+        @RequestBody List<SetlistAddMusicDTO> requests
     ) {
         SetlistAddMusicResponseDTO data = setlistFacade.addMusics(userId, setlistId, requests);
         return ApiResponseUtil.success(SuccessMessage.CREATED, data);
@@ -74,9 +74,9 @@ public class SetlistController {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/{setlistId}")
-    public ResponseEntity<BaseResponse<?>> getSetlistDetail(
-            @UserId Long userId,
-            @PathVariable Long setlistId
+    public ResponseEntity<BaseResponse<GetSetlistDetailResponse>> getSetlistDetail(
+        @UserId Long userId,
+        @PathVariable Long setlistId
     ) {
         GetSetlistDetailResponse data = setlistFacade.getSetlistDetail(userId, setlistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);

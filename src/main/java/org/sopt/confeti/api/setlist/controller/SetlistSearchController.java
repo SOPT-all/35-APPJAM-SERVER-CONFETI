@@ -36,43 +36,46 @@ public class SetlistSearchController {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/performances")
-    public ResponseEntity<BaseResponse<?>> searchPerformances(
-            @UserId Long userId,
-            @RequestParam(required = false) String aid,
-            @RequestParam(required = false) Long pid,
-            @RequestParam(required = false) String term
+    public ResponseEntity<BaseResponse<SetlistSearchPerformancesResponse>> searchPerformances(
+        @UserId Long userId,
+        @RequestParam(required = false) String aid,
+        @RequestParam(required = false) Long pid,
+        @RequestParam(required = false) String term
     ) {
         SearchPerformancesDTO searchResult = setlistSearchFacade.searchPerformances(aid, pid, term);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                SetlistSearchPerformancesResponse.of(searchResult, s3FileHandler));
+            SetlistSearchPerformancesResponse.of(searchResult, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/artist-musics")
-    public ResponseEntity<BaseResponse<?>> searchArtistMusics(
-            @UserId Long userId,
-            @RequestParam(required = false) String aid,
-            @RequestParam(required = false) String term,
-            @RequestParam(required = false, defaultValue = "0") @Min(0) int offset,
-            @RequestParam(required = false, defaultValue = "5") @Min(1) @Max(20) int limit
+    public ResponseEntity<BaseResponse<SetlistSearchArtistMusicsResponse>> searchArtistMusics(
+        @UserId Long userId,
+        @RequestParam(required = false) String aid,
+        @RequestParam(required = false) String term,
+        @RequestParam(required = false, defaultValue = "0") @Min(0) int offset,
+        @RequestParam(required = false, defaultValue = "5") @Min(1) @Max(20) int limit
     ) {
         if (Objects.isNull(aid) && Objects.isNull(term)) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
 
-        SetlistSearchArtistMusicsDTO artistMusics = setlistSearchFacade.searchArtistMusics(aid, term, offset, limit);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, SetlistSearchArtistMusicsResponse.from(artistMusics));
+        SetlistSearchArtistMusicsDTO artistMusics = setlistSearchFacade.searchArtistMusics(aid,
+            term, offset, limit);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            SetlistSearchArtistMusicsResponse.from(artistMusics));
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/musics")
-    public ResponseEntity<BaseResponse<?>> searchMusics(
-            @UserId Long userId,
-            @RequestParam String term,
-            @RequestParam(required = false, defaultValue = "0") @Min(0) int offset,
-            @RequestParam(required = false, defaultValue = "5") @Min(1) @Max(20) int limit
+    public ResponseEntity<BaseResponse<SetlistSearchMusicsResponse>> searchMusics(
+        @UserId Long userId,
+        @RequestParam String term,
+        @RequestParam(required = false, defaultValue = "0") @Min(0) int offset,
+        @RequestParam(required = false, defaultValue = "5") @Min(1) @Max(20) int limit
     ) {
         SetlistSearchMusicsDTO musics = setlistSearchFacade.searchMusics(term, offset, limit);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, SetlistSearchMusicsResponse.from(musics));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            SetlistSearchMusicsResponse.from(musics));
     }
 }

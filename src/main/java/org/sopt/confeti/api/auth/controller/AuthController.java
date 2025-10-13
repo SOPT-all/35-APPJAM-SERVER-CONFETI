@@ -31,7 +31,7 @@ public class AuthController {
     private final AuthFacade authFacade;
 
     @PostMapping("/login")
-    public ResponseEntity<BaseResponse<?>> login(
+    public ResponseEntity<BaseResponse<LoginResult>> login(
         @Valid @RequestBody LoginRequest request
     ) {
         LoginResult result = authFacade.login(LoginCommand.from(request));
@@ -40,7 +40,7 @@ public class AuthController {
 
     @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/reissue")
-    public ResponseEntity<BaseResponse<?>> reissue(
+    public ResponseEntity<BaseResponse<Token>> reissue(
         @RefreshToken String refreshToken
     ) {
         Token token = authFacade.reissue(refreshToken);
@@ -49,7 +49,7 @@ public class AuthController {
 
     @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/logout")
-    public ResponseEntity<BaseResponse<?>> logout(@UserId Long userId) {
+    public ResponseEntity<BaseResponse<Void>> logout(@UserId Long userId) {
         authFacade.logout(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
@@ -59,7 +59,7 @@ public class AuthController {
      */
     @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/onboard")
-    public ResponseEntity<BaseResponse<?>> onboard(
+    public ResponseEntity<BaseResponse<Void>> onboard(
         @UserId Long userId,
         @Valid @RequestBody OnboardRequest request
     ) {
@@ -70,7 +70,7 @@ public class AuthController {
 
     @Permission(role = {Role.GENERAL})
     @DeleteMapping("/withdraw")
-    public ResponseEntity<BaseResponse<?>> withdraw(
+    public ResponseEntity<BaseResponse<Void>> withdraw(
         @UserId Long userId
     ) {
         authFacade.withdraw(userId);

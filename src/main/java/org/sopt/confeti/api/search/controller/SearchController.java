@@ -33,23 +33,24 @@ public class SearchController {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping
-    public ResponseEntity<BaseResponse<?>> homeSearch(
-            @UserId(require = false) Long userId,
-            @RequestParam(required = false) String aid,
-            @RequestParam(required = false) Long pid,
-            @RequestParam(required = false) String term
+    public ResponseEntity<BaseResponse<SearchResultResponse>> homeSearch(
+        @UserId(require = false) Long userId,
+        @RequestParam(required = false) String aid,
+        @RequestParam(required = false) Long pid,
+        @RequestParam(required = false) String term
     ) {
         SearchType searchType = SearchType.resolve(aid, pid, term);
         SearchResultDTO searchResult = searchType.search(searchFacade, userId, aid, pid, term);
 
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, SearchResultResponse.of(searchResult, s3FileHandler));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            SearchResultResponse.of(searchResult, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/terms/popular")
-    public ResponseEntity<BaseResponse<?>> getPopularSearchTerms(
-            @UserId(require = false) Long userId,
-            @RequestParam(required = false, defaultValue = "10") @Min(1) @Max(20) Integer limit
+    public ResponseEntity<BaseResponse<PopularTermsResponse>> getPopularSearchTerms(
+        @UserId(require = false) Long userId,
+        @RequestParam(required = false, defaultValue = "10") @Min(1) @Max(20) Integer limit
     ) {
         PopularTermsDTO terms = searchFacade.getPopularSearchTerms(limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, PopularTermsResponse.from(terms));

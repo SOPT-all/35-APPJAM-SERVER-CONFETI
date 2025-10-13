@@ -43,38 +43,38 @@ public class UserFavoriteController {
 
     @Permission(role = {Role.GENERAL})
     @PostMapping("/festivals/{festivalId}")
-    public ResponseEntity<BaseResponse<?>> postFavoriteFestival(
-            @UserId Long userId,
-            @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId) {
+    public ResponseEntity<BaseResponse<Void>> postFavoriteFestival(
+        @UserId Long userId,
+        @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId) {
         userFavoriteFacade.addFestivalFavorite(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Permission(role = {Role.GENERAL})
     @DeleteMapping("/festivals/{festivalId}")
-    public ResponseEntity<BaseResponse<?>> deleteFavoriteFestival(
-            @UserId Long userId,
-            @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId) {
+    public ResponseEntity<BaseResponse<Void>> deleteFavoriteFestival(
+        @UserId Long userId,
+        @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId) {
         userFavoriteFacade.removeFestivalFavorite(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/artists/preview")
-    public ResponseEntity<BaseResponse<?>> getFavoriteArtistsPreview(
-            @UserId Long userId
+    public ResponseEntity<BaseResponse<UserFavoriteArtistsPreviewResponse>> getFavoriteArtistsPreview(
+        @UserId Long userId
     ) {
         UserFavoriteArtistsPreviewDTO userFavoriteArtistsPreviewDTO = userFavoriteFacade.getFavoriteArtistsPreview(
-                userId);
+            userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                UserFavoriteArtistsPreviewResponse.from(userFavoriteArtistsPreviewDTO.artists()));
+            UserFavoriteArtistsPreviewResponse.from(userFavoriteArtistsPreviewDTO.artists()));
     }
 
     @Permission(role = {Role.GENERAL})
     @PostMapping("/artists/{artistId}")
-    public ResponseEntity<BaseResponse<?>> addArtistFavorite(
-            @UserId Long userId,
-            @PathVariable(name = "artistId") String artistId
+    public ResponseEntity<BaseResponse<Void>> addArtistFavorite(
+        @UserId Long userId,
+        @PathVariable(name = "artistId") String artistId
     ) {
         userFavoriteFacade.addArtistFavorite(userId, artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
@@ -82,9 +82,9 @@ public class UserFavoriteController {
 
     @Permission(role = {Role.GENERAL})
     @DeleteMapping("/artists/{artistId}")
-    public ResponseEntity<BaseResponse<?>> removeArtistFavorite(
-            @UserId Long userId,
-            @PathVariable(name = "artistId") String artistId
+    public ResponseEntity<BaseResponse<Void>> removeArtistFavorite(
+        @UserId Long userId,
+        @PathVariable(name = "artistId") String artistId
     ) {
         userFavoriteFacade.removeArtistFavorite(userId, artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
@@ -92,9 +92,9 @@ public class UserFavoriteController {
 
     @Permission(role = {Role.GENERAL})
     @PostMapping("/concerts/{concertId}")
-    public ResponseEntity<BaseResponse<?>> addConcertFavorite(
-            @UserId Long userId,
-            @PathVariable(name = "concertId") Long concertId
+    public ResponseEntity<BaseResponse<Void>> addConcertFavorite(
+        @UserId Long userId,
+        @PathVariable(name = "concertId") Long concertId
     ) {
         userFavoriteFacade.addConcertFavorite(userId, concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
@@ -102,9 +102,9 @@ public class UserFavoriteController {
 
     @Permission(role = {Role.GENERAL})
     @DeleteMapping("/concerts/{concertId}")
-    public ResponseEntity<BaseResponse<?>> removeConcertFavorite(
-            @UserId Long userId,
-            @PathVariable(name = "concertId") Long concertId
+    public ResponseEntity<BaseResponse<Void>> removeConcertFavorite(
+        @UserId Long userId,
+        @PathVariable(name = "concertId") Long concertId
     ) {
         userFavoriteFacade.removeConcertFavorite(userId, concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
@@ -112,47 +112,54 @@ public class UserFavoriteController {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/performances/preview")
-    public ResponseEntity<BaseResponse<?>> getFavoritePerformances(
-            @UserId Long userId
+    public ResponseEntity<BaseResponse<UserFavoritePerformancesResponse>> getFavoritePerformances(
+        @UserId Long userId
     ) {
-        UserFavoritePerformancesDTO userFavoritePerformancesDTO = userFavoriteFacade.getFavoritePerformances(userId);
+        UserFavoritePerformancesDTO userFavoritePerformancesDTO = userFavoriteFacade.getFavoritePerformances(
+            userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                UserFavoritePerformancesResponse.of(userFavoritePerformancesDTO, s3FileHandler));
+            UserFavoritePerformancesResponse.of(userFavoritePerformancesDTO, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/performances")
-    public ResponseEntity<BaseResponse<?>> getFavoritePerformancesAll(
-            @RequestParam(value = "type") String type,
-            @UserId Long userId
+    public ResponseEntity<BaseResponse<UserFavoritePerformancesAllResponse>> getFavoritePerformancesAll(
+        @RequestParam(value = "type") String type,
+        @UserId Long userId
     ) {
         UserFavoritePerformancesAllDTO userFavoritePerformancesAllDTO = userFavoriteFacade.getFavoritePerformancesAll(
-                userId, type);
+            userId, type);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                UserFavoritePerformancesAllResponse.of(userFavoritePerformancesAllDTO, s3FileHandler));
+            UserFavoritePerformancesAllResponse.of(userFavoritePerformancesAllDTO, s3FileHandler));
     }
 
+    /**
+     * BaseResponse 의 type argument가 Map 일 수도, UpcomingPerformanceResponse 일 수도 있어서 타입 통일을 하려다가, 4차
+     * 스프린트부터 사용되지 않는 API라고 하셔서 우선 Object로 두었습니다.
+     */
     @Permission(role = {Role.GENERAL})
     @GetMapping("/performance")
-    public ResponseEntity<BaseResponse<?>> getUpcomingPerformance(
-            @UserId Long userId
+    public ResponseEntity<BaseResponse<Object>> getUpcomingPerformance(
+        @UserId Long userId
     ) {
-        UpcomingPerformanceDTO upcomingPerformanceDTO = userFavoriteFacade.getUpcomingPerformance(userId);
+        UpcomingPerformanceDTO upcomingPerformanceDTO = userFavoriteFacade.getUpcomingPerformance(
+            userId);
         if (upcomingPerformanceDTO == null) {
             return ApiResponseUtil.success(SuccessMessage.SUCCESS, Collections.emptyMap());
         }
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                UpcomingPerformanceResponse.of(upcomingPerformanceDTO, s3FileHandler));
+            UpcomingPerformanceResponse.of(upcomingPerformanceDTO, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/artists")
-    public ResponseEntity<BaseResponse<?>> getFavoriteArtists(
-            @UserId Long userId,
-            @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy
+    public ResponseEntity<BaseResponse<UserFavoriteArtistsResponse>> getFavoriteArtists(
+        @UserId Long userId,
+        @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy
     ) {
-        UserFavoriteArtistsDTO userFavoriteArtistsDTO = userFavoriteFacade.getFavoriteArtists(userId, sortBy);
+        UserFavoriteArtistsDTO userFavoriteArtistsDTO = userFavoriteFacade.getFavoriteArtists(
+            userId, sortBy);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                UserFavoriteArtistsResponse.from(userFavoriteArtistsDTO.artists()));
+            UserFavoriteArtistsResponse.from(userFavoriteArtistsDTO.artists()));
     }
 }

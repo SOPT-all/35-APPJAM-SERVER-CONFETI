@@ -7,6 +7,7 @@ import org.sopt.confeti.global.message.SuccessMessage;
 
 @Getter
 public class BaseResponse<T> {
+
     private final int status;
     private final String message;
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
@@ -21,26 +22,26 @@ public class BaseResponse<T> {
         this.exception = builder.exception;
     }
 
-    public static BaseResponse<?> of(SuccessMessage successMessage) {
-        return builder()
-                .status(successMessage.getHttpStatus().value())
-                .message(successMessage.getMessage())
-                .build();
+    public static BaseResponse<Void> of(SuccessMessage successMessage) {
+        return BaseResponse.<Void>builder()
+            .status(successMessage.getHttpStatus().value())
+            .message(successMessage.getMessage())
+            .build();
     }
 
-    public static <T> BaseResponse<?> of(SuccessMessage successMessage, T data) {
-        return builder()
-                .status(successMessage.getHttpStatus().value())
-                .message(successMessage.getMessage())
-                .data(data)
-                .build();
+    public static <T> BaseResponse<T> of(SuccessMessage successMessage, T data) {
+        return BaseResponse.<T>builder()
+            .status(successMessage.getHttpStatus().value())
+            .message(successMessage.getMessage())
+            .data(data)
+            .build();
     }
 
-    public static BaseResponse<?> of(ErrorMessage errorMessage) {
-        return builder()
-                .status(errorMessage.getHttpStatus().value())
-                .message(errorMessage.getMessage())
-                .build();
+    public static BaseResponse<Void> of(ErrorMessage errorMessage) {
+        return BaseResponse.<Void>builder()
+            .status(errorMessage.getHttpStatus().value())
+            .message(errorMessage.getMessage())
+            .build();
     }
 
     public static <T> Builder<T> builder() {
@@ -48,6 +49,7 @@ public class BaseResponse<T> {
     }
 
     public static class Builder<T> {
+
         private int status;
         private String message;
         private T data;
