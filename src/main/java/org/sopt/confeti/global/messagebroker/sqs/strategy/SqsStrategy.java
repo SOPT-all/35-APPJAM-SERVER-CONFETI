@@ -18,7 +18,7 @@ import org.sopt.confeti.global.messagebroker.handler.EventHandler;
 import org.sopt.confeti.global.messagebroker.message.Event;
 import org.sopt.confeti.global.notification.NotificationAgent;
 import org.sopt.confeti.global.notification.SlackNotificationType;
-import org.sopt.confeti.global.util.JsonUtil;
+import org.sopt.confeti.global.util.JsonMapper;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.messaging.Message;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -36,6 +36,7 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
     private final NotificationAgent notificationAgent;
     private final TaskExecutor messageConsumeExecutor;
     private final SqsAsyncClient sqsAsyncClient;
+    private final JsonMapper jsonMapper;
 
     private static final String ATTRIBUTE_DATA_TYPE_STRING = "string";
     private static final String ATTRIBUTE_EVENT_TYPE = "event";
@@ -48,7 +49,8 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
         SqsTemplate sqsTemplate,
         NotificationAgent notificationAgent,
         TaskExecutor messageConsumeExecutor,
-        SqsAsyncClient sqsAsyncClient
+        SqsAsyncClient sqsAsyncClient,
+        JsonMapper jsonMapper
     ) {
         super(eventHandlers);
         this.queueUrl = queueUrl;
@@ -56,11 +58,12 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
         this.notificationAgent = notificationAgent;
         this.messageConsumeExecutor = messageConsumeExecutor;
         this.sqsAsyncClient = sqsAsyncClient;
+        this.jsonMapper = jsonMapper;
     }
 
     protected void asyncSend(String queueName, Event event) {
         Map<String, Object> messageAttributes = createMessageAttributes(event);
-        String serializedData = JsonUtil.toJson(event);
+        String serializedData = jsonMapper.toJson(event);
 
         sqsTemplate.sendAsync(to -> to
                 .queue(queueName)
@@ -138,7 +141,7 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
 
     protected <T extends Event> void processEvent(EventHandler<T> eventHandler, String payload) {
         Class<T> supportedEventType = eventHandler.getSupportedType();
-        T event = JsonUtil.fromJson(supportedEventType, payload);
+        T event = jsonMapper.fromJson(supportedEventType, payload);
 
         eventHandler.handle(event);
     }

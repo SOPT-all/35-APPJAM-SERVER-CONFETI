@@ -10,6 +10,7 @@ import org.sopt.confeti.global.messagebroker.message.CreateEvent;
 import org.sopt.confeti.global.messagebroker.message.Event;
 import org.sopt.confeti.global.messagebroker.sqs.handler.SqsEventHandler;
 import org.sopt.confeti.global.notification.NotificationAgent;
+import org.sopt.confeti.global.util.JsonMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
@@ -27,10 +28,11 @@ public class CreateSqsStrategy<T extends CreateEventHandler<? extends CreateEven
         SqsTemplate sqsTemplate,
         NotificationAgent notificationAgent,
         @Qualifier(MESSAGE_CONSUMER_POOL) TaskExecutor messageConsumeExecutor,
-        SqsAsyncClient sqsAsyncClient
+        SqsAsyncClient sqsAsyncClient,
+        JsonMapper jsonMapper
     ) {
         super(createEventHandlers, queueName, sqsTemplate, notificationAgent,
-            messageConsumeExecutor, sqsAsyncClient);
+            messageConsumeExecutor, sqsAsyncClient, jsonMapper);
     }
 
     @Override

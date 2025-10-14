@@ -2,8 +2,7 @@ package org.sopt.confeti.global.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -11,12 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class JsonUtil {
+@RequiredArgsConstructor
+public class JsonMapper {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
-    public static <T> String toJson(T data) {
+    public <T> String toJson(T data) {
         try {
             return objectMapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
@@ -25,7 +24,7 @@ public class JsonUtil {
         }
     }
 
-    public static <T> T fromJson(Class<T> tClass, String content) {
+    public <T> T fromJson(Class<T> tClass, String content) {
         try {
             return objectMapper.readValue(content, tClass);
         } catch (JsonProcessingException e) {
