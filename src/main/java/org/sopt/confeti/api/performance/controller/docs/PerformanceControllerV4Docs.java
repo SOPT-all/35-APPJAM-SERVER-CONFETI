@@ -1,8 +1,6 @@
-package org.sopt.confeti.api.performance.controller;
+package org.sopt.confeti.api.performance.controller.docs;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,22 +17,15 @@ public interface PerformanceControllerV4Docs {
 
     @Operation(summary = "Confeti's pick 추천 공연 조회")
     @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "성공",
-                            content =
-                                    @Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation = RecommendPerformancesResponse.class
-                                                    )
-                                    )
-                    )
-            }
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
     )
     @CommonErrorResponses
     ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances(
-            @RequestParam(defaultValue = "5") @Min(1) @Max(20) int limit
+        @RequestParam(defaultValue = "5") @Min(1) @Max(20) int limit
     );
 }
