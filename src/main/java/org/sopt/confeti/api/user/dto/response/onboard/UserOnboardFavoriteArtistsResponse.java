@@ -4,13 +4,13 @@ import java.util.List;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardFavoriteArtistsDTO;
 
 public record UserOnboardFavoriteArtistsResponse(
-    List<UserOnboardFavoriteArtistResponse> favoriteArtistIds
+    List<UserOnboardFavoriteArtistResponse> artists
 ) {
 
     public static UserOnboardFavoriteArtistsResponse from(
         UserOnboardFavoriteArtistsDTO artistsDTO) {
         return new UserOnboardFavoriteArtistsResponse(
-            artistsDTO.favoriteArtistIds().stream()
+            artistsDTO.artists().stream()
                 .map(UserOnboardFavoriteArtistResponse::from)
                 .toList()
         );

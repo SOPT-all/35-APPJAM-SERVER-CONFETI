@@ -4,7 +4,7 @@ import java.util.List;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 
 public record UserOnboardFavoriteArtistsDTO(
-    List<UserOnboardFavoriteArtistDTO> favoriteArtistIds
+    List<UserOnboardFavoriteArtistDTO> artists
 ) {
 
     public static UserOnboardFavoriteArtistsDTO from(List<ConfetiArtist> confetiArtists) {
