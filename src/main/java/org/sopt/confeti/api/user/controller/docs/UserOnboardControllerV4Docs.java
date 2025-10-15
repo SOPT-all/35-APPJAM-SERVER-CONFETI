@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardFavoriteArtistsResponse;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.common.swagger.AuthErrorResponses;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
 import org.springframework.http.ResponseEntity;
 
@@ -21,6 +22,7 @@ public interface UserOnboardControllerV4Docs {
             )
         }
     )
+    @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<UserOnboardFavoriteArtistsResponse>> getFavoriteArtists(
         Long userId
