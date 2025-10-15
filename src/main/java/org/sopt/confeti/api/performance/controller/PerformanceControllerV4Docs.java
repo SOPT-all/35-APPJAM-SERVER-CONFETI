@@ -34,7 +34,7 @@ public interface PerformanceControllerV4Docs {
             }
     )
     @CommonErrorResponses
-    ResponseEntity<BaseResponse<?>> getRecommendPerformances(
-            @RequestParam(required = false, defaultValue = "5") @Min(1) @Max(20) int limit
+    ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances(
+            @RequestParam(defaultValue = "5") @Min(1) @Max(20) int limit
     );
 }

@@ -66,7 +66,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/concerts/{concertId}")
-    public ResponseEntity<BaseResponse<?>> getConcertInfo(
+    public ResponseEntity<BaseResponse<ConcertDetailResponse>> getConcertInfo(
             @UserId(require = false) Long userId,
             @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId
     ) {
@@ -77,7 +77,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/festivals/{festivalId}")
-    public ResponseEntity<BaseResponse<?>> getFestivalInfo(
+    public ResponseEntity<BaseResponse<FestivalDetailResponse>> getFestivalInfo(
             @UserId(require = false) Long userId,
             @PathVariable("festivalId") @Min(RequestConstraint.ID) Long festivalId
     ) {
@@ -88,7 +88,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/reservation")
-    public ResponseEntity<BaseResponse<?>> getPerformReservationInfo(
+    public ResponseEntity<BaseResponse<PerformanceReservationResponse>> getPerformReservationInfo(
             @UserId(require = false) Long userId
     ) {
         PerformanceReservationDTO performanceReservationDTO = performanceFacade.getPerformReservationInfo(userId);
@@ -98,7 +98,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/association/{artistId}")
-    public ResponseEntity<BaseResponse<?>> getPerformanceByArtist(
+    public ResponseEntity<BaseResponse<ArtistPerformancesResponse>> getPerformanceByArtist(
             @UserId(require = false) Long userId,
             @PathVariable(name = "artistId") String artistId
     ) {
@@ -109,7 +109,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/info")
-    public ResponseEntity<BaseResponse<?>> getRecentPerformances(
+    public ResponseEntity<BaseResponse<RecentPerformancesResponse>> getRecentPerformances(
             @UserId(require = false) Long userId
     ) {
         RecentPerformancesDTO recentPerformances = performanceFacade.getRecentPerformances(userId);
@@ -119,8 +119,8 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend")
-    public ResponseEntity<BaseResponse<?>> getRecommendPerformances(
-            @RequestParam(required = false, defaultValue = "5") @Min(1) @Max(20) int limit
+    public ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances(
+            @RequestParam(defaultValue = "5") @Min(1) @Max(20) int limit
     ) {
         RecommendPerformancesDTO recommendPerformances = performanceFacade.getRecommendPerformances(limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
@@ -129,7 +129,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/search/ac")
-    public ResponseEntity<BaseResponse<?>> searchAutoComplete(
+    public ResponseEntity<BaseResponse<SearchACPerformancesResponse>> searchAutoComplete(
             @UserId(require = false) Long userId,
             @RequestParam @NotBlank String term,
             @RequestParam(required = false, defaultValue = "1") @Min(1) @Max(10) Integer limit,
@@ -143,7 +143,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend/performance")
-    public ResponseEntity<BaseResponse<?>> getRecommendPerformanceId(
+    public ResponseEntity<BaseResponse<RecommendMusicsPerformanceResponse>> getRecommendPerformanceId(
             @UserId(require = false) Long userId
     ) {
         Optional<RecommendMusicsPerformanceDTO> recommendMusicsDTO = performanceFacade.getRecommendPerformanceId(
@@ -155,7 +155,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend/musics")
-    public ResponseEntity<BaseResponse<?>> getRecommendMusics(
+    public ResponseEntity<BaseResponse<RecommendMusicsResponse>> getRecommendMusics(
             @RequestParam Long performanceId,
             @RequestParam(required = false) List<String> musicIds
     ) {
@@ -166,7 +166,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/record")
-    public ResponseEntity<BaseResponse<?>> getConfetiRecord(
+    public ResponseEntity<BaseResponse<ConfetiRecordResponse>> getConfetiRecord(
             @UserId Long userId
     ) {
         ConfetiRecordDTO recordDTO = performanceFacade.getConfetiRecord(userId);
@@ -176,7 +176,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/expected")
-    public ResponseEntity<BaseResponse<?>> getExpectedPerformances(
+    public ResponseEntity<BaseResponse<ExpectedPerformancesResponse>> getExpectedPerformances(
             @UserId(require = false) Long userId,
             @RequestParam String items
     ) {
@@ -205,7 +205,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping
-    public ResponseEntity<BaseResponse<?>> getPerformances() {
+    public ResponseEntity<BaseResponse<PerformanceIdsResponse>> getPerformances() {
         PerformanceIdsDTO performances = performanceFacade.getPerformances();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 PerformanceIdsResponse.from(performances));
