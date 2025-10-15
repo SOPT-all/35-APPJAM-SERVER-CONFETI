@@ -118,4 +118,12 @@ public class UserOnboardFacade {
         Role userRole = userService.getRole(userId);
         return GetOnboardStatusDTO.from(userRole);
     }
+
+    public UserOnboardFavoriteArtistsDTO getFavoriteArtists(long userId) {
+        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
+        List<ConfetiArtist> favoriteArtists = musicAPIHandler.getArtistsByArtistIds(
+            cachedArtists.favoriteArtistIds());
+
+        return UserOnboardFavoriteArtistsDTO.from(favoriteArtists);
+    }
 }
