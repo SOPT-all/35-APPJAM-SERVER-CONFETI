@@ -1,6 +1,7 @@
 package org.sopt.confeti.global.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.message.SuccessMessage;
@@ -12,6 +13,8 @@ public class BaseResponse<T> {
     private final String message;
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private final T data;
+
+    @Schema(hidden = true)
     @JsonInclude(value = JsonInclude.Include.NON_DEFAULT)
     private final Exception exception;
 
@@ -80,4 +83,3 @@ public class BaseResponse<T> {
         }
     }
 }
-
