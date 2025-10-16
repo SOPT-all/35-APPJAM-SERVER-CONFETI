@@ -13,6 +13,7 @@ public enum RedisKey {
     MUSIC_ARTISTS_TOP_MUSICS("apple-music-api:artists:top-musics:%s"),
     MUSIC_MUSICS("apple-music-api:musics:%s"),
     MUSIC_TOP_MUSICS("apple-music-api:top-musics"),
+    MUSIC_TOP_ARTISTS("apple-music-api:top-artists"),
     MUSIC_PAGE_ARTIST_OFFSET_LIMIT("apple-music-api:music-page:artists:%s:%d:%d"),
     MUSIC_PAGE_KEYWORD_OFFSET_LIMIT("apple-music-api:music-page:keyword:%s:%d:%d"),
 

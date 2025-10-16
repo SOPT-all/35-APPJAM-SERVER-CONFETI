@@ -73,7 +73,7 @@ public class UserOnboardControllerV4 implements UserOnboardControllerV4Docs {
         @UserId Long userId,
         @RequestParam(required = false, defaultValue = "100") @Min(1) @Max(200) int limit
     ) {
-        UserOnboardTopArtistsDTO topArtists = userOnboardFacade.getTopArtists(limit);
+        UserOnboardTopArtistsDTO topArtists = userOnboardFacade.getTopArtists(limit, userId);
         userOnboardFacade.cacheTopArtistsToUser(userId, topArtists);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserOnboardTopArtistsResponse.from(topArtists));
