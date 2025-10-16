@@ -73,7 +73,15 @@ public class UserOnboardFacade {
 
     public UserOnboardTopArtistsDTO getTopArtists(int limit, long userId) {
         List<ConfetiArtist> topArtists = getAllTopArtists();
-        return UserOnboardTopArtistsDTO.from(topArtists);
+
+        Set<String> exposedArtistIds = userOnboardService.getCachedExposedArtistIds(userId);
+
+        return UserOnboardTopArtistsDTO.from(
+            topArtists.stream()
+                .filter(artist -> !exposedArtistIds.contains(artist.getId()))
+                .limit(limit)
+                .toList()
+        );
     }
 
     public UserOnboardRelatedArtistsDTO getRelatedArtists(

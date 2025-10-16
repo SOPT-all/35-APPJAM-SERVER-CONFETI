@@ -1,6 +1,7 @@
 package org.sopt.confeti.domain.user.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +42,11 @@ public class UserOnboardService {
     }
 
     public Set<String> getCachedExposedArtistIds(long userId) {
-        return getCachedArtists(userId).exposedArtistIds();
+        try {
+            return getCachedArtists(userId).exposedArtistIds();
+        } catch (NotFoundException e) {
+            return Collections.emptySet();
+        }
     }
 
     public void cacheTopArtists(long userId, UserOnboardCacheDTO artistsDTO) {
