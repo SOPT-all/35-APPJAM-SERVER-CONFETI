@@ -85,7 +85,7 @@ public class UserOnboardController {
         @UserId Long userId,
         @PathVariable String artistId
     ) {
-        userOnboardFacade.cacheTopArtist(userId, artistId);
+        userOnboardFacade.cacheExposedArtist(userId, artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
