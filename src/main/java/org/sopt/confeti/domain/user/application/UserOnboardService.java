@@ -50,7 +50,6 @@ public class UserOnboardService {
     }
 
     public void cacheOnboardArtists(long userId, UserOnboardCacheDTO artistsDTO) {
-        redisTemplate.opsForValue().set("TEST:" + userId, "test", REDIS_TTL_DAY, TimeUnit.DAYS);
         redisTemplate.opsForValue()
             .set(generateRedisKey(userId), artistsDTO, REDIS_TTL_DAY, TimeUnit.DAYS);
     }
