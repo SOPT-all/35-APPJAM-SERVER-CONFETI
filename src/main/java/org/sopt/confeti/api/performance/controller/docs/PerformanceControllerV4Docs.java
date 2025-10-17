@@ -15,7 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Tag(name = "공연")
 public interface PerformanceControllerV4Docs {
 
-    @Operation(summary = "Confeti's pick 추천 공연 조회")
+    @Operation(
+            summary = "Confeti's pick 추천 공연 조회",
+            description =
+                    """
+                    V4 변경사항
+                    - 공연 개수를 클라이언트에서 정할 수 있도록 수정 (1 ~ 20, default 5)
+                    """
+    )
     @ApiResponses(
         value = {
             @ApiResponse(
