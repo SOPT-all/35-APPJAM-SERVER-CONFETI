@@ -122,11 +122,14 @@ public class UserOnboardFacade {
     }
 
     public void cacheExposedArtist(long userId, String artistId) {
-        Set<String> exposedArtistIds = userOnboardService.getCachedExposedArtistIds(userId);
+        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
+        Set<String> favoriteArtistIds = cachedArtists.favoriteArtistIds();
+        Set<String> exposedArtistIds = cachedArtists.exposedArtistIds();
+
         exposedArtistIds.add(artistId);
 
         userOnboardService.cacheOnboardArtists(userId,
-            UserOnboardCacheDTO.createWithExposedArtistIds(exposedArtistIds));
+            UserOnboardCacheDTO.of(favoriteArtistIds, exposedArtistIds));
     }
 
     @Transactional(readOnly = true)
