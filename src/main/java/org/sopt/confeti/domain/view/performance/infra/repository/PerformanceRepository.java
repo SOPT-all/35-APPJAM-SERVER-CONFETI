@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -81,7 +83,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     List<Performance> findTop5ByRand();
 
     @Query(value = "SELECT p FROM Performance p WHERE p.endAt >= CURRENT_DATE ORDER BY RAND() LIMIT :limit")
-    List<Performance> findTopByRand(@Param("limit") int limit);
+    List<Performance> findPerformancesByRand(@Param("limit") int limit);
 
     Optional<Performance> findPerformanceByIdAndEndAtGreaterThanEqual(long performanceId, LocalDate date);
 
@@ -100,4 +102,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     List<Performance> findRecentPerformancesByEndAtGreaterThanEqual(LocalDate now, PageRequest pageRequest);
 
     List<Performance> findByEndAtGreaterThanEqual(LocalDate now);
+
+    @Query(value = "SELECT pa FROM PerformanceArtist pa JOIN pa.performance p WHERE p.id = :id ORDER BY RAND() LIMIT :limit")
+    List<PerformanceArtist> findPerformanceArtistsByRand(@Param("id") long id, @Param("limit") int limit);
 }

@@ -15,6 +15,7 @@ import org.sopt.confeti.api.performance.dto.response.ExpectedPerformancesRespons
 import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceIdsResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
+import org.sopt.confeti.api.performance.dto.response.PerformancesRecommendResponse;
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendMusicsPerformanceResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendMusicsResponse;
@@ -29,6 +30,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformances
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformancesRecommendDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
@@ -131,7 +133,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
     @GetMapping("/search/ac")
     public ResponseEntity<BaseResponse<SearchACPerformancesResponse>> searchAutoComplete(
             @UserId(require = false) Long userId,
-            @RequestParam @NotBlank String term,
+            @RequestParam @NotBlank  String term,
             @RequestParam(required = false, defaultValue = "1") @Min(1) @Max(10) Integer limit,
             @RequestParam(required = false, defaultValue = Default.PERFORMANCE_STATUS) String status
     ) {
@@ -141,6 +143,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
                 SearchACPerformancesResponse.of(performancesDTO, s3FileHandler));
     }
 
+    @Deprecated
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend/performance")
     public ResponseEntity<BaseResponse<RecommendMusicsPerformanceResponse>> getRecommendPerformanceId(
@@ -153,6 +156,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
         );
     }
 
+    @Deprecated
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend/musics")
     public ResponseEntity<BaseResponse<RecommendMusicsResponse>> getRecommendMusics(
@@ -162,6 +166,15 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
         RecommendMusicsDTO recommendMusicsDTO = performanceFacade.getNewRecommendMusics(performanceId, musicIds);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 RecommendMusicsResponse.from(recommendMusicsDTO));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/music/recommend")
+    public ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getMusicRecommend() {
+        PerformancesRecommendDTO performancesRecommendDTO = performanceFacade.getPerformancesRecommend();
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                PerformancesRecommendResponse.of(performancesRecommendDTO, s3FileHandler)
+        );
     }
 
     @Permission(role = {Role.GENERAL})

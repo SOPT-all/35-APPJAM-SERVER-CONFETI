@@ -59,6 +59,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Validated
 @RequestMapping("/performances")
+@Deprecated
 public class PerformanceController {
 
     private final PerformanceFacade performanceFacade;

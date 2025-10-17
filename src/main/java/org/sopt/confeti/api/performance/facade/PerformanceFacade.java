@@ -3,6 +3,7 @@ package org.sopt.confeti.api.performance.facade;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,8 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
@@ -22,12 +25,15 @@ import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformanceRecommendDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformancesRecommendDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.SongRecommendDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
@@ -45,6 +51,7 @@ import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceArtistDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
@@ -52,6 +59,7 @@ import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +71,9 @@ public class PerformanceFacade {
 
     private static final int RECENT_PERFORMANCES_SIZE = 7;
     private static final int RECOMMEND_MUSIC_SIZE = 3;
+    private static final int RECOMMEND_SONG_SIZE = 3;
+    private static final int RECOMMEND_SONG_FETCH_SIZE = 20;
+    private static final int RECOMMEND_PERFORMANCE_SIZE = 3;
     private static final boolean PERSONALIZED = true;
     private static final boolean UNPERSONALIZED = false;
 
@@ -380,5 +391,42 @@ public class PerformanceFacade {
         return PerformanceIdsDTO.from(
                 performanceService.getPerformances()
         );
+    }
+
+    public PerformancesRecommendDTO getPerformancesRecommend() {
+        List<PerformanceRecommendDTO> performancesRecommend = performanceService.getRandomPerformances(RECOMMEND_PERFORMANCE_SIZE).stream()
+                .map(this::getPerformanceRecommend)
+                .toList();
+
+        return PerformancesRecommendDTO.from(performancesRecommend);
+    }
+
+    private PerformanceRecommendDTO getPerformanceRecommend(PerformanceDTO performance) {
+        List<SongRecommendDTO> songsRecommend = getSongsRecommend(
+                performanceService.getRandomPerformanceArtists(performance.id(), RECOMMEND_SONG_SIZE)
+        );
+
+        return PerformanceRecommendDTO.of(performance, songsRecommend);
+    }
+
+    private List<SongRecommendDTO> getSongsRecommend(List<PerformanceArtistDTO> artists) {
+        List<ConfetiMusic> topSongs = artists.stream()
+                .map(this::getArtistTopSongs)
+                .flatMap(Collection::stream)
+                .toList();
+
+        return pickRandomSongs(topSongs, RECOMMEND_SONG_SIZE).stream()
+                .map(SongRecommendDTO::from)
+                .toList();
+    }
+
+    private List<ConfetiMusic> getArtistTopSongs(PerformanceArtistDTO artist) {
+        return musicAPIHandler.getArtistTopSongs(artist.artistId(), RECOMMEND_SONG_FETCH_SIZE);
+    }
+
+    private List<ConfetiMusic> pickRandomSongs(List<ConfetiMusic> songs, int size) {
+        List<ConfetiMusic> copiedSongs = new ArrayList<>(songs);
+        Collections.shuffle(copiedSongs);
+        return copiedSongs.subList(0, Math.min(size, copiedSongs.size()));
     }
 }
