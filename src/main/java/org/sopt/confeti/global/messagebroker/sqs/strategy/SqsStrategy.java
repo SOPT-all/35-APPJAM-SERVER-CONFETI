@@ -107,23 +107,19 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
             data.toString());
     }
 
-    protected CompletableFuture<Void> processMessage(Collection<Message<?>> messages) {
-        List<CompletableFuture<Void>> futures = messages.stream()
-            .map(message -> {
-                return CompletableFuture.runAsync(() -> {
-                        String type = message.getHeaders().get(ATTRIBUTE_TYPE_ID, String.class);
-                        String payload = message.getPayload().toString();
-                        handleEvent(type, payload);
-                    }, messageConsumeExecutor)
-                    .exceptionally(e -> {
-                        log.error("message: {}", message.toString(), e);
-                        return null;
-                    });
-            })
-            .toList();
-
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    protected CompletableFuture<Void> processMessageAndDelete(Message<?> message) {
+        return CompletableFuture.runAsync(() -> {
+                String type = message.getHeaders().get(ATTRIBUTE_TYPE_ID, String.class);
+                String payload = message.getPayload().toString();
+                handleEvent(type, payload);
+            }, messageConsumeExecutor)
+            .thenRun(() -> deleteMessage(message))
+            .exceptionally(e -> {
+                log.error("[Process Message Error]: {}", message.toString(), e);
+                return null;
+            });
     }
+
 
     protected void handleEvent(String typeId, String payload) {
         EventHandler<? extends Event> eventHandler = super.getEventHandlers().get(typeId);
@@ -155,14 +151,11 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
             return;
         }
 
-        processMessage(receivedMessages)
-            .thenRun(() -> {
-                receivedMessages.forEach(this::deleteMessage);
-            })
-            .exceptionally(e -> {
-                log.error("[SQS Polling Exception] message: {}", receivedMessages, e);
-                return null;
-            });
+        List<CompletableFuture<Void>> futures = receivedMessages.stream()
+            .map(this::processMessageAndDelete)
+            .toList();
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
 
     private void deleteMessage(Message<?> message) {
