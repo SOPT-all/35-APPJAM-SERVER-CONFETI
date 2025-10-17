@@ -43,6 +43,9 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
     private static final String ATTRIBUTE_TRACE_ID = "traceId";
     private static final String ATTRIBUTE_TYPE_ID = "confetiEventType";
 
+    private static final int MAX_POLLING_MESSAGE_SIZE = 10;
+    private static final int POLLING_TIMEOUT = 20;
+
     protected SqsStrategy(
         List<? extends EventHandler<? extends Event>> eventHandlers,
         String queueUrl,
@@ -143,8 +146,8 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
 
         Collection<Message<?>> receivedMessages = sqsTemplate.receiveMany(options -> options
             .queue(queueUrl)
-            .maxNumberOfMessages(10)
-            .pollTimeout(Duration.ofSeconds(20))
+            .maxNumberOfMessages(MAX_POLLING_MESSAGE_SIZE)
+            .pollTimeout(Duration.ofSeconds(POLLING_TIMEOUT))
         );
 
         if (receivedMessages.isEmpty()) {
