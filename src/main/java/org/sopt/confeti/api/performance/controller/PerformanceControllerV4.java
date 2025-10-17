@@ -143,31 +143,6 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
                 SearchACPerformancesResponse.of(performancesDTO, s3FileHandler));
     }
 
-    @Deprecated
-    @Permission(role = {Role.GENERAL})
-    @GetMapping("/recommend/performance")
-    public ResponseEntity<BaseResponse<RecommendMusicsPerformanceResponse>> getRecommendPerformanceId(
-            @UserId(require = false) Long userId
-    ) {
-        Optional<RecommendMusicsPerformanceDTO> recommendMusicsDTO = performanceFacade.getRecommendPerformanceId(
-                userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                recommendMusicsDTO.map(RecommendMusicsPerformanceResponse::from).orElse(null)
-        );
-    }
-
-    @Deprecated
-    @Permission(role = {Role.GENERAL})
-    @GetMapping("/recommend/musics")
-    public ResponseEntity<BaseResponse<RecommendMusicsResponse>> getRecommendMusics(
-            @RequestParam Long performanceId,
-            @RequestParam(required = false) List<String> musicIds
-    ) {
-        RecommendMusicsDTO recommendMusicsDTO = performanceFacade.getNewRecommendMusics(performanceId, musicIds);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                RecommendMusicsResponse.from(recommendMusicsDTO));
-    }
-
     @Permission(role = {Role.GENERAL})
     @GetMapping("/music/recommend")
     public ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getMusicRecommend() {
