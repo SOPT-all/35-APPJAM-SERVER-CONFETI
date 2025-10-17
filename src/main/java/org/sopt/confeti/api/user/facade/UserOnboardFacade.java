@@ -102,19 +102,20 @@ public class UserOnboardFacade {
         return UserOnboardRelatedArtistsDTO.from(relatedArtists);
     }
 
+    @Deprecated
     public void cacheTopArtistsToUser(Long userId, UserOnboardTopArtistsDTO topArtists) {
         if (!userService.existsById(userId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
 
-        userOnboardService.cacheTopArtists(userId, UserOnboardCacheDTO.from(topArtists));
+        userOnboardService.cacheOnboardArtists(userId, UserOnboardCacheDTO.from(topArtists));
     }
 
     public void cacheExposedArtist(long userId, String artistId) {
         Set<String> exposedArtistIds = userOnboardService.getCachedExposedArtistIds(userId);
         exposedArtistIds.add(artistId);
 
-        userOnboardService.cacheTopArtists(userId,
+        userOnboardService.cacheOnboardArtists(userId,
             UserOnboardCacheDTO.createWithExposedArtistIds(exposedArtistIds));
     }
 
@@ -189,7 +190,7 @@ public class UserOnboardFacade {
         newFavoriteArtistIds.add(requestArtistId);
         newExposedArtistIds.addAll(exposedArtistIds);
 
-        userOnboardService.cacheTopArtists(userId,
+        userOnboardService.cacheOnboardArtists(userId,
             UserOnboardCacheDTO.of(newFavoriteArtistIds, newExposedArtistIds));
     }
 
