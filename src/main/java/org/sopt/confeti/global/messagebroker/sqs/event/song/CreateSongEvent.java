@@ -1,24 +1,25 @@
-package org.sopt.confeti.domain.applemusic.artist.event;
+package org.sopt.confeti.global.messagebroker.sqs.event.song;
 
 
-import org.sopt.confeti.domain.applemusic.artist.Artist;
+import org.sopt.confeti.domain.applemusic.song.Song;
 import org.sopt.confeti.global.messagebroker.message.CreateEvent;
 
-public record CreateArtistEvent(
-    String artistId,
+public record CreateSongEvent(
+    String songId,
     String name,
     String artworkUrl,
     Integer artworkWidth,
     Integer artworkHeight
 ) implements CreateEvent {
 
-    public Artist toArtist() {
-        return Artist.builder()
-            .artistId(artistId)
+    public Song toSong() {
+        return Song.builder()
+            .songId(songId)
             .name(name)
             .artworkUrl(artworkUrl)
             .artworkWidth(artworkWidth)
             .artworkHeight(artworkHeight)
             .build();
     }
+
 }
