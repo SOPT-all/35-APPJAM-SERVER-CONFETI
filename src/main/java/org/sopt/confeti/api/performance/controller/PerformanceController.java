@@ -146,6 +146,7 @@ public class PerformanceController {
             SearchACPerformancesResponse.of(performancesDTO, s3FileHandler));
     }
 
+    @Deprecated
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend/performance")
     public ResponseEntity<BaseResponse<RecommendMusicsPerformanceResponse>> getRecommendPerformanceId(
@@ -158,6 +159,7 @@ public class PerformanceController {
         );
     }
 
+    @Deprecated
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend/musics")
     public ResponseEntity<BaseResponse<RecommendMusicsResponse>> getRecommendMusics(
