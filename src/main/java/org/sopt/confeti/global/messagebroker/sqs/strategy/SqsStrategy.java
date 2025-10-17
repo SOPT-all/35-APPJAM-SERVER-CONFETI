@@ -96,13 +96,9 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
     }
 
     private String getEventTypeId(Event event) {
-        return getEventHandlers()
-            .values()
-            .stream()
-            .filter(eventHandler -> eventHandler.isSupported(event.getClass()))
-            .findFirst()
-            .orElseThrow(() -> new ConfetiException(INTERNAL_SERVER_ERROR))
-            .getSupportedTypeId();
+        EventHandler<? extends Event> eventHandler = getEventHandlerByEventClass().get(
+            event.getClass());
+        return eventHandler.getSupportedTypeId();
     }
 
     private <T> String extractExceptionMessage(Throwable exception, T data) {
@@ -129,10 +125,10 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
-    protected void handleEvent(String type, String payload) {
-        EventHandler<? extends Event> eventHandler = super.getEventHandlers().get(type);
+    protected void handleEvent(String typeId, String payload) {
+        EventHandler<? extends Event> eventHandler = super.getEventHandlers().get(typeId);
         if (eventHandler == null) {
-            log.error("Cannot find event handler: {}. Payload: {}", type, payload);
+            log.error("Cannot find event handler: {}. Payload: {}", typeId, payload);
             throw new ConfetiException(INTERNAL_SERVER_ERROR);
         }
 
