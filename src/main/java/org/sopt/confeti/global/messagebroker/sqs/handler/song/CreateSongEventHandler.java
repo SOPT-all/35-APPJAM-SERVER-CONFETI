@@ -19,7 +19,7 @@ public class CreateSongEventHandler implements CreateEventHandler<CreateSongEven
     @Transactional
     public void handle(CreateSongEvent event) {
         if (!songService.isExistBySongId(event.songId())) {
-            songService.create(event.toSong());
+            songService.create(event.toCreateDTO());
         }
     }
 

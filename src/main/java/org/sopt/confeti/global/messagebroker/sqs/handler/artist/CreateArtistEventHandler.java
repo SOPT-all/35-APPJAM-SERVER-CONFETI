@@ -20,7 +20,7 @@ public class CreateArtistEventHandler implements CreateEventHandler<CreateArtist
     @Transactional
     public void handle(CreateArtistEvent event) {
         if (!artistService.isExistByArtistId(event.artistId())) {
-            artistService.create(event.toArtist());
+            artistService.create(event.toCreateDTO());
         }
     }
 

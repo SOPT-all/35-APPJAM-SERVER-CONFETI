@@ -1,7 +1,7 @@
 package org.sopt.confeti.global.messagebroker.sqs.event.song;
 
 
-import org.sopt.confeti.domain.applemusic.song.Song;
+import org.sopt.confeti.domain.applemusic.song.application.dto.request.CreateSongDTO;
 import org.sopt.confeti.global.messagebroker.message.CreateEvent;
 
 public record CreateSongEvent(
@@ -12,8 +12,8 @@ public record CreateSongEvent(
     Integer artworkHeight
 ) implements CreateEvent {
 
-    public Song toSong() {
-        return Song.builder()
+    public CreateSongDTO toCreateDTO() {
+        return CreateSongDTO.builder()
             .songId(songId)
             .name(name)
             .artworkUrl(artworkUrl)

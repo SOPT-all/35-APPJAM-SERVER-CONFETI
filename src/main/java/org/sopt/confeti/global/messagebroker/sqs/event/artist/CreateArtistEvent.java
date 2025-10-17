@@ -1,7 +1,7 @@
 package org.sopt.confeti.global.messagebroker.sqs.event.artist;
 
 
-import org.sopt.confeti.domain.applemusic.artist.Artist;
+import org.sopt.confeti.domain.applemusic.artist.application.dto.request.CreateArtistDTO;
 import org.sopt.confeti.global.messagebroker.message.CreateEvent;
 
 public record CreateArtistEvent(
@@ -12,8 +12,8 @@ public record CreateArtistEvent(
     Integer artworkHeight
 ) implements CreateEvent {
 
-    public Artist toArtist() {
-        return Artist.builder()
+    public CreateArtistDTO toCreateDTO() {
+        return CreateArtistDTO.builder()
             .artistId(artistId)
             .name(name)
             .artworkUrl(artworkUrl)
