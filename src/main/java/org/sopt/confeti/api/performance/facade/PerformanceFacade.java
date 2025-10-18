@@ -71,9 +71,7 @@ public class PerformanceFacade {
 
     private static final int RECENT_PERFORMANCES_SIZE = 7;
     private static final int RECOMMEND_MUSIC_SIZE = 3;
-    private static final int RECOMMEND_SONG_SIZE = 3;
     private static final int RECOMMEND_SONG_FETCH_SIZE = 20;
-    private static final int RECOMMEND_PERFORMANCE_SIZE = 3;
     private static final boolean PERSONALIZED = true;
     private static final boolean UNPERSONALIZED = false;
 
@@ -393,29 +391,29 @@ public class PerformanceFacade {
         );
     }
 
-    public PerformancesRecommendDTO getPerformancesRecommend() {
-        List<PerformanceRecommendDTO> performancesRecommend = performanceService.getRandomPerformances(RECOMMEND_PERFORMANCE_SIZE).stream()
-                .map(this::getPerformanceRecommend)
+    public PerformancesRecommendDTO getPerformancesRecommend(int performanceLimit, int songLimit) {
+        List<PerformanceRecommendDTO> performancesRecommend = performanceService.getRandomPerformances(performanceLimit).stream()
+                .map(performance -> getPerformanceRecommend(performance, songLimit))
                 .toList();
 
         return PerformancesRecommendDTO.from(performancesRecommend);
     }
 
-    private PerformanceRecommendDTO getPerformanceRecommend(PerformanceDTO performance) {
+    private PerformanceRecommendDTO getPerformanceRecommend(PerformanceDTO performance, int songLimit) {
         List<SongRecommendDTO> songsRecommend = getSongsRecommend(
-                performanceService.getRandomPerformanceArtists(performance.id(), RECOMMEND_SONG_SIZE)
+                performanceService.getRandomPerformanceArtists(performance.id(), songLimit), songLimit
         );
 
         return PerformanceRecommendDTO.of(performance, songsRecommend);
     }
 
-    private List<SongRecommendDTO> getSongsRecommend(List<PerformanceArtistDTO> artists) {
+    private List<SongRecommendDTO> getSongsRecommend(List<PerformanceArtistDTO> artists, int songLimit) {
         List<ConfetiMusic> topSongs = artists.stream()
                 .map(this::getArtistTopSongs)
                 .flatMap(Collection::stream)
                 .toList();
 
-        return pickRandomSongs(topSongs, RECOMMEND_SONG_SIZE).stream()
+        return pickRandomSongs(topSongs, songLimit).stream()
                 .map(SongRecommendDTO::from)
                 .toList();
     }

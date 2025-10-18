@@ -62,5 +62,8 @@ public interface PerformanceControllerV4Docs {
             }
     )
     @CommonErrorResponses
-    ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getMusicRecommend();
+    ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getSongRecommend(
+            @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer performanceLimit,
+            @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer songLimit
+    );
 }
