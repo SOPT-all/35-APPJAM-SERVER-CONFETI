@@ -11,6 +11,7 @@ public record RecentPerformanceDTO(
         long typeId,
         PerformanceType type,
         String title,
+        String area,
         LocalDate startAt,
         String posterPath
 ) {
@@ -20,6 +21,7 @@ public record RecentPerformanceDTO(
                 concert.getId(),
                 PerformanceType.CONCERT,
                 concert.getTitle(),
+                concert.getArea(),
                 concert.getStartAt(),
                 concert.getPosterPath()
         );
@@ -31,6 +33,7 @@ public record RecentPerformanceDTO(
                 festival.getId(),
                 PerformanceType.FESTIVAL,
                 festival.getTitle(),
+                festival.getArea(),
                 festival.getStartAt(),
                 festival.getPosterPath()
         );
@@ -42,6 +45,7 @@ public record RecentPerformanceDTO(
                 performance.getTypeId(),
                 performance.getType(),
                 performance.getTitle(),
+                performance.getArea(),
                 performance.getStartAt(),
                 performance.getPosterPath()
         );

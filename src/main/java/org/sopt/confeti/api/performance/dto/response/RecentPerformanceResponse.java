@@ -11,6 +11,7 @@ public record RecentPerformanceResponse(
         long typeId,
         PerformanceType type,
         String title,
+        String area,
         String startAt,
         String posterUrl
 ) {
@@ -23,6 +24,7 @@ public record RecentPerformanceResponse(
                 recentPerformanceDTO.typeId(),
                 recentPerformanceDTO.type(),
                 recentPerformanceDTO.title(),
+                recentPerformanceDTO.area(),
                 DateConvertor.convertToDefaultFormat(recentPerformanceDTO.startAt()),
                 s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER),
                         recentPerformanceDTO.posterPath()).toString()

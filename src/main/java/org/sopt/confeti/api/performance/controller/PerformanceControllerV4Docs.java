@@ -9,8 +9,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.sopt.confeti.api.performance.dto.response.PerformancesRecommendResponse;
+import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformancesRecommendDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
+import org.sopt.confeti.domain.user.constant.Role;
+import org.sopt.confeti.global.annotation.Permission;
+import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
 import org.sopt.confeti.global.message.SuccessMessage;
@@ -65,5 +70,26 @@ public interface PerformanceControllerV4Docs {
     ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getSongRecommend(
             @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer performanceLimit,
             @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer songLimit
+    );
+
+    @Operation(
+            summary = "최신 공연 등록순 조회",
+            description =
+                    """
+                    V4 변경사항
+                    - 장소 응답 값 추가  
+                    """
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "성공"
+                    )
+            }
+    )
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<RecentPerformancesResponse>> getRecentPerformances(
+            @UserId(require = false) Long userId
     );
 }
