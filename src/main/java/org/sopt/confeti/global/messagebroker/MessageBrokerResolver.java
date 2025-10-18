@@ -2,6 +2,7 @@ package org.sopt.confeti.global.messagebroker;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.annotation.Resolver;
@@ -15,23 +16,22 @@ public class MessageBrokerResolver {
 
     private final Map<Class<? extends Event>, MessageBrokerStrategy> strategyByEventClass;
 
-    protected MessageBrokerResolver(List<MessageBrokerStrategy> messageBrokerStrategies,
-        List<Event> events) {
-        this.strategyByEventClass = events.stream()
+    protected MessageBrokerResolver(List<MessageBrokerStrategy> messageBrokerStrategies) {
+
+        this.strategyByEventClass = messageBrokerStrategies.stream()
+            .flatMap(strategy ->
+                strategy.getEventHandlerByEventClass().keySet().stream()
+                    .map(eventClass -> Map.entry(eventClass, strategy))
+            )
             .collect(Collectors.toUnmodifiableMap(
-                    Event::getClass,
-                    event -> messageBrokerStrategies.stream()
-                        .filter(messageBrokerStrategy ->
-                            messageBrokerStrategy.isSupported(event.getClass()))
-                        .findFirst()
-                        .orElseThrow(() -> {
-                            log.error(
-                                "[Message broker strategy Initialize Error]: Not Found for Event {}",
-                                event.getClass());
-                            return new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
-                        })
-                )
-            );
+                Entry::getKey,
+                Entry::getValue,
+                (strategy1, strategy2) -> {
+                    log.error("Duplicate event class in {}, {}", strategy1.getClass(),
+                        strategy2.getClass());
+                    throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
+                }
+            ));
     }
 
     public void sendMessage(Event event) {
