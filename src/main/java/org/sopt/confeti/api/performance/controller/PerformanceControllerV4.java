@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.dto.request.GetExpectedPerformanceRequest;
 import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
@@ -15,9 +14,8 @@ import org.sopt.confeti.api.performance.dto.response.ExpectedPerformancesRespons
 import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceIdsResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
+import org.sopt.confeti.api.performance.dto.response.PerformancesRecommendResponse;
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
-import org.sopt.confeti.api.performance.dto.response.RecommendMusicsPerformanceResponse;
-import org.sopt.confeti.api.performance.dto.response.RecommendMusicsResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.SearchACPerformancesResponse;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
@@ -29,9 +27,8 @@ import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformances
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformancesRecommendDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -131,7 +128,7 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
     @GetMapping("/search/ac")
     public ResponseEntity<BaseResponse<SearchACPerformancesResponse>> searchAutoComplete(
             @UserId(require = false) Long userId,
-            @RequestParam @NotBlank String term,
+            @RequestParam @NotBlank  String term,
             @RequestParam(required = false, defaultValue = "1") @Min(1) @Max(10) Integer limit,
             @RequestParam(required = false, defaultValue = Default.PERFORMANCE_STATUS) String status
     ) {
@@ -142,26 +139,15 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
     }
 
     @Permission(role = {Role.GENERAL})
-    @GetMapping("/recommend/performance")
-    public ResponseEntity<BaseResponse<RecommendMusicsPerformanceResponse>> getRecommendPerformanceId(
-            @UserId(require = false) Long userId
+    @GetMapping("/song/recommend")
+    public ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getSongRecommend(
+            @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer performanceLimit,
+            @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer songLimit
     ) {
-        Optional<RecommendMusicsPerformanceDTO> recommendMusicsDTO = performanceFacade.getRecommendPerformanceId(
-                userId);
+        PerformancesRecommendDTO performancesRecommendDTO = performanceFacade.getPerformancesRecommend(performanceLimit, songLimit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                recommendMusicsDTO.map(RecommendMusicsPerformanceResponse::from).orElse(null)
+                PerformancesRecommendResponse.of(performancesRecommendDTO, s3FileHandler)
         );
-    }
-
-    @Permission(role = {Role.GENERAL})
-    @GetMapping("/recommend/musics")
-    public ResponseEntity<BaseResponse<RecommendMusicsResponse>> getRecommendMusics(
-            @RequestParam Long performanceId,
-            @RequestParam(required = false) List<String> musicIds
-    ) {
-        RecommendMusicsDTO recommendMusicsDTO = performanceFacade.getNewRecommendMusics(performanceId, musicIds);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                RecommendMusicsResponse.from(recommendMusicsDTO));
     }
 
     @Permission(role = {Role.GENERAL})

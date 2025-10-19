@@ -471,4 +471,20 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                                 ).orElseGet(List::of)
                 )).orElseGet(MusicPage::empty);
     }
+
+    @Override
+    public List<ConfetiMusic> getArtistTopSongs(String artistId, int recommendSongFetchSize) {
+        List<ConfetiMusic> songs = new ArrayList<>(getCachedTopMusicsByArtistId(artistId, recommendSongFetchSize));
+
+        if (!songs.isEmpty()) {
+            return songs;
+        }
+
+        List<ConfetiMusic> fetchedSongs = convertToConfetiMusics(
+                client.getArtistTopSongsById(artistId, String.valueOf(recommendSongFetchSize))
+        );
+        cachingTopMusicsByArtistId(artistId, fetchedSongs);
+
+        return fetchedSongs;
+    }
 }

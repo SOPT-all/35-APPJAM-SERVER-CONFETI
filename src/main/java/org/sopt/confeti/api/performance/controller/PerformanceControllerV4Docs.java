@@ -8,10 +8,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import org.sopt.confeti.api.performance.dto.response.PerformancesRecommendResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformancesRecommendDTO;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
+import org.sopt.confeti.global.message.SuccessMessage;
+import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "공연")
@@ -36,5 +41,29 @@ public interface PerformanceControllerV4Docs {
     @CommonErrorResponses
     ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances(
             @RequestParam(defaultValue = "5") @Min(1) @Max(20) int limit
+    );
+
+    @Operation(
+            summary = "공연 미리듣기 조회",
+            description =
+                    """
+                    V4 변경사항
+                    - 랜덤한 공연 3개, 각 공연 당 랜덤한 음악 3개를 조회
+                    - 공연이 3개 이하일 수도, 음악이 3개 이하일 수도 있음
+                    - 아예 조회된 값이 없을 수도 있음        
+                    """
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "성공"
+                    )
+            }
+    )
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getSongRecommend(
+            @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer performanceLimit,
+            @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer songLimit
     );
 }
