@@ -10,22 +10,15 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
-import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
-import org.sopt.confeti.domain.user.constant.Role;
-import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
-import org.sopt.confeti.global.message.SuccessMessage;
-import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "공연")
 public interface PerformanceControllerV4Docs {
 
-    @Permission(role = {Role.GENERAL})
     @Operation(summary = "Confeti's pick 추천 공연 조회")
     @ApiResponses(
             value = {
