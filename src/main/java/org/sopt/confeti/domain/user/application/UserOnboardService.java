@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO;
 import org.sopt.confeti.global.exception.NotFoundException;
-import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +33,7 @@ public class UserOnboardService {
 
         Object raw = redisTemplate.opsForValue().get(key);
         if (Objects.isNull(raw)) {
-            log.info("Get Top Artists from Redis Failed");
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+            return UserOnboardCacheDTO.empty();
         }
 
         return objectMapper.convertValue(raw, UserOnboardCacheDTO.class);

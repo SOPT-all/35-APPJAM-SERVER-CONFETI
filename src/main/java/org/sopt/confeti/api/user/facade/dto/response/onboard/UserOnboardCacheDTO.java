@@ -29,4 +29,8 @@ public record UserOnboardCacheDTO(
     ) {
         return new UserOnboardCacheDTO(favoriteArtistIds, exposedArtistIds);
     }
+
+    public static UserOnboardCacheDTO empty() {
+        return new UserOnboardCacheDTO(Collections.emptySet(), Collections.emptySet());
+    }
 }
