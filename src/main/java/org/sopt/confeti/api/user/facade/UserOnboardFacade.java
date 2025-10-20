@@ -1,5 +1,7 @@
 package org.sopt.confeti.api.user.facade;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +43,7 @@ public class UserOnboardFacade {
     private final UserService userService;
     private final UserOnboardService userOnboardService;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
 
     public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(long userId, String term, int limit) {
         Set<String> topArtistIds = userOnboardService.getCachedExposedArtistIds(userId);
@@ -75,8 +78,8 @@ public class UserOnboardFacade {
         List<ConfetiArtist> topArtists = getAllTopArtists();
 
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
-        Set<String> favoriteArtistIds = cachedArtists.favoriteArtistIds();
-        Set<String> exposedArtistIds = cachedArtists.exposedArtistIds();
+        Set<String> favoriteArtistIds = new HashSet<>(cachedArtists.favoriteArtistIds());
+        Set<String> exposedArtistIds = new HashSet<>(cachedArtists.exposedArtistIds());
 
         UserOnboardTopArtistsDTO userOnboardTopArtistsDTO = UserOnboardTopArtistsDTO.from(
             topArtists.stream()
@@ -150,17 +153,14 @@ public class UserOnboardFacade {
         redisTemplate.opsForValue().set(RedisKey.MUSIC_TOP_ARTISTS.get(), topArtists);
     }
 
-    /**
-     * MUSIC_TOP_ARTISTS 캐시는 항상 List<ConfetiArtist> 타입을 캐싱하므로 unchecked 하도록 함
-     */
-    @SuppressWarnings("unchecked")
     private List<ConfetiArtist> getAllTopArtists() {
-        Object cachedTopArtists = redisTemplate.opsForValue().get(RedisKey.MUSIC_TOP_ARTISTS);
+        Object cachedTopArtists = redisTemplate.opsForValue().get(RedisKey.MUSIC_TOP_ARTISTS.get());
 
         if (!Objects.isNull(cachedTopArtists) &&
             (cachedTopArtists instanceof Collection<?> topArtists && !topArtists.isEmpty())) {
             try {
-                return (List<ConfetiArtist>) topArtists;
+                return objectMapper.convertValue(cachedTopArtists, new TypeReference<>() {
+                });
             } catch (ClassCastException e) {
                 log.error("[Casting Exception]", e);
             }
