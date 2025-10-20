@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.performance.controller.docs.PerformanceControllerV4Docs;
 import org.sopt.confeti.api.performance.dto.request.GetExpectedPerformanceRequest;
 import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;

@@ -3,12 +3,15 @@ package org.sopt.confeti.api.user.controller;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.user.controller.docs.UserOnboardControllerV4Docs;
 import org.sopt.confeti.api.user.dto.response.UserOnboardTopArtistsResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.GetOnboardStatusResponse;
+import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardFavoriteArtistsResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardRelatedArtistsResponse;
 import org.sopt.confeti.api.user.facade.UserOnboardFacade;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.GetOnboardStatusDTO;
+import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardFavoriteArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedArtistsDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
@@ -27,9 +30,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user/onboard")
+@RequestMapping("/user/onboard/v4")
 @Validated
-public class UserOnboardController {
+public class UserOnboardControllerV4 implements UserOnboardControllerV4Docs {
 
     private final UserOnboardFacade userOnboardFacade;
 
@@ -70,8 +73,7 @@ public class UserOnboardController {
         @UserId Long userId,
         @RequestParam(required = false, defaultValue = "100") @Min(1) @Max(200) int limit
     ) {
-        UserOnboardTopArtistsDTO topArtists = userOnboardFacade.getTopArtists(limit);
-        userOnboardFacade.cacheTopArtistsToUser(userId, topArtists);
+        UserOnboardTopArtistsDTO topArtists = userOnboardFacade.getTopArtists(limit, userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserOnboardTopArtistsResponse.from(topArtists));
     }
@@ -97,4 +99,19 @@ public class UserOnboardController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             GetOnboardStatusResponse.from(onboardStatusDTO));
     }
+
+    /**
+     * 개발을 위해 임시로 Role.GENERAL 접근 허용
+     */
+    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @GetMapping("/artists/favorite")
+    public ResponseEntity<BaseResponse<UserOnboardFavoriteArtistsResponse>> getFavoriteArtists(
+        @UserId Long userId
+    ) {
+        UserOnboardFavoriteArtistsDTO favoriteArtists = userOnboardFacade.getFavoriteArtists(
+            userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            UserOnboardFavoriteArtistsResponse.from(favoriteArtists));
+    }
+
 }

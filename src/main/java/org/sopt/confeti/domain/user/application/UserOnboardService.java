@@ -1,13 +1,13 @@
 package org.sopt.confeti.domain.user.application;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.domain.user.application.dto.request.UserOnboardCacheTopArtistsDTO;
+import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -29,7 +29,7 @@ public class UserOnboardService {
         return String.format(REDIS_KEY_PREFIX, userId);
     }
 
-    public Set<String> getCachedTopArtists(long userId) {
+    public UserOnboardCacheDTO getCachedArtists(long userId) {
         String key = generateRedisKey(userId);
 
         Object raw = redisTemplate.opsForValue().get(key);
@@ -38,13 +38,20 @@ public class UserOnboardService {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
 
-        return objectMapper.convertValue(raw, new TypeReference<>() {
-        });
+        return objectMapper.convertValue(raw, UserOnboardCacheDTO.class);
     }
 
-    public void cacheTopArtists(long userId, UserOnboardCacheTopArtistsDTO artistsDTO) {
-        redisTemplate.opsForValue().set("TEST:" + userId, "test", REDIS_TTL_DAY, TimeUnit.DAYS);
-        redisTemplate.opsForValue().set(generateRedisKey(userId), artistsDTO.artistIds(), REDIS_TTL_DAY, TimeUnit.DAYS);
+    public Set<String> getCachedExposedArtistIds(long userId) {
+        try {
+            return getCachedArtists(userId).exposedArtistIds();
+        } catch (NotFoundException e) {
+            return Collections.emptySet();
+        }
+    }
+
+    public void cacheOnboardArtists(long userId, UserOnboardCacheDTO artistsDTO) {
+        redisTemplate.opsForValue()
+            .set(generateRedisKey(userId), artistsDTO, REDIS_TTL_DAY, TimeUnit.DAYS);
     }
 
     public void flushCachedTopArtists(long userId) {
