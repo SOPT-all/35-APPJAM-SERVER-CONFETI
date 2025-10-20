@@ -28,4 +28,6 @@ public interface MusicAPIHandler {
     MusicPage getMusicsByKeyword(String term, int offset, int limit);
 
     MusicPage getArtistMusicsByArtistId(String artistId, int offset, int limit);
+
+    List<ConfetiMusic> getArtistTopSongs(String id, int recommendSongFetchSize);
 }

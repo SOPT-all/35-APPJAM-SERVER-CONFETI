@@ -8,11 +8,11 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceArtistDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
 import org.sopt.confeti.domain.view.performance.infra.repository.PerformanceCriteriaRepository;
@@ -28,7 +28,6 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PerformanceService {
@@ -139,7 +138,7 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public List<Performance> getRecommendPerformances(int limit) {
-        return performanceRepository.findTopByRand(limit);
+        return performanceRepository.findPerformancesByRand(limit);
     }
 
     @Transactional(readOnly = true)
@@ -219,5 +218,19 @@ public class PerformanceService {
     @Transactional(readOnly = true)
     public List<Performance> getPerformances() {
         return performanceRepository.findByEndAtGreaterThanEqual(LocalDate.now());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PerformanceDTO> getRandomPerformances(int fetchSize) {
+        return performanceRepository.findPerformancesByRand(fetchSize).stream()
+                .map(PerformanceDTO::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PerformanceArtistDTO> getRandomPerformanceArtists(long performanceId, int fetchSize) {
+        return performanceRepository.findPerformanceArtistsByRand(performanceId, fetchSize).stream()
+                .map(PerformanceArtistDTO::from)
+                .toList();
     }
 }

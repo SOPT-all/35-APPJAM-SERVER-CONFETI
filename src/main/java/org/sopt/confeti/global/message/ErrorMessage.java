@@ -1,10 +1,21 @@
 package org.sopt.confeti.global.message;
 
-import static org.sopt.confeti.global.exception.ErrorResponseConstant.*;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.BAD_REQUEST_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.CONFLICT_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.EMPTY_TOKEN_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.EXPIRED_TOKEN_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.FORBIDDEN_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.INTERNAL_SERVER_ERROR_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.METHOD_NOT_ALLOWED_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.NOT_FOUND_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.TIMETABLE_FESTIVAL_IS_FULL_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.UNAUTHORIZED_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.UNPROCESSABLE_ENTITY_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.WRONG_TOKEN_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.WRONG_TOKEN_REQUEST_MESSAGE;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.sopt.confeti.global.exception.ErrorResponseConstant;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -38,8 +49,7 @@ public enum ErrorMessage {
     TYPE_MISMATCH(HttpStatus.UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY_MESSAGE),
 
     /* 500 Internal Server Error*/
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MESSAGE),
-    ;
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MESSAGE);
 
     private final HttpStatus httpStatus;
     private final String message;
