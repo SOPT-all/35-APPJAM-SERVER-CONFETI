@@ -3,7 +3,7 @@ package org.sopt.confeti.api.performance.dto.response;
 import org.sopt.confeti.api.performance.facade.dto.response.SongRecommendDTO;
 
 public record SongRecommendResponse(
-        String id,
+        String songId,
         String artistName,
         String artworkUrl,
         String previewUrl
