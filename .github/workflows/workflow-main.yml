@@ -168,6 +168,7 @@ jobs:
       # 원격 서버에 배포
       - name: docker container deploy
         uses: appleboy/ssh-action@master
+        timeout-minutes: 20
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
