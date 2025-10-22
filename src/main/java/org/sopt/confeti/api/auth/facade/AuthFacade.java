@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.auth.facade.dto.request.OnboardArtistDTO;
 import org.sopt.confeti.api.auth.facade.dto.request.OnboardDTO;
-import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO;
 import org.sopt.confeti.auth.LoginService;
 import org.sopt.confeti.auth.LogoutService;
 import org.sopt.confeti.auth.OnboardService;
@@ -94,7 +93,7 @@ public class AuthFacade {
 
 
     public void flushCachedTopArtists(long userId) {
-        userOnboardService.flushCachedTopArtists(userId);
+        userOnboardService.flushCachedOnboardArtists(userId);
     }
 
     @Transactional
