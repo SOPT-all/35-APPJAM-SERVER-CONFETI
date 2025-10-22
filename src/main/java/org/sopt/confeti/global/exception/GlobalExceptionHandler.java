@@ -12,6 +12,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<BaseResponse<Void>> handleIllegalArgumentException(
+        BadRequestException e, HttpServletRequest request) {
+        request.setAttribute("exception", e);
+        return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<BaseResponse<Void>> handleIllegalArgumentException(
         IllegalArgumentException e, HttpServletRequest request) {
