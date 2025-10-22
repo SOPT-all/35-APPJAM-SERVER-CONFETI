@@ -1,9 +1,11 @@
 package org.sopt.confeti.api.user.controller;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.docs.UserOnboardControllerV4Docs;
+import org.sopt.confeti.api.user.dto.request.PatchOnboardFavoriteArtistsRequest;
 import org.sopt.confeti.api.user.dto.response.UserOnboardTopArtistsResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.GetOnboardStatusResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardFavoriteArtistsResponse;
@@ -22,8 +24,10 @@ import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -112,6 +116,19 @@ public class UserOnboardControllerV4 implements UserOnboardControllerV4Docs {
             userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserOnboardFavoriteArtistsResponse.from(favoriteArtists));
+    }
+
+    /**
+     * 개발을 위해 임시로 Role.GENERAL 접근 허용
+     */
+    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @PatchMapping("/artists/favorite")
+    public ResponseEntity<BaseResponse<Void>> patchFavoriteArtists(
+        @UserId Long userId,
+        @Valid @RequestBody PatchOnboardFavoriteArtistsRequest request
+    ) {
+        userOnboardFacade.patchFavoriteArtist(userId, request.toDto());
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
 }
