@@ -52,7 +52,7 @@ public class UserOnboardService {
             .set(generateRedisKey(userId), artistsDTO, REDIS_TTL_DAY, TimeUnit.DAYS);
     }
 
-    public void flushCachedTopArtists(long userId) {
+    public void flushCachedOnboardArtists(long userId) {
         redisTemplate.delete(generateRedisKey(userId));
     }
 }

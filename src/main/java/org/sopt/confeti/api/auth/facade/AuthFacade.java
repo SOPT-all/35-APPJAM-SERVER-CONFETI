@@ -68,12 +68,13 @@ public class AuthFacade {
         logoutService.logout(userId);
     }
 
+    @Deprecated
     @Transactional
     public void onboard(long userId, OnboardDTO onboardDTO) {
         User user = userService.findById(userId);
         Set<String> favoriteArtistIds = onboardDTO.favoriteArtists().stream()
-                .map(OnboardArtistDTO::artistId)
-                .collect(Collectors.toSet());
+            .map(OnboardArtistDTO::artistId)
+            .collect(Collectors.toSet());
 
         onboardService.validateFavoriteArtistCount(favoriteArtistIds);
         artistFavoriteService.addFavorites(user, favoriteArtistIds);
@@ -81,7 +82,7 @@ public class AuthFacade {
     }
 
     public void flushCachedTopArtists(long userId) {
-        userOnboardService.flushCachedTopArtists(userId);
+        userOnboardService.flushCachedOnboardArtists(userId);
     }
 
     @Transactional

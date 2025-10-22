@@ -16,10 +16,13 @@ import org.sopt.confeti.api.user.facade.dto.response.onboard.GetOnboardStatusDTO
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardFavoriteArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedArtistsDTO;
+import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
+import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserOnboardService;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.exception.BadRequestException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
@@ -45,6 +48,7 @@ public class UserOnboardFacade {
     private final UserOnboardService userOnboardService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final ArtistFavoriteService artistFavoriteService;
 
     public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(long userId, String term, int limit) {
         Set<String> topArtistIds = userOnboardService.getCachedExposedArtistIds(userId);
@@ -150,6 +154,22 @@ public class UserOnboardFacade {
         return UserOnboardFavoriteArtistsDTO.from(favoriteArtists);
     }
 
+    @Transactional
+    public void onboard(long userId) {
+        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
+        validOnboardArtists(cachedArtists);
+
+        Set<String> favoriteArtistIds = cachedArtists.favoriteArtistIds();
+        User user = userService.findById(userId);
+
+        artistFavoriteService.addFavorites(user, favoriteArtistIds);
+        user.setRole(Role.GENERAL);
+    }
+
+    public void flushCachedOnboardArtists(long userId) {
+        userOnboardService.flushCachedOnboardArtists(userId);
+    }
+
     public void cacheTopArtists(List<ConfetiArtist> topArtists) {
         redisTemplate.opsForValue().set(RedisKey.MUSIC_TOP_ARTISTS.get(), topArtists);
     }
@@ -217,6 +237,14 @@ public class UserOnboardFacade {
 
         userOnboardService.cacheOnboardArtists(userId,
             UserOnboardCacheDTO.of(newFavoriteArtistIds, newExposedArtistIds));
+    }
+
+    private void validOnboardArtists(UserOnboardCacheDTO userOnboardCacheDTO) {
+        Set<String> favoriteArtistIds = userOnboardCacheDTO.favoriteArtistIds();
+
+        if (favoriteArtistIds == null || favoriteArtistIds.isEmpty()) {
+            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+        }
     }
 
 }
