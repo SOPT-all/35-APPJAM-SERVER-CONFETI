@@ -159,10 +159,7 @@ public class UserOnboardFacade {
         Set<String> favoriteArtistIds = new HashSet<>(cachedArtists.favoriteArtistIds());
         Set<String> deleteFavoriteArtistIds = requestDto.deleteFavoriteArtistIds();
 
-        boolean isRemoved = favoriteArtistIds.removeAll(deleteFavoriteArtistIds);
-        if (!isRemoved) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
+        favoriteArtistIds.removeAll(deleteFavoriteArtistIds);
 
         userOnboardService.cacheOnboardArtists(
             userId, UserOnboardCacheDTO.of(favoriteArtistIds, cachedArtists.exposedArtistIds()));
