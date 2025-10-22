@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.auth.facade.dto.request.OnboardArtistDTO;
 import org.sopt.confeti.api.auth.facade.dto.request.OnboardDTO;
+import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO;
 import org.sopt.confeti.auth.LoginService;
 import org.sopt.confeti.auth.LogoutService;
 import org.sopt.confeti.auth.OnboardService;
@@ -68,17 +69,29 @@ public class AuthFacade {
         logoutService.logout(userId);
     }
 
+    @Deprecated
     @Transactional
     public void onboard(long userId, OnboardDTO onboardDTO) {
         User user = userService.findById(userId);
         Set<String> favoriteArtistIds = onboardDTO.favoriteArtists().stream()
-                .map(OnboardArtistDTO::artistId)
-                .collect(Collectors.toSet());
+            .map(OnboardArtistDTO::artistId)
+            .collect(Collectors.toSet());
 
         onboardService.validateFavoriteArtistCount(favoriteArtistIds);
         artistFavoriteService.addFavorites(user, favoriteArtistIds);
         user.setRole(Role.GENERAL);
     }
+
+    @Transactional
+    public void onboard(long userId) {
+        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
+        Set<String> favoriteArtistIds = cachedArtists.favoriteArtistIds();
+        User user = userService.findById(userId);
+
+        artistFavoriteService.addFavorites(user, favoriteArtistIds);
+        user.setRole(Role.GENERAL);
+    }
+
 
     public void flushCachedTopArtists(long userId) {
         userOnboardService.flushCachedTopArtists(userId);
