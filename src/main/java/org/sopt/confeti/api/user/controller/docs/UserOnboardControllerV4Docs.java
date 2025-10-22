@@ -47,7 +47,7 @@ public interface UserOnboardControllerV4Docs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<Void>> patchFavoriteArtists(
-        Long userIdm,
+        Long userId,
         PatchOnboardFavoriteArtistsRequest request
     );
 }
