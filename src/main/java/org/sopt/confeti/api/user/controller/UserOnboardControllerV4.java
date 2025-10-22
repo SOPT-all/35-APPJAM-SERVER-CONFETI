@@ -114,4 +114,17 @@ public class UserOnboardControllerV4 implements UserOnboardControllerV4Docs {
             UserOnboardFavoriteArtistsResponse.from(favoriteArtists));
     }
 
+    /**
+     * 개발을 위해 임시로 Role.GENERAL 접근 허용
+     */
+    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @PostMapping()
+    public ResponseEntity<BaseResponse<Void>> onboard(
+        @UserId Long userId
+    ) {
+        userOnboardFacade.onboard(userId);
+        userOnboardFacade.flushCachedOnboardArtists(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
 }

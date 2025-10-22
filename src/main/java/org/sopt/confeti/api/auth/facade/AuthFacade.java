@@ -81,17 +81,6 @@ public class AuthFacade {
         user.setRole(Role.GENERAL);
     }
 
-    @Transactional
-    public void onboard(long userId) {
-        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
-        Set<String> favoriteArtistIds = cachedArtists.favoriteArtistIds();
-        User user = userService.findById(userId);
-
-        artistFavoriteService.addFavorites(user, favoriteArtistIds);
-        user.setRole(Role.GENERAL);
-    }
-
-
     public void flushCachedTopArtists(long userId) {
         userOnboardService.flushCachedOnboardArtists(userId);
     }
