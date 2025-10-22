@@ -21,6 +21,7 @@ import org.sopt.confeti.domain.user.application.UserOnboardService;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.exception.BadRequestException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
@@ -155,6 +156,8 @@ public class UserOnboardFacade {
     @Transactional
     public void onboard(long userId) {
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
+        validOnboardArtists(cachedArtists);
+
         Set<String> favoriteArtistIds = cachedArtists.favoriteArtistIds();
         User user = userService.findById(userId);
 
@@ -222,6 +225,14 @@ public class UserOnboardFacade {
 
         userOnboardService.cacheOnboardArtists(userId,
             UserOnboardCacheDTO.of(newFavoriteArtistIds, newExposedArtistIds));
+    }
+
+    private void validOnboardArtists(UserOnboardCacheDTO userOnboardCacheDTO) {
+        Set<String> favoriteArtistIds = userOnboardCacheDTO.favoriteArtistIds();
+
+        if (favoriteArtistIds == null || favoriteArtistIds.isEmpty()) {
+            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+        }
     }
 
 }
