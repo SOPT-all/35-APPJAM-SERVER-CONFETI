@@ -2,6 +2,7 @@ package org.sopt.confeti.api.auth.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.auth.controller.docs.AuthControllerV4Docs;
 import org.sopt.confeti.api.auth.dto.request.LoginRequest;
 import org.sopt.confeti.api.auth.facade.AuthFacade;
 import org.sopt.confeti.auth.Token;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth/v4")
-public class AuthControllerV4 {
+public class AuthControllerV4 implements AuthControllerV4Docs {
 
     private final AuthFacade authFacade;
 
