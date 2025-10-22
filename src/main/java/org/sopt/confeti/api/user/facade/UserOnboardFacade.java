@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.api.user.facade.dto.request.PatchOnboardFavoriteArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.GetOnboardStatusDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO;
@@ -151,6 +152,20 @@ public class UserOnboardFacade {
 
     public void cacheTopArtists(List<ConfetiArtist> topArtists) {
         redisTemplate.opsForValue().set(RedisKey.MUSIC_TOP_ARTISTS.get(), topArtists);
+    }
+
+    public void patchFavoriteArtist(long userId, PatchOnboardFavoriteArtistsDTO requestDto) {
+        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
+        Set<String> favoriteArtistIds = new HashSet<>(cachedArtists.favoriteArtistIds());
+        Set<String> deleteFavoriteArtistIds = requestDto.deleteFavoriteArtistIds();
+
+        boolean isRemoved = favoriteArtistIds.removeAll(deleteFavoriteArtistIds);
+        if (!isRemoved) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+
+        userOnboardService.cacheOnboardArtists(
+            userId, UserOnboardCacheDTO.of(favoriteArtistIds, cachedArtists.exposedArtistIds()));
     }
 
     private List<ConfetiArtist> getAllTopArtists() {
