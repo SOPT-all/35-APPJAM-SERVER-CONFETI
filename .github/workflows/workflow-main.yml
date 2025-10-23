@@ -122,6 +122,20 @@ jobs:
           echo "${{ secrets.APPLICATION_NOTIFICATION_YML }}" > ./src/main/resources/notification/application-notification.yml
         shell: bash
 
+      # messagebroker 폴더 생성
+      - name: Create messagebroker folder if not exist
+        run: |
+          if [ ! -d "./src/main/resources/messagebroker" ]; then
+               mkdir -p ./src/main/resources/messagebroker
+          fi
+
+      # application-messagebroker.yml 파일 생성
+      - name: make application-message-broker.yml
+        run: |
+          touch ./src/main/resources/messagebroker/application-message-broker.yml
+          echo "${{ secrets.APPLICATION_MESSAGE_BROKER_YML }}" > ./src/main/resources/messagebroker/application-message-broker.yml
+        shell: bash
+
       # 빌드 속도 향상을 위한 Gradle 캐싱
       - name: Gradle Caching
         uses: actions/cache@v4
