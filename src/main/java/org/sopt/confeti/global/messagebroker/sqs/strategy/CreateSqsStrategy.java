@@ -24,14 +24,14 @@ public class CreateSqsStrategy<T extends CreateEventHandler<? extends CreateEven
 
     protected CreateSqsStrategy(
         List<T> createEventHandlers,
-        @Value("${event.queues.confeti-server}") String queueName,
+        @Value("${message-broker.sqs.create-event}") String queueUrl,
         SqsTemplate sqsTemplate,
         NotificationAgent notificationAgent,
         @Qualifier(MESSAGE_CONSUMER_POOL) TaskExecutor messageConsumeExecutor,
         SqsAsyncClient sqsAsyncClient,
         JsonMapper jsonMapper
     ) {
-        super(createEventHandlers, queueName, sqsTemplate, notificationAgent,
+        super(createEventHandlers, queueUrl, sqsTemplate, notificationAgent,
             messageConsumeExecutor, sqsAsyncClient, jsonMapper);
     }
 
