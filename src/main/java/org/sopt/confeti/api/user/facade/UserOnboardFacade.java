@@ -97,6 +97,23 @@ public class UserOnboardFacade {
 
     public UserOnboardTopArtistsDTO getTopArtists(int limit, long userId) {
         List<ConfetiArtist> topArtists = getAllTopArtists();
+        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
+
+        UserOnboardTopArtistsDTO userOnboardTopArtistsDTO = UserOnboardTopArtistsDTO.from(
+            topArtists.stream()
+                .filter(artist -> !cachedArtists.favoriteArtistIds().contains(artist.getId()))
+                .limit(limit)
+                .toList()
+        );
+
+        return userOnboardTopArtistsDTO;
+    }
+
+    /**
+     * exposed Artist 사용할 경우의 Top Artist 목록 조회 메서드
+     */
+    public UserOnboardTopArtistsDTO getTopArtistsWhenControlExposed(int limit, long userId) {
+        List<ConfetiArtist> topArtists = getAllTopArtists();
 
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
         Set<String> favoriteArtistIds = new HashSet<>(cachedArtists.favoriteArtistIds());
