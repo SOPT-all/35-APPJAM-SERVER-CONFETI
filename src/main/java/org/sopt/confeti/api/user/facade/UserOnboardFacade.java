@@ -127,6 +127,27 @@ public class UserOnboardFacade {
 
         List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
                 FIXED_RELATED_ARTISTS_FETCH_SIZE).stream()
+            .filter(artist -> !cachedOnboardArtists.favoriteArtistIds().contains(artist.getId()))
+            .limit(limit)
+            .toList();
+
+        cacheFavoriteArtists(userId, requestArtistId, cachedOnboardArtists);
+
+        return UserOnboardRelatedArtistsDTO.from(relatedArtists);
+    }
+
+    /**
+     * exposed Artist 를 사용할 경우의 RelatedArtists 조회 메서드
+     */
+    public UserOnboardRelatedArtistsDTO getRelatedArtistsWhenControlExposed(
+        long userId,
+        String requestArtistId,
+        int limit
+    ) {
+        UserOnboardCacheDTO cachedOnboardArtists = userOnboardService.getCachedArtists(userId);
+
+        List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
+                FIXED_RELATED_ARTISTS_FETCH_SIZE).stream()
             .filter(artist -> !cachedOnboardArtists.exposedArtistIds().contains(artist.getId()))
             .limit(limit)
             .toList();
@@ -234,13 +255,27 @@ public class UserOnboardFacade {
         return topArtists;
     }
 
+    private void cacheFavoriteArtists(
+        long userId,
+        String requestArtistId,
+        UserOnboardCacheDTO userOnboardCacheDTO
+    ) {
+        Set<String> newFavoriteArtistIds = new HashSet<>(userOnboardCacheDTO.favoriteArtistIds());
+        newFavoriteArtistIds.add(requestArtistId);
+
+        userOnboardService.cacheOnboardArtists(userId,
+            UserOnboardCacheDTO.createWithFavoriteArtistIds(newFavoriteArtistIds));
+    }
+
+    /**
+     * exposed Artist 를 사용할 경우의 RelatedArtists 캐싱 메서드
+     */
     private void cacheRelatedArtists(
         long userId,
         String requestArtistId,
         UserOnboardCacheDTO userOnboardCacheDTO,
         List<ConfetiArtist> artists
     ) {
-
         Set<String> newFavoriteArtistIds = new HashSet<>(userOnboardCacheDTO.favoriteArtistIds());
         Set<String> newExposedArtistIds = new HashSet<>(userOnboardCacheDTO.exposedArtistIds());
 
