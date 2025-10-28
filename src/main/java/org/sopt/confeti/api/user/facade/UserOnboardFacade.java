@@ -51,6 +51,22 @@ public class UserOnboardFacade {
     private final ArtistFavoriteService artistFavoriteService;
 
     public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(long userId, String term, int limit) {
+        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
+        List<ConfetiArtist> artists = musicAPIHandler.findArtistsByKeyword(term,
+                FIXED_SEARCH_ARTISTS_FETCH_SIZE)
+            .stream()
+            .filter(artist -> !cachedArtists.favoriteArtistIds().contains(artist.getId()))
+            .limit(limit)
+            .toList();
+
+        return UserOnboardRelatedArtistsDTO.from(artists);
+    }
+
+    /**
+     * exposed Artist 사용할 경우의 온보딩 아티스트 검색 메서드
+     */
+    public UserOnboardRelatedArtistsDTO getArtistsRelatedTermWhenControlExposed(long userId,
+        String term, int limit) {
         Set<String> topArtistIds = userOnboardService.getCachedExposedArtistIds(userId);
         List<ConfetiArtist> artists = musicAPIHandler.findArtistsByKeyword(term,
                 FIXED_SEARCH_ARTISTS_FETCH_SIZE)
