@@ -52,14 +52,12 @@ public class UserOnboardFacade {
 
     public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(long userId, String term, int limit) {
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
-        List<ConfetiArtist> artists = musicAPIHandler.findArtistsByKeyword(term,
-                FIXED_SEARCH_ARTISTS_FETCH_SIZE)
-            .stream()
-            .filter(artist -> !cachedArtists.favoriteArtistIds().contains(artist.getId()))
-            .limit(limit)
-            .toList();
+        List<ConfetiArtist> searchedArtists = musicAPIHandler.findArtistsByKeyword(term,
+            FIXED_SEARCH_ARTISTS_FETCH_SIZE);
+        List<ConfetiArtist> filteredArtists = getFilteredArtists(searchedArtists,
+            cachedArtists.favoriteArtistIds(), limit);
 
-        return UserOnboardRelatedArtistsDTO.from(artists);
+        return UserOnboardRelatedArtistsDTO.from(filteredArtists);
     }
 
     /**
@@ -67,15 +65,13 @@ public class UserOnboardFacade {
      */
     public UserOnboardRelatedArtistsDTO getArtistsRelatedTermWhenControlExposed(long userId,
         String term, int limit) {
-        Set<String> topArtistIds = userOnboardService.getCachedExposedArtistIds(userId);
-        List<ConfetiArtist> artists = musicAPIHandler.findArtistsByKeyword(term,
-                FIXED_SEARCH_ARTISTS_FETCH_SIZE)
-            .stream()
-            .filter(artist -> !topArtistIds.contains(artist.getId()))
-            .limit(limit)
-            .toList();
+        Set<String> exposedArtistIds = userOnboardService.getCachedExposedArtistIds(userId);
+        List<ConfetiArtist> searchedArtists = musicAPIHandler.findArtistsByKeyword(term,
+            FIXED_SEARCH_ARTISTS_FETCH_SIZE);
+        List<ConfetiArtist> filteredArtists = getFilteredArtists(searchedArtists, exposedArtistIds,
+            limit);
 
-        return UserOnboardRelatedArtistsDTO.from(artists);
+        return UserOnboardRelatedArtistsDTO.from(filteredArtists);
     }
 
     @Deprecated
@@ -100,10 +96,7 @@ public class UserOnboardFacade {
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
 
         UserOnboardTopArtistsDTO userOnboardTopArtistsDTO = UserOnboardTopArtistsDTO.from(
-            topArtists.stream()
-                .filter(artist -> !cachedArtists.favoriteArtistIds().contains(artist.getId()))
-                .limit(limit)
-                .toList()
+            getFilteredArtists(topArtists, cachedArtists.favoriteArtistIds(), limit)
         );
 
         return userOnboardTopArtistsDTO;
@@ -114,17 +107,12 @@ public class UserOnboardFacade {
      */
     public UserOnboardTopArtistsDTO getTopArtistsWhenControlExposed(int limit, long userId) {
         List<ConfetiArtist> topArtists = getAllTopArtists();
-
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
         Set<String> favoriteArtistIds = new HashSet<>(cachedArtists.favoriteArtistIds());
         Set<String> exposedArtistIds = new HashSet<>(cachedArtists.exposedArtistIds());
 
         UserOnboardTopArtistsDTO userOnboardTopArtistsDTO = UserOnboardTopArtistsDTO.from(
-            topArtists.stream()
-                .filter(artist -> !favoriteArtistIds.contains(artist.getId()))
-                .limit(limit)
-                .toList()
-        );
+            getFilteredArtists(topArtists, favoriteArtistIds, limit));
 
         userOnboardTopArtistsDTO.artists()
             .forEach(artist -> exposedArtistIds.add(artist.id()));
@@ -141,16 +129,14 @@ public class UserOnboardFacade {
         int limit
     ) {
         UserOnboardCacheDTO cachedOnboardArtists = userOnboardService.getCachedArtists(userId);
-
         List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
-                FIXED_RELATED_ARTISTS_FETCH_SIZE).stream()
-            .filter(artist -> !cachedOnboardArtists.favoriteArtistIds().contains(artist.getId()))
-            .limit(limit)
-            .toList();
+            FIXED_RELATED_ARTISTS_FETCH_SIZE);
+        List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
+            relatedArtists, cachedOnboardArtists.favoriteArtistIds(), limit);
 
         cacheFavoriteArtists(userId, requestArtistId, cachedOnboardArtists);
 
-        return UserOnboardRelatedArtistsDTO.from(relatedArtists);
+        return UserOnboardRelatedArtistsDTO.from(filteredRelatedArtists);
     }
 
     /**
@@ -164,12 +150,11 @@ public class UserOnboardFacade {
         UserOnboardCacheDTO cachedOnboardArtists = userOnboardService.getCachedArtists(userId);
 
         List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
-                FIXED_RELATED_ARTISTS_FETCH_SIZE).stream()
-            .filter(artist -> !cachedOnboardArtists.exposedArtistIds().contains(artist.getId()))
-            .limit(limit)
-            .toList();
+            FIXED_RELATED_ARTISTS_FETCH_SIZE);
+        List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
+            relatedArtists, cachedOnboardArtists.exposedArtistIds(), limit);
 
-        cacheRelatedArtists(userId, requestArtistId, cachedOnboardArtists, relatedArtists);
+        cacheRelatedArtists(userId, requestArtistId, cachedOnboardArtists, filteredRelatedArtists);
 
         return UserOnboardRelatedArtistsDTO.from(relatedArtists);
     }
@@ -313,6 +298,14 @@ public class UserOnboardFacade {
         if (favoriteArtistIds == null || favoriteArtistIds.isEmpty()) {
             throw new BadRequestException(ErrorMessage.BAD_REQUEST);
         }
+    }
+
+    private List<ConfetiArtist> getFilteredArtists(List<ConfetiArtist> targetArtists,
+        Set<String> excludeArtistIds, int limit) {
+        return targetArtists.stream()
+            .filter(artist -> !excludeArtistIds.contains(artist.getId()))
+            .limit(limit)
+            .toList();
     }
 
 }
