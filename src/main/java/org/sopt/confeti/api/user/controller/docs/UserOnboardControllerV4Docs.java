@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.sopt.confeti.api.user.dto.request.PatchOnboardFavoriteArtistsRequest;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardFavoriteArtistsResponse;
 import org.sopt.confeti.global.annotation.UserId;
@@ -11,6 +12,7 @@ import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.swagger.AuthErrorResponses;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "유저 온보딩")
 public interface UserOnboardControllerV4Docs {
@@ -27,7 +29,7 @@ public interface UserOnboardControllerV4Docs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<UserOnboardFavoriteArtistsResponse>> getFavoriteArtists(
-        Long userId
+        @UserId Long userId
     );
 
     @Operation(
@@ -71,7 +73,7 @@ public interface UserOnboardControllerV4Docs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<Void>> patchFavoriteArtists(
-        Long userId,
-        PatchOnboardFavoriteArtistsRequest request
+        @UserId Long userId,
+        @Valid @RequestBody PatchOnboardFavoriteArtistsRequest request
     );
 }
