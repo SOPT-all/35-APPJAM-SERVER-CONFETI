@@ -33,4 +33,8 @@ public record UserOnboardCacheDTO(
     public static UserOnboardCacheDTO empty() {
         return new UserOnboardCacheDTO(Collections.emptySet(), Collections.emptySet());
     }
+
+    public static UserOnboardCacheDTO createWithFavoriteArtistIds(Set<String> favoriteArtistIds) {
+        return new UserOnboardCacheDTO(favoriteArtistIds, Collections.emptySet());
+    }
 }
