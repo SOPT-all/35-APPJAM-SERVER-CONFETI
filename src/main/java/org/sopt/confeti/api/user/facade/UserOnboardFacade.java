@@ -51,15 +51,27 @@ public class UserOnboardFacade {
     private final ArtistFavoriteService artistFavoriteService;
 
     public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(long userId, String term, int limit) {
-        Set<String> topArtistIds = userOnboardService.getCachedExposedArtistIds(userId);
-        List<ConfetiArtist> artists = musicAPIHandler.findArtistsByKeyword(term,
-                FIXED_SEARCH_ARTISTS_FETCH_SIZE)
-            .stream()
-            .filter(artist -> !topArtistIds.contains(artist.getId()))
-            .limit(limit)
-            .toList();
+        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
+        List<ConfetiArtist> searchedArtists = musicAPIHandler.findArtistsByKeyword(term,
+            FIXED_SEARCH_ARTISTS_FETCH_SIZE);
+        List<ConfetiArtist> filteredArtists = getFilteredArtists(searchedArtists,
+            cachedArtists.favoriteArtistIds(), limit);
 
-        return UserOnboardRelatedArtistsDTO.from(artists);
+        return UserOnboardRelatedArtistsDTO.from(filteredArtists);
+    }
+
+    /**
+     * exposed Artist 사용할 경우의 온보딩 아티스트 검색 메서드
+     */
+    public UserOnboardRelatedArtistsDTO getArtistsRelatedTermWhenControlExposed(long userId,
+        String term, int limit) {
+        Set<String> exposedArtistIds = userOnboardService.getCachedExposedArtistIds(userId);
+        List<ConfetiArtist> searchedArtists = musicAPIHandler.findArtistsByKeyword(term,
+            FIXED_SEARCH_ARTISTS_FETCH_SIZE);
+        List<ConfetiArtist> filteredArtists = getFilteredArtists(searchedArtists, exposedArtistIds,
+            limit);
+
+        return UserOnboardRelatedArtistsDTO.from(filteredArtists);
     }
 
     @Deprecated
@@ -81,17 +93,26 @@ public class UserOnboardFacade {
 
     public UserOnboardTopArtistsDTO getTopArtists(int limit, long userId) {
         List<ConfetiArtist> topArtists = getAllTopArtists();
+        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
 
+        UserOnboardTopArtistsDTO userOnboardTopArtistsDTO = UserOnboardTopArtistsDTO.from(
+            getFilteredArtists(topArtists, cachedArtists.favoriteArtistIds(), limit)
+        );
+
+        return userOnboardTopArtistsDTO;
+    }
+
+    /**
+     * exposed Artist 사용할 경우의 Top Artist 목록 조회 메서드
+     */
+    public UserOnboardTopArtistsDTO getTopArtistsWhenControlExposed(int limit, long userId) {
+        List<ConfetiArtist> topArtists = getAllTopArtists();
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedArtists(userId);
         Set<String> favoriteArtistIds = new HashSet<>(cachedArtists.favoriteArtistIds());
         Set<String> exposedArtistIds = new HashSet<>(cachedArtists.exposedArtistIds());
 
         UserOnboardTopArtistsDTO userOnboardTopArtistsDTO = UserOnboardTopArtistsDTO.from(
-            topArtists.stream()
-                .filter(artist -> !favoriteArtistIds.contains(artist.getId()))
-                .limit(limit)
-                .toList()
-        );
+            getFilteredArtists(topArtists, favoriteArtistIds, limit));
 
         userOnboardTopArtistsDTO.artists()
             .forEach(artist -> exposedArtistIds.add(artist.id()));
@@ -108,14 +129,32 @@ public class UserOnboardFacade {
         int limit
     ) {
         UserOnboardCacheDTO cachedOnboardArtists = userOnboardService.getCachedArtists(userId);
+        List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
+            FIXED_RELATED_ARTISTS_FETCH_SIZE);
+        List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
+            relatedArtists, cachedOnboardArtists.favoriteArtistIds(), limit);
+
+        cacheFavoriteArtists(userId, requestArtistId, cachedOnboardArtists);
+
+        return UserOnboardRelatedArtistsDTO.from(filteredRelatedArtists);
+    }
+
+    /**
+     * exposed Artist 를 사용할 경우의 RelatedArtists 조회 메서드
+     */
+    public UserOnboardRelatedArtistsDTO getRelatedArtistsWhenControlExposed(
+        long userId,
+        String requestArtistId,
+        int limit
+    ) {
+        UserOnboardCacheDTO cachedOnboardArtists = userOnboardService.getCachedArtists(userId);
 
         List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
-                FIXED_RELATED_ARTISTS_FETCH_SIZE).stream()
-            .filter(artist -> !cachedOnboardArtists.exposedArtistIds().contains(artist.getId()))
-            .limit(limit)
-            .toList();
+            FIXED_RELATED_ARTISTS_FETCH_SIZE);
+        List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
+            relatedArtists, cachedOnboardArtists.exposedArtistIds(), limit);
 
-        cacheRelatedArtists(userId, requestArtistId, cachedOnboardArtists, relatedArtists);
+        cacheRelatedArtists(userId, requestArtistId, cachedOnboardArtists, filteredRelatedArtists);
 
         return UserOnboardRelatedArtistsDTO.from(relatedArtists);
     }
@@ -218,13 +257,27 @@ public class UserOnboardFacade {
         return topArtists;
     }
 
+    private void cacheFavoriteArtists(
+        long userId,
+        String requestArtistId,
+        UserOnboardCacheDTO userOnboardCacheDTO
+    ) {
+        Set<String> newFavoriteArtistIds = new HashSet<>(userOnboardCacheDTO.favoriteArtistIds());
+        newFavoriteArtistIds.add(requestArtistId);
+
+        userOnboardService.cacheOnboardArtists(userId,
+            UserOnboardCacheDTO.createWithFavoriteArtistIds(newFavoriteArtistIds));
+    }
+
+    /**
+     * exposed Artist 를 사용할 경우의 RelatedArtists 캐싱 메서드
+     */
     private void cacheRelatedArtists(
         long userId,
         String requestArtistId,
         UserOnboardCacheDTO userOnboardCacheDTO,
         List<ConfetiArtist> artists
     ) {
-
         Set<String> newFavoriteArtistIds = new HashSet<>(userOnboardCacheDTO.favoriteArtistIds());
         Set<String> newExposedArtistIds = new HashSet<>(userOnboardCacheDTO.exposedArtistIds());
 
@@ -245,6 +298,14 @@ public class UserOnboardFacade {
         if (favoriteArtistIds == null || favoriteArtistIds.isEmpty()) {
             throw new BadRequestException(ErrorMessage.BAD_REQUEST);
         }
+    }
+
+    private List<ConfetiArtist> getFilteredArtists(List<ConfetiArtist> targetArtists,
+        Set<String> excludeArtistIds, int limit) {
+        return targetArtists.stream()
+            .filter(artist -> !excludeArtistIds.contains(artist.getId()))
+            .limit(limit)
+            .toList();
     }
 
 }
