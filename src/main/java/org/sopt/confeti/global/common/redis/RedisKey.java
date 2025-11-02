@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistMusicEditDTO;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
-import org.sopt.confeti.global.util.StringUtil;
 import org.sopt.confeti.global.util.music.dto.music.MusicPage;
+import org.springframework.util.StringUtils;
 
 /**
  * When adding a new key, if you add a new object, register it with the Pool.
@@ -58,7 +58,7 @@ public enum RedisKey {
         }
 
         public boolean isValid() {
-            return StringUtil.hasText(key) && ttl != null && type != null;
+            return StringUtils.hasText(key) && ttl != null && type != null;
         }
     }
 
