@@ -1,6 +1,7 @@
 package org.sopt.confeti.api.user.facade.dto.response.onboard;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -45,5 +46,17 @@ public record UserOnboardCacheDTO(
 
     public static UserOnboardCacheDTO createWithFavoriteArtistIds(Set<String> favoriteArtistIds) {
         return new UserOnboardCacheDTO(favoriteArtistIds, Collections.emptySet());
+    }
+
+    public UserOnboardCacheDTO withAddFavoriteArtistIds(Collection<String> newFavoriteArtistIds) {
+        Set<String> currentFavoriteArtistIds = new LinkedHashSet<>(this.favoriteArtistIds);
+        currentFavoriteArtistIds.addAll(newFavoriteArtistIds);
+        return new UserOnboardCacheDTO(currentFavoriteArtistIds, this.exposedArtistIds);
+    }
+
+    public UserOnboardCacheDTO deleteFavoriteArtistIds(Collection<String> targetArtistIds) {
+        Set<String> currentFavoriteArtistIds = new LinkedHashSet<>(this.favoriteArtistIds);
+        currentFavoriteArtistIds.removeAll(targetArtistIds);
+        return new UserOnboardCacheDTO(currentFavoriteArtistIds, this.exposedArtistIds);
     }
 }

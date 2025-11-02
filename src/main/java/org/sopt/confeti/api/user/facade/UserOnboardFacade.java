@@ -1,5 +1,8 @@
 package org.sopt.confeti.api.user.facade;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -210,13 +213,11 @@ public class UserOnboardFacade {
 
     public void patchFavoriteArtist(long userId, PatchOnboardFavoriteArtistsDTO requestDto) {
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
-        Set<String> favoriteArtistIds = new HashSet<>(cachedArtists.favoriteArtistIds());
-        Set<String> deleteFavoriteArtistIds = requestDto.deleteFavoriteArtistIds();
 
-        favoriteArtistIds.removeAll(deleteFavoriteArtistIds);
+        UserOnboardCacheDTO newUserOnboardCacheDTO
+            = cachedArtists.deleteFavoriteArtistIds(requestDto.deleteFavoriteArtistIds());
 
-        userOnboardService.cacheOnboardArtists(
-            userId, UserOnboardCacheDTO.of(favoriteArtistIds, cachedArtists.exposedArtistIds()));
+        userOnboardService.cacheOnboardArtists(userId, newUserOnboardCacheDTO);
     }
 
     private List<ConfetiArtist> getAllTopArtists() {
@@ -251,11 +252,10 @@ public class UserOnboardFacade {
         String requestArtistId,
         UserOnboardCacheDTO userOnboardCacheDTO
     ) {
-        Set<String> newFavoriteArtistIds = new HashSet<>(userOnboardCacheDTO.favoriteArtistIds());
-        newFavoriteArtistIds.add(requestArtistId);
+        UserOnboardCacheDTO newUserOnboardCacheDTO = userOnboardCacheDTO.withAddFavoriteArtistIds(
+            new LinkedHashSet<>(List.of(requestArtistId)));
 
-        userOnboardService.cacheOnboardArtists(userId,
-            UserOnboardCacheDTO.createWithFavoriteArtistIds(newFavoriteArtistIds));
+        userOnboardService.cacheOnboardArtists(userId, newUserOnboardCacheDTO);
     }
 
     /**
