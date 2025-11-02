@@ -128,6 +128,6 @@ public class RedisHandler {
     }
 
     private boolean isNotValidKeyInfo(KeyInfo keyInfo) {
-        return keyInfo == null;
+        return keyInfo == null || !keyInfo.isValid();
     }
 }

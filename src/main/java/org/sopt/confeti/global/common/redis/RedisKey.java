@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistMusicEditDTO;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
+import org.sopt.confeti.global.util.StringUtil;
 import org.sopt.confeti.global.util.music.dto.music.MusicPage;
 
 /**
@@ -54,6 +55,10 @@ public enum RedisKey {
         @SuppressWarnings("unchecked")
         public <T> Class<T> getType() {
             return (Class<T>) type;
+        }
+
+        public boolean isValid() {
+            return StringUtil.hasText(key) && ttl != null && type != null;
         }
     }
 
