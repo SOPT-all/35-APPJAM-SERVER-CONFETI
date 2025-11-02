@@ -1,6 +1,8 @@
 package org.sopt.confeti.api.user.facade.dto.response.onboard;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistDTO;
@@ -10,6 +12,11 @@ public record UserOnboardCacheDTO(
     Set<String> favoriteArtistIds,
     Set<String> exposedArtistIds
 ) {
+
+    public UserOnboardCacheDTO {
+        favoriteArtistIds = new LinkedHashSet<>(favoriteArtistIds);
+        exposedArtistIds = new HashSet<>(exposedArtistIds);
+    }
 
     public static UserOnboardCacheDTO createWithExposedArtistIds(Set<String> exposedArtistIds) {
         return new UserOnboardCacheDTO(Collections.emptySet(), exposedArtistIds);
