@@ -15,8 +15,6 @@ import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.concurrent.TimeUnit;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -44,7 +42,7 @@ public class ReissueService {
     }
 
     private void validateCachedRefreshToken(long userId, String refreshToken) {
-        String cachedRefreshToken = redisHandler.<String>get(RedisKey.USER_REFRESH_TOKEN, userId)
+        String cachedRefreshToken = redisHandler.<String>get(RedisKey.USER_REFRESH_TOKEN.createKeyInfo(userId))
                 .orElseThrow(() -> new ConfetiException(ErrorMessage.BAD_REQUEST));
 
         if (!cachedRefreshToken.equals(refreshToken)) {
@@ -53,6 +51,6 @@ public class ReissueService {
     }
 
     public void cachingRefreshToken(Long userId, String refreshToken) {
-        redisHandler.set(refreshToken, RedisKey.USER_REFRESH_TOKEN, userId);
+        redisHandler.set(RedisKey.USER_REFRESH_TOKEN.createKeyInfo(userId), refreshToken);
     }
 }

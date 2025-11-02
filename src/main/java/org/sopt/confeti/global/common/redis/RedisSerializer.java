@@ -3,6 +3,7 @@ package org.sopt.confeti.global.common.redis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,21 +17,21 @@ public class RedisSerializer {
     private final RedisSerializeTypeFactory typeFactory;
     private final ObjectMapper objectMapper;
 
-    public <T> String serialize(T obj) {
+    public <T> Optional<String> serialize(T obj) {
         try {
-            return objectMapper.writeValueAsString(obj);
+            return Optional.of(objectMapper.writeValueAsString(obj));
         } catch (JsonProcessingException e) {
             log.warn("RedisSerializer.serialize : Exception occurred while serialize object : {}", obj);
-            return null;
+            return Optional.empty();
         }
     }
 
-    public <T> T deserialize(String value, Class<T> type) {
+    public <T> Optional<T> deserialize(String value, Class<T> type) {
         try {
-            return objectMapper.readValue(value, type);
+            return Optional.of(objectMapper.readValue(value, type));
         } catch (JsonProcessingException e) {
             log.warn("RedisSerializer.deserialize : Exception occurred while deserialize string to object. value : {}, type : {}", value, type);
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -39,7 +40,7 @@ public class RedisSerializer {
             return objectMapper.readValue(value, typeFactory.getSerializeType(List.class, type));
         } catch (JsonProcessingException e) {
             log.warn("RedisSerializer.deserializeToList : Exception occurred while deserialize string to list. value : {}, type : {}", value, type);
-            return null;
+            return List.of();
         }
     }
 
@@ -48,7 +49,7 @@ public class RedisSerializer {
             return objectMapper.readValue(value, typeFactory.getSerializeType(Set.class, type));
         } catch (JsonProcessingException e) {
             log.warn("RedisSerializer.deserializeToSet : Exception occurred while deserialize string to set. value : {}, type : {}", value, type);
-            return null;
+            return Set.of();
         }
     }
 }

@@ -102,7 +102,6 @@ dependencies {
 
     // Spring Cloud AWS SQS Starter
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs:3.3.1'
-
 }
 
 dependencyManagement {

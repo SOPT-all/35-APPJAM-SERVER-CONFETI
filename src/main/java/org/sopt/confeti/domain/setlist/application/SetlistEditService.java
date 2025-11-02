@@ -1,7 +1,5 @@
 package org.sopt.confeti.domain.setlist.application;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -15,9 +13,10 @@ import org.sopt.confeti.api.setlist.facade.dto.request.SetlistMusicEditDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistUpdateMusicOrderDTO;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistMusicRepository;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
+import org.sopt.confeti.global.common.redis.RedisHandler;
+import org.sopt.confeti.global.common.redis.RedisKey;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +26,7 @@ public class SetlistEditService {
 
     private final SetlistRepository setlistRepository;
     private final SetlistMusicRepository setlistMusicRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper;
+    private final RedisHandler redisHandler;
 
     private static final int SWAP_REQUEST_SIZE = 2;
 
@@ -43,20 +41,17 @@ public class SetlistEditService {
                 .map(SetlistMusicEditDTO::from)
                 .toList();
 
-        String redisKey = generateRedisKey(userId, setlistId);
-
-        Boolean existed = redisTemplate.hasKey(redisKey);
-        if (Boolean.TRUE.equals(existed)) {
-            redisTemplate.delete(redisKey);
+        boolean existed = redisHandler.hasKey(RedisKey.SETLIST_EDIT.createKeyInfo(userId, setlistId));
+        if (existed) {
+            redisHandler.delete(RedisKey.SETLIST_EDIT.createKeyInfo(userId, setlistId));
         }
 
-        redisTemplate.opsForValue().set(redisKey, musicDtos);
+        cachingMusics(userId, setlistId, musicDtos);
     }
 
     @Transactional
     public void updateMusicOrder(Long userId, Long setlistId, List<SetlistUpdateMusicOrderDTO> requests) {
-        String key = generateRedisKey(userId, setlistId);
-        List<SetlistMusicEditDTO> musics = getRedisMusicList(key);
+        List<SetlistMusicEditDTO> musics = getCachedMusics(userId, setlistId);
 
         Map<String, SetlistMusicEditDTO> musicMap = toMusicMap(musics);
 
@@ -68,17 +63,12 @@ public class SetlistEditService {
                 .sorted(Comparator.comparing(SetlistMusicEditDTO::orders))
                 .toList();
 
-        redisTemplate.opsForValue().set(key, updated);
+        cachingMusics(userId, setlistId, updated);
     }
 
     @Transactional
     public String deleteMusic(Long userId, Long setlistId, int orders) {
-        String key = generateRedisKey(userId, setlistId);
-        Object raw = redisTemplate.opsForValue().get(key);
-        if(Objects.isNull(raw)) throw new NotFoundException(ErrorMessage.NOT_FOUND);
-
-        List<SetlistMusicEditDTO> musics = objectMapper.convertValue(raw, new TypeReference<>() {});
-        if(musics.isEmpty()) throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        List<SetlistMusicEditDTO> musics = getCachedMusics(userId, setlistId);
 
         SetlistMusicEditDTO deleted = musics.stream()
                 .filter(m -> m.orders() == orders)
@@ -99,18 +89,13 @@ public class SetlistEditService {
             ));
         }
 
-        redisTemplate.opsForValue().set(key, reordered);
+        cachingMusics(userId, setlistId, reordered);
         return deleted.musicId();
     }
 
     @Transactional
     public void completeEdit(Long userId, Long setlistId) {
-        String key = generateRedisKey(userId, setlistId);
-        Object raw = redisTemplate.opsForValue().get(key);
-        if (Objects.isNull(raw)) throw new NotFoundException(ErrorMessage.NOT_FOUND);
-
-        List<SetlistMusicEditDTO> edited = objectMapper.convertValue(raw, new TypeReference<>() {});
-        if (edited.isEmpty()) throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        List<SetlistMusicEditDTO> edited = getCachedMusics(userId, setlistId);
 
         Setlist setlist = setlistRepository.findByIdAndUserId(setlistId, userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
@@ -140,32 +125,18 @@ public class SetlistEditService {
             setlistMusicRepository.deleteAll(toDelete);
         }
 
-        redisTemplate.delete(key);
+        redisHandler.delete(RedisKey.SETLIST_EDIT.createKeyInfo(userId, setlistId));
     }
 
     @Transactional
     public void cancelEdit(Long userId, Long setlistId) {
-        String key = generateRedisKey(userId, setlistId);
-        Boolean existed = redisTemplate.hasKey(key);
-        System.out.println(existed);
-        if (Boolean.FALSE.equals(existed)) {
+        boolean existed = redisHandler.hasKey(RedisKey.SETLIST_EDIT.createKeyInfo(userId, setlistId));
+
+        if (!existed) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
-        redisTemplate.delete(key);
-    }
 
-    private String generateRedisKey(Long userId, Long setlistId) {
-        return "edit:setlist:" + userId + ":" + setlistId;
-    }
-
-    private List<SetlistMusicEditDTO> getRedisMusicList(String key) {
-        Object raw = redisTemplate.opsForValue().get(key);
-        if(Objects.isNull(raw)) throw new NotFoundException(ErrorMessage.NOT_FOUND);
-
-        List<SetlistMusicEditDTO> musics = objectMapper.convertValue(raw, new TypeReference<>() {});
-        if (musics.isEmpty()) throw new NotFoundException(ErrorMessage.NOT_FOUND);
-
-        return musics;
+        redisHandler.delete(RedisKey.SETLIST_EDIT.createKeyInfo(userId, setlistId));
     }
 
     private Map<String, SetlistMusicEditDTO> toMusicMap(List<SetlistMusicEditDTO> musics) {
@@ -185,5 +156,19 @@ public class SetlistEditService {
             musicMap.put(a.musicId(), a);
             musicMap.put(b.musicId(), b);
         }
+    }
+
+    private List<SetlistMusicEditDTO> getCachedMusics(Long userId, Long setlistId) {
+        List<SetlistMusicEditDTO> musics = redisHandler.getList(RedisKey.SETLIST_EDIT.createKeyInfo(userId, setlistId));
+
+        if (musics.isEmpty()) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+
+        return musics;
+    }
+
+    private void cachingMusics(Long userId, Long setlistId, List<SetlistMusicEditDTO> musics) {
+        redisHandler.set(RedisKey.SETLIST_EDIT.createKeyInfo(userId, setlistId), musics);
     }
 }

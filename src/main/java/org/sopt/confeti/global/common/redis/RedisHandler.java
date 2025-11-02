@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.annotation.Handler;
+import org.sopt.confeti.global.common.redis.RedisKey.KeyInfo;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Set;
@@ -23,92 +24,110 @@ public class RedisHandler {
     @Builder
     @RequiredArgsConstructor
     public static class RedisData<T> {
-        private final String key;
+        private final KeyInfo keyInfo;
         private final T value;
     }
 
-    public <T> void set(T value, RedisKey redisKey, Object... args) {
-        String key = redisKey.getKey(args);
-
-        if (key == null) {
-            log.warn("RedisHandler.set : Redis key format error. Redis key : {}, args : {}", redisKey, args);
+    public <T> void set(KeyInfo keyInfo, T value) {
+        if (isNotValidKeyInfo(keyInfo)) {
+            log.warn("RedisHandler.set : Redis key format error. value : {}", value);
             return;
         }
 
-        redisTemplate.opsForValue().set(key, serializer.serialize(value), redisKey.getTtl());
+        Optional<String> result = serializer.serialize(value);
+        result.ifPresent(serialized ->
+                redisTemplate.opsForValue().set(keyInfo.getKey(), serialized, keyInfo.getTtl()));
     }
 
-    public <T> void multiSet(RedisKey redisKey, List<RedisData<T>> dataList) {
+    public <T> void multiSet(List<RedisData<T>> dataList) {
         for (RedisData<T> data : dataList) {
-            redisTemplate.opsForValue().set(data.key, serializer.serialize(data.value), redisKey.getTtl());
+            KeyInfo keyInfo = data.keyInfo;
+
+            Optional<String> result = serializer.serialize(data.value);
+            result.ifPresent(serialized ->
+                    redisTemplate.opsForValue().set(keyInfo.getKey(), serialized, keyInfo.getTtl()));
         }
     }
 
-    public <T> Optional<T> get(RedisKey redisKey, Object... args) {
-        String key = redisKey.getKey(args);
-
-        if (key == null) {
-            log.warn("RedisHandler.get : Redis key format error. Redis key : {}, args : {}", redisKey, args);
+    public <T> Optional<T> get(KeyInfo keyInfo) {
+        if (isNotValidKeyInfo(keyInfo)) {
+            log.warn("RedisHandler.get : Redis key format error.");
             return Optional.empty();
         }
 
-        T result = serializer.deserialize(
-                redisTemplate.opsForValue().get(key),
-                redisKey.getType()
-        );
+        String cachedValue = redisTemplate.opsForValue().get(keyInfo.getKey());
+        if (cachedValue == null) {
+            return Optional.empty();
+        }
 
-        return Optional.of(result);
+        return serializer.deserialize(cachedValue, keyInfo.getType());
     }
 
-    public <T> List<T> getList(RedisKey redisKey, Object... args) {
-        String key = redisKey.getKey(args);
-
-        if (key == null) {
-            log.warn("RedisHandler.getList : Redis key format error. Redis key : {}, args : {}", redisKey, args);
+    public <T> List<T> getList(KeyInfo keyInfo) {
+        if (isNotValidKeyInfo(keyInfo)) {
+            log.warn("RedisHandler.getList : Redis key format error.");
             return Collections.emptyList();
         }
 
-        return serializer.deserializeToList(
-                redisTemplate.opsForValue().get(key),
-                redisKey.getType()
-        );
+        String cachedValue = redisTemplate.opsForValue().get(keyInfo.getKey());
+        if (cachedValue == null) {
+            return List.of();
+        }
+
+        return serializer.deserializeToList(cachedValue, keyInfo.getType());
     }
 
-    public <T> Set<T> getSet(RedisKey redisKey, Object... args) {
-        String key = redisKey.getKey(args);
-
-        if (key == null) {
-            log.warn("RedisHandler.getSet : Redis key format error. Redis key : {}, args : {}", redisKey, args);
+    public <T> Set<T> getSet(KeyInfo keyInfo) {
+        if (isNotValidKeyInfo(keyInfo)) {
+            log.warn("RedisHandler.getSet : Redis key format error.");
             return Collections.emptySet();
         }
 
-        return serializer.deserializeToSet(
-                redisTemplate.opsForValue().get(key),
-                redisKey.getType()
-        );
+        String cachedValue = redisTemplate.opsForValue().get(keyInfo.getKey());
+        if (cachedValue == null) {
+            return Set.of();
+        }
+
+        return serializer.deserializeToSet(cachedValue, keyInfo.getType());
     }
 
-    public <T> List<T> multiGet(RedisKey redisKey, Set<String> keys) {
-        List<T> results = new ArrayList<>(keys.size());
+    public <T> List<T> multiGet(List<KeyInfo> keyInfos) {
+        List<T> results = new ArrayList<>(keyInfos.size());
 
-        for (String key : keys) {
-            results.add(serializer.deserialize(
-                    redisTemplate.opsForValue().get(key),
-                    redisKey.getType()
-            ));
+        for (KeyInfo keyInfo : keyInfos) {
+            String cachedValue = redisTemplate.opsForValue().get(keyInfo.getKey());
+
+            if (cachedValue == null) {
+                log.warn("RedisHandler.multiGet: cache missed. key : {}, type : {}", keyInfo.getKey(), keyInfo.getType());
+                continue;
+            }
+
+            Optional<T> result = serializer.deserialize(cachedValue, keyInfo.getType());
+            result.ifPresent(results::add);
         }
 
         return results;
     }
 
-    public void delete(RedisKey redisKey, Object... args) {
-        String key = redisKey.getKey(args);
-
-        if (key == null) {
-            log.warn("RedisHandler.delete : Redis key format error. Redis key : {}, args : {}", redisKey, args);
+    public void delete(KeyInfo keyInfo) {
+        if (isNotValidKeyInfo(keyInfo)) {
+            log.warn("RedisHandler.delete : Redis key format error.");
             return;
         }
 
-        redisTemplate.delete(key);
+        redisTemplate.delete(keyInfo.getKey());
+    }
+
+    public boolean hasKey(KeyInfo keyInfo) {
+        if (isNotValidKeyInfo(keyInfo)) {
+            log.warn("RedisHandler.hasKey : Redis key format error.");
+            return false;
+        }
+
+        return redisTemplate.hasKey(keyInfo.getKey());
+    }
+
+    private boolean isNotValidKeyInfo(KeyInfo keyInfo) {
+        return keyInfo == null;
     }
 }
