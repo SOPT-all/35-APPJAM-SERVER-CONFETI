@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.user.facade.dto.response.onboard;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -9,6 +10,7 @@ import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
 
 public record UserOnboardCacheDTO(
+    @JsonDeserialize(as = LinkedHashSet.class)
     Set<String> favoriteArtistIds,
     Set<String> exposedArtistIds
 ) {
