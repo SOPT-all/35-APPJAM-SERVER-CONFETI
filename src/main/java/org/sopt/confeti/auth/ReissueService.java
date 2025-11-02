@@ -36,7 +36,7 @@ public class ReissueService {
         String newAccessToken = jwtTokenGenerator.createAccessToken(userId, role, provider);
         String newRefreshToken = jwtTokenGenerator.createRefreshToken(userId, role, provider);
 
-        cachingRefreshToken(Long.parseLong(userId), newRefreshToken);
+        cacheRefreshToken(Long.parseLong(userId), newRefreshToken);
 
         return new Token(newAccessToken, newRefreshToken);
     }
@@ -50,7 +50,7 @@ public class ReissueService {
         }
     }
 
-    public void cachingRefreshToken(Long userId, String refreshToken) {
+    public void cacheRefreshToken(Long userId, String refreshToken) {
         redisHandler.set(RedisKey.USER_REFRESH_TOKEN.createKeyInfo(userId), refreshToken);
     }
 }

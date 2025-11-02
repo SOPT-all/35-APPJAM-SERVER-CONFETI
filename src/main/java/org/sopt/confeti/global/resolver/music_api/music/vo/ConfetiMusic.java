@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.sopt.confeti.global.annotation.RedisSerializable;
 import org.sopt.confeti.global.common.constant.MusicConstant;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicArtistsResponse;
 import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicAttributesResponse;
@@ -24,6 +25,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@RedisSerializable
 public class ConfetiMusic {
 
     @Column(name = "music_id", length = 50, nullable = false)

@@ -46,7 +46,7 @@ public class SetlistEditService {
             redisHandler.delete(RedisKey.SETLIST_EDIT.createKeyInfo(userId, setlistId));
         }
 
-        cachingMusics(userId, setlistId, musicDtos);
+        cacheMusics(userId, setlistId, musicDtos);
     }
 
     @Transactional
@@ -63,7 +63,7 @@ public class SetlistEditService {
                 .sorted(Comparator.comparing(SetlistMusicEditDTO::orders))
                 .toList();
 
-        cachingMusics(userId, setlistId, updated);
+        cacheMusics(userId, setlistId, updated);
     }
 
     @Transactional
@@ -89,7 +89,7 @@ public class SetlistEditService {
             ));
         }
 
-        cachingMusics(userId, setlistId, reordered);
+        cacheMusics(userId, setlistId, reordered);
         return deleted.musicId();
     }
 
@@ -168,7 +168,7 @@ public class SetlistEditService {
         return musics;
     }
 
-    private void cachingMusics(Long userId, Long setlistId, List<SetlistMusicEditDTO> musics) {
+    private void cacheMusics(Long userId, Long setlistId, List<SetlistMusicEditDTO> musics) {
         redisHandler.set(RedisKey.SETLIST_EDIT.createKeyInfo(userId, setlistId), musics);
     }
 }

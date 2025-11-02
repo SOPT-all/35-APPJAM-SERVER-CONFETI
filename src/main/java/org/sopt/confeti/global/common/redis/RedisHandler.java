@@ -92,17 +92,25 @@ public class RedisHandler {
     }
 
     public <T> List<T> multiGet(List<KeyInfo> keyInfos) {
-        List<T> results = new ArrayList<>(keyInfos.size());
+        if (keyInfos.isEmpty()) {
+            return List.of();
+        }
 
-        for (KeyInfo keyInfo : keyInfos) {
-            String cachedValue = redisTemplate.opsForValue().get(keyInfo.getKey());
+        List<String> keys = keyInfos.stream()
+                .map(KeyInfo::getKey)
+                .toList();
+        Class<T> type = keyInfos.stream().findFirst().get().getType();
 
-            if (cachedValue == null) {
-                log.warn("RedisHandler.multiGet: cache missed. key : {}, type : {}", keyInfo.getKey(), keyInfo.getType());
-                continue;
-            }
+        List<String> cachedValues = redisTemplate.opsForValue().multiGet(keys);
 
-            Optional<T> result = serializer.deserialize(cachedValue, keyInfo.getType());
+        if (cachedValues == null) {
+            return List.of();
+        }
+
+        List<T> results = new ArrayList<>(cachedValues.size());
+
+        for (String cachedValue : cachedValues) {
+            Optional<T> result = serializer.deserialize(cachedValue, type);
             result.ifPresent(results::add);
         }
 

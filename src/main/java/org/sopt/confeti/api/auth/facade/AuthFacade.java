@@ -53,7 +53,7 @@ public class AuthFacade {
 
         AuthUser authUser = userService.getAuthUser(socialInfo.id(), loginCommand.provider());
         Token token = loginService.createToken(authUser, socialInfo);
-        reissueService.cachingRefreshToken(authUser.getId(), token.refreshToken());
+        reissueService.cacheRefreshToken(authUser.getId(), token.refreshToken());
 
         return loginService.getLoginResult(token, authUser.getRole());
     }

@@ -67,7 +67,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                 client.getArtists(String.join(QUERY_PARAMETER_IDS_DELIMITER, uncachedArtistIds))
         );
         // 4. 캐시 업데이트
-        cachingArtists(fetchedArtists);
+        cacheArtists(fetchedArtists);
 
         return Stream.concat(cachedArtists.stream(), fetchedArtists.stream()).toList();
     }
@@ -80,7 +80,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         return redisHandler.multiGet(keyInfos);
     }
 
-    private void cachingArtists(final List<ConfetiArtist> artists) {
+    private void cacheArtists(final List<ConfetiArtist> artists) {
         List<RedisData<ConfetiArtist>> dataList = artists.stream()
                 .map(artist ->
                         RedisData.<ConfetiArtist>builder()
@@ -107,7 +107,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                 client.getRelatedArtistsById(artistId, String.valueOf(limit))
         );
         // 3. 캐시 업데이트
-        cachingRelatedArtists(artistId, limit, fetchedArtists);
+        cacheRelatedArtists(artistId, limit, fetchedArtists);
 
         return fetchedArtists;
     }
@@ -116,7 +116,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         return redisHandler.getList(RedisKey.MUSIC_ARTISTS_RELATED.createKeyInfo(artistId, limit));
     }
 
-    private void cachingRelatedArtists(String artistId, int limit, List<ConfetiArtist> fetchedArtists) {
+    private void cacheRelatedArtists(String artistId, int limit, List<ConfetiArtist> fetchedArtists) {
         redisHandler.set(RedisKey.MUSIC_ARTISTS_RELATED.createKeyInfo(artistId, limit), fetchedArtists);
     }
 
@@ -143,7 +143,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         Optional<ConfetiArtist> artist = responseConverter.convertToConfetiArtist(
                 client.getArtistById(artistId)
         );
-        artist.ifPresent(this::cachingArtist);
+        artist.ifPresent(this::cacheArtist);
 
         return artist;
     }
@@ -152,7 +152,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         return redisHandler.get(RedisKey.MUSIC_ARTISTS.createKeyInfo(artistId));
     }
 
-    private void cachingArtist(final ConfetiArtist artist) {
+    private void cacheArtist(final ConfetiArtist artist) {
         redisHandler.set(RedisKey.MUSIC_ARTISTS.createKeyInfo(artist.getId()), artist);
     }
 
@@ -183,7 +183,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                 client.getSongsByIds(String.join(QUERY_PARAMETER_IDS_DELIMITER, uncachedMusicIds))
         );
         // 4. 캐시 업데이트
-        cachingMusics(fetchedMusics);
+        cacheMusics(fetchedMusics);
 
         return Stream.concat(cachedMusics.stream(), fetchedMusics.stream()).toList();
     }
@@ -196,7 +196,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         return redisHandler.multiGet(keyInfos);
     }
 
-    private void cachingMusics(List<ConfetiMusic> musics) {
+    private void cacheMusics(List<ConfetiMusic> musics) {
         List<RedisData<ConfetiMusic>> dataList = musics.stream()
                 .map(music ->
                         RedisData.<ConfetiMusic>builder()
@@ -220,7 +220,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         List<ConfetiMusic> fetchedTopMusics = responseConverter.convertToConfetiMusics(
                 client.getCharts(SONGS_TYPE, String.valueOf(fetchSize))
         );
-        cachingTopMusics(fetchedTopMusics);
+        cacheTopMusics(fetchedTopMusics);
 
         return fetchedTopMusics;
     }
@@ -231,7 +231,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                 .toList();
     }
 
-    private void cachingTopMusics(final List<ConfetiMusic> fetchedTopMusics) {
+    private void cacheTopMusics(final List<ConfetiMusic> fetchedTopMusics) {
         redisHandler.set(RedisKey.MUSIC_TOP_MUSICS.createKeyInfo(), fetchedTopMusics);
     }
 
@@ -283,8 +283,8 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         List<ConfetiMusic> fetchedTopMusics = responseConverter.convertToConfetiMusics(
                 client.getArtistTopSongsById(artistId, String.valueOf(fetchSize))
         );
-        log.debug("caching : {}", fetchedTopMusics);
-        cachingTopMusicsByArtistId(artistId, fetchedTopMusics);
+        log.debug("cache : {}", fetchedTopMusics);
+        cacheTopMusicsByArtistId(artistId, fetchedTopMusics);
 
         return fetchedTopMusics;
     }
@@ -301,7 +301,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
                 .toList();
     }
 
-    private void cachingTopMusicsByArtistId(final String artistId, final List<ConfetiMusic> musics) {
+    private void cacheTopMusicsByArtistId(final String artistId, final List<ConfetiMusic> musics) {
         redisHandler.set(RedisKey.MUSIC_ARTISTS_TOP_MUSICS.createKeyInfo(artistId), musics);
     }
 
@@ -315,7 +315,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         MusicPage musicPage = responseConverter.convertToConfetiMusicPage(
                 client.getArtistSongsById(artistId, String.valueOf(limit), String.valueOf(offset))
         );
-        cachingMusicPageByArtistId(artistId, offset, limit, musicPage);
+        cacheMusicPageByArtistId(artistId, offset, limit, musicPage);
 
         return musicPage;
     }
@@ -324,7 +324,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         return redisHandler.get(RedisKey.MUSIC_PAGE_ARTIST_OFFSET_LIMIT.createKeyInfo(artistId, offset, limit));
     }
 
-    private void cachingMusicPageByArtistId(String artistId, int offset, int limit, MusicPage musicPage) {
+    private void cacheMusicPageByArtistId(String artistId, int offset, int limit, MusicPage musicPage) {
         redisHandler.set(RedisKey.MUSIC_PAGE_ARTIST_OFFSET_LIMIT.createKeyInfo(artistId, offset ,limit), musicPage);
     }
 
@@ -338,7 +338,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         MusicPage musicPage = responseConverter.convertToConfetiMusicPage(
                 client.searchByKeyword(term, SONGS_TYPE, String.valueOf(limit), String.valueOf(offset), null)
         );
-        cachingMusicPageByKeyword(term, offset, limit, musicPage);
+        cacheMusicPageByKeyword(term, offset, limit, musicPage);
 
         return musicPage;
     }
@@ -347,7 +347,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         return redisHandler.get(RedisKey.MUSIC_PAGE_KEYWORD_OFFSET_LIMIT.createKeyInfo(term, offset, limit));
     }
 
-    private void cachingMusicPageByKeyword(String term, int offset, int limit, MusicPage musicPage) {
+    private void cacheMusicPageByKeyword(String term, int offset, int limit, MusicPage musicPage) {
         redisHandler.set(RedisKey.MUSIC_PAGE_KEYWORD_OFFSET_LIMIT.createKeyInfo(term, offset, limit), musicPage);
     }
 
@@ -362,7 +362,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         List<ConfetiMusic> fetchedSongs = responseConverter.convertToConfetiMusics(
                 client.getArtistTopSongsById(artistId, String.valueOf(recommendSongFetchSize))
         );
-        cachingTopMusicsByArtistId(artistId, fetchedSongs);
+        cacheTopMusicsByArtistId(artistId, fetchedSongs);
 
         return fetchedSongs;
     }

@@ -3,29 +3,39 @@ package org.sopt.confeti.global.common.redis;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.sopt.confeti.api.setlist.facade.dto.request.SetlistMusicEditDTO;
-import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
-import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
-import org.sopt.confeti.global.util.music.dto.music.MusicPage;
+import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.global.annotation.RedisSerializable;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public final class RedisSerializePool {
 
+    private static final String SCAN_BASE_PACKAGE = "org.sopt.confeti";
+
     private final List<Class<?>> classes = new ArrayList<>();
 
-    public RedisSerializePool() {
-        this
-                .register(ConfetiArtist.class)
-                .register(ConfetiMusic.class)
-                .register(MusicPage.class)
-                .register(SetlistMusicEditDTO.class)
-        ;
+    private RedisSerializePool() {
+        register();
     }
 
-    private RedisSerializePool register(Class<?> clazz) {
-        classes.add(clazz);
-        return this;
+    private void register() {
+        log.info("RedisSerializePool.register: RedisSerializePool configure start.");
+        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
+        scanner.addIncludeFilter(new AnnotationTypeFilter(RedisSerializable.class));
+
+        for (BeanDefinition beanDefinition : scanner.findCandidateComponents(SCAN_BASE_PACKAGE)) {
+            try {
+                Class<?> clazz = Class.forName(beanDefinition.getBeanClassName());
+                classes.add(clazz);
+                log.info("RedisSerializePool.register: {} class registered in RedisSerializePool.", clazz.getSimpleName());
+            } catch (ClassNotFoundException e) {
+                log.warn("RedisSerializePool.register: Failed to load class {}.", beanDefinition.getBeanClassName());
+            }
+        }
     }
 
     public List<Class<?>> getPool() {
