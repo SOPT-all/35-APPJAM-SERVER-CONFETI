@@ -2,8 +2,11 @@ package org.sopt.confeti.global.common.redis;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,13 +43,16 @@ public class RedisHandler {
     }
 
     public <T> void multiSet(List<RedisData<T>> dataList) {
+        Map<String, String> dataMap = new HashMap<>(dataList.size());
+
         for (RedisData<T> data : dataList) {
             KeyInfo keyInfo = data.keyInfo;
 
             Optional<String> result = serializer.serialize(data.value);
-            result.ifPresent(serialized ->
-                    redisTemplate.opsForValue().set(keyInfo.getKey(), serialized, keyInfo.getTtl()));
+            result.ifPresent(serialized -> dataMap.put(keyInfo.getKey(), serialized));
         }
+
+        redisTemplate.opsForValue().multiSet(dataMap);
     }
 
     public <T> Optional<T> get(KeyInfo keyInfo) {
