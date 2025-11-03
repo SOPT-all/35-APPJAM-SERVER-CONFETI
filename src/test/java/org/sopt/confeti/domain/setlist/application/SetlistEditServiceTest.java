@@ -30,21 +30,18 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@ExtendWith(MockitoExtension.class)
 class SetlistEditServiceTest {
 
-    @InjectMocks private SetlistEditService setlistEditService;
-    @Mock private SetlistRepository setlistRepository;
-    @Mock private SetlistMusicRepository setlistMusicRepository;
-    @Mock private RedisTemplate<String, Object> redisTemplate;
-    @Mock private ValueOperations<String, Object> valueOperations;
+    private SetlistEditService setlistEditService;
+    private SetlistRepository setlistRepository;
+    private SetlistMusicRepository setlistMusicRepository;
+    private RedisTemplate<String, Object> redisTemplate;
+    private ValueOperations<String, Object> valueOperations;
 
-    @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(setlistEditService, "objectMapper", new ObjectMapper());
     }
 
-    @Test
     void startEdit_편집_시작() {
         // given
         Long userId = 1L;
@@ -97,7 +94,6 @@ class SetlistEditServiceTest {
         assertThat(captured.get(0).orders()).isEqualTo(1);
     }
 
-    @Test
     void updateMusicOrder_곡_순서_변경() {
         // given
         Long userId = 1L;
@@ -136,7 +132,6 @@ class SetlistEditServiceTest {
         });
     }
 
-    @Test
     void deleteMusic_곡_삭제_및_순서_재정렬() {
         // given
         Long userId = 1L;

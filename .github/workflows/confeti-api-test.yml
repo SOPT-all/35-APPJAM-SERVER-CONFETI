@@ -39,4 +39,4 @@ jobs:
           timezoneLinux: "Asia/Seoul"
 
       - name: execute testcase
-        run: ./gradle clean test --parallel --build-cache --refresh-dependencies
+        run: ./gradlew clean test --parallel --build-cache --refresh-dependencies
