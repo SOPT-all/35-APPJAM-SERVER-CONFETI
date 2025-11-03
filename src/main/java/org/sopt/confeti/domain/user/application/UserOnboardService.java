@@ -18,22 +18,22 @@ public class UserOnboardService {
 
     private final RedisHandler redisHandler;
 
-    public UserOnboardCacheDTO getCachedTopArtists(long userId) {
+    public UserOnboardCacheDTO getCachedOnboardArtists(long userId) {
         Optional<UserOnboardCacheDTO> cachedTopArtists = redisHandler.get(RedisKey.USER_ONBOARD_TOP_ARTISTS.createKeyInfo(userId));
         return cachedTopArtists.orElse(UserOnboardCacheDTO.empty());
     }
 
-    public void cacheTopArtists(long userId, UserOnboardCacheDTO artistsDTO) {
+    public void cacheOnboardArtists(long userId, UserOnboardCacheDTO artistsDTO) {
         redisHandler.set(RedisKey.USER_ONBOARD_TOP_ARTISTS.createKeyInfo(userId), artistsDTO);
     }
 
-    public void flushCachedTopArtists(long userId) {
+    public void flushCachedOnboardArtists(long userId) {
         redisHandler.delete(RedisKey.USER_ONBOARD_TOP_ARTISTS.createKeyInfo(userId));
     }
 
     public Set<String> getCachedExposedArtistIds(long userId) {
         try {
-            return getCachedTopArtists(userId).exposedArtistIds();
+            return getCachedOnboardArtists(userId).exposedArtistIds();
         } catch (NotFoundException e) {
             return Collections.emptySet();
         }

@@ -82,7 +82,7 @@ public class AuthFacade {
     }
 
     public void flushCachedTopArtists(long userId) {
-        userOnboardService.flushCachedTopArtists(userId);
+        userOnboardService.flushCachedOnboardArtists(userId);
     }
 
     @Transactional
