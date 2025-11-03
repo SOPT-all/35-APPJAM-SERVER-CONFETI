@@ -40,6 +40,7 @@ public enum RedisKey {
     ;
 
     private final String format;
+    @Getter
     private final Class<?> type;
     private final Duration ttl;
 
@@ -83,10 +84,5 @@ public enum RedisKey {
             log.warn("RedisKey.createKeyInfo : Format String not matched with arguments. format : {}, first arg : {}, second arg : {}, third arg : {}", format, firstArg, secondArg, thirdArg);
             return null;
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> Class<T> getType() {
-        return (Class<T>) type;
     }
 }

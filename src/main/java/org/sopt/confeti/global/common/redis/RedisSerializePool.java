@@ -1,8 +1,8 @@
 package org.sopt.confeti.global.common.redis;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.annotation.RedisSerializable;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -16,10 +16,24 @@ public final class RedisSerializePool {
 
     private static final String SCAN_BASE_PACKAGE = "org.sopt.confeti";
 
-    private final List<Class<?>> classes = new ArrayList<>();
+    private final Set<Class<?>> classes = new HashSet<>();
 
     private RedisSerializePool() {
         register();
+        manualRegister();
+    }
+
+    private void manualRegister() {
+        this
+                .add(String.class)
+                .add(Integer.class)
+                .add(Long.class)
+                .add(Object.class);
+    }
+
+    private RedisSerializePool add(Class<?> clazz) {
+        classes.add(clazz);
+        return this;
     }
 
     private void register() {
@@ -38,7 +52,7 @@ public final class RedisSerializePool {
         }
     }
 
-    public List<Class<?>> getPool() {
-        return Collections.unmodifiableList(classes);
+    public Set<Class<?>> getPool() {
+        return Collections.unmodifiableSet(classes);
     }
 }
