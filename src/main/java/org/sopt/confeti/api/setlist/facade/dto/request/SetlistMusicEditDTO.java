@@ -1,7 +1,9 @@
 package org.sopt.confeti.api.setlist.facade.dto.request;
 
 import org.sopt.confeti.domain.setlist.SetlistMusic;
+import org.sopt.confeti.global.annotation.RedisSerializable;
 
+@RedisSerializable
 public record SetlistMusicEditDTO(
         Long setlistMusicId,
         String musicId,

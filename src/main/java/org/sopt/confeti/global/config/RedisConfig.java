@@ -1,7 +1,8 @@
 package org.sopt.confeti.global.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.lettuce.core.ClientOptions;
 import io.lettuce.core.ReadFrom;
+import io.lettuce.core.SocketOptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +12,6 @@ import org.springframework.data.redis.connection.lettuce.LettuceClientConfigurat
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Slf4j
@@ -24,8 +24,7 @@ public class RedisConfig {
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
-        log.info("Redis 연결 설정");
-        log.info("timeout : {}", redisInfo.getTimeout());
+        log.info("RedisConfig.redisConnectionFactory: Configure connection. command timeout : {}, connect timeout : {}, shutdown timeout : {}", redisInfo.getCommandTimeout(), redisInfo.getConnectTimeout(), redisInfo.getShutdownTimeout());
 
         RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration()
                 .master(redisInfo.getSentinel().getMaster());
@@ -36,23 +35,33 @@ public class RedisConfig {
 
         LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
                 .readFrom(ReadFrom.REPLICA_PREFERRED) // replica -> master read
-                .commandTimeout(redisInfo.getTimeout())
+                .commandTimeout(redisInfo.getCommandTimeout())
+                .shutdownTimeout(redisInfo.getShutdownTimeout())
+                .clientOptions(
+                        ClientOptions.builder()
+                                .socketOptions(
+                                        SocketOptions.builder()
+                                                .connectTimeout(redisInfo.getConnectTimeout())
+                                                .build()
+                                )
+                                .build()
+                )
                 .build();
 
-        return new LettuceConnectionFactory(sentinelConfig, clientConfig);
+        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(sentinelConfig, clientConfig);
+        lettuceConnectionFactory.setValidateConnection(true); // 연결 검증
+
+        return lettuceConnectionFactory;
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(
-            ObjectMapper objectMapper
-    ) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-
-        GenericJackson2JsonRedisSerializer serializer =
-                new GenericJackson2JsonRedisSerializer(objectMapper);
+    public RedisTemplate<String, String> redisTemplate() {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
 
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(serializer);
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new StringRedisSerializer());
         template.setConnectionFactory(redisConnectionFactory());
         template.afterPropertiesSet();
 

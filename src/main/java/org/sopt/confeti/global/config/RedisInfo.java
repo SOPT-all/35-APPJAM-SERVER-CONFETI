@@ -14,10 +14,31 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RedisInfo {
 
-    private long timeout;
+    /**
+     * Redis command timeout (Seconds)
+     */
+    private long commandTimeout;
+
+    /**
+     * Redis connect timeout (Seconds)
+     */
+    private long connectTimeout;
+
+    /**
+     * Redis shutdown timeout (Milliseconds)
+     */
+    private long shutdownTimeout;
     private SentinelInfo sentinel;
 
-    public Duration getTimeout() {
-        return Duration.ofSeconds(timeout);
+    public Duration getCommandTimeout() {
+        return Duration.ofSeconds(commandTimeout);
+    }
+
+    public Duration getConnectTimeout() {
+        return Duration.ofSeconds(connectTimeout);
+    }
+
+    public Duration getShutdownTimeout() {
+        return Duration.ofMillis(shutdownTimeout);
     }
 }

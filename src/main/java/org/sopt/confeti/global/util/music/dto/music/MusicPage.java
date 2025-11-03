@@ -8,11 +8,13 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.sopt.confeti.global.annotation.RedisSerializable;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@RedisSerializable
 public class MusicPage {
 
     private static final Pattern offsetPattern = Pattern.compile("offset=(\\d+)");

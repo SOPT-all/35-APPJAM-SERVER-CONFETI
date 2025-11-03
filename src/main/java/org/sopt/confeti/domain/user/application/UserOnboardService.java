@@ -1,15 +1,14 @@
 package org.sopt.confeti.domain.user.application;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO;
+import org.sopt.confeti.global.common.redis.RedisHandler;
+import org.sopt.confeti.global.common.redis.RedisKey;
 import org.sopt.confeti.global.exception.NotFoundException;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -17,42 +16,35 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserOnboardService {
 
-    private static final String REDIS_KEY_PREFIX = "user:onboard:top-artists:%d";
-    private static final int REDIS_TTL_DAY = 1;
+    private final RedisHandler redisHandler;
 
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper;
-
-    private static String generateRedisKey(long userId) {
-        log.info("Redis Key: {}", String.format(REDIS_KEY_PREFIX, userId));
-        return String.format(REDIS_KEY_PREFIX, userId);
+    public UserOnboardCacheDTO getCachedOnboardArtists(long userId) {
+        Optional<UserOnboardCacheDTO> cachedTopArtists = redisHandler.get(RedisKey.USER_ONBOARD_TOP_ARTISTS.createKeyInfo(userId));
+        return cachedTopArtists.orElse(UserOnboardCacheDTO.empty());
     }
 
-    public UserOnboardCacheDTO getCachedArtists(long userId) {
-        String key = generateRedisKey(userId);
+    public void cacheOnboardArtists(long userId, UserOnboardCacheDTO artistsDTO) {
+        redisHandler.set(RedisKey.USER_ONBOARD_TOP_ARTISTS.createKeyInfo(userId), artistsDTO);
+    }
 
-        Object raw = redisTemplate.opsForValue().get(key);
-        if (Objects.isNull(raw)) {
-            return UserOnboardCacheDTO.empty();
-        }
-
-        return objectMapper.convertValue(raw, UserOnboardCacheDTO.class);
+    public void flushCachedOnboardArtists(long userId) {
+        redisHandler.delete(RedisKey.USER_ONBOARD_TOP_ARTISTS.createKeyInfo(userId));
     }
 
     public Set<String> getCachedExposedArtistIds(long userId) {
         try {
-            return getCachedArtists(userId).exposedArtistIds();
+            return getCachedOnboardArtists(userId).exposedArtistIds();
         } catch (NotFoundException e) {
             return Collections.emptySet();
         }
     }
 
-    public void cacheOnboardArtists(long userId, UserOnboardCacheDTO artistsDTO) {
-        redisTemplate.opsForValue()
-            .set(generateRedisKey(userId), artistsDTO, REDIS_TTL_DAY, TimeUnit.DAYS);
+    public static void argParam(Object f, Object s, Object t) {
+        // nothing
     }
 
-    public void flushCachedOnboardArtists(long userId) {
-        redisTemplate.delete(generateRedisKey(userId));
+    public static void vararg(Object... args) {
+        // nothing
     }
 }
+

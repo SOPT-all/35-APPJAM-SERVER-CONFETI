@@ -1,37 +1,26 @@
 package org.sopt.confeti.global.util.music;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.external.client.AppleMusicFeignClient;
 import org.sopt.confeti.global.annotation.Handler;
+import org.sopt.confeti.global.common.redis.RedisHandler.RedisData;
+import org.sopt.confeti.global.common.redis.RedisKey;
+import org.sopt.confeti.global.common.redis.RedisKey.KeyInfo;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
-import org.sopt.confeti.global.util.RedisHandler;
-import org.sopt.confeti.global.util.RedisKey;
-import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistResponse;
-import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistsResponse;
-import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartResponse;
-import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartSongResponse;
-import org.sopt.confeti.global.util.music.dto.chart.AppleMusicChartsResponse;
-import org.sopt.confeti.global.util.music.dto.music.AppleMusicArtistMusicsResponse;
-import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicResponse;
-import org.sopt.confeti.global.util.music.dto.music.AppleMusicMusicsResponse;
+import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.sopt.confeti.global.util.music.dto.music.MusicPage;
-import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
-import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResultsResponse;
 
 @Slf4j
 @Handler
@@ -42,42 +31,13 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     private static final String ARTISTS_TYPE = "artists";
     private static final String SONGS_TYPE = "songs";
 
-    // Redis
-    private static final int REDIS_TTL_DAY = 1;
-
     // Fetch Limit 목록
     private static final int CHARTS_FETCH_LIMIT = 200;
     private static final int ARTIST_TOP_SONGS_MULTIPLIER = 5;
 
     private final RedisHandler redisHandler;
-    private final ObjectMapper objectMapper;
-
     private final AppleMusicFeignClient client;
-
-    private List<ConfetiArtist> getCachedArtists(final Set<String> artistIds) {
-        Object raw = redisHandler.multiGet(
-                artistIds.stream()
-                        .map(RedisKey.MUSIC_ARTISTS::get)
-                        .collect(Collectors.toSet())
-        );
-
-        List<ConfetiArtist> cachedArtists = objectMapper.convertValue(raw, new TypeReference<List<ConfetiArtist>>() {
-                }).stream()
-                .filter(Objects::nonNull)
-                .toList();
-
-        Set<String> cachedArtistIds = cachedArtists.stream()
-                .map(ConfetiArtist::getId)
-                .collect(Collectors.toSet());
-
-        artistIds.removeIf(cachedArtistIds::contains);
-
-        return cachedArtists;
-    }
-
-    private void cachingArtists(final List<ConfetiArtist> artists) {
-        artists.forEach(artist -> redisHandler.set(RedisKey.MUSIC_ARTISTS.get(artist.getId()), artist, REDIS_TTL_DAY, TimeUnit.DAYS));
-    }
+    private final AppleMusicAPIResponseConverter responseConverter;
 
     @Override
     public List<ConfetiArtist> getArtistsByArtistIds(final Set<String> artistIds) {
@@ -85,55 +45,79 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
             return Collections.emptyList();
         }
 
-        List<ConfetiArtist> artists = new ArrayList<>(getCachedArtists(artistIds));
+        // 1. 캐시 조회
+        List<ConfetiArtist> cachedArtists = getCachedArtists(artistIds);
 
-        // Cache Hit된 아이디는 제거되므로 Apple Music API 서버 조회 전 목록 확인
-        if (artistIds.isEmpty()) {
-            return artists;
+        if (cachedArtists.size() == artistIds.size()) {
+            // 1.1 더 이상 조회할 아이디가 없을 경우 반환
+            return cachedArtists;
         }
 
-        List<ConfetiArtist> fetchedArtists = convertToConfetiArtists(
-                client.getArtists(String.join(QUERY_PARAMETER_IDS_DELIMITER, artistIds))
+        Set<String> cachedArtistIds = cachedArtists.stream()
+                .map(ConfetiArtist::getId)
+                .collect(Collectors.toSet());
+
+        // 2. 조회 대상 아이디 추출
+        Set<String> uncachedArtistIds = artistIds.stream()
+                .filter(artistId -> !cachedArtistIds.contains(artistId))
+                .collect(Collectors.toSet());
+
+        // 3. Apple Music에서 조회
+        List<ConfetiArtist> fetchedArtists = responseConverter.convertToConfetiArtists(
+                client.getArtists(String.join(QUERY_PARAMETER_IDS_DELIMITER, uncachedArtistIds))
         );
-        cachingArtists(fetchedArtists);
-        artists.addAll(fetchedArtists);
+        // 4. 캐시 업데이트
+        cacheArtists(fetchedArtists);
 
-        return artists;
+        return Stream.concat(cachedArtists.stream(), fetchedArtists.stream()).toList();
     }
 
-    private List<ConfetiArtist> getCachedRelatedArtists(final String artistId, final int limit) {
-        Object raw = redisHandler.get(RedisKey.MUSIC_ARTISTS_RELATED.get(artistId, limit));
-        if (Objects.isNull(raw)) {
-            return List.of();
-        }
-
-        List<ConfetiArtist> artists = objectMapper.convertValue(raw, new TypeReference<>() {
-        });
-
-        return artists.stream()
-                .limit(limit)
+    private List<ConfetiArtist> getCachedArtists(Set<String> artistIds) {
+        List<KeyInfo<ConfetiArtist>> keyInfos = artistIds.stream()
+                .map(RedisKey.MUSIC_ARTISTS::<ConfetiArtist>createKeyInfo)
                 .toList();
+
+        return redisHandler.multiGet(keyInfos);
     }
 
-    private void cacheRelatedArtists(final String artistId, final int limit, final List<ConfetiArtist> artists) {
-        redisHandler.set(RedisKey.MUSIC_ARTISTS_RELATED.get(artistId, limit), artists, REDIS_TTL_DAY, TimeUnit.DAYS);
+    private void cacheArtists(final List<ConfetiArtist> artists) {
+        List<RedisData<ConfetiArtist>> dataList = artists.stream()
+                .map(artist ->
+                        RedisData.<ConfetiArtist>builder()
+                                .keyInfo(RedisKey.MUSIC_ARTISTS.createKeyInfo(artist.getId()))
+                                .value(artist)
+                                .build()
+                ).toList();
+
+        redisHandler.multiSet(dataList);
     }
 
     @Override
     public List<ConfetiArtist> getRelatedArtists(final String artistId, final int limit) {
-        List<ConfetiArtist> artists = new ArrayList<>(getCachedRelatedArtists(artistId, limit));
+        // 1. 캐시 조회
+        List<ConfetiArtist> cachedArtists = getCachedRelatedArtists(artistId, limit);
 
-        if (!artists.isEmpty()) {
-            return artists;
+        if (!cachedArtists.isEmpty()) {
+            // 1.1 캐시 히트 시 반환
+            return cachedArtists;
         }
 
-        List<ConfetiArtist> fetchedArtists = convertToConfetiArtists(
+        // 2. Apple Music 조회
+        List<ConfetiArtist> fetchedArtists = responseConverter.convertToConfetiArtists(
                 client.getRelatedArtistsById(artistId, String.valueOf(limit))
         );
+        // 3. 캐시 업데이트
         cacheRelatedArtists(artistId, limit, fetchedArtists);
-        artists.addAll(fetchedArtists);
 
-        return artists;
+        return fetchedArtists;
+    }
+
+    private List<ConfetiArtist> getCachedRelatedArtists(String artistId, int limit) {
+        return redisHandler.getList(RedisKey.MUSIC_ARTISTS_RELATED.createKeyInfo(artistId, limit));
+    }
+
+    private void cacheRelatedArtists(String artistId, int limit, List<ConfetiArtist> fetchedArtists) {
+        redisHandler.set(RedisKey.MUSIC_ARTISTS_RELATED.createKeyInfo(artistId, limit), fetchedArtists);
     }
 
     @Override
@@ -144,23 +128,9 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
 
     @Override
     public List<ConfetiArtist> findArtistsByKeyword(final String keyword, final int limit) {
-        return convertToConfetiArtists(
+        return responseConverter.convertToConfetiArtists(
                 client.searchByKeyword(keyword, ARTISTS_TYPE, String.valueOf(limit), null, "topResults")
         );
-    }
-
-    private Optional<ConfetiArtist> getCachedArtist(final String artistId) {
-        Object raw = redisHandler.get(RedisKey.MUSIC_ARTISTS.get(artistId));
-
-        if (Objects.isNull(raw)) {
-            return Optional.empty();
-        }
-
-        return Optional.of(objectMapper.convertValue(raw, ConfetiArtist.class));
-    }
-
-    private void cachingArtist(final ConfetiArtist artist) {
-        redisHandler.set(RedisKey.MUSIC_ARTISTS.get(artist.getId()), artist, REDIS_TTL_DAY, TimeUnit.DAYS);
     }
 
     @Override
@@ -170,63 +140,20 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
             return cachedArtist;
         }
 
-        Optional<ConfetiArtist> artist = convertToConfetiArtist(
+        Optional<ConfetiArtist> artist = responseConverter.convertToConfetiArtist(
                 client.getArtistById(artistId)
         );
-        artist.ifPresent(this::cachingArtist);
+        artist.ifPresent(this::cacheArtist);
 
         return artist;
     }
 
-    private List<ConfetiArtist> convertToConfetiArtists(final AppleMusicArtistsResponse artists) {
-        return Optional.ofNullable(artists)
-                .map(AppleMusicArtistsResponse::data)
-                .map(data ->
-                        data.stream()
-                                .map(ConfetiArtist::from)
-                                .toList()
-                ).orElseGet(List::of);
+    private Optional<ConfetiArtist> getCachedArtist(final String artistId) {
+        return redisHandler.get(RedisKey.MUSIC_ARTISTS.createKeyInfo(artistId));
     }
 
-    private List<ConfetiArtist> convertToConfetiArtists(final AppleMusicSearchResponse searchResult) {
-        return Optional.ofNullable(searchResult)
-                .map(AppleMusicSearchResponse::results)
-                .map(AppleMusicSearchResultsResponse::artists)
-                .map(this::convertToConfetiArtists)
-                .orElseGet(List::of);
-    }
-
-    private Optional<ConfetiArtist> convertToConfetiArtist(final AppleMusicArtistResponse artist) {
-        return Optional.of(
-                Optional.ofNullable(artist)
-                    .map(ConfetiArtist::from)
-                    .orElse(ConfetiArtist.empty())
-        );
-    }
-
-    private List<ConfetiMusic> getCachedMusics(final Set<String> musicIds) {
-        Object raw = redisHandler.multiGet(
-                musicIds.stream()
-                        .map(RedisKey.MUSIC_MUSICS::get)
-                        .collect(Collectors.toSet())
-        );
-
-        List<ConfetiMusic> cachedMusics = objectMapper.convertValue(raw, new TypeReference<List<ConfetiMusic>>() {
-                }).stream()
-                .filter(Objects::nonNull)
-                .toList();
-
-        Set<String> cachedMusicIds = cachedMusics.stream()
-                .map(ConfetiMusic::getId)
-                .collect(Collectors.toSet());
-
-        musicIds.removeIf(cachedMusicIds::contains);
-
-        return cachedMusics;
-    }
-
-    private void cachingMusics(final List<ConfetiMusic> musics) {
-        musics.forEach(music -> redisHandler.set(RedisKey.MUSIC_MUSICS.get(music.getId()), music, REDIS_TTL_DAY, TimeUnit.DAYS));
+    private void cacheArtist(final ConfetiArtist artist) {
+        redisHandler.set(RedisKey.MUSIC_ARTISTS.createKeyInfo(artist.getId()), artist);
     }
 
     @Override
@@ -235,87 +162,77 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
             return Collections.emptyList();
         }
 
-        List<ConfetiMusic> musics = new ArrayList<>(getCachedMusics(musicIds));
-
-        // Cache Hit된 아이디는 제거되므로 Apple Music API 서버 조회 전 목록 확인
-        if (musicIds.isEmpty()) {
-            return musics;
+        // 1. 캐시 조회
+        List<ConfetiMusic> cachedMusics = getCachedMusics(musicIds);
+        if (cachedMusics.size() == musicIds.size()) {
+            // 1.1 더 이상 조회할 아이디가 없을 경우 반환
+            return cachedMusics;
         }
 
-        List<ConfetiMusic> fetchedMusics = convertToConfetiMusics(
-                client.getSongsByIds(String.join(QUERY_PARAMETER_IDS_DELIMITER, musicIds))
+        Set<String> cachedMusicIds = cachedMusics.stream()
+                .map(ConfetiMusic::getId)
+                .collect(Collectors.toSet());
+
+        // 2. 조회 대상 아이디 추출
+        Set<String> uncachedMusicIds = musicIds.stream()
+                .filter(musicId -> !cachedMusicIds.contains(musicId))
+                .collect(Collectors.toSet());
+
+        // 3. Apple Music에서 조회
+        List<ConfetiMusic> fetchedMusics = responseConverter.convertToConfetiMusics(
+                client.getSongsByIds(String.join(QUERY_PARAMETER_IDS_DELIMITER, uncachedMusicIds))
         );
-        cachingMusics(fetchedMusics);
-        musics.addAll(fetchedMusics);
+        // 4. 캐시 업데이트
+        cacheMusics(fetchedMusics);
 
-        return musics;
+        return Stream.concat(cachedMusics.stream(), fetchedMusics.stream()).toList();
     }
 
-    private List<ConfetiMusic> convertToConfetiMusics(final AppleMusicMusicsResponse musics) {
-        return Optional.ofNullable(musics)
-                .map(AppleMusicMusicsResponse::data)
-                .map(data ->
-                        data.stream()
-                                .map(ConfetiMusic::from)
-                                .toList()
-                ).orElseGet(List::of);
-    }
-
-    private List<ConfetiMusic> getCachedTopMusics(final int fetchSize) {
-        Object raw = redisHandler.get(RedisKey.MUSIC_TOP_MUSICS.get());
-
-        if (Objects.isNull(raw)) {
-            return List.of();
-        }
-
-        List<ConfetiMusic> musics = objectMapper.convertValue(raw, new TypeReference<>() {
-        });
-
-        if (musics.size() < fetchSize) {
-            return List.of();
-        }
-
-        return musics.stream()
-                .limit(fetchSize)
+    private List<ConfetiMusic> getCachedMusics(Set<String> musicIds) {
+        List<KeyInfo<ConfetiMusic>> keyInfos = musicIds.stream()
+                .map(RedisKey.MUSIC_MUSICS::<ConfetiMusic>createKeyInfo)
                 .toList();
+
+        return redisHandler.multiGet(keyInfos);
     }
 
-    private void cachingTopMusics(final List<ConfetiMusic> musics) {
-        redisHandler.set(RedisKey.MUSIC_TOP_MUSICS.get(), musics, REDIS_TTL_DAY, TimeUnit.DAYS );
+    private void cacheMusics(List<ConfetiMusic> musics) {
+        List<RedisData<ConfetiMusic>> dataList = musics.stream()
+                .map(music ->
+                        RedisData.<ConfetiMusic>builder()
+                                .keyInfo(RedisKey.MUSIC_MUSICS.createKeyInfo(music.getId()))
+                                .value(music)
+                                .build()
+                ).toList();
+
+        redisHandler.multiSet(dataList);
     }
 
     @Override
     public List<ConfetiMusic> getTopMusics(final int fetchSize) {
         validateFetchSize(fetchSize);
 
-        List<ConfetiMusic> topMusics = new ArrayList<>(getCachedTopMusics(fetchSize));
-        if (!topMusics.isEmpty()) {
-            return topMusics;
+        List<ConfetiMusic> cachedTopMusics = getCachedTopMusics(fetchSize);
+        if (!cachedTopMusics.isEmpty()) {
+            return cachedTopMusics;
         }
 
-        topMusics.addAll(convertToConfetiMusics(
+        List<ConfetiMusic> fetchedTopMusics = responseConverter.convertToConfetiMusics(
                 client.getCharts(SONGS_TYPE, String.valueOf(fetchSize))
-        ));
-        cachingTopMusics(topMusics);
+        );
+        cacheTopMusics(fetchedTopMusics);
 
-        return topMusics;
+        return fetchedTopMusics;
     }
 
-    private List<ConfetiMusic> convertToConfetiMusics(final AppleMusicChartsResponse charts) {
-        return Optional.ofNullable(charts)
-                .map(AppleMusicChartsResponse::results)
-                .map(AppleMusicChartResponse::songs)
-                .map(songs ->
-                        songs.stream()
-                                .findFirst()
-                                .map(AppleMusicChartSongResponse::data)
-                                .orElseGet(List::of)
-                )
-                .map(musics ->
-                        musics.stream()
-                                .map(ConfetiMusic::from)
-                                .toList()
-                ).orElseGet(List::of);
+    private List<ConfetiMusic> getCachedTopMusics(final int fetchSize) {
+        return redisHandler.<ConfetiMusic>getList(RedisKey.MUSIC_TOP_MUSICS.createKeyInfo()).stream()
+                .limit(fetchSize)
+                .toList();
+    }
+
+    private void cacheTopMusics(final List<ConfetiMusic> fetchedTopMusics) {
+        redisHandler.set(RedisKey.MUSIC_TOP_MUSICS.createKeyInfo(), fetchedTopMusics);
     }
 
     private void validateFetchSize(int fetchSize) {
@@ -324,43 +241,7 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         }
     }
 
-    private List<ConfetiMusic> getCachedTopMusicsByArtistId(final String artistId, final int fetchSize) {
-        Object raw = redisHandler.get(RedisKey.MUSIC_ARTISTS_TOP_MUSICS.get(artistId));
-
-        if (Objects.isNull(raw)) {
-            return List.of();
-        }
-
-        List<ConfetiMusic> musics = objectMapper.convertValue(raw, new TypeReference<>() {
-        });
-
-        if (musics.size() < fetchSize) {
-            return List.of();
-        }
-
-        return musics.stream()
-                .limit(fetchSize)
-                .toList();
-    }
-
-    private void cachingTopMusicsByArtistId(final String artistId, final List<ConfetiMusic> musics) {
-        redisHandler.set(RedisKey.MUSIC_ARTISTS_TOP_MUSICS.get(artistId), musics, REDIS_TTL_DAY, TimeUnit.DAYS) ;
-    }
-
-    public List<ConfetiMusic> getTopSongsByArtistId(final String artistId, final int fetchSize) {
-        List<ConfetiMusic> topMusics = new ArrayList<>(getCachedTopMusicsByArtistId(artistId, fetchSize));
-        if (!topMusics.isEmpty()) {
-            return topMusics;
-        }
-
-        topMusics.addAll(convertToConfetiMusics(
-                client.getArtistTopSongsById(artistId, String.valueOf(fetchSize))
-        ));
-        cachingTopMusicsByArtistId(artistId, topMusics);
-
-        return topMusics;
-    }
-
+    @Deprecated
     @Override
     public List<ConfetiMusic> getFilteredTopSongsByArtist(String artistId, int limit, Set<String> excludedMusicIds) {
         List<ConfetiMusic> songs = getTopSongsByArtistId(artistId, limit * ARTIST_TOP_SONGS_MULTIPLIER);
@@ -385,19 +266,34 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
         return result;
     }
 
-    private Optional<MusicPage> getCachedMusicPageByArtistId(String artistId, int offset, int limit) {
-        // check exists artist
-        Object raw = redisHandler.get(RedisKey.MUSIC_PAGE_ARTIST_OFFSET_LIMIT.get(artistId, offset, limit));
-
-        if (Objects.isNull(raw)) {
-            return Optional.empty();
+    public List<ConfetiMusic> getTopSongsByArtistId(final String artistId, final int fetchSize) {
+        List<ConfetiMusic> cachedTopMusics = getCachedTopMusicsByArtistId(artistId, fetchSize);
+        if (!cachedTopMusics.isEmpty()) {
+            return cachedTopMusics;
         }
 
-        return Optional.of(objectMapper.convertValue(raw, MusicPage.class));
+        List<ConfetiMusic> fetchedTopMusics = responseConverter.convertToConfetiMusics(
+                client.getArtistTopSongsById(artistId, String.valueOf(fetchSize))
+        );
+        cacheTopMusicsByArtistId(artistId, fetchedTopMusics);
+
+        return fetchedTopMusics;
     }
 
-    private void cachingMusicPageByArtistId(String artistId, int offset, int limit, MusicPage musicPage) {
-        redisHandler.set(RedisKey.MUSIC_PAGE_ARTIST_OFFSET_LIMIT.get(artistId, offset, limit), musicPage, REDIS_TTL_DAY, TimeUnit.DAYS);
+    private List<ConfetiMusic> getCachedTopMusicsByArtistId(final String artistId, final int fetchSize) {
+        List<ConfetiMusic> musics = redisHandler.getList(RedisKey.MUSIC_ARTISTS_TOP_MUSICS.createKeyInfo(artistId));
+
+        if (musics.size() < fetchSize) {
+            return List.of();
+        }
+
+        return musics.stream()
+                .limit(fetchSize)
+                .toList();
+    }
+
+    private void cacheTopMusicsByArtistId(final String artistId, final List<ConfetiMusic> musics) {
+        redisHandler.set(RedisKey.MUSIC_ARTISTS_TOP_MUSICS.createKeyInfo(artistId), musics);
     }
 
     @Override
@@ -407,39 +303,20 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
             return optMusicPage.get();
         }
 
-        MusicPage musicPage = convertToConfetiMusicPage(
+        MusicPage musicPage = responseConverter.convertToConfetiMusicPage(
                 client.getArtistSongsById(artistId, String.valueOf(limit), String.valueOf(offset))
         );
-        cachingMusicPageByArtistId(artistId, offset, limit, musicPage);
+        cacheMusicPageByArtistId(artistId, offset, limit, musicPage);
 
         return musicPage;
     }
 
-    private MusicPage convertToConfetiMusicPage(AppleMusicArtistMusicsResponse artistMusics) {
-        return Optional.ofNullable(artistMusics)
-                .map(musics -> MusicPage.of(
-                        musics.next(),
-                        Optional.ofNullable(musics.data())
-                                .map(data ->
-                                        data.stream()
-                                                .map(ConfetiMusic::from)
-                                                .toList()
-                                ).orElseGet(List::of)
-                )).orElseGet(MusicPage::empty);
+    private Optional<MusicPage> getCachedMusicPageByArtistId(String artistId, int offset, int limit) {
+        return redisHandler.get(RedisKey.MUSIC_PAGE_ARTIST_OFFSET_LIMIT.createKeyInfo(artistId, offset, limit));
     }
 
-    private Optional<MusicPage> getCachedMusicPageByKeyword(String term, int offset, int limit) {
-        Object raw = redisHandler.get(RedisKey.MUSIC_PAGE_KEYWORD_OFFSET_LIMIT.get(term, offset, limit));
-
-        if (Objects.isNull(raw)) {
-            return Optional.empty();
-        }
-
-        return Optional.of(objectMapper.convertValue(raw, MusicPage.class));
-    }
-
-    private void cachingMusicPageByKeyword(String term, int offset, int limit, MusicPage musicPage) {
-        redisHandler.set(RedisKey.MUSIC_PAGE_KEYWORD_OFFSET_LIMIT.get(term, offset, limit), musicPage, REDIS_TTL_DAY, TimeUnit.DAYS);
+    private void cacheMusicPageByArtistId(String artistId, int offset, int limit, MusicPage musicPage) {
+        redisHandler.set(RedisKey.MUSIC_PAGE_ARTIST_OFFSET_LIMIT.createKeyInfo(artistId, offset ,limit), musicPage);
     }
 
     @Override
@@ -449,41 +326,34 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
             return optMusicPage.get();
         }
 
-        MusicPage musicPage = convertToConfetiMusicPage(
+        MusicPage musicPage = responseConverter.convertToConfetiMusicPage(
                 client.searchByKeyword(term, SONGS_TYPE, String.valueOf(limit), String.valueOf(offset), null)
         );
-        cachingMusicPageByKeyword(term, offset, limit, musicPage);
+        cacheMusicPageByKeyword(term, offset, limit, musicPage);
 
         return musicPage;
     }
 
-    private MusicPage convertToConfetiMusicPage(AppleMusicSearchResponse searchResult) {
-        return Optional.ofNullable(searchResult)
-                .map(AppleMusicSearchResponse::results)
-                .map(AppleMusicSearchResultsResponse::songs)
-                .map(musics -> MusicPage.of(
-                        musics.next(),
-                        Optional.ofNullable(musics.data())
-                                .map(data ->
-                                        data.stream()
-                                                .map(ConfetiMusic::from)
-                                                .toList()
-                                ).orElseGet(List::of)
-                )).orElseGet(MusicPage::empty);
+    private Optional<MusicPage> getCachedMusicPageByKeyword(String term, int offset, int limit) {
+        return redisHandler.get(RedisKey.MUSIC_PAGE_KEYWORD_OFFSET_LIMIT.createKeyInfo(term, offset, limit));
+    }
+
+    private void cacheMusicPageByKeyword(String term, int offset, int limit, MusicPage musicPage) {
+        redisHandler.set(RedisKey.MUSIC_PAGE_KEYWORD_OFFSET_LIMIT.createKeyInfo(term, offset, limit), musicPage);
     }
 
     @Override
     public List<ConfetiMusic> getArtistTopSongs(String artistId, int recommendSongFetchSize) {
-        List<ConfetiMusic> songs = new ArrayList<>(getCachedTopMusicsByArtistId(artistId, recommendSongFetchSize));
+        List<ConfetiMusic> songs = getCachedTopMusicsByArtistId(artistId, recommendSongFetchSize);
 
         if (!songs.isEmpty()) {
             return songs;
         }
 
-        List<ConfetiMusic> fetchedSongs = convertToConfetiMusics(
+        List<ConfetiMusic> fetchedSongs = responseConverter.convertToConfetiMusics(
                 client.getArtistTopSongsById(artistId, String.valueOf(recommendSongFetchSize))
         );
-        cachingTopMusicsByArtistId(artistId, fetchedSongs);
+        cacheTopMusicsByArtistId(artistId, fetchedSongs);
 
         return fetchedSongs;
     }
