@@ -73,8 +73,8 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiArtist> getCachedArtists(Set<String> artistIds) {
-        List<KeyInfo> keyInfos = artistIds.stream()
-                .map(RedisKey.MUSIC_ARTISTS::createKeyInfo)
+        List<KeyInfo<ConfetiArtist>> keyInfos = artistIds.stream()
+                .map(RedisKey.MUSIC_ARTISTS::<ConfetiArtist>createKeyInfo)
                 .toList();
 
         return redisHandler.multiGet(keyInfos);
@@ -189,8 +189,8 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     }
 
     private List<ConfetiMusic> getCachedMusics(Set<String> musicIds) {
-        List<KeyInfo> keyInfos = musicIds.stream()
-                .map(RedisKey.MUSIC_MUSICS::createKeyInfo)
+        List<KeyInfo<ConfetiMusic>> keyInfos = musicIds.stream()
+                .map(RedisKey.MUSIC_MUSICS::<ConfetiMusic>createKeyInfo)
                 .toList();
 
         return redisHandler.multiGet(keyInfos);

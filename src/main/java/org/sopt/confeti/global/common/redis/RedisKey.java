@@ -46,40 +46,36 @@ public enum RedisKey {
     @Getter
     @Builder
     @RequiredArgsConstructor
-    public static class KeyInfo {
+    public static class KeyInfo<T> {
 
-        private final Class<?> type;
+        private final Class<T> type;
         private final String key;
         private final Duration ttl;
-
-        @SuppressWarnings("unchecked")
-        public <T> Class<T> getType() {
-            return (Class<T>) type;
-        }
 
         public boolean isValid() {
             return StringUtils.hasText(key) && ttl != null && type != null;
         }
     }
 
-    public KeyInfo createKeyInfo() {
+    public <T> KeyInfo<T> createKeyInfo() {
         return createKeyInfo(null, null, null);
     }
 
-    public KeyInfo createKeyInfo(Object firstArg) {
+    public <T> KeyInfo<T> createKeyInfo(Object firstArg) {
         return createKeyInfo(firstArg, null, null);
     }
 
-    public KeyInfo createKeyInfo(Object firstArg, Object secondArg) {
+    public <T> KeyInfo<T> createKeyInfo(Object firstArg, Object secondArg) {
         return createKeyInfo(firstArg, secondArg, null);
     }
 
-    public KeyInfo createKeyInfo(Object firstArg, Object secondArg, Object thirdArg) {
+    @SuppressWarnings("unchecked")
+    public <T> KeyInfo<T> createKeyInfo(Object firstArg, Object secondArg, Object thirdArg) {
         try {
             String key = String.format(format, firstArg, secondArg, thirdArg);
 
-            return KeyInfo.builder()
-                    .type(type)
+            return KeyInfo.<T>builder()
+                    .type((Class<T>) type)
                     .key(key)
                     .ttl(ttl)
                     .build();
@@ -87,5 +83,10 @@ public enum RedisKey {
             log.warn("RedisKey.createKeyInfo : Format String not matched with arguments. format : {}, first arg : {}, second arg : {}, third arg : {}", format, firstArg, secondArg, thirdArg);
             return null;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Class<T> getType() {
+        return (Class<T>) type;
     }
 }

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +26,11 @@ public class RedisHandler {
     @Builder
     @RequiredArgsConstructor
     public static class RedisData<T> {
-        private final KeyInfo keyInfo;
+        private final KeyInfo<T> keyInfo;
         private final T value;
     }
 
-    public <T> void set(KeyInfo keyInfo, T value) {
+    public <T> void set(KeyInfo<T> keyInfo, T value) {
         if (isNotValidKeyInfo(keyInfo)) {
             log.warn("RedisHandler.set : Redis key format error. value : {}", value);
             return;
@@ -55,7 +54,7 @@ public class RedisHandler {
         redisTemplate.opsForValue().multiSet(dataMap);
     }
 
-    public <T> Optional<T> get(KeyInfo keyInfo) {
+    public <T> Optional<T> get(KeyInfo<T> keyInfo) {
         if (isNotValidKeyInfo(keyInfo)) {
             log.warn("RedisHandler.get : Redis key format error.");
             return Optional.empty();
@@ -69,7 +68,7 @@ public class RedisHandler {
         return serializer.deserialize(cachedValue, keyInfo.getType());
     }
 
-    public <T> List<T> getList(KeyInfo keyInfo) {
+    public <T> List<T> getList(KeyInfo<T> keyInfo) {
         if (isNotValidKeyInfo(keyInfo)) {
             log.warn("RedisHandler.getList : Redis key format error.");
             return Collections.emptyList();
@@ -83,7 +82,7 @@ public class RedisHandler {
         return serializer.deserializeToList(cachedValue, keyInfo.getType());
     }
 
-    public <T> Set<T> getSet(KeyInfo keyInfo) {
+    public <T> Set<T> getSet(KeyInfo<T> keyInfo) {
         if (isNotValidKeyInfo(keyInfo)) {
             log.warn("RedisHandler.getSet : Redis key format error.");
             return Collections.emptySet();
@@ -97,7 +96,7 @@ public class RedisHandler {
         return serializer.deserializeToSet(cachedValue, keyInfo.getType());
     }
 
-    public <T> List<T> multiGet(List<KeyInfo> keyInfos) {
+    public <T> List<T> multiGet(List<KeyInfo<T>> keyInfos) {
         if (keyInfos.isEmpty()) {
             return List.of();
         }
@@ -123,7 +122,7 @@ public class RedisHandler {
         return results;
     }
 
-    public void delete(KeyInfo keyInfo) {
+    public <T> void delete(KeyInfo<T> keyInfo) {
         if (isNotValidKeyInfo(keyInfo)) {
             log.warn("RedisHandler.delete : Redis key format error.");
             return;
@@ -132,7 +131,7 @@ public class RedisHandler {
         redisTemplate.delete(keyInfo.getKey());
     }
 
-    public boolean hasKey(KeyInfo keyInfo) {
+    public <T> boolean hasKey(KeyInfo<T> keyInfo) {
         if (isNotValidKeyInfo(keyInfo)) {
             log.warn("RedisHandler.hasKey : Redis key format error.");
             return false;
@@ -141,7 +140,7 @@ public class RedisHandler {
         return redisTemplate.hasKey(keyInfo.getKey());
     }
 
-    private boolean isNotValidKeyInfo(KeyInfo keyInfo) {
+    private <T> boolean isNotValidKeyInfo(KeyInfo<T> keyInfo) {
         return keyInfo == null || !keyInfo.isValid();
     }
 }

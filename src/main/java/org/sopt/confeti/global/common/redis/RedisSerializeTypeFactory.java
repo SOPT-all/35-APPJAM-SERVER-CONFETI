@@ -21,12 +21,6 @@ public class RedisSerializeTypeFactory {
     public RedisSerializeTypeFactory(RedisSerializePool serializePool,
                                      ObjectMapper objectMapper) {
         serializePool.getPool().forEach(clazz -> {
-            // Map
-            typeMapper.put(
-                    new CompositeKey(Map.class, clazz),
-                    objectMapper.getTypeFactory().constructMapType(Map.class, String.class, clazz)
-            );
-
             // Set
             typeMapper.put(
                     new CompositeKey(Set.class, clazz),
