@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistMusicEditDTO;
+import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.util.music.dto.music.MusicPage;
@@ -37,6 +38,7 @@ public enum RedisKey {
 
     // setlist
     SETLIST_EDIT("edit:setlist:%d:%d", SetlistMusicEditDTO.class, Duration.ofHours(1)),
+    TEST("test", Performance.class, Duration.ofHours(1)),
     ;
 
     private final String format;
