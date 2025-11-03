@@ -22,6 +22,12 @@ public record UserOnboardCacheDTO(
         exposedArtistIds = new HashSet<>(exposedArtistIds);
     }
 
+    public Set<String> favoriteArtistIds() {
+        return favoriteArtists.stream()
+            .map(ConfetiArtist::getId)
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
     public static UserOnboardCacheDTO createWithExposedArtistIds(Set<String> exposedArtistIds) {
         return new UserOnboardCacheDTO(Collections.emptySet(), exposedArtistIds);
     }
