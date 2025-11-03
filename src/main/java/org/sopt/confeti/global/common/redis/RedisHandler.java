@@ -115,6 +115,10 @@ public class RedisHandler {
         List<T> results = new ArrayList<>(cachedValues.size());
 
         for (String cachedValue : cachedValues) {
+            if (cachedValue == null) {
+                continue;
+            }
+
             Optional<T> result = serializer.deserialize(cachedValue, type);
             result.ifPresent(results::add);
         }

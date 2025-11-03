@@ -244,46 +244,37 @@ public class AppleMusicAPIHandler implements MusicAPIHandler {
     @Deprecated
     @Override
     public List<ConfetiMusic> getFilteredTopSongsByArtist(String artistId, int limit, Set<String> excludedMusicIds) {
-        log.debug("Get filtered top songs. Artist id : {}, limit : {}, excludeMusicIds : {}", artistId, limit, excludedMusicIds);
         List<ConfetiMusic> songs = getTopSongsByArtistId(artistId, limit * ARTIST_TOP_SONGS_MULTIPLIER);
 
-        log.debug("Filter");
         List<ConfetiMusic> filteredSongs = songs.stream()
                 .filter(song -> !excludedMusicIds.contains(song.getId()))
                 .collect(Collectors.toList());
 
         if (filteredSongs.isEmpty()) {
-            log.debug("Empty");
             return Collections.emptyList();
         }
 
         List<ConfetiMusic> result = new ArrayList<>();
         Random random = new Random();
 
-        log.debug("Pick random");
         for (int i = 0; i < limit && !filteredSongs.isEmpty(); i++) {
             int randomIndex = random.nextInt(filteredSongs.size());
             result.add(filteredSongs.get(randomIndex));
             filteredSongs.remove(randomIndex);
         }
-        log.debug("End");
 
         return result;
     }
 
     public List<ConfetiMusic> getTopSongsByArtistId(final String artistId, final int fetchSize) {
-        log.debug("Try to get cached top musics. Artist id : {}, fetch size : {}", artistId, fetchSize);
         List<ConfetiMusic> cachedTopMusics = getCachedTopMusicsByArtistId(artistId, fetchSize);
         if (!cachedTopMusics.isEmpty()) {
-            log.debug("cache hit");
             return cachedTopMusics;
         }
 
-        log.debug("Try to get fetched top musics. Artist id : {}, fetch size : {}", artistId, fetchSize);
         List<ConfetiMusic> fetchedTopMusics = responseConverter.convertToConfetiMusics(
                 client.getArtistTopSongsById(artistId, String.valueOf(fetchSize))
         );
-        log.debug("cache : {}", fetchedTopMusics);
         cacheTopMusicsByArtistId(artistId, fetchedTopMusics);
 
         return fetchedTopMusics;
