@@ -9,15 +9,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 
 public record UserOnboardCacheDTO(
     @JsonDeserialize(as = LinkedHashSet.class)
-    Set<String> favoriteArtistIds,
+    Set<ConfetiArtist> favoriteArtists,
     Set<String> exposedArtistIds
 ) {
 
     public UserOnboardCacheDTO {
-        favoriteArtistIds = new LinkedHashSet<>(favoriteArtistIds);
+        favoriteArtists = new LinkedHashSet<>(favoriteArtists);
         exposedArtistIds = new HashSet<>(exposedArtistIds);
     }
 
@@ -34,29 +35,30 @@ public record UserOnboardCacheDTO(
     }
 
     public static UserOnboardCacheDTO of(
-        Set<String> favoriteArtistIds,
+        Set<ConfetiArtist> favoriteArtists,
         Set<String> exposedArtistIds
     ) {
-        return new UserOnboardCacheDTO(favoriteArtistIds, exposedArtistIds);
+        return new UserOnboardCacheDTO(favoriteArtists, exposedArtistIds);
     }
 
     public static UserOnboardCacheDTO empty() {
         return new UserOnboardCacheDTO(Collections.emptySet(), Collections.emptySet());
     }
 
-    public static UserOnboardCacheDTO createWithFavoriteArtistIds(Set<String> favoriteArtistIds) {
-        return new UserOnboardCacheDTO(favoriteArtistIds, Collections.emptySet());
-    }
-
-    public UserOnboardCacheDTO withAddFavoriteArtistIds(Collection<String> newFavoriteArtistIds) {
-        Set<String> currentFavoriteArtistIds = new LinkedHashSet<>(this.favoriteArtistIds);
+    public UserOnboardCacheDTO withAddFavoriteArtistIds(
+        Collection<ConfetiArtist> newFavoriteArtistIds
+    ) {
+        Set<ConfetiArtist> currentFavoriteArtistIds = new LinkedHashSet<>(this.favoriteArtists);
         currentFavoriteArtistIds.addAll(newFavoriteArtistIds);
         return new UserOnboardCacheDTO(currentFavoriteArtistIds, this.exposedArtistIds);
     }
 
     public UserOnboardCacheDTO deleteFavoriteArtistIds(Collection<String> targetArtistIds) {
-        Set<String> currentFavoriteArtistIds = new LinkedHashSet<>(this.favoriteArtistIds);
-        currentFavoriteArtistIds.removeAll(targetArtistIds);
-        return new UserOnboardCacheDTO(currentFavoriteArtistIds, this.exposedArtistIds);
+        Set<String> targetIds = new HashSet<>(targetArtistIds);
+        Set<ConfetiArtist> currentFavoriteArtists = new LinkedHashSet<>(this.favoriteArtists);
+
+        currentFavoriteArtists.removeIf(targetIds::contains);
+
+        return new UserOnboardCacheDTO(currentFavoriteArtists, this.exposedArtistIds);
     }
 }
