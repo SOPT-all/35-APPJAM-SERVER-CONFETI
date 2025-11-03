@@ -3,7 +3,7 @@ package org.sopt.confeti.api.user.facade;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -130,9 +130,11 @@ public class UserOnboardFacade {
         List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
             FIXED_RELATED_ARTISTS_FETCH_SIZE);
         List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
-            relatedArtists, cachedOnboardArtists.favoriteArtistIds(), limit);
+            relatedArtists,
+            cachedOnboardArtists.favoriteArtists().stream().map(ConfetiArtist::getId)
+                .collect(Collectors.toSet()), limit);
 
-        cacheFavoriteArtists(userId, requestArtistId, cachedOnboardArtists);
+//        cacheFavoriteArtists(userId, requestArtistId, cachedOnboardArtists);
 
         return UserOnboardRelatedArtistsDTO.from(filteredRelatedArtists);
     }
@@ -168,7 +170,7 @@ public class UserOnboardFacade {
 
     public void cacheExposedArtist(long userId, String artistId) {
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
-        Set<String> favoriteArtistIds = cachedArtists.favoriteArtistIds();
+        Set<ConfetiArtist> favoriteArtistIds = cachedArtists.favoriteArtists();
         Set<String> exposedArtistIds = cachedArtists.exposedArtistIds();
 
         exposedArtistIds.add(artistId);
@@ -185,9 +187,7 @@ public class UserOnboardFacade {
 
     public UserOnboardFavoriteArtistsDTO getFavoriteArtists(long userId) {
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
-        List<ConfetiArtist> favoriteArtists = musicAPIHandler.getArtistsByArtistIds(
-            cachedArtists.favoriteArtistIds());
-
+        List<ConfetiArtist> favoriteArtists = cachedArtists.favoriteArtists().stream().toList();
         return UserOnboardFavoriteArtistsDTO.from(favoriteArtists);
     }
 
@@ -249,11 +249,11 @@ public class UserOnboardFacade {
 
     private void cacheFavoriteArtists(
         long userId,
-        String requestArtistId,
+        ConfetiArtist requestArtist,
         UserOnboardCacheDTO userOnboardCacheDTO
     ) {
         UserOnboardCacheDTO newUserOnboardCacheDTO = userOnboardCacheDTO.withAddFavoriteArtistIds(
-            new LinkedHashSet<>(List.of(requestArtistId)));
+            new LinkedHashSet<>(List.of(requestArtist)));
 
         userOnboardService.cacheOnboardArtists(userId, newUserOnboardCacheDTO);
     }
@@ -282,7 +282,7 @@ public class UserOnboardFacade {
     }
 
     private void validOnboardArtists(UserOnboardCacheDTO userOnboardCacheDTO) {
-        Set<String> favoriteArtistIds = userOnboardCacheDTO.favoriteArtistIds();
+        Set<ConfetiArtist> favoriteArtistIds = userOnboardCacheDTO.favoriteArtists();
 
         if (favoriteArtistIds == null || favoriteArtistIds.isEmpty()) {
             throw new BadRequestException(ErrorMessage.BAD_REQUEST);
