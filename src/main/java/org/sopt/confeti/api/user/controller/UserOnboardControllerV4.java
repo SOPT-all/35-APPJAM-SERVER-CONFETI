@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.docs.UserOnboardControllerV4Docs;
+import org.sopt.confeti.api.user.dto.request.onboard.AddOnboardFavoriteArtistRequest;
 import org.sopt.confeti.api.user.dto.request.onboard.PatchOnboardFavoriteArtistsRequest;
 import org.sopt.confeti.api.user.dto.response.onboard.GetOnboardStatusResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardArtistsResponse;
@@ -61,7 +62,7 @@ public class UserOnboardControllerV4 implements UserOnboardControllerV4Docs {
     public ResponseEntity<BaseResponse<UserOnboardArtistsResponse>> getOnboardArtists(
         @UserId Long userId,
         @RequestParam(required = false, defaultValue = "50") @Min(1) @Max(200) int limit,
-        @RequestParam String targetArtistId
+        @RequestParam(required = false) String targetArtistId
     ) {
         UserOnboardArtistsDTO onboardArtists = userOnboardFacade.getOnboardArtists(limit, userId,
             Optional.ofNullable(targetArtistId));
@@ -129,6 +130,21 @@ public class UserOnboardControllerV4 implements UserOnboardControllerV4Docs {
     ) {
         userOnboardFacade.patchFavoriteArtist(userId, request.toDto());
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    /**
+     * 개발을 위해 임시로 Role.GENERAL 접근 허용
+     */
+    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @PostMapping("/artists/favorite")
+    public ResponseEntity<BaseResponse<UserOnboardFavoriteArtistsResponse>> addFavoriteArtists(
+        @UserId Long userId,
+        @Valid @RequestBody AddOnboardFavoriteArtistRequest request
+    ) {
+        UserOnboardFavoriteArtistsDTO favoriteArtists = userOnboardFacade.addFavoriteArtists(
+            userId, request.toDTO());
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            UserOnboardFavoriteArtistsResponse.from(favoriteArtists));
     }
 
 }
