@@ -1,10 +1,8 @@
 package org.sopt.confeti.api.user.facade;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.user.facade.dto.request.PatchOnboardFavoriteArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.GetOnboardStatusDTO;
+import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardFavoriteArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedArtistsDTO;
@@ -75,23 +74,32 @@ public class UserOnboardFacade {
         return UserOnboardTopArtistsDTO.from(topArtists);
     }
 
-    public UserOnboardTopArtistsDTO getTopArtists(int limit, long userId) {
+    public UserOnboardArtistsDTO getOnboardArtists(
+        int limit,
+        long userId,
+        Optional<String> targetArtistId
+    ) {
+        if (targetArtistId.isPresent()) {
+            return getRelatedArtistsV4(userId, targetArtistId.get(), limit);
+        }
+        return getTopArtists(limit, userId);
+    }
+
+    public UserOnboardArtistsDTO getTopArtists(int limit, long userId) {
         List<ConfetiArtist> topArtists = getAllTopArtists();
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
 
-        UserOnboardTopArtistsDTO userOnboardTopArtistsDTO = UserOnboardTopArtistsDTO.from(
-            getFilteredArtists(topArtists, cachedArtists.favoriteArtistIds(), limit)
-        );
-
-        return userOnboardTopArtistsDTO;
+        return UserOnboardArtistsDTO.from(
+            getFilteredArtists(topArtists, cachedArtists.favoriteArtistIds(), limit));
     }
 
-    public UserOnboardRelatedArtistsDTO getRelatedArtists(
+    public UserOnboardArtistsDTO getRelatedArtistsV4(
         long userId,
         String requestArtistId,
         int limit
     ) {
-        UserOnboardCacheDTO cachedOnboardArtists = userOnboardService.getCachedOnboardArtists(userId);
+        UserOnboardCacheDTO cachedOnboardArtists = userOnboardService.getCachedOnboardArtists(
+            userId);
         List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
             FIXED_RELATED_ARTISTS_FETCH_SIZE);
         List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
@@ -99,7 +107,23 @@ public class UserOnboardFacade {
             cachedOnboardArtists.favoriteArtists().stream().map(ConfetiArtist::getId)
                 .collect(Collectors.toSet()), limit);
 
-//        cacheFavoriteArtists(userId, requestArtistId, cachedOnboardArtists);
+        return UserOnboardArtistsDTO.from(filteredRelatedArtists);
+    }
+
+    @Deprecated
+    public UserOnboardRelatedArtistsDTO getRelatedArtists(
+        long userId,
+        String requestArtistId,
+        int limit
+    ) {
+        UserOnboardCacheDTO cachedOnboardArtists = userOnboardService.getCachedOnboardArtists(
+            userId);
+        List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
+            FIXED_RELATED_ARTISTS_FETCH_SIZE);
+        List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
+            relatedArtists,
+            cachedOnboardArtists.favoriteArtists().stream().map(ConfetiArtist::getId)
+                .collect(Collectors.toSet()), limit);
 
         return UserOnboardRelatedArtistsDTO.from(filteredRelatedArtists);
     }
@@ -166,7 +190,8 @@ public class UserOnboardFacade {
     }
 
     private List<ConfetiArtist> getAllTopArtists() {
-        List<ConfetiArtist> cachedTopArtists = redisHandler.getList(RedisKey.MUSIC_TOP_ARTISTS.createKeyInfo());
+        List<ConfetiArtist> cachedTopArtists = redisHandler.getList(
+            RedisKey.MUSIC_TOP_ARTISTS.createKeyInfo());
 
         if (!cachedTopArtists.isEmpty()) {
             return cachedTopArtists;

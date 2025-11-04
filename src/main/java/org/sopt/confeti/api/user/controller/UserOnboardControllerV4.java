@@ -3,16 +3,17 @@ package org.sopt.confeti.api.user.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.docs.UserOnboardControllerV4Docs;
 import org.sopt.confeti.api.user.dto.request.PatchOnboardFavoriteArtistsRequest;
-import org.sopt.confeti.api.user.dto.response.UserOnboardTopArtistsResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.GetOnboardStatusResponse;
+import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardArtistsResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardFavoriteArtistsResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardRelatedArtistsResponse;
 import org.sopt.confeti.api.user.facade.UserOnboardFacade;
-import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.GetOnboardStatusDTO;
+import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardFavoriteArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedArtistsDTO;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -40,22 +41,6 @@ public class UserOnboardControllerV4 implements UserOnboardControllerV4Docs {
 
     private final UserOnboardFacade userOnboardFacade;
 
-    /**
-     * 개발을 위해 임시로 Role.GENERAL 접근 허용
-     */
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
-    @GetMapping("/artists/{artistId}/related")
-    public ResponseEntity<BaseResponse<UserOnboardRelatedArtistsResponse>> getRelatedArtists(
-        @UserId Long userId,
-        @PathVariable String artistId,
-        @RequestParam(defaultValue = "1") @Min(1) @Max(30) Integer limit
-    ) {
-        UserOnboardRelatedArtistsDTO relatedArtists = userOnboardFacade.getRelatedArtists(userId,
-            artistId, limit);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserOnboardRelatedArtistsResponse.from(relatedArtists));
-    }
-
     @GetMapping("/artists/search")
     public ResponseEntity<BaseResponse<UserOnboardRelatedArtistsResponse>> getArtistsRelatedTerm(
         @UserId Long userId,
@@ -73,13 +58,15 @@ public class UserOnboardControllerV4 implements UserOnboardControllerV4Docs {
      */
     @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @GetMapping("/artists")
-    public ResponseEntity<BaseResponse<UserOnboardTopArtistsResponse>> getTopArtists(
+    public ResponseEntity<BaseResponse<UserOnboardArtistsResponse>> getOnboardArtists(
         @UserId Long userId,
-        @RequestParam(required = false, defaultValue = "100") @Min(1) @Max(200) int limit
+        @RequestParam(required = false, defaultValue = "50") @Min(1) @Max(200) int limit,
+        @RequestParam String targetArtistId
     ) {
-        UserOnboardTopArtistsDTO topArtists = userOnboardFacade.getTopArtists(limit, userId);
+        UserOnboardArtistsDTO onboardArtists = userOnboardFacade.getOnboardArtists(limit, userId,
+            Optional.ofNullable(targetArtistId));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserOnboardTopArtistsResponse.from(topArtists));
+            UserOnboardArtistsResponse.from(onboardArtists));
     }
 
     /**
