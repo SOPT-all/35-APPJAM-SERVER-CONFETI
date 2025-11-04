@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistMusicEditDTO;
+import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.sopt.confeti.global.util.music.dto.music.MusicPage;
@@ -14,6 +15,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * When adding a new key, if you add a new object, register it with the Pool.
+ *
  * @see RedisSerializePool
  */
 @Slf4j
@@ -21,19 +23,24 @@ import org.springframework.util.StringUtils;
 public enum RedisKey {
     // music api handler
     MUSIC_ARTISTS("apple-music-api:artists:%s", ConfetiArtist.class, Duration.ofHours(1)),
-    MUSIC_ARTISTS_RELATED("apple-music-api:artists-related:%s:%d", ConfetiArtist.class, Duration.ofHours(1)),
-    MUSIC_ARTISTS_TOP_MUSICS("apple-music-api:artists:top-musics:%s", ConfetiMusic.class, Duration.ofHours(1)),
+    MUSIC_ARTISTS_RELATED("apple-music-api:artists-related:%s:%d", ConfetiArtist.class,
+        Duration.ofHours(1)),
+    MUSIC_ARTISTS_TOP_MUSICS("apple-music-api:artists:top-musics:%s", ConfetiMusic.class,
+        Duration.ofHours(1)),
     MUSIC_MUSICS("apple-music-api:musics:%s", ConfetiMusic.class, Duration.ofHours(1)),
     MUSIC_TOP_MUSICS("apple-music-api:top-musics", ConfetiMusic.class, Duration.ofHours(1)),
     MUSIC_TOP_ARTISTS("apple-music-api:top-artists", ConfetiArtist.class, Duration.ofHours(1)),
-    MUSIC_PAGE_ARTIST_OFFSET_LIMIT("apple-music-api:music-page:artists:%s:%d:%d", MusicPage.class, Duration.ofHours(1)),
-    MUSIC_PAGE_KEYWORD_OFFSET_LIMIT("apple-music-api:music-page:keyword:%s:%d:%d", MusicPage.class, Duration.ofHours(1)),
+    MUSIC_PAGE_ARTIST_OFFSET_LIMIT("apple-music-api:music-page:artists:%s:%d:%d", MusicPage.class,
+        Duration.ofHours(1)),
+    MUSIC_PAGE_KEYWORD_OFFSET_LIMIT("apple-music-api:music-page:keyword:%s:%d:%d", MusicPage.class,
+        Duration.ofHours(1)),
 
     // user refresh token
     USER_REFRESH_TOKEN("user:refresh-token:%d", String.class, Duration.ofHours(1)),
 
     // user onboard
-    USER_ONBOARD_TOP_ARTISTS("user:onboard:top-artists:%d", String.class, Duration.ofHours(1)),
+    USER_ONBOARD_TOP_ARTISTS("user:onboard:top-artists:%d", UserOnboardCacheDTO.class,
+        Duration.ofHours(1)),
 
     // setlist
     SETLIST_EDIT("edit:setlist:%d:%d", SetlistMusicEditDTO.class, Duration.ofHours(1)),
@@ -76,12 +83,14 @@ public enum RedisKey {
             String key = String.format(format, firstArg, secondArg, thirdArg);
 
             return KeyInfo.<T>builder()
-                    .type((Class<T>) type)
-                    .key(key)
-                    .ttl(ttl)
-                    .build();
+                .type((Class<T>) type)
+                .key(key)
+                .ttl(ttl)
+                .build();
         } catch (IllegalFormatException e) {
-            log.warn("RedisKey.createKeyInfo : Format String not matched with arguments. format : {}, first arg : {}, second arg : {}, third arg : {}", format, firstArg, secondArg, thirdArg);
+            log.warn(
+                "RedisKey.createKeyInfo : Format String not matched with arguments. format : {}, first arg : {}, second arg : {}, third arg : {}",
+                format, firstArg, secondArg, thirdArg);
             return null;
         }
     }
