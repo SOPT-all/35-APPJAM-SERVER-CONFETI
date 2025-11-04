@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.api.user.facade.dto.request.PatchOnboardFavoriteArtistsDTO;
+import org.sopt.confeti.api.user.facade.dto.request.onboard.PatchOnboardFavoriteArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.GetOnboardStatusDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardArtistsDTO;

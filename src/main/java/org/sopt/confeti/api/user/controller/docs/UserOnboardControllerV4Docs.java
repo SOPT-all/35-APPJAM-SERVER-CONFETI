@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.sopt.confeti.api.user.dto.request.PatchOnboardFavoriteArtistsRequest;
+import org.sopt.confeti.api.user.dto.request.onboard.PatchOnboardFavoriteArtistsRequest;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardFavoriteArtistsResponse;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;

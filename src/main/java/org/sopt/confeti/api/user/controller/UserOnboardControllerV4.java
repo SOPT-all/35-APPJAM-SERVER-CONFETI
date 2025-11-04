@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Min;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.docs.UserOnboardControllerV4Docs;
-import org.sopt.confeti.api.user.dto.request.PatchOnboardFavoriteArtistsRequest;
+import org.sopt.confeti.api.user.dto.request.onboard.PatchOnboardFavoriteArtistsRequest;
 import org.sopt.confeti.api.user.dto.response.onboard.GetOnboardStatusResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardArtistsResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardFavoriteArtistsResponse;
