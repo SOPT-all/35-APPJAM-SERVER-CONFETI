@@ -58,20 +58,6 @@ public class UserOnboardFacade {
         return UserOnboardRelatedArtistsDTO.from(filteredArtists);
     }
 
-    /**
-     * exposed Artist 사용할 경우의 온보딩 아티스트 검색 메서드
-     */
-    public UserOnboardRelatedArtistsDTO getArtistsRelatedTermWhenControlExposed(long userId,
-        String term, int limit) {
-        Set<String> exposedArtistIds = userOnboardService.getCachedExposedArtistIds(userId);
-        List<ConfetiArtist> searchedArtists = musicAPIHandler.findArtistsByKeyword(term,
-            FIXED_SEARCH_ARTISTS_FETCH_SIZE);
-        List<ConfetiArtist> filteredArtists = getFilteredArtists(searchedArtists, exposedArtistIds,
-            limit);
-
-        return UserOnboardRelatedArtistsDTO.from(filteredArtists);
-    }
-
     @Deprecated
     public UserOnboardTopArtistsDTO getTopArtists(int limit) {
         List<ConfetiMusic> topMusics = musicAPIHandler.getTopMusics(limit);
@@ -100,27 +86,6 @@ public class UserOnboardFacade {
         return userOnboardTopArtistsDTO;
     }
 
-    /**
-     * exposed Artist 사용할 경우의 Top Artist 목록 조회 메서드
-     */
-    public UserOnboardTopArtistsDTO getTopArtistsWhenControlExposed(int limit, long userId) {
-        List<ConfetiArtist> topArtists = getAllTopArtists();
-        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
-        Set<String> favoriteArtistIds = new HashSet<>(cachedArtists.favoriteArtistIds());
-        Set<String> exposedArtistIds = new HashSet<>(cachedArtists.exposedArtistIds());
-
-        UserOnboardTopArtistsDTO userOnboardTopArtistsDTO = UserOnboardTopArtistsDTO.from(
-            getFilteredArtists(topArtists, favoriteArtistIds, limit));
-
-        userOnboardTopArtistsDTO.artists()
-            .forEach(artist -> exposedArtistIds.add(artist.id()));
-
-        userOnboardService.cacheOnboardArtists(userId,
-            UserOnboardCacheDTO.of(favoriteArtistIds, exposedArtistIds));
-
-        return userOnboardTopArtistsDTO;
-    }
-
     public UserOnboardRelatedArtistsDTO getRelatedArtists(
         long userId,
         String requestArtistId,
@@ -137,26 +102,6 @@ public class UserOnboardFacade {
 //        cacheFavoriteArtists(userId, requestArtistId, cachedOnboardArtists);
 
         return UserOnboardRelatedArtistsDTO.from(filteredRelatedArtists);
-    }
-
-    /**
-     * exposed Artist 를 사용할 경우의 RelatedArtists 조회 메서드
-     */
-    public UserOnboardRelatedArtistsDTO getRelatedArtistsWhenControlExposed(
-        long userId,
-        String requestArtistId,
-        int limit
-    ) {
-        UserOnboardCacheDTO cachedOnboardArtists = userOnboardService.getCachedOnboardArtists(userId);
-
-        List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
-            FIXED_RELATED_ARTISTS_FETCH_SIZE);
-        List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
-            relatedArtists, cachedOnboardArtists.exposedArtistIds(), limit);
-
-        cacheRelatedArtists(userId, requestArtistId, cachedOnboardArtists, filteredRelatedArtists);
-
-        return UserOnboardRelatedArtistsDTO.from(relatedArtists);
     }
 
     @Deprecated
@@ -256,29 +201,6 @@ public class UserOnboardFacade {
             new LinkedHashSet<>(List.of(requestArtist)));
 
         userOnboardService.cacheOnboardArtists(userId, newUserOnboardCacheDTO);
-    }
-
-    /**
-     * exposed Artist 를 사용할 경우의 RelatedArtists 캐싱 메서드
-     */
-    private void cacheRelatedArtists(
-        long userId,
-        String requestArtistId,
-        UserOnboardCacheDTO userOnboardCacheDTO,
-        List<ConfetiArtist> artists
-    ) {
-        Set<String> newFavoriteArtistIds = new HashSet<>(userOnboardCacheDTO.favoriteArtistIds());
-        Set<String> newExposedArtistIds = new HashSet<>(userOnboardCacheDTO.exposedArtistIds());
-
-        List<String> exposedArtistIds = artists.stream()
-            .map(ConfetiArtist::getId)
-            .toList();
-
-        newFavoriteArtistIds.add(requestArtistId);
-        newExposedArtistIds.addAll(exposedArtistIds);
-
-        userOnboardService.cacheOnboardArtists(userId,
-            UserOnboardCacheDTO.of(newFavoriteArtistIds, newExposedArtistIds));
     }
 
     private void validOnboardArtists(UserOnboardCacheDTO userOnboardCacheDTO) {
