@@ -190,8 +190,8 @@ public class UserOnboardFacade {
         AddOnboardFavoriteArtistDTO requestDTO
     ) {
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
-        UserOnboardCacheDTO newUserOnboardCacheDTO = cachedArtists.withAddFavoriteArtists(
-            List.of(requestDTO.toConfetiArtist()));
+        UserOnboardCacheDTO newUserOnboardCacheDTO
+            = cachedArtists.withAddFavoriteArtist(requestDTO.toConfetiArtist());
         userOnboardService.cacheOnboardArtists(userId, newUserOnboardCacheDTO);
 
         List<ConfetiArtist> favoriteArtists = newUserOnboardCacheDTO.favoriteArtists().stream()

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistDTO;
@@ -59,6 +60,12 @@ public record UserOnboardCacheDTO(
         Set<ConfetiArtist> currentFavoriteArtistIds = new LinkedHashSet<>(this.favoriteArtists);
         currentFavoriteArtistIds.addAll(newFavoriteArtists);
         return new UserOnboardCacheDTO(currentFavoriteArtistIds, this.exposedArtistIds);
+    }
+
+    public UserOnboardCacheDTO withAddFavoriteArtist(
+        ConfetiArtist newFavoriteArtist
+    ) {
+        return withAddFavoriteArtists(List.of(newFavoriteArtist));
     }
 
     public UserOnboardCacheDTO deleteFavoriteArtistIds(Collection<String> targetArtistIds) {
