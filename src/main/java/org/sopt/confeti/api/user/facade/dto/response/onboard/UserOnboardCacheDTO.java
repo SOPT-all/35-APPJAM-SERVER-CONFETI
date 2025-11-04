@@ -9,8 +9,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
+import org.sopt.confeti.global.annotation.RedisSerializable;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 
+@RedisSerializable
 public record UserOnboardCacheDTO(
     @JsonDeserialize(as = LinkedHashSet.class)
     Set<ConfetiArtist> favoriteArtists,
@@ -51,11 +53,11 @@ public record UserOnboardCacheDTO(
         return new UserOnboardCacheDTO(Collections.emptySet(), Collections.emptySet());
     }
 
-    public UserOnboardCacheDTO withAddFavoriteArtistIds(
-        Collection<ConfetiArtist> newFavoriteArtistIds
+    public UserOnboardCacheDTO withAddFavoriteArtists(
+        Collection<ConfetiArtist> newFavoriteArtists
     ) {
         Set<ConfetiArtist> currentFavoriteArtistIds = new LinkedHashSet<>(this.favoriteArtists);
-        currentFavoriteArtistIds.addAll(newFavoriteArtistIds);
+        currentFavoriteArtistIds.addAll(newFavoriteArtists);
         return new UserOnboardCacheDTO(currentFavoriteArtistIds, this.exposedArtistIds);
     }
 
@@ -63,7 +65,7 @@ public record UserOnboardCacheDTO(
         Set<String> targetIds = new HashSet<>(targetArtistIds);
         Set<ConfetiArtist> currentFavoriteArtists = new LinkedHashSet<>(this.favoriteArtists);
 
-        currentFavoriteArtists.removeIf(targetIds::contains);
+        currentFavoriteArtists.removeIf(confetiArtist -> targetIds.contains(confetiArtist.getId()));
 
         return new UserOnboardCacheDTO(currentFavoriteArtists, this.exposedArtistIds);
     }
