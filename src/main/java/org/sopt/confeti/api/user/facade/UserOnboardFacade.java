@@ -103,9 +103,7 @@ public class UserOnboardFacade {
         List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
             FIXED_RELATED_ARTISTS_FETCH_SIZE);
         List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
-            relatedArtists,
-            cachedOnboardArtists.favoriteArtists().stream().map(ConfetiArtist::getId)
-                .collect(Collectors.toSet()), limit);
+            relatedArtists, cachedOnboardArtists.favoriteArtistIds(), limit);
 
         return UserOnboardArtistsDTO.from(filteredRelatedArtists);
     }
@@ -121,9 +119,7 @@ public class UserOnboardFacade {
         List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
             FIXED_RELATED_ARTISTS_FETCH_SIZE);
         List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
-            relatedArtists,
-            cachedOnboardArtists.favoriteArtists().stream().map(ConfetiArtist::getId)
-                .collect(Collectors.toSet()), limit);
+            relatedArtists, cachedOnboardArtists.favoriteArtistIds(), limit);
 
         return UserOnboardRelatedArtistsDTO.from(filteredRelatedArtists);
     }
