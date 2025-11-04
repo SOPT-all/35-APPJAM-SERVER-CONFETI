@@ -1,12 +1,12 @@
 package org.sopt.confeti.api.user.facade;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.api.user.facade.dto.request.onboard.AddOnboardFavoriteArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.request.onboard.PatchOnboardFavoriteArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.GetOnboardStatusDTO;
@@ -189,6 +189,20 @@ public class UserOnboardFacade {
         userOnboardService.cacheOnboardArtists(userId, newUserOnboardCacheDTO);
     }
 
+    public UserOnboardFavoriteArtistsDTO addFavoriteArtists(
+        long userId,
+        AddOnboardFavoriteArtistDTO requestDTO
+    ) {
+        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
+        UserOnboardCacheDTO newUserOnboardCacheDTO = cachedArtists.withAddFavoriteArtists(
+            List.of(requestDTO.toConfetiArtist()));
+        userOnboardService.cacheOnboardArtists(userId, newUserOnboardCacheDTO);
+
+        List<ConfetiArtist> favoriteArtists = newUserOnboardCacheDTO.favoriteArtists().stream()
+            .toList();
+        return UserOnboardFavoriteArtistsDTO.from(favoriteArtists);
+    }
+
     private List<ConfetiArtist> getAllTopArtists() {
         List<ConfetiArtist> cachedTopArtists = redisHandler.getList(
             RedisKey.MUSIC_TOP_ARTISTS.createKeyInfo());
@@ -215,17 +229,6 @@ public class UserOnboardFacade {
         List<ConfetiArtist> topArtists = musicAPIHandler.getArtistsByArtistIds(topArtistIds);
         cacheTopArtists(topArtists);
         return topArtists;
-    }
-
-    private void cacheFavoriteArtists(
-        long userId,
-        ConfetiArtist requestArtist,
-        UserOnboardCacheDTO userOnboardCacheDTO
-    ) {
-        UserOnboardCacheDTO newUserOnboardCacheDTO = userOnboardCacheDTO.withAddFavoriteArtistIds(
-            new LinkedHashSet<>(List.of(requestArtist)));
-
-        userOnboardService.cacheOnboardArtists(userId, newUserOnboardCacheDTO);
     }
 
     private void validOnboardArtists(UserOnboardCacheDTO userOnboardCacheDTO) {
