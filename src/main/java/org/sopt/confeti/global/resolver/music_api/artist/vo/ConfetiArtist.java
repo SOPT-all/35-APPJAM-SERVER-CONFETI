@@ -3,6 +3,7 @@ package org.sopt.confeti.global.resolver.music_api.artist.vo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Transient;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -67,5 +68,18 @@ public class ConfetiArtist {
     public static ConfetiArtist of(final String artistId, final String name,
         final String profileUrl) {
         return new ConfetiArtist(artistId, name, profileUrl);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ConfetiArtist that)) {
+            return false;
+        }
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }
