@@ -189,9 +189,11 @@ public class UserOnboardFacade {
         long userId,
         AddOnboardFavoriteArtistDTO requestDTO
     ) {
+        List<ConfetiArtist> newFavoriteArtists = musicAPIHandler.getArtistsByArtistIds(
+            requestDTO.artistIds());
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
         UserOnboardCacheDTO newUserOnboardCacheDTO
-            = cachedArtists.withAddFavoriteArtist(requestDTO.toConfetiArtist());
+            = cachedArtists.withAddFavoriteArtists(newFavoriteArtists);
         userOnboardService.cacheOnboardArtists(userId, newUserOnboardCacheDTO);
 
         List<ConfetiArtist> favoriteArtists = newUserOnboardCacheDTO.favoriteArtists().stream()
