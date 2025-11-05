@@ -3,6 +3,7 @@ package org.sopt.confeti.api.user.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.docs.UserOnboardControllerV4Docs;
 import org.sopt.confeti.api.user.dto.request.onboard.AddOnboardFavoriteArtistRequest;
@@ -23,7 +24,6 @@ import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -64,13 +64,8 @@ public class UserOnboardControllerV4 implements UserOnboardControllerV4Docs {
         @RequestParam(required = false, defaultValue = "50") @Min(1) @Max(200) int limit,
         @RequestParam(required = false) String targetArtistId
     ) {
-        UserOnboardArtistsDTO onboardArtists;
-        if (StringUtils.hasText(targetArtistId)) {
-            onboardArtists = userOnboardFacade.getRelatedArtistsV4(userId,
-                targetArtistId, limit);
-        } else {
-            onboardArtists = userOnboardFacade.getTopArtists(limit, userId);
-        }
+        UserOnboardArtistsDTO onboardArtists = userOnboardFacade.getOnboardArtists(limit, userId,
+            Optional.ofNullable(targetArtistId));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserOnboardArtistsResponse.from(onboardArtists));
     }
