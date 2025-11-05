@@ -40,19 +40,20 @@ public class ConfetiArtist {
     }
 
     public static ConfetiArtist from(final AppleMusicArtistResponse artist) {
-        Optional<AppleMusicArtistAttributesResponse> optAttributes = Optional.ofNullable(artist.attributes());
+        Optional<AppleMusicArtistAttributesResponse> optAttributes = Optional.ofNullable(
+            artist.attributes());
         String name = optAttributes.map(AppleMusicArtistAttributesResponse::name).orElse(null);
         String profileUrl = optAttributes.map(AppleMusicArtistAttributesResponse::artwork)
-                .map(AppleMusicArtistArtworkResponse::url)
-                .map(url -> UriComponentsBuilder.fromUriString(url)
-                        .buildAndExpand(ArtistConstant.PROFILE_IMG_SIZE)
-                        .toUriString()
-                ).orElse(null);
+            .map(AppleMusicArtistArtworkResponse::url)
+            .map(url -> UriComponentsBuilder.fromUriString(url)
+                .buildAndExpand(ArtistConstant.PROFILE_IMG_SIZE)
+                .toUriString()
+            ).orElse(null);
 
         return new ConfetiArtist(
-                artist.id(),
-                name,
-                profileUrl
+            artist.id(),
+            name,
+            profileUrl
         );
     }
 
@@ -62,5 +63,26 @@ public class ConfetiArtist {
 
     public static ConfetiArtist empty() {
         return new ConfetiArtist();
+    }
+
+    public static ConfetiArtist of(final String artistId, final String name,
+        final String profileUrl) {
+        return new ConfetiArtist(artistId, name, profileUrl);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ConfetiArtist that)) {
+            return false;
+        }
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

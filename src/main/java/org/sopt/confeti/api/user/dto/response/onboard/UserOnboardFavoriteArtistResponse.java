@@ -3,7 +3,7 @@ package org.sopt.confeti.api.user.dto.response.onboard;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardFavoriteArtistDTO;
 
 public record UserOnboardFavoriteArtistResponse(
-    String id,
+    String artistId,
     String profileUrl,
     String name
 ) {

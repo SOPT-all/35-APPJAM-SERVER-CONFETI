@@ -1,4 +1,4 @@
-package org.sopt.confeti.api.user.facade.dto.request;
+package org.sopt.confeti.api.user.facade.dto.request.onboard;
 
 import java.util.Set;
 

@@ -1,10 +1,10 @@
-package org.sopt.confeti.api.user.dto.request;
+package org.sopt.confeti.api.user.dto.request.onboard;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.Set;
-import org.sopt.confeti.api.user.facade.dto.request.PatchOnboardFavoriteArtistsDTO;
+import org.sopt.confeti.api.user.facade.dto.request.onboard.PatchOnboardFavoriteArtistsDTO;
 
 public record PatchOnboardFavoriteArtistsRequest(
     @NotNull
