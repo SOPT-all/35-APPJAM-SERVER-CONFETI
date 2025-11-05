@@ -1,7 +1,6 @@
 package org.sopt.confeti.api.user.facade;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -72,17 +71,6 @@ public class UserOnboardFacade {
 
         List<ConfetiArtist> topArtists = musicAPIHandler.getArtistsByArtistIds(topArtistIds);
         return UserOnboardTopArtistsDTO.from(topArtists);
-    }
-
-    public UserOnboardArtistsDTO getOnboardArtists(
-        int limit,
-        long userId,
-        Optional<String> targetArtistId
-    ) {
-        if (targetArtistId.isPresent()) {
-            return getRelatedArtistsV4(userId, targetArtistId.get(), limit);
-        }
-        return getTopArtists(limit, userId);
     }
 
     public UserOnboardArtistsDTO getTopArtists(int limit, long userId) {
