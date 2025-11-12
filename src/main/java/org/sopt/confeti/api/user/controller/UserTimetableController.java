@@ -2,6 +2,7 @@ package org.sopt.confeti.api.user.controller;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.user.controller.docs.UserTimetableControllerDocs;
 import org.sopt.confeti.api.user.dto.request.AddTimetableFestivalRequest;
 import org.sopt.confeti.api.user.dto.request.PatchTimetableRequest;
 import org.sopt.confeti.api.user.dto.response.TimetablesToAddResponse;
@@ -45,7 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RequiredArgsConstructor
 @RequestMapping("/user/timetables")
-public class UserTimetableController {
+public class UserTimetableController implements UserTimetableControllerDocs {
 
     private final UserTimetableFacade userTimetableFacade;
     private final S3FileHandler s3FileHandler;
