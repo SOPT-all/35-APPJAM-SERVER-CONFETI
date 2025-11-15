@@ -136,7 +136,7 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
         eventHandler.handle(event);
     }
 
-    public void pollSqsMessages(List<Message<String>> receivedMessages) {
+    public void consumeSqsMessages(List<Message<String>> receivedMessages) {
         List<CompletableFuture<Void>> futures = receivedMessages.stream()
             .map(this::processMessageAndDelete)
             .toList();

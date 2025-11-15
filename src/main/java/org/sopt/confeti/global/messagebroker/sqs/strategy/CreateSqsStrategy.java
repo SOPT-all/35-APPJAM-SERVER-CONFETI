@@ -45,6 +45,6 @@ public class CreateSqsStrategy<T extends CreateEventHandler<? extends CreateEven
     @Override
     @SqsListener(value = "${message-broker.sqs.create-event}", factory = "createEventSqsListenerContainerFactory")
     protected void listen(List<Message<String>> messages) {
-        pollSqsMessages(messages);
+        consumeSqsMessages(messages);
     }
 }
