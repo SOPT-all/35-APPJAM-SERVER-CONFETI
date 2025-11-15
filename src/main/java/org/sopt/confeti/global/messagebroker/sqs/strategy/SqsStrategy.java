@@ -4,8 +4,6 @@ import static org.sopt.confeti.global.message.ErrorMessage.INTERNAL_SERVER_ERROR
 
 import io.awspring.cloud.sqs.listener.SqsHeaders;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
-import java.time.Duration;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -21,7 +19,6 @@ import org.sopt.confeti.global.notification.SlackNotificationType;
 import org.sopt.confeti.global.util.JsonMapper;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.messaging.Message;
-import org.springframework.scheduling.annotation.Scheduled;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
@@ -43,9 +40,6 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
     private static final String ATTRIBUTE_TRACE_ID = "traceId";
     private static final String ATTRIBUTE_TYPE_ID = "confetiEventType";
 
-    private static final int MAX_POLLING_MESSAGE_SIZE = 10;
-    private static final int POLLING_TIMEOUT = 20;
-
     protected SqsStrategy(
         List<? extends EventHandler<? extends Event>> eventHandlers,
         String queueUrl,
@@ -63,6 +57,8 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
         this.sqsAsyncClient = sqsAsyncClient;
         this.jsonMapper = jsonMapper;
     }
+
+    abstract void listen(List<Message<String>> messages);
 
     protected void asyncSend(String queueName, Event event) {
         Map<String, Object> messageAttributes = createMessageAttributes(event);
@@ -123,7 +119,6 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
             });
     }
 
-
     protected void handleEvent(String typeId, String payload) {
         EventHandler<? extends Event> eventHandler = super.getEventHandlers().get(typeId);
         if (eventHandler == null) {
@@ -141,19 +136,7 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
         eventHandler.handle(event);
     }
 
-    @Scheduled(fixedDelay = 1000)
-    public void pollSqsMessages() {
-
-        Collection<Message<?>> receivedMessages = sqsTemplate.receiveMany(options -> options
-            .queue(queueUrl)
-            .maxNumberOfMessages(MAX_POLLING_MESSAGE_SIZE)
-            .pollTimeout(Duration.ofSeconds(POLLING_TIMEOUT))
-        );
-
-        if (receivedMessages.isEmpty()) {
-            return;
-        }
-
+    public void consumeSqsMessages(List<Message<String>> receivedMessages) {
         List<CompletableFuture<Void>> futures = receivedMessages.stream()
             .map(this::processMessageAndDelete)
             .toList();
