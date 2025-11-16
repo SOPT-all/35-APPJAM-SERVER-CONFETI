@@ -2,8 +2,8 @@ package org.sopt.confeti.global.messagebroker;
 
 import org.sopt.confeti.global.messagebroker.message.Message;
 
-public interface MessageBroker {
+public interface MessagePublisher {
 
-    void sendMessage(Message message);
+    void publish(Message message);
 
 }

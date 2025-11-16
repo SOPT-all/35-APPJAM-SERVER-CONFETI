@@ -12,10 +12,10 @@ public class MessageBrokerResolver {
 
     private final MessageBrokerProvider messageBrokerProvider;
 
-    public void sendMessage(Message message) {
+    public void publish(Message message) {
         MessageBrokerStrategy strategy = messageBrokerProvider.getStrategyByMessageClass(
             message.getClass());
-        strategy.sendMessage(message);
+        strategy.publish(message);
     }
 
 }

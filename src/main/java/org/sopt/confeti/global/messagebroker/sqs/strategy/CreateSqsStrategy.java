@@ -37,7 +37,7 @@ public class CreateSqsStrategy<T extends CreateMessageHandler<? extends CreateMe
     }
 
     @Override
-    public void sendMessage(Message message) {
+    public void publish(Message message) {
         asyncSend(super.getQueueUrl(), message);
     }
 

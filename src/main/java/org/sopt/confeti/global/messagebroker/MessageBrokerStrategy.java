@@ -9,7 +9,7 @@ import org.sopt.confeti.global.messagebroker.handler.MessageHandler;
 import org.sopt.confeti.global.messagebroker.message.Message;
 
 @Getter
-public abstract class MessageBrokerStrategy implements MessageBroker {
+public abstract class MessageBrokerStrategy implements MessagePublisher {
 
     private final Map<String, ? extends MessageHandler<? extends Message>> messageHandlers;
     private final Map<Class<? extends Message>, MessageHandler<? extends Message>> messageHandlerByMessageClass;
