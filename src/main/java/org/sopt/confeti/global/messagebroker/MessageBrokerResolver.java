@@ -10,10 +10,10 @@ import org.sopt.confeti.global.messagebroker.message.Message;
 @RequiredArgsConstructor
 public class MessageBrokerResolver {
 
-    private final MessageBrokerProvider messageBrokerProvider;
+    private final MessageStrategyProvider messageStrategyProvider;
 
     public void publish(Message message) {
-        MessageBrokerStrategy strategy = messageBrokerProvider.getStrategyByMessageClass(
+        MessageBrokerStrategy strategy = messageStrategyProvider.getStrategyByMessageClass(
             message.getClass());
         strategy.publish(message);
     }

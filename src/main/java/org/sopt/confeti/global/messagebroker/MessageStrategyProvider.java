@@ -12,15 +12,15 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public final class MessageBrokerProvider {
+public final class MessageStrategyProvider {
 
-    private final Map<Class<? extends Message>, MessageBrokerStrategy> strategyByEventClass;
+    private final Map<Class<? extends Message>, MessageBrokerStrategy> strategyByMessageClass;
 
-    private MessageBrokerProvider(List<MessageBrokerStrategy> messageBrokerStrategies) {
-        this.strategyByEventClass = messageBrokerStrategies.stream()
+    private MessageStrategyProvider(List<MessageBrokerStrategy> messageBrokerStrategies) {
+        this.strategyByMessageClass = messageBrokerStrategies.stream()
             .flatMap(strategy ->
                 strategy.getMessageHandlerByMessageClass().keySet().stream()
-                    .map(eventClass -> Map.entry(eventClass, strategy))
+                    .map(messageClass -> Map.entry(messageClass, strategy))
             )
             .collect(Collectors.toUnmodifiableMap(
                 Entry::getKey,
@@ -33,10 +33,10 @@ public final class MessageBrokerProvider {
             ));
     }
 
-    public MessageBrokerStrategy getStrategyByMessageClass(Class<? extends Message> eventClass) {
-        MessageBrokerStrategy strategy = strategyByEventClass.get(eventClass);
+    public MessageBrokerStrategy getStrategyByMessageClass(Class<? extends Message> messageClass) {
+        MessageBrokerStrategy strategy = strategyByMessageClass.get(messageClass);
         if (strategy == null) {
-            log.error("No strategy about message: {}", eventClass.getName());
+            log.error("No strategy about message: {}", messageClass.getName());
             throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
         return strategy;
