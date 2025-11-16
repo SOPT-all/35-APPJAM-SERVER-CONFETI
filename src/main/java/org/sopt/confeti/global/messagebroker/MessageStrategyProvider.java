@@ -19,7 +19,7 @@ public final class MessageStrategyProvider {
     private MessageStrategyProvider(List<MessageBrokerStrategy> messageBrokerStrategies) {
         this.strategyByMessageClass = messageBrokerStrategies.stream()
             .flatMap(strategy ->
-                strategy.getMessageHandlerByMessageClass().keySet().stream()
+                strategy.getSupportedMessageClasses().stream()
                     .map(messageClass -> Map.entry(messageClass, strategy))
             )
             .collect(Collectors.toUnmodifiableMap(
