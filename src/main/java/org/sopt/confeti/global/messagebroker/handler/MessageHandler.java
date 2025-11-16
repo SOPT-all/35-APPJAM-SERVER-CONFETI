@@ -4,7 +4,7 @@ import org.sopt.confeti.global.messagebroker.message.Message;
 
 public interface MessageHandler<T extends Message> {
 
-    void handle(T event);
+    void handle(T message);
 
     Class<T> getSupportedType();
 
