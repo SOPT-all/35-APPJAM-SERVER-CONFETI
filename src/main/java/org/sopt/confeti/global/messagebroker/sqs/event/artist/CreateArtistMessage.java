@@ -2,15 +2,15 @@ package org.sopt.confeti.global.messagebroker.sqs.event.artist;
 
 
 import org.sopt.confeti.domain.applemusic.artist.application.dto.request.CreateArtistDTO;
-import org.sopt.confeti.global.messagebroker.message.CreateEvent;
+import org.sopt.confeti.global.messagebroker.message.CreateMessage;
 
-public record CreateArtistEvent(
+public record CreateArtistMessage(
     String artistId,
     String name,
     String artworkUrl,
     Integer artworkWidth,
     Integer artworkHeight
-) implements CreateEvent {
+) implements CreateMessage {
 
     public CreateArtistDTO toCreateDTO() {
         return CreateArtistDTO.builder()

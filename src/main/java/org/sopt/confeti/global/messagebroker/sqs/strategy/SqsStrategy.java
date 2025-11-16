@@ -12,13 +12,12 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.messagebroker.MessageBrokerStrategy;
-import org.sopt.confeti.global.messagebroker.handler.EventHandler;
-import org.sopt.confeti.global.messagebroker.message.Event;
+import org.sopt.confeti.global.messagebroker.handler.MessageHandler;
+import org.sopt.confeti.global.messagebroker.message.Message;
 import org.sopt.confeti.global.notification.NotificationAgent;
 import org.sopt.confeti.global.notification.SlackNotificationType;
 import org.sopt.confeti.global.util.JsonMapper;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.messaging.Message;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.MessageAttributeValue;
@@ -41,7 +40,7 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
     private static final String ATTRIBUTE_TYPE_ID = "confetiEventType";
 
     protected SqsStrategy(
-        List<? extends EventHandler<? extends Event>> eventHandlers,
+        List<? extends MessageHandler<? extends Message>> eventHandlers,
         String queueUrl,
         SqsTemplate sqsTemplate,
         NotificationAgent notificationAgent,
@@ -58,11 +57,11 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
         this.jsonMapper = jsonMapper;
     }
 
-    abstract void listen(List<Message<String>> messages);
+    abstract void listen(List<org.springframework.messaging.Message<String>> messages);
 
-    protected void asyncSend(String queueName, Event event) {
-        Map<String, Object> messageAttributes = createMessageAttributes(event);
-        String serializedData = jsonMapper.toJson(event);
+    protected void asyncSend(String queueName, Message message) {
+        Map<String, Object> messageAttributes = createMessageAttributes(message);
+        String serializedData = jsonMapper.toJson(message);
 
         sqsTemplate.sendAsync(to -> to
                 .queue(queueName)
@@ -70,15 +69,15 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
                 .headers(messageAttributes)
             )
             .exceptionally(exception -> {
-                String errorMessage = extractExceptionMessage(exception, event);
+                String errorMessage = extractExceptionMessage(exception, message);
                 notificationAgent.notify(SlackNotificationType.HIGH_ERROR, errorMessage);
                 log.error("[SqsService send exception] {}", errorMessage, exception);
                 return null;
             });
     }
 
-    private Map<String, Object> createMessageAttributes(Event event) {
-        String eventType = event.getClass().getSimpleName();
+    private Map<String, Object> createMessageAttributes(Message message) {
+        String eventType = message.getClass().getSimpleName();
         String eventTraceId = UUID.randomUUID().toString();
 
         return Map.of(
@@ -90,14 +89,14 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
                 .stringValue(eventTraceId)
                 .dataType(ATTRIBUTE_DATA_TYPE_STRING)
                 .build(),
-            ATTRIBUTE_TYPE_ID, getEventTypeId(event)
+            ATTRIBUTE_TYPE_ID, getEventTypeId(message)
         );
     }
 
-    private String getEventTypeId(Event event) {
-        EventHandler<? extends Event> eventHandler = getEventHandlerByEventClass().get(
-            event.getClass());
-        return eventHandler.getSupportedTypeId();
+    private String getEventTypeId(Message message) {
+        MessageHandler<? extends Message> messageHandler = getMessageHandlerByMessageClass().get(
+            message.getClass());
+        return messageHandler.getSupportedTypeId();
     }
 
     private <T> String extractExceptionMessage(Throwable exception, T data) {
@@ -106,7 +105,8 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
             data.toString());
     }
 
-    protected CompletableFuture<Void> processMessageAndDelete(Message<?> message) {
+    protected CompletableFuture<Void> processMessageAndDelete(
+        org.springframework.messaging.Message<?> message) {
         return CompletableFuture.runAsync(() -> {
                 String type = message.getHeaders().get(ATTRIBUTE_TYPE_ID, String.class);
                 String payload = message.getPayload().toString();
@@ -120,23 +120,25 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
     }
 
     protected void handleEvent(String typeId, String payload) {
-        EventHandler<? extends Event> eventHandler = super.getEventHandlers().get(typeId);
-        if (eventHandler == null) {
+        MessageHandler<? extends Message> messageHandler = super.getMessageHandlers().get(typeId);
+        if (messageHandler == null) {
             log.error("Cannot find event handler: {}. Payload: {}", typeId, payload);
             throw new ConfetiException(INTERNAL_SERVER_ERROR);
         }
 
-        processEvent(eventHandler, payload);
+        processEvent(messageHandler, payload);
     }
 
-    protected <T extends Event> void processEvent(EventHandler<T> eventHandler, String payload) {
-        Class<T> supportedEventType = eventHandler.getSupportedType();
+    protected <T extends Message> void processEvent(MessageHandler<T> messageHandler,
+        String payload) {
+        Class<T> supportedEventType = messageHandler.getSupportedType();
         T event = jsonMapper.fromJson(supportedEventType, payload);
 
-        eventHandler.handle(event);
+        messageHandler.handle(event);
     }
 
-    public void consumeSqsMessages(List<Message<String>> receivedMessages) {
+    public void consumeSqsMessages(
+        List<org.springframework.messaging.Message<String>> receivedMessages) {
         List<CompletableFuture<Void>> futures = receivedMessages.stream()
             .map(this::processMessageAndDelete)
             .toList();
@@ -144,7 +146,7 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
 
-    private void deleteMessage(Message<?> message) {
+    private void deleteMessage(org.springframework.messaging.Message<?> message) {
         String receiptHandle = (String) message.getHeaders()
             .get(SqsHeaders.SQS_RECEIPT_HANDLE_HEADER);
 

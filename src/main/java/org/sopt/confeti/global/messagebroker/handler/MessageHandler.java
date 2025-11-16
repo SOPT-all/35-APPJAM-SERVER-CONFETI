@@ -1,8 +1,8 @@
 package org.sopt.confeti.global.messagebroker.handler;
 
-import org.sopt.confeti.global.messagebroker.message.Event;
+import org.sopt.confeti.global.messagebroker.message.Message;
 
-public interface EventHandler<T extends Event> {
+public interface MessageHandler<T extends Message> {
 
     void handle(T event);
 
