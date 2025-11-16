@@ -4,8 +4,8 @@ package org.sopt.confeti.global.messagebroker.sqs.handler.artist;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.applemusic.artist.application.ArtistService;
 import org.sopt.confeti.global.messagebroker.handler.CreateMessageHandler;
-import org.sopt.confeti.global.messagebroker.sqs.event.artist.CreateArtistMessage;
 import org.sopt.confeti.global.messagebroker.sqs.handler.SqsMessageHandler;
+import org.sopt.confeti.global.messagebroker.sqs.message.artist.CreateArtistMessage;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,9 +18,9 @@ public class CreateArtistMessageHandler implements CreateMessageHandler<CreateAr
 
     @Override
     @Transactional
-    public void handle(CreateArtistMessage event) {
-        if (!artistService.isExistByArtistId(event.artistId())) {
-            artistService.create(event.toCreateDTO());
+    public void handle(CreateArtistMessage message) {
+        if (!artistService.isExistByArtistId(message.artistId())) {
+            artistService.create(message.toCreateDTO());
         }
     }
 

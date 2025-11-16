@@ -24,7 +24,7 @@ public class CreateSqsStrategy<T extends CreateMessageHandler<? extends CreateMe
     extends SqsStrategy {
 
     protected CreateSqsStrategy(
-        List<T> createEventHandlers,
+        List<T> createMessageHandlers,
         @Value("${message-broker.sqs.create-event}") String queueUrl,
         SqsTemplate sqsTemplate,
         NotificationAgent notificationAgent,
@@ -32,7 +32,7 @@ public class CreateSqsStrategy<T extends CreateMessageHandler<? extends CreateMe
         SqsAsyncClient sqsAsyncClient,
         JsonMapper jsonMapper
     ) {
-        super(createEventHandlers, queueUrl, sqsTemplate, notificationAgent,
+        super(createMessageHandlers, queueUrl, sqsTemplate, notificationAgent,
             messageConsumeExecutor, sqsAsyncClient, jsonMapper);
     }
 
@@ -42,7 +42,7 @@ public class CreateSqsStrategy<T extends CreateMessageHandler<? extends CreateMe
     }
 
     @Override
-    @SqsListener(value = "${message-broker.sqs.create-event}", factory = "createEventSqsListenerContainerFactory")
+    @SqsListener(value = "${message-broker.sqs.create-event}", factory = "createMessageSqsListenerContainerFactory")
     protected void listen(List<org.springframework.messaging.Message<String>> messages) {
         consumeSqsMessages(messages);
     }

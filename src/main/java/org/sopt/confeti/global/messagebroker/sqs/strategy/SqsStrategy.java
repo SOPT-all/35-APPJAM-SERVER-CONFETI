@@ -35,12 +35,12 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
     private final JsonMapper jsonMapper;
 
     private static final String ATTRIBUTE_DATA_TYPE_STRING = "string";
-    private static final String ATTRIBUTE_EVENT_TYPE = "event";
+    private static final String ATTRIBUTE_MESSAGE_TYPE = "message";
     private static final String ATTRIBUTE_TRACE_ID = "traceId";
-    private static final String ATTRIBUTE_TYPE_ID = "confetiEventType";
+    private static final String ATTRIBUTE_TYPE_ID = "confetiMessageType";
 
     protected SqsStrategy(
-        List<? extends MessageHandler<? extends Message>> eventHandlers,
+        List<? extends MessageHandler<? extends Message>> messageHandlers,
         String queueUrl,
         SqsTemplate sqsTemplate,
         NotificationAgent notificationAgent,
@@ -48,7 +48,7 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
         SqsAsyncClient sqsAsyncClient,
         JsonMapper jsonMapper
     ) {
-        super(eventHandlers);
+        super(messageHandlers);
         this.queueUrl = queueUrl;
         this.sqsTemplate = sqsTemplate;
         this.notificationAgent = notificationAgent;
@@ -77,23 +77,23 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
     }
 
     private Map<String, Object> createMessageAttributes(Message message) {
-        String eventType = message.getClass().getSimpleName();
-        String eventTraceId = UUID.randomUUID().toString();
+        String messageType = message.getClass().getSimpleName();
+        String messageTraceId = UUID.randomUUID().toString();
 
         return Map.of(
-            ATTRIBUTE_EVENT_TYPE, MessageAttributeValue.builder()
-                .stringValue(eventType)
+            ATTRIBUTE_MESSAGE_TYPE, MessageAttributeValue.builder()
+                .stringValue(messageType)
                 .dataType(ATTRIBUTE_DATA_TYPE_STRING)
                 .build(),
             ATTRIBUTE_TRACE_ID, MessageAttributeValue.builder()
-                .stringValue(eventTraceId)
+                .stringValue(messageTraceId)
                 .dataType(ATTRIBUTE_DATA_TYPE_STRING)
                 .build(),
-            ATTRIBUTE_TYPE_ID, getEventTypeId(message)
+            ATTRIBUTE_TYPE_ID, getMessageTypeId(message)
         );
     }
 
-    private String getEventTypeId(Message message) {
+    private String getMessageTypeId(Message message) {
         MessageHandler<? extends Message> messageHandler = getHandlerByMessageClass(
             message.getClass());
         return messageHandler.getSupportedTypeId();
@@ -110,7 +110,7 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
         return CompletableFuture.runAsync(() -> {
                 String type = message.getHeaders().get(ATTRIBUTE_TYPE_ID, String.class);
                 String payload = message.getPayload().toString();
-                handleEvent(type, payload);
+                handleMessage(type, payload);
             }, messageConsumeExecutor)
             .thenRun(() -> deleteMessage(message))
             .exceptionally(e -> {
@@ -119,22 +119,22 @@ public abstract class SqsStrategy extends MessageBrokerStrategy {
             });
     }
 
-    protected void handleEvent(String typeId, String payload) {
+    protected void handleMessage(String typeId, String payload) {
         MessageHandler<? extends Message> messageHandler = getHandlerByTypeId(typeId);
         if (messageHandler == null) {
-            log.error("Cannot find event handler: {}. Payload: {}", typeId, payload);
+            log.error("Cannot find message handler: {}. Payload: {}", typeId, payload);
             throw new ConfetiException(INTERNAL_SERVER_ERROR);
         }
 
-        processEvent(messageHandler, payload);
+        processMessage(messageHandler, payload);
     }
 
-    protected <T extends Message> void processEvent(MessageHandler<T> messageHandler,
+    protected <T extends Message> void processMessage(MessageHandler<T> messageHandler,
         String payload) {
-        Class<T> supportedEventType = messageHandler.getSupportedType();
-        T event = jsonMapper.fromJson(supportedEventType, payload);
+        Class<T> supportedMessageType = messageHandler.getSupportedType();
+        T message = jsonMapper.fromJson(supportedMessageType, payload);
 
-        messageHandler.handle(event);
+        messageHandler.handle(message);
     }
 
     public void consumeSqsMessages(
