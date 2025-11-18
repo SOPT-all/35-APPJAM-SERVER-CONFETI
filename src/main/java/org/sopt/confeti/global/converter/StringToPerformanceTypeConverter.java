@@ -3,7 +3,9 @@ package org.sopt.confeti.global.converter;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
+@Component
 public class StringToPerformanceTypeConverter implements Converter<String, PerformanceType> {
 
     @Override
