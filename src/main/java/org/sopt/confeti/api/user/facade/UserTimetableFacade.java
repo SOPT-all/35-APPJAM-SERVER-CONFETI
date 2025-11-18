@@ -7,12 +7,17 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalArtiestDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
+import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
-import org.sopt.confeti.api.user.facade.dto.response.*;
+import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDetailFestivalsDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetableEntireFestivalDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetableHistoryDTO;
+import org.sopt.confeti.api.user.facade.dto.response.UserTimetablesDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
@@ -68,17 +73,17 @@ public class UserTimetableFacade {
     public void addTimetableFestivals(final long userId, final AddTimetableFestivalDTO from) {
         User user = userService.findUserTimetablesById(userId);
         List<Festival> addFestivals = festivalService.findFestivalsByIdIn(
-                from.festivals().stream()
-                        .distinct()
-                        .map(AddTimetableFestivalArtiestDTO::festivalId)
-                        .toList()
+            from.festivals().stream()
+                .distinct()
+                .map(AddTimetableFestivalArtiestDTO::festivalId)
+                .toList()
         );
 
         validateDuplicateTimetableFestival(
-                user.getTimetableFestivals().stream()
-                        .map(TimetableFestival::getFestival)
-                        .toList(),
-                addFestivals
+            user.getTimetableFestivals().stream()
+                .map(TimetableFestival::getFestival)
+                .toList(),
+            addFestivals
         );
 
         timetableFestivalService.addTimetableFestivals(user, addFestivals);
@@ -87,11 +92,11 @@ public class UserTimetableFacade {
 
     @Transactional
     protected void validateDuplicateTimetableFestival(final List<Festival> currentFestivals,
-                                                      final List<Festival> addFestivals) {
+        final List<Festival> addFestivals) {
         if (
-                currentFestivals.stream()
-                        .anyMatch(currentFestival -> addFestivals.stream()
-                                .anyMatch(Predicate.isEqual(currentFestival)))
+            currentFestivals.stream()
+                .anyMatch(currentFestival -> addFestivals.stream()
+                    .anyMatch(Predicate.isEqual(currentFestival)))
         ) {
             throw new ConflictException(ErrorMessage.CONFLICT);
         }
@@ -122,29 +127,31 @@ public class UserTimetableFacade {
     public CursorPage<TimetableToAddDTO> getTimetablesToAdd(final long userId, final Long cursor) {
         if (cursor == null) {
             List<Festival> festivals = festivalService.findFestivalsUsingInitCursor(userId,
-                    TIMETABLE_FESTIVALS_TO_ADD_SIZE);
+                TIMETABLE_FESTIVALS_TO_ADD_SIZE);
             return CursorPage.of(
-                    festivals.stream()
-                            .map(TimetableToAddDTO::from)
-                            .toList(),
-                    TIMETABLE_FESTIVALS_TO_ADD_SIZE
+                festivals.stream()
+                    .map(TimetableToAddDTO::from)
+                    .toList(),
+                TIMETABLE_FESTIVALS_TO_ADD_SIZE
             );
         }
 
         // 커서 값 조회
         FestivalCursorDTO festivalCursorDTO = getFestivalCursor(userId, cursor);
 
-        List<Festival> festivals = festivalService.findFestivalsUsingCursor(userId, festivalCursorDTO.cursorTitle(),
-                festivalCursorDTO.cursorIsFavorite(), TIMETABLE_FESTIVALS_TO_ADD_SIZE);
+        List<Festival> festivals = festivalService.findFestivalsUsingCursor(userId,
+            festivalCursorDTO.cursorTitle(),
+            festivalCursorDTO.cursorIsFavorite(), TIMETABLE_FESTIVALS_TO_ADD_SIZE);
         return CursorPage.of(
-                festivals.stream()
-                        .map(TimetableToAddDTO::from)
-                        .toList(),
-                TIMETABLE_FESTIVALS_TO_ADD_SIZE
+            festivals.stream()
+                .map(TimetableToAddDTO::from)
+                .toList(),
+            TIMETABLE_FESTIVALS_TO_ADD_SIZE
         );
     }
 
-    public UserTimetableFestivalBasicDTO getTimetableInfo(final long userId, final long festivalDateId) {
+    public UserTimetableFestivalBasicDTO getTimetableInfo(final long userId,
+        final long festivalDateId) {
         FestivalDate festivalDate = festivalDateService.findFestivalDateId(festivalDateId);
         return getUserTimetableDTO(userId, festivalDate);
     }
@@ -159,9 +166,9 @@ public class UserTimetableFacade {
     @Transactional(readOnly = true)
     public FestivalCursorDTO getFestivalCursor(final long userId, final long cursor) {
         return festivalService.findFestivalCursor(userId, cursor)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
+            .orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+            );
     }
 
     @Transactional
@@ -180,7 +187,8 @@ public class UserTimetableFacade {
         validateUserExists(userId);
         validateSortType(sortBy);
 
-        List<TimetableFestival> userTimetables = timetableFestivalService.getTimetables(userId, sortBy);
+        List<TimetableFestival> userTimetables = timetableFestivalService.getTimetables(userId,
+            sortBy);
 
         return UserTimetablesDTO.from(userTimetables);
     }
@@ -189,7 +197,8 @@ public class UserTimetableFacade {
     public UserTimetablesDTO getTimetablesPreview(final long userId) {
         validateUserExists(userId);
 
-        List<TimetableFestival> userTimetables = timetableFestivalService.getTimetablesPreview(userId);
+        List<TimetableFestival> userTimetables = timetableFestivalService.getTimetablesPreview(
+            userId);
         return UserTimetablesDTO.from(userTimetables);
     }
 
@@ -199,14 +208,16 @@ public class UserTimetableFacade {
         }
     }
 
-    private UserTimetableFestivalBasicDTO getUserTimetableDTO(final long userId, FestivalDate festivalDate) {
+    private UserTimetableFestivalBasicDTO getUserTimetableDTO(final long userId,
+        FestivalDate festivalDate) {
         List<Long> festivalTimeIds = festivalDate.getStages().stream()
-                .flatMap(festivalStage -> festivalStage.getTimes().stream())
-                .map(FestivalTime::getId)
-                .toList();
+            .flatMap(festivalStage -> festivalStage.getTimes().stream())
+            .map(FestivalTime::getId)
+            .toList();
         validateExistFestivalTimeIds(festivalTimeIds);
 
-        List<UserTimetable> userTimetables = userTimetableService.getUserTimetablesByFestivalTimeId(userId, festivalTimeIds);
+        List<UserTimetable> userTimetables = userTimetableService.getUserTimetablesByFestivalTimeId(
+            userId, festivalTimeIds);
         validateExistUserTimetables(userTimetables);
 
         Map<Long, UserTimetable> userTimetableMapper = createUserTimetableMapper(userTimetables);
@@ -217,9 +228,9 @@ public class UserTimetableFacade {
 
     private Map<Long, UserTimetable> createUserTimetableMapper(List<UserTimetable> userTimetables) {
         return userTimetables.stream()
-                .collect(Collectors.toMap(userTimetable ->
-                        userTimetable.getFestivalTime().getId(), Function.identity())
-                );
+            .collect(Collectors.toMap(userTimetable ->
+                userTimetable.getFestivalTime().getId(), Function.identity())
+            );
     }
 
     protected void validateExistUserTimetableMapper(Map<Long, UserTimetable> userTimetables) {
@@ -235,10 +246,11 @@ public class UserTimetableFacade {
     }
 
     @Transactional(readOnly = true)
-    protected void validateExistTimetableIds(List<UserTimetable> userTimetables, PatchTimetableDTO timetableDTO) {
+    protected void validateExistTimetableIds(List<UserTimetable> userTimetables,
+        PatchTimetableDTO timetableDTO) {
         Set<Long> existingIds = userTimetables.stream()
-                .map(UserTimetable::getId)
-                .collect(Collectors.toSet());
+            .map(UserTimetable::getId)
+            .collect(Collectors.toSet());
 
         for (PatchTimetableListDTO timetableListDTO : timetableDTO.userTimetables()) {
             if (!existingIds.contains(timetableListDTO.userTimetableId())) {
@@ -261,13 +273,24 @@ public class UserTimetableFacade {
     }
 
     public UserTimetableEntireFestivalDTO getEntireFestivalInfo(long userId, long festivalId) {
-        TimetableFestival festival = timetableFestivalService.getEntireFestivalInfo(userId, festivalId);
+        TimetableFestival festival = timetableFestivalService.getEntireFestivalInfo(userId,
+            festivalId);
         return UserTimetableEntireFestivalDTO.from(festival);
     }
 
-    public UserTimetableFestivalBasicDTO getEntireFestivalDateInfo(final long userId, final long festivalDateId) {
+    public UserTimetableFestivalBasicDTO getEntireFestivalDateInfo(final long userId,
+        final long festivalDateId) {
         FestivalDate festivalDate = festivalDateService.findEntireFestivalDateById(festivalDateId);
         return getUserTimetableDTO(userId, festivalDate);
+    }
+
+    @Transactional
+    public void updateTimetableFestivals(
+        final long userId,
+        final PatchTimetableFestivalDTO patchTimetableFestivalDTO
+    ) {
+        timetableFestivalService.removeTimetableFestivals(
+            userId, patchTimetableFestivalDTO.deleteFestivalIds());
     }
 }
 
