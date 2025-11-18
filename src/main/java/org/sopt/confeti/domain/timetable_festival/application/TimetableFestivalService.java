@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.timetable_festival.application;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @AllArgsConstructor
 public class TimetableFestivalService {
+
     private final TimetableFestivalRepository timetableFestivalRepository;
 
     @Transactional(readOnly = true)
@@ -33,11 +35,19 @@ public class TimetableFestivalService {
     }
 
     @Transactional
+    public void removeTimetableFestivals(
+        final long userId,
+        final Collection<Long> deleteFestivalId
+    ) {
+        timetableFestivalRepository.deleteAllByUserIdAndFestivalIdIn(userId, deleteFestivalId);
+    }
+
+    @Transactional
     public void addTimetableFestivals(final User user, final List<Festival> festivals) {
         timetableFestivalRepository.saveAll(
-                festivals.stream()
-                        .map(festival -> TimetableFestival.create(user, festival))
-                        .toList()
+            festivals.stream()
+                .map(festival -> TimetableFestival.create(user, festival))
+                .toList()
         );
     }
 
@@ -67,6 +77,6 @@ public class TimetableFestivalService {
     @Transactional(readOnly = true)
     public TimetableFestival getEntireFestivalInfo(final long userId, final long festivalId) {
         return timetableFestivalRepository.findByUserIdAndFestivalId(userId, festivalId)
-                .orElseThrow(()->new NotFoundException(ErrorMessage.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 }
