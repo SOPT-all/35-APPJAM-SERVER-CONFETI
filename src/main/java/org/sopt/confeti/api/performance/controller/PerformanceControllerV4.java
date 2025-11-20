@@ -131,10 +131,10 @@ public class PerformanceControllerV4 implements PerformanceControllerV4Docs {
             @UserId(require = false) Long userId,
             @RequestParam @NotBlank  String term,
             @RequestParam(required = false, defaultValue = "1") @Min(1) @Max(10) Integer limit,
-            @RequestParam(required = false, defaultValue = Default.PERFORMANCE_STATUS) String status
+            @RequestParam(required = false, defaultValue = Default.PERFORMANCE_STATUS) PerformanceStatus status
     ) {
         SearchACPerformancesDTO performancesDTO = performanceFacade.searchACPerformances(term, limit,
-                PerformanceStatus.convert(status));
+                status);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
                 SearchACPerformancesResponse.of(performancesDTO, s3FileHandler));
     }

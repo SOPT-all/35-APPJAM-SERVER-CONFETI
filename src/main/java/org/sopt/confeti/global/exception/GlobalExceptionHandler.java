@@ -5,9 +5,12 @@ import jakarta.validation.ConstraintViolationException;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -30,7 +33,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<Void>> handleMethodArgumentTypeMismatchException(
         MethodArgumentTypeMismatchException e, HttpServletRequest request) {
         request.setAttribute("exception", e);
-        return ApiResponseUtil.failure(ErrorMessage.TYPE_MISMATCH);
+        return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
     }
 
     @ExceptionHandler(UnauthorizedException.class)
@@ -71,6 +74,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<BaseResponse<Void>> handleConstraintViolationException(
         ConstraintViolationException e, HttpServletRequest request) {
+        request.setAttribute("exception", e);
+        return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConversionFailedException.class)
+    public ResponseEntity<BaseResponse<Void>> handleConversionFailedException(
+            ConversionFailedException e, HttpServletRequest request) {
         request.setAttribute("exception", e);
         return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
     }

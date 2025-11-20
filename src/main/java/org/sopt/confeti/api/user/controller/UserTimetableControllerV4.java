@@ -3,6 +3,8 @@ package org.sopt.confeti.api.user.controller;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.docs.UserTimetableControllerV4Docs;
+import org.sopt.confeti.api.user.controller.docs.UserTimetableControllerDocs;
+import org.sopt.confeti.api.user.controller.docs.UserTimetableControllerV4Docs;
 import org.sopt.confeti.api.user.dto.request.AddTimetableFestivalRequest;
 import org.sopt.confeti.api.user.dto.request.PatchTimetableFestivalRequest;
 import org.sopt.confeti.api.user.dto.request.PatchTimetableRequest;
@@ -11,8 +13,8 @@ import org.sopt.confeti.api.user.dto.response.UserTimetableDetailFestivalsRespon
 import org.sopt.confeti.api.user.dto.response.UserTimetableEntireFestivalResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetableFestivalResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetableHistoryResponse;
+import org.sopt.confeti.api.user.dto.response.UserTimetableCursorResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetablesPreviewResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetablesResponse;
 import org.sopt.confeti.api.user.facade.UserTimetableFacade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
@@ -22,12 +24,18 @@ import org.sopt.confeti.api.user.facade.dto.response.UserTimetableEntireFestival
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableHistoryDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetablesDTO;
+import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
+import org.sopt.confeti.domain.timetable_festival.TimetableFestivalCursor;
+import org.sopt.confeti.domain.timetable_festival.TimetableFestivalCursor.CursorData;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.CursorPage;
+import org.sopt.confeti.global.common.constant.Default;
+import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
+import org.sopt.confeti.global.common.constant.TimetableSortType;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -132,13 +140,16 @@ public class UserTimetableControllerV4 implements UserTimetableControllerV4Docs 
     }
 
     @GetMapping
-    public ResponseEntity<BaseResponse<UserTimetablesResponse>> getTimetables(
+    public ResponseEntity<BaseResponse<UserTimetableCursorResponse>> getTimetables(
         @UserId Long userId,
-        @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy
+        @RequestParam(defaultValue = Default.TIMETABLE_SORT_TYPE) TimetableSortType sortBy,
+        @RequestParam(required = false) String cursor,
+        @RequestParam(defaultValue = Default.PERFORMANCE_STATUS) PerformanceStatus status
     ) {
-        UserTimetablesDTO timetables = userTimetableFacade.getTimetables(userId, sortBy);
+        CursorData cursorData = TimetableFestivalCursor.decode(cursor);
+        CursorPage<TimetableFestival> timetableCursorPage = userTimetableFacade.getTimetableCursorPage(userId, sortBy, cursorData, status);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserTimetablesResponse.of(timetables, s3FileHandler));
+            UserTimetableCursorResponse.of(timetableCursorPage, s3FileHandler));
     }
 
     @GetMapping("/preview")

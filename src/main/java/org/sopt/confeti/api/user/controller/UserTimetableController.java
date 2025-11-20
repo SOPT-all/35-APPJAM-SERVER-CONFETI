@@ -135,7 +135,7 @@ public class UserTimetableController implements UserTimetableControllerDocs {
         @UserId Long userId,
         @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy
     ) {
-        UserTimetablesDTO timetables = userTimetableFacade.getTimetables(userId, sortBy);
+        UserTimetablesDTO timetables = userTimetableFacade.getTimetables_deprecated(userId, sortBy);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserTimetablesResponse.of(timetables, s3FileHandler));
     }

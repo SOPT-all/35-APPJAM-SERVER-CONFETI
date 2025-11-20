@@ -25,6 +25,7 @@ import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.application.FestivalDateService;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
+import org.sopt.confeti.domain.timetable_festival.TimetableFestivalCursor.CursorData;
 import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
@@ -32,6 +33,8 @@ import org.sopt.confeti.domain.user_timetable.UserTimetable;
 import org.sopt.confeti.domain.user_timetable.application.UserTimetableService;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.CursorPage;
+import org.sopt.confeti.global.common.constant.PerformanceStatus;
+import org.sopt.confeti.global.common.constant.TimetableSortType;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -182,8 +185,9 @@ public class UserTimetableFacade {
         userTimetableService.patchTimetableFestival(userTimetables, timetableDTO);
     }
 
+    @Deprecated
     @Transactional(readOnly = true)
-    public UserTimetablesDTO getTimetables(final long userId, final String sortBy) {
+    public UserTimetablesDTO getTimetables_deprecated(final long userId, final String sortBy) {
         validateUserExists(userId);
         validateSortType(sortBy);
 
@@ -191,6 +195,13 @@ public class UserTimetableFacade {
             sortBy);
 
         return UserTimetablesDTO.from(userTimetables);
+    }
+
+    @Transactional(readOnly = true)
+    public CursorPage<TimetableFestival> getTimetableCursorPage(long userId, TimetableSortType sortBy, CursorData cursor, PerformanceStatus performanceStatus) {
+        validateUserExists(userId);
+
+        return sortBy.getTimetableCursorPage(timetableFestivalService, userId, cursor, performanceStatus);
     }
 
     @Transactional(readOnly = true)
