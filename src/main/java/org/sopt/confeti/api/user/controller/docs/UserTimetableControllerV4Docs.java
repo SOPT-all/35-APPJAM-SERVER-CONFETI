@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.sopt.confeti.api.user.dto.request.AddTimetableFestivalRequest;
+import org.sopt.confeti.api.user.dto.request.PatchTimetableFestivalRequest;
 import org.sopt.confeti.api.user.dto.response.UserTimetableCursorResponse;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
@@ -60,6 +61,7 @@ public interface UserTimetableControllerV4Docs {
             )
         }
     )
+
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<UserTimetableCursorResponse>> getTimetables(

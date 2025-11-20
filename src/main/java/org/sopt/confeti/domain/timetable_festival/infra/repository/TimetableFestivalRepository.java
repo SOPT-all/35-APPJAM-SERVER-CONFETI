@@ -30,7 +30,8 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
     List<Long> findFestivalIdsByUserId(@Param("userId") Long userId);
 
     @Query("SELECT tf FROM TimetableFestival tf JOIN FETCH tf.festival f LEFT JOIN FETCH f.dates d WHERE tf.user.id = :userId AND tf.festival.id = :festivalId")
-    Optional<TimetableFestival> findByUserIdAndFestivalId(@Param("userId") Long userId, final long festivalId);
+    Optional<TimetableFestival> findByUserIdAndFestivalId(@Param("userId") Long userId,
+                                                          final long festivalId);
 
     @Query(value =
             """
@@ -107,6 +108,4 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
                                                                 @Param("size") int size);
 
     long user(User user);
-    Optional<TimetableFestival> findByUserIdAndFestivalId(@Param("userId") Long userId,
-        final long festivalId);
 }
