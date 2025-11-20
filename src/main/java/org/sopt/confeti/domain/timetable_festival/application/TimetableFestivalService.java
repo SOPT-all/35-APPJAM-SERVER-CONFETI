@@ -85,7 +85,7 @@ public class TimetableFestivalService {
                         timetableFestivalRepository.findAllUsingCursorOrderByStartAtAsc(
                                 userId, cursor, performanceStatus, GET_TIMETABLES_SIZE_WITH_CURSOR
                         )
-                ).orElse(
+                ).orElseGet(() ->
                         timetableFestivalRepository.findAllOrderByStartAtAsc(
                                 userId, performanceStatus, GET_TIMETABLES_SIZE_WITH_CURSOR
                         )
@@ -104,7 +104,7 @@ public class TimetableFestivalService {
                         timetableFestivalRepository.findAllUsingCursorOrderByStartAtDesc(
                                 userId, cursor, performanceStatus, GET_TIMETABLES_SIZE_WITH_CURSOR
                         )
-                ).orElse(
+                ).orElseGet(() ->
                         timetableFestivalRepository.findAllOrderByStartAtDesc(
                                 userId, performanceStatus, GET_TIMETABLES_SIZE_WITH_CURSOR
                         )

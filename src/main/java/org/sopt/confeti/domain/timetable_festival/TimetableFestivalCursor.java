@@ -3,6 +3,7 @@ package org.sopt.confeti.domain.timetable_festival;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Base64;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ import org.sopt.confeti.global.message.ErrorMessage;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TimetableFestivalCursor {
 
-    private static final String DELIMITER = ":";
+    private static final String DELIMITER = "@";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
     /**
@@ -51,7 +52,7 @@ public class TimetableFestivalCursor {
             long timetableFestivalId = Long.parseLong(parts[1]);
 
             return new CursorData(startAt, timetableFestivalId);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | DateTimeParseException e) {
             log.error("TimetableFestivalCursor.decode: An error occurred during the decoding process. Encoded cursor : {}", encodedCursor);
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
