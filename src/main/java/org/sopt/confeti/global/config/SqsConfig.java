@@ -41,7 +41,7 @@ public class SqsConfig {
      * 애플리케이션 실행 이후에 수동으로 지정
      */
     @Bean
-    public SqsMessageListenerContainerFactory createEventSqsListenerContainerFactory(
+    public SqsMessageListenerContainerFactory createMessageSqsListenerContainerFactory(
         SqsAsyncClient sqsAsyncClient,
         @Qualifier(MESSAGE_CONSUMER_POOL) TaskExecutor consumerExecutor
     ) {

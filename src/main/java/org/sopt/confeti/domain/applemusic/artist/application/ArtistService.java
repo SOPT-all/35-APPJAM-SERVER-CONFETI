@@ -19,7 +19,7 @@ public class ArtistService {
     }
 
     public boolean isExistByArtistId(String artistId) {
-        return artistRepository.existsById(artistId);
+        return artistRepository.existsByArtistId(artistId);
     }
 
 }
