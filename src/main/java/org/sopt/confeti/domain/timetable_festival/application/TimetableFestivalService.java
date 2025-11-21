@@ -1,7 +1,6 @@
 package org.sopt.confeti.domain.timetable_festival.application;
 
 import java.util.Collection;
-import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +16,6 @@ import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +29,12 @@ public class TimetableFestivalService {
     private static final String START_AT_COLUMN = "startAt";
 
     private final TimetableFestivalRepository timetableFestivalRepository;
+
+    @Transactional(readOnly = true)
+    public TimetableFestival getWithFestival(Long timetableFestivalId) {
+        return timetableFestivalRepository.findByIdWithFestival(timetableFestivalId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+    }
 
     @Transactional(readOnly = true)
     public List<TimetableFestival> getFetivalList(long userId) {
@@ -79,40 +83,42 @@ public class TimetableFestivalService {
     }
 
     @Transactional(readOnly = true)
-    public CursorPage<TimetableFestival> getTimetablesEarliest(long userId, CursorData cursor, PerformanceStatus performanceStatus) {
+    public CursorPage<TimetableFestival> getTimetablesEarliest(long userId, CursorData cursor,
+        PerformanceStatus performanceStatus) {
         List<TimetableFestival> timetables = Optional.ofNullable(cursor)
-                .map(cursorData ->
-                        timetableFestivalRepository.findAllUsingCursorOrderByStartAtAsc(
-                                userId, cursor, performanceStatus, GET_TIMETABLES_SIZE_WITH_CURSOR
-                        )
-                ).orElseGet(() ->
-                        timetableFestivalRepository.findAllOrderByStartAtAsc(
-                                userId, performanceStatus, GET_TIMETABLES_SIZE_WITH_CURSOR
-                        )
-                );
+            .map(cursorData ->
+                timetableFestivalRepository.findAllUsingCursorOrderByStartAtAsc(
+                    userId, cursor, performanceStatus, GET_TIMETABLES_SIZE_WITH_CURSOR
+                )
+            ).orElseGet(() ->
+                timetableFestivalRepository.findAllOrderByStartAtAsc(
+                    userId, performanceStatus, GET_TIMETABLES_SIZE_WITH_CURSOR
+                )
+            );
 
         return CursorPage.of(
-                timetables,
-                GET_TIMETABLES_SIZE_WITH_CURSOR
+            timetables,
+            GET_TIMETABLES_SIZE_WITH_CURSOR
         );
     }
 
     @Transactional(readOnly = true)
-    public CursorPage<TimetableFestival> getTimetablesLatest(long userId, CursorData cursor, PerformanceStatus performanceStatus) {
+    public CursorPage<TimetableFestival> getTimetablesLatest(long userId, CursorData cursor,
+        PerformanceStatus performanceStatus) {
         List<TimetableFestival> timetables = Optional.ofNullable(cursor)
-                .map(cursorData ->
-                        timetableFestivalRepository.findAllUsingCursorOrderByStartAtDesc(
-                                userId, cursor, performanceStatus, GET_TIMETABLES_SIZE_WITH_CURSOR
-                        )
-                ).orElseGet(() ->
-                        timetableFestivalRepository.findAllOrderByStartAtDesc(
-                                userId, performanceStatus, GET_TIMETABLES_SIZE_WITH_CURSOR
-                        )
-                );
+            .map(cursorData ->
+                timetableFestivalRepository.findAllUsingCursorOrderByStartAtDesc(
+                    userId, cursor, performanceStatus, GET_TIMETABLES_SIZE_WITH_CURSOR
+                )
+            ).orElseGet(() ->
+                timetableFestivalRepository.findAllOrderByStartAtDesc(
+                    userId, performanceStatus, GET_TIMETABLES_SIZE_WITH_CURSOR
+                )
+            );
 
         return CursorPage.of(
-                timetables,
-                GET_TIMETABLES_SIZE_WITH_CURSOR
+            timetables,
+            GET_TIMETABLES_SIZE_WITH_CURSOR
         );
     }
 

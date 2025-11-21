@@ -31,10 +31,20 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
 
     @Query("SELECT tf FROM TimetableFestival tf JOIN FETCH tf.festival f LEFT JOIN FETCH f.dates d WHERE tf.user.id = :userId AND tf.festival.id = :festivalId")
     Optional<TimetableFestival> findByUserIdAndFestivalId(@Param("userId") Long userId,
-                                                          final long festivalId);
+        final long festivalId);
 
     @Query(value =
-            """
+        """
+                select tf
+                from TimetableFestival tf
+                join fetch tf.festival f
+                where tf.id = :timetableFestivalId
+            """)
+    Optional<TimetableFestival> findByIdWithFestival(
+        @Param("timetableFestivalId") Long timetableFestivalId);
+
+    @Query(value =
+        """
             SELECT tf
             FROM TimetableFestival tf
             JOIN FETCH tf.festival f
@@ -46,11 +56,11 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
             """
     )
     List<TimetableFestival> findAllOrderByStartAtAsc(@Param("userId") long userId,
-                                                     @Param("status") PerformanceStatus status,
-                                                     @Param("size") int size);
+        @Param("status") PerformanceStatus status,
+        @Param("size") int size);
 
     @Query(value =
-            """
+        """
             SELECT tf
             FROM TimetableFestival tf
             JOIN FETCH tf.festival f
@@ -66,12 +76,12 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
             """
     )
     List<TimetableFestival> findAllUsingCursorOrderByStartAtAsc(@Param("userId") long userId,
-                                                                @Param("cursor") CursorData cursor,
-                                                                @Param("status") PerformanceStatus status,
-                                                                @Param("size") int size);
+        @Param("cursor") CursorData cursor,
+        @Param("status") PerformanceStatus status,
+        @Param("size") int size);
 
     @Query(value =
-            """
+        """
             SELECT tf
             FROM TimetableFestival tf
             JOIN FETCH tf.festival f
@@ -83,11 +93,11 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
             """
     )
     List<TimetableFestival> findAllOrderByStartAtDesc(@Param("userId") long userId,
-                                                      @Param("status") PerformanceStatus status,
-                                                      @Param("size") int size);
+        @Param("status") PerformanceStatus status,
+        @Param("size") int size);
 
     @Query(value =
-            """
+        """
             SELECT tf
             FROM TimetableFestival tf
             JOIN FETCH tf.festival f
@@ -103,9 +113,9 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
             """
     )
     List<TimetableFestival> findAllUsingCursorOrderByStartAtDesc(@Param("userId") long userId,
-                                                                @Param("cursor") CursorData cursor,
-                                                                @Param("status") PerformanceStatus status,
-                                                                @Param("size") int size);
+        @Param("cursor") CursorData cursor,
+        @Param("status") PerformanceStatus status,
+        @Param("size") int size);
 
     long user(User user);
 }
