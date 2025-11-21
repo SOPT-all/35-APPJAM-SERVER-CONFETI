@@ -1,6 +1,8 @@
 package org.sopt.confeti.domain.festival_date.application;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.infra.repository.FestivalDateRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -19,7 +21,7 @@ public class FestivalDateService {
     @Transactional(readOnly = true)
     public FestivalDate findFestivalDateId(final long festivalDateId) {
         FestivalDate festivalDate = festivalDateRepository.findByFestivalDateId(festivalDateId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         musicAPIResolver.load(festivalDate);
 
         return festivalDate;
@@ -28,9 +30,14 @@ public class FestivalDateService {
     @Transactional(readOnly = true)
     public FestivalDate findEntireFestivalDateById(final long festivalDateId) {
         FestivalDate festivalDate = festivalDateRepository.findAllFestivalDateById(festivalDateId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         musicAPIResolver.load(festivalDate);
 
         return festivalDate;
+    }
+
+    @Transactional(readOnly = true)
+    public List<FestivalDate> findAllByFestival(final Festival festival) {
+        return festivalDateRepository.findAllByFestival(festival);
     }
 }
