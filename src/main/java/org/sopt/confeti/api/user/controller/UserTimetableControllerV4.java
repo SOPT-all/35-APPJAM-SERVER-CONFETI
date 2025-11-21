@@ -3,21 +3,21 @@ package org.sopt.confeti.api.user.controller;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.docs.UserTimetableControllerV4Docs;
-import org.sopt.confeti.api.user.controller.docs.UserTimetableControllerDocs;
-import org.sopt.confeti.api.user.controller.docs.UserTimetableControllerV4Docs;
 import org.sopt.confeti.api.user.dto.request.AddTimetableFestivalRequest;
 import org.sopt.confeti.api.user.dto.request.PatchTimetableFestivalRequest;
 import org.sopt.confeti.api.user.dto.request.PatchTimetableRequest;
+import org.sopt.confeti.api.user.dto.response.TimetableDatesResponse;
 import org.sopt.confeti.api.user.dto.response.TimetablesToAddResponse;
+import org.sopt.confeti.api.user.dto.response.UserTimetableCursorResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetableDetailFestivalsResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetableEntireFestivalResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetableFestivalResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetableHistoryResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetableCursorResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetablesPreviewResponse;
 import org.sopt.confeti.api.user.facade.UserTimetableFacade;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
+import org.sopt.confeti.api.user.facade.dto.response.TimetableDatesDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDetailFestivalsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableEntireFestivalDTO;
@@ -147,7 +147,8 @@ public class UserTimetableControllerV4 implements UserTimetableControllerV4Docs 
         @RequestParam(defaultValue = Default.PERFORMANCE_STATUS) PerformanceStatus status
     ) {
         CursorData cursorData = TimetableFestivalCursor.decode(cursor);
-        CursorPage<TimetableFestival> timetableCursorPage = userTimetableFacade.getTimetableCursorPage(userId, sortBy, cursorData, status);
+        CursorPage<TimetableFestival> timetableCursorPage = userTimetableFacade.getTimetableCursorPage(
+            userId, sortBy, cursorData, status);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserTimetableCursorResponse.of(timetableCursorPage, s3FileHandler));
     }
@@ -192,5 +193,17 @@ public class UserTimetableControllerV4 implements UserTimetableControllerV4Docs 
         userTimetableFacade.updateTimetableFestivals(userId,
             patchTimetableFestivalRequest.toDTO());
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/{timetableFestivalId}/dates")
+    public ResponseEntity<BaseResponse<TimetableDatesResponse>> getTimetables(
+        @UserId Long userId,
+        @PathVariable Long timetableFestivalId
+    ) {
+        TimetableDatesDTO timetableDates = userTimetableFacade.getTimetableDates(userId,
+            timetableFestivalId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            TimetableDatesResponse.from(timetableDates));
     }
 }
