@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,8 @@ import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user_timetable.UserTimetable;
+import org.sopt.confeti.global.exception.ForbiddenException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.data.annotation.CreatedDate;
 
 @Entity
@@ -52,16 +55,22 @@ public class TimetableFestival {
         this.createdAt = LocalDateTime.now();
 
         this.userTimetables = festival.getDates().stream()
-                .flatMap(festivalDate -> festivalDate.getStages().stream())
-                .flatMap(festivalStage -> festivalStage.getTimes().stream())
-                .map(festivalTime -> UserTimetable.create(this, festivalTime, false))
-                .toList();
+            .flatMap(festivalDate -> festivalDate.getStages().stream())
+            .flatMap(festivalStage -> festivalStage.getTimes().stream())
+            .map(festivalTime -> UserTimetable.create(this, festivalTime, false))
+            .toList();
     }
 
     public static TimetableFestival create(User user, Festival festival) {
         return TimetableFestival.builder()
-                .user(user)
-                .festival(festival)
-                .build();
+            .user(user)
+            .festival(festival)
+            .build();
+    }
+
+    public void validateOwner(Long userId) {
+        if (!Objects.equals(this.user.getId(), userId)) {
+            throw new ForbiddenException(ErrorMessage.FORBIDDEN);
+        }
     }
 }

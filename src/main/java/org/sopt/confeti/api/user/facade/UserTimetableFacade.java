@@ -311,9 +311,12 @@ public class UserTimetableFacade {
     public TimetableDatesDTO getTimetableDates(Long userId, Long timetableFestivalId) {
         TimetableFestival timetableFestival = timetableFestivalService.getWithFestival(
             timetableFestivalId);
+        timetableFestival.validateOwner(userId);
+
         Festival festival = timetableFestival.getFestival();
         List<FestivalDate> festivalDates = festivalDateService.findAllByFestival(festival);
         return TimetableDatesDTO.of(timetableFestival, festival, festivalDates);
     }
+
 }
 
