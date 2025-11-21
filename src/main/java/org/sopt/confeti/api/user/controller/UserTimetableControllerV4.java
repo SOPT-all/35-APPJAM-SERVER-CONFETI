@@ -197,7 +197,7 @@ public class UserTimetableControllerV4 implements UserTimetableControllerV4Docs 
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/{timetableFestivalId}/dates")
-    public ResponseEntity<BaseResponse<TimetableDatesResponse>> getTimetables(
+    public ResponseEntity<BaseResponse<TimetableDatesResponse>> getTimetableDates(
         @UserId Long userId,
         @PathVariable Long timetableFestivalId
     ) {

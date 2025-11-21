@@ -103,7 +103,7 @@ public interface UserTimetableControllerV4Docs {
     )
     @Permission(role = {Role.GENERAL})
     @GetMapping("/{timetableFestivalId}/dates")
-    ResponseEntity<BaseResponse<TimetableDatesResponse>> getTimetables(
+    ResponseEntity<BaseResponse<TimetableDatesResponse>> getTimetableDates(
         @UserId Long userId,
         @PathVariable Long timetableFestivalId
     );
