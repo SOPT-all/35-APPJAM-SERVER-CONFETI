@@ -1,15 +1,12 @@
 package org.sopt.confeti.global.messagebroker.sqs.message.song;
 
-
 import org.sopt.confeti.domain.applemusic.song.application.dto.request.CreateSongDTO;
 import org.sopt.confeti.global.messagebroker.message.CreateMessage;
 
 public record CreateSongMessage(
     String songId,
     String name,
-    String artworkUrl,
-    Integer artworkWidth,
-    Integer artworkHeight
+    String artworkUrl
 ) implements CreateMessage {
 
     public CreateSongDTO toCreateDTO() {
@@ -17,9 +14,6 @@ public record CreateSongMessage(
             .songId(songId)
             .name(name)
             .artworkUrl(artworkUrl)
-            .artworkWidth(artworkWidth)
-            .artworkHeight(artworkHeight)
             .build();
     }
-
 }

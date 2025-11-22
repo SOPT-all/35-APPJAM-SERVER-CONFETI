@@ -23,8 +23,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "artist_songs")
-@EntityListeners(AuditingEntityListener.class)
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArtistSong {
 
@@ -40,25 +40,23 @@ public class ArtistSong {
     @JoinColumn(name = "song_id")
     private Song song;
 
-    public static ArtistSong create(Long id, Artist artist, Song song) {
-        return ArtistSong.builder()
-            .id(id)
-            .artist(artist)
-            .song(song)
-            .build();
-    }
-
-    @Builder
-    private ArtistSong(Long id, Artist artist, Song song) {
-        this.id = id;
-        this.artist = artist;
-        this.song = song;
-    }
-
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @Builder
+    private ArtistSong(Artist artist, Song song) {
+        this.artist = artist;
+        this.song = song;
+    }
+
+    public static ArtistSong create(Artist artist, Song song) {
+        return ArtistSong.builder()
+            .artist(artist)
+            .song(song)
+            .build();
+    }
 }

@@ -5,6 +5,7 @@ import org.sopt.confeti.domain.applemusic.song.Song;
 import org.sopt.confeti.domain.applemusic.song.application.dto.request.CreateSongDTO;
 import org.sopt.confeti.domain.applemusic.song.infra.repository.SongRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -17,7 +18,8 @@ public class SongService {
         return songRepository.existsBySongId(songId);
     }
 
-    public Long create(CreateSongDTO createSongDTO) {
+    @Transactional
+    public String create(CreateSongDTO createSongDTO) {
         Song song = createSongDTO.toSong();
         return songRepository.save(song).getId();
     }

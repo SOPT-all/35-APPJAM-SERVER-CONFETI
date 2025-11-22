@@ -3,10 +3,7 @@ package org.sopt.confeti.domain.applemusic.song;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -18,30 +15,25 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "songs", indexes = {
-    @Index(name = "uk_song_id", columnList = "song_id", unique = true)
-})
-@EntityListeners(AuditingEntityListener.class)
+@Table(name = "songs")
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Song {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 20, nullable = false)
+    private String id;
 
-    @Column(name = "song_id", nullable = false)
-    private String songId;
+    @Column(length = 50, nullable = false)
+    private String trackName;
 
-    @Column(nullable = false)
-    private String name;
-
+    // width와 height 정보를 추가해야한다.
     @Column(length = 3000)
     private String artworkUrl;
 
-    private Integer artworkWidth;
-
-    private Integer artworkHeight;
+    @Column(length = 3000)
+    private String previewUrl;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -49,24 +41,21 @@ public class Song {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public static Song create(String songId, String name, String artworkUrl, Integer artworkWidth,
-        Integer artworkHeight) {
-        return Song.builder()
-            .songId(songId)
-            .name(name)
-            .artworkUrl(artworkUrl)
-            .artworkHeight(artworkHeight)
-            .artworkWidth(artworkWidth)
-            .build();
+    @Builder
+    private Song(String songId, String trackName, String artworkUrl, String previewUrl) {
+        this.id = songId;
+        this.trackName = trackName;
+        this.artworkUrl = artworkUrl;
+        this.previewUrl = previewUrl;
     }
 
-    @Builder
-    private Song(String songId, String name, String artworkUrl, Integer artworkWidth,
-        Integer artworkHeight) {
-        this.songId = songId;
-        this.name = name;
-        this.artworkUrl = artworkUrl;
-        this.artworkWidth = artworkWidth;
-        this.artworkHeight = artworkHeight;
+    public static Song create(String songId, String trackName, String artworkUrl,
+        String previewUrl) {
+        return Song.builder()
+            .songId(songId)
+            .trackName(trackName)
+            .artworkUrl(artworkUrl)
+            .previewUrl(previewUrl)
+            .build();
     }
 }

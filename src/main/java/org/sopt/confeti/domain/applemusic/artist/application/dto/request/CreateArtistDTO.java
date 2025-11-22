@@ -7,9 +7,7 @@ import org.sopt.confeti.domain.applemusic.artist.Artist;
 public record CreateArtistDTO(
     String artistId,
     String name,
-    String artworkUrl,
-    Integer artworkWidth,
-    Integer artworkHeight
+    String artworkUrl
 ) {
 
     public Artist toArtist() {
@@ -17,9 +15,6 @@ public record CreateArtistDTO(
             .artistId(artistId)
             .name(name)
             .artworkUrl(artworkUrl)
-            .artworkWidth(artworkWidth)
-            .artworkHeight(artworkHeight)
             .build();
     }
-
 }

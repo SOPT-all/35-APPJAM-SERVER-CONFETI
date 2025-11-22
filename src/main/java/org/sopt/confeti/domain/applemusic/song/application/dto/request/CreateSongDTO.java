@@ -7,18 +7,14 @@ import org.sopt.confeti.domain.applemusic.song.Song;
 public record CreateSongDTO(
     String songId,
     String name,
-    String artworkUrl,
-    Integer artworkWidth,
-    Integer artworkHeight
+    String artworkUrl
 ) {
 
     public Song toSong() {
         return Song.builder()
             .songId(songId)
-            .name(name)
+            .trackName(name)
             .artworkUrl(artworkUrl)
-            .artworkWidth(artworkWidth)
-            .artworkHeight(artworkHeight)
             .build();
     }
 
