@@ -6,7 +6,7 @@ import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record TimetableDatesResponse(
-    Long timetableFestivalId,
+    long timetableFestivalId,
     String title,
     String posterUrl,
     List<TimetableDateResponse> dates

@@ -7,7 +7,7 @@ import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 
 public record TimetableDatesDTO(
-    Long timetableFestivalId,
+    long timetableFestivalId,
     String title,
     String posterUrl,
     List<TimetableDateDTO> dates

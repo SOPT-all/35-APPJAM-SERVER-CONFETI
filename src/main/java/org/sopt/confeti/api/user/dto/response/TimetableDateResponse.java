@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableDateDTO;
 
 public record TimetableDateResponse(
-    Long festivalDateId,
+    long festivalDateId,
     LocalDate festivalAt,
     String dayOfWeek,
     String displayedDayOfWeek

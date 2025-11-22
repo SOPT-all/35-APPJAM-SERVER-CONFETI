@@ -7,7 +7,7 @@ import java.util.Locale;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 
 public record TimetableDateDTO(
-    Long festivalDateId,
+    long festivalDateId,
     LocalDate festivalAt,
     String dayOfWeek,
     String displayedDayOfWeek
