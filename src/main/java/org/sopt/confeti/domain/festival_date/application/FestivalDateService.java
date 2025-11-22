@@ -2,7 +2,6 @@ package org.sopt.confeti.domain.festival_date.application;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.infra.repository.FestivalDateRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -37,7 +36,7 @@ public class FestivalDateService {
     }
 
     @Transactional(readOnly = true)
-    public List<FestivalDate> findAllByFestival(final Festival festival) {
-        return festivalDateRepository.findAllByFestival(festival);
+    public List<FestivalDate> findAllByFestivalId(final Long festivalId) {
+        return festivalDateRepository.findAllByFestivalId(festivalId);
     }
 }

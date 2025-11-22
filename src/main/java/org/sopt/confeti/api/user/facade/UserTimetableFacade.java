@@ -314,7 +314,8 @@ public class UserTimetableFacade {
         timetableFestival.validateOwner(userId);
 
         Festival festival = timetableFestival.getFestival();
-        List<FestivalDate> festivalDates = festivalDateService.findAllByFestival(festival);
+        List<FestivalDate> festivalDates = festivalDateService.findAllByFestivalId(
+            festival.getId());
         return TimetableDatesDTO.of(timetableFestival, festival, festivalDates);
     }
 
