@@ -204,6 +204,6 @@ public class UserTimetableControllerV4 implements UserTimetableControllerV4Docs 
         TimetableDatesDTO timetableDates = userTimetableFacade.getTimetableDates(userId,
             timetableFestivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            TimetableDatesResponse.from(timetableDates));
+            TimetableDatesResponse.of(timetableDates, s3FileHandler));
     }
 }
