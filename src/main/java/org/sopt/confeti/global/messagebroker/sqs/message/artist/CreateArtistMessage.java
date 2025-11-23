@@ -1,6 +1,6 @@
 package org.sopt.confeti.global.messagebroker.sqs.message.artist;
 
-import org.sopt.confeti.domain.applemusic.artist.application.dto.request.CreateArtistDTO;
+import org.sopt.confeti.domain.music.artist.application.dto.request.CreateArtistDTO;
 import org.sopt.confeti.global.messagebroker.message.CreateMessage;
 
 public record CreateArtistMessage(
