@@ -46,7 +46,7 @@ public class ArtistMusicService extends MusicService<ConfetiArtist> {
     @Override
     public CacheResult<ConfetiArtist> getCached(MusicCondition musicCondition) {
         List<KeyInfo<ConfetiArtist>> keyInfos = musicCondition.ids().stream()
-            .map(RedisKey.MUSIC_MUSICS::<ConfetiArtist>createKeyInfo)
+            .map(RedisKey.MUSIC_ARTISTS::<ConfetiArtist>createKeyInfo)
             .toList();
         List<ConfetiArtist> cachedMusics = redisHandler.multiGet(keyInfos);
         Set<String> cachedMusicIds = cachedMusics.stream()

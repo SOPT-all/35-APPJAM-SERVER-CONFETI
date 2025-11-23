@@ -10,9 +10,13 @@ import org.sopt.confeti.domain.music.application.dto.PersistResult;
 public abstract class MusicService<T> {
 
     public abstract void cache(List<T> targetList);
+
     public abstract void persist(List<T> targetList);
+
     public abstract CacheResult<T> getCached(MusicCondition musicCondition);
+
     public abstract PersistResult<T> getPersisted(MusicCondition musicCondition);
+
     public abstract FetchResult<T> getFetched(MusicCondition musicCondition);
 
     public List<T> getList(MusicCondition musicCondition) {
@@ -20,14 +24,16 @@ public abstract class MusicService<T> {
 
         CacheResult<T> cacheResult = getCached(musicCondition);
         results.addAll(cacheResult.results());
-        musicCondition.removeIds(cacheResult.cachedIds());
+        musicCondition = MusicCondition.from(
+            musicCondition.excludeIds(cacheResult.cachedIds()));
         if (isDone(results, musicCondition)) {
             return results;
         }
 
         PersistResult<T> persistResult = getPersisted(musicCondition);
         results.addAll(persistResult.results());
-        musicCondition.removeIds(persistResult.persistedIds());
+        musicCondition = MusicCondition.from(
+            musicCondition.excludeIds(persistResult.persistedIds()));
         if (isDone(results, musicCondition)) {
             return results;
         }
