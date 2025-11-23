@@ -1,7 +1,7 @@
-package org.sopt.confeti.domain.applemusic.song.application.dto.request;
+package org.sopt.confeti.domain.music.song.application.dto.request;
 
 import lombok.Builder;
-import org.sopt.confeti.domain.applemusic.song.Song;
+import org.sopt.confeti.domain.music.song.Song;
 
 @Builder
 public record CreateSongDTO(

@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.applemusic.song;
+package org.sopt.confeti.domain.music.song;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -72,6 +73,15 @@ public class Song {
             .artistName(artistName)
             .artworkUrl(artworkUrl)
             .previewUrl(previewUrl)
+            .build();
+    }
+
+    public ConfetiMusic toConfetiMusic() {
+        return ConfetiMusic.builder()
+            .id(id)
+            .trackName(trackName)
+            .artworkUrl(artworkUrl)
+            // TODO: 아티스트 이름 추가
             .build();
     }
 }
