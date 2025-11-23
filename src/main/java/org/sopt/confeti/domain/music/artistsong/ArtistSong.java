@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.applemusic.artistsong;
+package org.sopt.confeti.domain.music.artistsong;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,8 +15,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.sopt.confeti.domain.applemusic.artist.Artist;
-import org.sopt.confeti.domain.applemusic.song.Song;
+import org.sopt.confeti.domain.music.artist.Artist;
+import org.sopt.confeti.domain.music.song.Song;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
