@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.applemusic.artist;
+package org.sopt.confeti.domain.music.artist;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,11 +15,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.domain.applemusic.artistsong.ArtistSong;
-import org.sopt.confeti.domain.applemusic.relatedartist.topartist.RelatedArtist;
-import org.sopt.confeti.domain.applemusic.song.Song;
+import org.sopt.confeti.domain.music.artistsong.ArtistSong;
+import org.sopt.confeti.domain.music.relatedartist.RelatedArtist;
+import org.sopt.confeti.domain.music.song.Song;
 import org.sopt.confeti.global.common.constant.ArtistConstant;
 import org.sopt.confeti.global.common.constant.Default;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -74,6 +75,10 @@ public class Artist {
             .name(name)
             .artworkUrl(artworkUrl)
             .build();
+    }
+
+    public ConfetiArtist toConfetiArtist() {
+        return ConfetiArtist.of(id, name, getProfileUrl());
     }
 
     public void addSong(Song song) {
