@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class MusicConstant {
 
-    private static final String ARTWORK_IMG_WIDTH_FORMAT = "w";
-    private static final String ARTWORK_IMG_HEIGHT_FORMAT = "h";
+    public static final String ARTWORK_IMG_WIDTH_FORMAT = "w";
+    public static final String ARTWORK_IMG_HEIGHT_FORMAT = "h";
     private static final int ARTWORK_IMG_WIDTH = 300;
     private static final int ARTWORK_IMG_HEIGHT = 300;
     public static final Map<String, Integer> ARTWORK_IMG_SIZE = Map.ofEntries(
