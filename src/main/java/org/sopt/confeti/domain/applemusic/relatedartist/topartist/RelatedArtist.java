@@ -34,6 +34,10 @@ public class RelatedArtist {
     @JoinColumn(name = "artist_id", unique = true)
     private Artist artist;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "related_artist_id", unique = true)
+    private Artist relatedArtist;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
@@ -41,13 +45,15 @@ public class RelatedArtist {
     private LocalDateTime updatedAt;
 
     @Builder
-    private RelatedArtist(Artist artist) {
+    private RelatedArtist(Artist artist, Artist relatedArtist) {
         this.artist = artist;
+        this.relatedArtist = relatedArtist;
     }
 
-    public static RelatedArtist create(Artist artist, int ranking) {
+    public static RelatedArtist create(Artist artist, Artist relatedArtist) {
         return RelatedArtist.builder()
             .artist(artist)
+            .relatedArtist(relatedArtist)
             .build();
     }
 }

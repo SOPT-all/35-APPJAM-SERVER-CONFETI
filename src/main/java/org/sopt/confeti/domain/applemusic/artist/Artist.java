@@ -78,6 +78,10 @@ public class Artist {
         );
     }
 
+    public void addRelatedArtist(Artist relatedArtist) {
+        this.relatedArtists.add(RelatedArtist.create(this, relatedArtist));
+    }
+
     public String getProfileUrl() {
         try {
             return UriComponentsBuilder.fromUriString(artworkUrl)
