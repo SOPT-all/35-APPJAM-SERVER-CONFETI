@@ -12,6 +12,7 @@ import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableListDTO;
+import org.sopt.confeti.api.user.facade.dto.response.TimetableDatesDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDetailFestivalsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserTimetableEntireFestivalDTO;
@@ -198,10 +199,12 @@ public class UserTimetableFacade {
     }
 
     @Transactional(readOnly = true)
-    public CursorPage<TimetableFestival> getTimetableCursorPage(long userId, TimetableSortType sortBy, CursorData cursor, PerformanceStatus performanceStatus) {
+    public CursorPage<TimetableFestival> getTimetableCursorPage(long userId,
+        TimetableSortType sortBy, CursorData cursor, PerformanceStatus performanceStatus) {
         validateUserExists(userId);
 
-        return sortBy.getTimetableCursorPage(timetableFestivalService, userId, cursor, performanceStatus);
+        return sortBy.getTimetableCursorPage(timetableFestivalService, userId, cursor,
+            performanceStatus);
     }
 
     @Transactional(readOnly = true)
@@ -303,5 +306,18 @@ public class UserTimetableFacade {
         timetableFestivalService.removeTimetableFestivals(
             userId, patchTimetableFestivalDTO.deleteFestivalIds());
     }
+
+    @Transactional(readOnly = true)
+    public TimetableDatesDTO getTimetableDates(Long userId, Long timetableFestivalId) {
+        TimetableFestival timetableFestival = timetableFestivalService.getWithFestival(
+            timetableFestivalId);
+        timetableFestival.validateOwner(userId);
+
+        Festival festival = timetableFestival.getFestival();
+        List<FestivalDate> festivalDates = festivalDateService.findAllByFestivalId(
+            festival.getId());
+        return TimetableDatesDTO.of(timetableFestival, festival, festivalDates);
+    }
+
 }
 
