@@ -22,7 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Song {
 
     @Id
-    @Column(length = 20, nullable = false)
+    @Column(nullable = false)
     private String id;
 
     @Column(length = 50, nullable = false)

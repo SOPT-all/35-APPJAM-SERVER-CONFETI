@@ -35,7 +35,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class Artist {
 
     @Id
-    @Column(length = 20, nullable = false)
+    @Column(nullable = false)
     private String id;
 
     @Column(length = 100, nullable = false)
