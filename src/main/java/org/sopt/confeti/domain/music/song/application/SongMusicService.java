@@ -27,43 +27,43 @@ public class SongMusicService extends MusicService<ConfetiMusic> {
     private final MusicAPIHandler musicAPIHandler;
 
     @Override
-    public void cache(List<ConfetiMusic> targetList) {
+    protected void cache(List<ConfetiMusic> targetList) {
         List<RedisData<ConfetiMusic>> dataList = targetList.stream()
-                .map(target -> RedisData.<ConfetiMusic>builder()
-                        .keyInfo(RedisKey.MUSIC_MUSICS.createKeyInfo(target.getId()))
-                        .value(target)
-                        .build())
-                .toList();
+            .map(target -> RedisData.<ConfetiMusic>builder()
+                .keyInfo(RedisKey.MUSIC_MUSICS.createKeyInfo(target.getId()))
+                .value(target)
+                .build())
+            .toList();
 
         redisHandler.multiSet(dataList);
     }
 
     @Override
-    public void persist(List<ConfetiMusic> targetList) {
+    protected void persist(List<ConfetiMusic> targetList) {
         songService.create(targetList);
     }
 
     @Override
-    public CacheResult<ConfetiMusic> getCached(MusicCondition musicCondition) {
+    protected CacheResult<ConfetiMusic> getCached(MusicCondition musicCondition) {
         List<KeyInfo<ConfetiMusic>> keyInfos = musicCondition.ids().stream()
-                .map(RedisKey.MUSIC_MUSICS::<ConfetiMusic>createKeyInfo)
-                .toList();
+            .map(RedisKey.MUSIC_MUSICS::<ConfetiMusic>createKeyInfo)
+            .toList();
         List<ConfetiMusic> cachedMusics = redisHandler.multiGet(keyInfos);
         Set<String> cachedMusicIds = cachedMusics.stream()
-                .map(ConfetiMusic::getId)
-                .collect(Collectors.toSet());
+            .map(ConfetiMusic::getId)
+            .collect(Collectors.toSet());
 
         return new CacheResult<>(cachedMusics, cachedMusicIds);
     }
 
     @Override
-    public PersistResult<ConfetiMusic> getPersisted(MusicCondition musicCondition) {
+    protected PersistResult<ConfetiMusic> getPersisted(MusicCondition musicCondition) {
         List<ConfetiMusic> persistedSongs = songService.getSongs(musicCondition.ids()).stream()
-                .map(Song::toConfetiMusic)
-                .toList();
+            .map(Song::toConfetiMusic)
+            .toList();
         Set<String> persistedSongIds = persistedSongs.stream()
-                .map(ConfetiMusic::getId)
-                .collect(Collectors.toSet());
+            .map(ConfetiMusic::getId)
+            .collect(Collectors.toSet());
 
         cache(persistedSongs);
 
@@ -71,11 +71,11 @@ public class SongMusicService extends MusicService<ConfetiMusic> {
     }
 
     @Override
-    public FetchResult<ConfetiMusic> getFetched(MusicCondition musicCondition) {
+    protected FetchResult<ConfetiMusic> getFetched(MusicCondition musicCondition) {
         List<ConfetiMusic> fetchedSongs = musicAPIHandler.getMusicsByMusicIds(musicCondition.ids());
 
-        cache(fetchedSongs);
         persist(fetchedSongs);
+        cache(fetchedSongs);
 
         return new FetchResult<>(fetchedSongs);
     }

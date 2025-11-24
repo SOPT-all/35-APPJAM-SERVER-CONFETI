@@ -29,45 +29,46 @@ public class TopArtistMusicService extends MusicService<ConfetiArtist> {
     private final MusicAPIHandler musicAPIHandler;
 
     @Override
-    public void cache(List<ConfetiArtist> targetList) {
+    protected void cache(List<ConfetiArtist> targetList) {
         redisHandler.set(RedisKey.MUSIC_TOP_ARTISTS.createKeyInfo(), targetList);
     }
 
     @Override
-    public void persist(List<ConfetiArtist> targetList) {
+    protected void persist(List<ConfetiArtist> targetList) {
         topArtistService.create(targetList);
     }
 
     @Override
-    public CacheResult<ConfetiArtist> getCached(MusicCondition musicCondition) {
-        List<ConfetiArtist> cachedTopArtists = redisHandler.getList(RedisKey.MUSIC_TOP_ARTISTS.createKeyInfo());
+    protected CacheResult<ConfetiArtist> getCached(MusicCondition musicCondition) {
+        List<ConfetiArtist> cachedTopArtists = redisHandler.getList(
+            RedisKey.MUSIC_TOP_ARTISTS.createKeyInfo());
         return new CacheResult<>(cachedTopArtists, new HashSet<>());
     }
 
     @Override
-    public PersistResult<ConfetiArtist> getPersisted(MusicCondition musicCondition) {
+    protected PersistResult<ConfetiArtist> getPersisted(MusicCondition musicCondition) {
         List<ConfetiArtist> persistedTopArtists = topArtistService.getTopArtists();
 
         return new PersistResult<>(persistedTopArtists, new HashSet<>());
     }
 
     @Override
-    public FetchResult<ConfetiArtist> getFetched(MusicCondition musicCondition) {
+    protected FetchResult<ConfetiArtist> getFetched(MusicCondition musicCondition) {
         List<ConfetiMusic> topMusics = musicAPIHandler.getTopMusics(FETCH_TOP_MUSIC_MAX_SIZE);
         Set<String> topMusicIds = topMusics.stream()
-                .map(ConfetiMusic::getId)
-                .collect(Collectors.toSet());
+            .map(ConfetiMusic::getId)
+            .collect(Collectors.toSet());
 
         List<ConfetiMusic> topMusicsWithArtists = musicAPIHandler.getMusicsByMusicIds(topMusicIds);
         Set<String> topArtistIds = topMusicsWithArtists.stream()
-                .flatMap(music -> music.getArtists().stream())
-                .map(ConfetiMusicArtist::getId)
-                .collect(Collectors.toSet());
+            .flatMap(music -> music.getArtists().stream())
+            .map(ConfetiMusicArtist::getId)
+            .collect(Collectors.toSet());
 
         List<ConfetiArtist> fetchedTopArtists = musicAPIHandler.getArtistsByArtistIds(topArtistIds);
 
-        cache(fetchedTopArtists);
         persist(fetchedTopArtists);
+        cache(fetchedTopArtists);
 
         return new FetchResult<>(fetchedTopArtists);
     }

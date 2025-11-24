@@ -9,15 +9,15 @@ import org.sopt.confeti.domain.music.application.dto.PersistResult;
 
 public abstract class MusicService<T> {
 
-    public abstract void cache(List<T> targetList);
+    protected abstract void cache(List<T> targetList);
 
-    public abstract void persist(List<T> targetList);
+    protected abstract void persist(List<T> targetList);
 
-    public abstract CacheResult<T> getCached(MusicCondition musicCondition);
+    protected abstract CacheResult<T> getCached(MusicCondition musicCondition);
 
-    public abstract PersistResult<T> getPersisted(MusicCondition musicCondition);
+    protected abstract PersistResult<T> getPersisted(MusicCondition musicCondition);
 
-    public abstract FetchResult<T> getFetched(MusicCondition musicCondition);
+    protected abstract FetchResult<T> getFetched(MusicCondition musicCondition);
 
     public List<T> getList(MusicCondition musicCondition) {
         List<T> results = new ArrayList<>(musicCondition.ids().size());

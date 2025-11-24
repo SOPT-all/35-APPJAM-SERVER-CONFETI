@@ -27,7 +27,7 @@ public class ArtistMusicService extends MusicService<ConfetiArtist> {
     private final MusicAPIHandler musicAPIHandler;
 
     @Override
-    public void cache(List<ConfetiArtist> targetList) {
+    protected void cache(List<ConfetiArtist> targetList) {
         List<RedisData<ConfetiArtist>> dataList = targetList.stream()
             .map(target -> RedisData.<ConfetiArtist>builder()
                 .keyInfo(RedisKey.MUSIC_ARTISTS.createKeyInfo(target.getId()))
@@ -39,12 +39,12 @@ public class ArtistMusicService extends MusicService<ConfetiArtist> {
     }
 
     @Override
-    public void persist(List<ConfetiArtist> targetList) {
+    protected void persist(List<ConfetiArtist> targetList) {
         artistService.create(targetList);
     }
 
     @Override
-    public CacheResult<ConfetiArtist> getCached(MusicCondition musicCondition) {
+    protected CacheResult<ConfetiArtist> getCached(MusicCondition musicCondition) {
         List<KeyInfo<ConfetiArtist>> keyInfos = musicCondition.ids().stream()
             .map(RedisKey.MUSIC_ARTISTS::<ConfetiArtist>createKeyInfo)
             .toList();
@@ -57,7 +57,7 @@ public class ArtistMusicService extends MusicService<ConfetiArtist> {
     }
 
     @Override
-    public PersistResult<ConfetiArtist> getPersisted(MusicCondition musicCondition) {
+    protected PersistResult<ConfetiArtist> getPersisted(MusicCondition musicCondition) {
         List<ConfetiArtist> persistedSongs = artistService.getArtists(musicCondition.ids()).stream()
             .map(Artist::toConfetiArtist)
             .toList();
@@ -71,12 +71,12 @@ public class ArtistMusicService extends MusicService<ConfetiArtist> {
     }
 
     @Override
-    public FetchResult<ConfetiArtist> getFetched(MusicCondition musicCondition) {
+    protected FetchResult<ConfetiArtist> getFetched(MusicCondition musicCondition) {
         List<ConfetiArtist> fetchedSongs = musicAPIHandler.getArtistsByArtistIds(
             musicCondition.ids());
 
-        cache(fetchedSongs);
         persist(fetchedSongs);
+        cache(fetchedSongs);
 
         return new FetchResult<>(fetchedSongs);
     }
