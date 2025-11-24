@@ -25,8 +25,11 @@ public class Song {
     @Column(nullable = false)
     private String id;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 100, nullable = false)
     private String trackName;
+
+    @Column(length = 100)
+    private String artistName;
 
     /*
      * Apple Music에서 width와 height를 커스텀할 수 있도록 아래의 형식으로 온다.
@@ -46,18 +49,27 @@ public class Song {
     private LocalDateTime updatedAt;
 
     @Builder
-    private Song(String songId, String trackName, String artworkUrl, String previewUrl) {
+    private Song(String songId,
+        String trackName,
+        String artistName,
+        String artworkUrl,
+        String previewUrl) {
         this.id = songId;
         this.trackName = trackName;
+        this.artistName = artistName;
         this.artworkUrl = artworkUrl;
         this.previewUrl = previewUrl;
     }
 
-    public static Song create(String songId, String trackName, String artworkUrl,
+    public static Song create(String songId,
+        String trackName,
+        String artistName,
+        String artworkUrl,
         String previewUrl) {
         return Song.builder()
             .songId(songId)
             .trackName(trackName)
+            .artistName(artistName)
             .artworkUrl(artworkUrl)
             .previewUrl(previewUrl)
             .build();
