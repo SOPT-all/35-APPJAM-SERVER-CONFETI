@@ -28,7 +28,11 @@ public class Song {
     @Column(length = 50, nullable = false)
     private String trackName;
 
-    // width와 height 정보를 추가해야한다.
+    /*
+     * Apple Music에서 width와 height를 커스텀할 수 있도록 아래의 형식으로 온다.
+     * ex) https://~~{w}-{y}.png
+     * 필요에 맞춰 width, height 를 넣어야한다.
+     */
     @Column(length = 3000)
     private String artworkUrl;
 
