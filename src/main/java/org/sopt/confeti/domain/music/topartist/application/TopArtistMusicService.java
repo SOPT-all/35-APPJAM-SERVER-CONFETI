@@ -49,6 +49,8 @@ public class TopArtistMusicService extends MusicService<ConfetiArtist> {
     protected PersistResult<ConfetiArtist> getPersisted(MusicCondition musicCondition) {
         List<ConfetiArtist> persistedTopArtists = topArtistService.getTopArtists();
 
+        cache(persistedTopArtists);
+
         return new PersistResult<>(persistedTopArtists, new HashSet<>());
     }
 
@@ -68,7 +70,6 @@ public class TopArtistMusicService extends MusicService<ConfetiArtist> {
         List<ConfetiArtist> fetchedTopArtists = musicAPIHandler.getArtistsByArtistIds(topArtistIds);
 
         persist(fetchedTopArtists);
-        cache(fetchedTopArtists);
 
         return new FetchResult<>(fetchedTopArtists);
     }

@@ -75,7 +75,6 @@ public class SongMusicService extends MusicService<ConfetiMusic> {
         List<ConfetiMusic> fetchedSongs = musicAPIHandler.getMusicsByMusicIds(musicCondition.ids());
 
         persist(fetchedSongs);
-        cache(fetchedSongs);
 
         return new FetchResult<>(fetchedSongs);
     }

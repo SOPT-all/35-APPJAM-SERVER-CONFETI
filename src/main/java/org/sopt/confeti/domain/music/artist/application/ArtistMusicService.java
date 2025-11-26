@@ -76,7 +76,6 @@ public class ArtistMusicService extends MusicService<ConfetiArtist> {
             musicCondition.ids());
 
         persist(fetchedSongs);
-        cache(fetchedSongs);
 
         return new FetchResult<>(fetchedSongs);
     }
