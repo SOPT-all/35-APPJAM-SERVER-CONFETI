@@ -39,6 +39,6 @@ public class ArtistService {
 
     @Transactional(readOnly = true)
     public boolean isExistByArtistId(String artistId) {
-        return artistRepository.existsByArtistId(artistId);
+        return artistRepository.existsById(artistId);
     }
 }

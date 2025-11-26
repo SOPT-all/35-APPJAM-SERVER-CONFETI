@@ -18,7 +18,7 @@ public class SongService {
 
     @Transactional(readOnly = true)
     public boolean isExistBySongId(String songId) {
-        return songRepository.existsBySongId(songId);
+        return songRepository.existsById(songId);
     }
 
     @Transactional(readOnly = true)
