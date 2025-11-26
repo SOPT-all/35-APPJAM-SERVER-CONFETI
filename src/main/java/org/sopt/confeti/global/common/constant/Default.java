@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Default {
 
+    public static final String CONFETI_LOGO_IMG_URL = "https://confeti-s3-prod.s3.ap-northeast-2.amazonaws.com/default/img_logo_3d.svg";
     public static final String IMG_PATH = "img_logo_3d.svg";
     public static final String URL = "https://www.naver.com/";
     public static final String TEXT = "CONFETI";

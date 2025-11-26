@@ -1,6 +1,5 @@
 package org.sopt.confeti.domain.concert.application;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.concert.Concert;
@@ -27,9 +26,9 @@ public class ConcertService {
     @Transactional(readOnly = true)
     public Concert getConcertDetailByConcertId(final long concertId) {
         Concert concert = concertRepository.findById(concertId)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
+            .orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+            );
 
         musicAPIResolver.load(concert);
 
@@ -44,17 +43,9 @@ public class ConcertService {
     @Transactional(readOnly = true)
     public Concert findById(final long concertId) {
         return concertRepository.findById(concertId)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
-    }
-
-    @Transactional(readOnly = true)
-    public List<Concert> getRecentConcerts(final int size) {
-        return concertRepository.findAllByEndAtGreaterThanEqual(
-                LocalDateTime.now(),
-                getPageRequest(size, getRecentConcertsSort())
-        );
+            .orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+            );
     }
 
     private PageRequest getPageRequest(final int size, final Sort sort) {
@@ -63,7 +54,7 @@ public class ConcertService {
 
     private Sort getRecentConcertsSort() {
         return Sort.by(
-                Order.asc(START_AT_COLUMN)
+            Order.asc(START_AT_COLUMN)
         );
     }
 

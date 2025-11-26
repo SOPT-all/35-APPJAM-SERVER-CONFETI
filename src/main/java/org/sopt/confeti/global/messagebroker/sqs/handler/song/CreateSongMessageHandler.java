@@ -1,7 +1,7 @@
 package org.sopt.confeti.global.messagebroker.sqs.handler.song;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.domain.applemusic.song.application.SongService;
+import org.sopt.confeti.domain.music.song.application.SongService;
 import org.sopt.confeti.global.messagebroker.handler.CreateMessageHandler;
 import org.sopt.confeti.global.messagebroker.sqs.handler.SqsMessageHandler;
 import org.sopt.confeti.global.messagebroker.sqs.message.song.CreateSongMessage;
