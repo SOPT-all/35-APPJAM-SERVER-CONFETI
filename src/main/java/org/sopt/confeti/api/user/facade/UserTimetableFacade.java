@@ -48,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserTimetableFacade {
 
     private static final int NEXT_CURSOR_SIZE = 1;
+    private static final int TIMETABLE_FESTIVAL_COUNT_MAXIMUM = 5;
     private static final int TIMETABLE_FESTIVALS_TO_ADD_SIZE = 6 + NEXT_CURSOR_SIZE;
 
     private final UserService userService;
@@ -89,6 +90,7 @@ public class UserTimetableFacade {
                 .toList(),
             addFestivals
         );
+        validateCountTimetableFestival(user.getTimetableFestivals().size(), addFestivals.size());
 
         timetableFestivalService.addTimetableFestivals(user, addFestivals);
         userService.updateHasTimetableHistory(userId);
@@ -103,6 +105,13 @@ public class UserTimetableFacade {
                     .anyMatch(Predicate.isEqual(currentFestival)))
         ) {
             throw new ConflictException(ErrorMessage.CONFLICT);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    protected void validateCountTimetableFestival(final long currentCount, final int addCount) {
+        if (currentCount + addCount > TIMETABLE_FESTIVAL_COUNT_MAXIMUM) {
+            throw new ConflictException(ErrorMessage.TIMETABLE_FESTIVAL_IS_FULL);
         }
     }
 
