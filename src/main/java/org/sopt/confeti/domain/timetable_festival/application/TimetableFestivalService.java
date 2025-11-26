@@ -54,9 +54,9 @@ public class TimetableFestivalService {
     @Transactional
     public void removeTimetableFestivals(
         final long userId,
-        final Collection<Long> deleteFestivalId
+        final Collection<Long> deleteTimeTableIds
     ) {
-        timetableFestivalRepository.deleteAllByUserIdAndFestivalIdIn(userId, deleteFestivalId);
+        timetableFestivalRepository.deleteAllByUserIdAndIdIn(userId, deleteTimeTableIds);
     }
 
     @Transactional

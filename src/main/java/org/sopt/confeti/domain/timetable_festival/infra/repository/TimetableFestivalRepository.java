@@ -22,7 +22,7 @@ public interface TimetableFestivalRepository extends JpaRepository<TimetableFest
 
     void deleteByUserIdAndFestivalId(final long userId, final long festivalId);
 
-    void deleteAllByUserIdAndFestivalIdIn(final long userId, final Collection<Long> festivalIds);
+    void deleteAllByUserIdAndIdIn(final long userId, final Collection<Long> timeTableFestivalIds);
 
     List<TimetableFestival> findTop4ByUserIdOrderByCreatedAt(long userId);
 

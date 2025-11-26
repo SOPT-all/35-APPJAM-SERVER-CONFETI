@@ -304,7 +304,7 @@ public class UserTimetableFacade {
         final PatchTimetableFestivalDTO patchTimetableFestivalDTO
     ) {
         timetableFestivalService.removeTimetableFestivals(
-            userId, patchTimetableFestivalDTO.deleteFestivalIds());
+            userId, patchTimetableFestivalDTO.deleteTimetableIds());
     }
 
     @Transactional(readOnly = true)
