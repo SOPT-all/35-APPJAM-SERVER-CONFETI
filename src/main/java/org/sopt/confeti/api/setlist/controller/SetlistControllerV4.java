@@ -2,6 +2,7 @@ package org.sopt.confeti.api.setlist.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.setlist.controller.docs.SetlistControllerV4Docs;
 import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
 import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
@@ -15,7 +16,6 @@ import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
-import org.sopt.confeti.global.common.constant.Default;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v4/my/setlists")
-public class SetlistControllerV4 {
+public class SetlistControllerV4 implements SetlistControllerV4Docs {
 
     private final SetlistFacade setlistFacade;
 
@@ -38,7 +38,7 @@ public class SetlistControllerV4 {
     @GetMapping("/all")
     public ResponseEntity<BaseResponse<GetAllSetlistsResponse>> getAllMySetlists(
         @UserId Long userId,
-        @RequestParam(defaultValue = Default.SETLIST_SORT_TYPE) SetlistSortType sortBy
+        @RequestParam(required = false) SetlistSortType sortBy
     ) {
         GetAllSetlistsResponse data = setlistFacade.getAllMySetlists(userId, sortBy);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
