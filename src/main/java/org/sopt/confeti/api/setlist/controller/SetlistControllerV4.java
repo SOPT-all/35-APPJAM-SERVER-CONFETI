@@ -25,11 +25,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Deprecated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/my/setlists")
-public class SetlistController {
+@RequestMapping("/v4/my/setlists")
+public class SetlistControllerV4 {
 
     private final SetlistFacade setlistFacade;
 
