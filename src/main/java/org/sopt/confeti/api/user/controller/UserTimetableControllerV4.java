@@ -142,7 +142,7 @@ public class UserTimetableControllerV4 implements UserTimetableControllerV4Docs 
     @GetMapping
     public ResponseEntity<BaseResponse<UserTimetableCursorResponse>> getTimetables(
         @UserId Long userId,
-        @RequestParam(defaultValue = Default.TIMETABLE_SORT_TYPE) TimetableSortType sortBy,
+        @RequestParam(required = false) TimetableSortType sortBy,
         @RequestParam(required = false) String cursor,
         @RequestParam(defaultValue = Default.PERFORMANCE_STATUS) PerformanceStatus status
     ) {

@@ -2,7 +2,7 @@ package org.sopt.confeti.global.converter;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.global.common.constant.TimetableSortType;
+import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.global.exception.BadRequestException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.core.convert.converter.Converter;
@@ -11,19 +11,19 @@ import org.springframework.util.StringUtils;
 
 @Slf4j
 @Component
-public class TimetableSortTypeConverter implements Converter<String, TimetableSortType> {
+public class SetlistSortTypeConverter implements Converter<String, SetlistSortType> {
 
     @Override
-    public TimetableSortType convert(String source) {
+    public SetlistSortType convert(String source) {
         if (!StringUtils.hasText(source)) {
-            return TimetableSortType.getDefault();
+            return SetlistSortType.getDefault();
         }
 
-        Optional<TimetableSortType> sortType = TimetableSortType.from(source);
+        Optional<SetlistSortType> sortType = SetlistSortType.from(source);
 
         if (sortType.isEmpty()) {
             log.error(
-                "TimetableSortTypeConverter.convert : Unknown timetable sort type. source : {}",
+                "SetlistSortTypeConverter.convert : Unknown setlist sort type. source : {}",
                 source);
             throw new BadRequestException(ErrorMessage.BAD_REQUEST);
         }

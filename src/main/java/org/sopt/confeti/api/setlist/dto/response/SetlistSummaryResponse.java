@@ -8,30 +8,34 @@ import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record SetlistSummaryResponse(
-        Long setlistId,
-        String type,
-        Long typeId,
-        String title,
-        String posterUrl,
-        LocalDate endAt
+    Long setlistId,
+    String type,
+    Long typeId,
+    String title,
+    String posterUrl,
+    LocalDate startAt,
+    LocalDate endAt
 ) {
+
     public static SetlistSummaryResponse of(
-            Setlist setlist,
-            Performance performance,
-            S3FileHandler s3FileHandler
+        Setlist setlist,
+        Performance performance,
+        S3FileHandler s3FileHandler
     ) {
         String posterUrl = s3FileHandler.getFileUrl(
-                FolderPath.combine(
-                        setlist.getType() == SetlistType.CONCERT ? FolderPath.CONCERT : FolderPath.FESTIVAL, FolderPath.POSTER
-                ), performance.getPosterPath()).toString();
+            FolderPath.combine(
+                setlist.getType() == SetlistType.CONCERT ? FolderPath.CONCERT : FolderPath.FESTIVAL,
+                FolderPath.POSTER
+            ), performance.getPosterPath()).toString();
 
         return new SetlistSummaryResponse(
-                setlist.getId(),
-                setlist.getType().name(),
-                setlist.getTypeId(),
-                performance.getTitle(),
-                posterUrl,
-                performance.getEndAt()
+            setlist.getId(),
+            setlist.getType().name(),
+            setlist.getTypeId(),
+            performance.getTitle(),
+            posterUrl,
+            performance.getStartAt(),
+            performance.getEndAt()
         );
     }
 }

@@ -1,28 +1,25 @@
 package org.sopt.confeti.domain.setlist;
 
 import java.util.Arrays;
+import java.util.Optional;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@Getter
+@RequiredArgsConstructor
 public enum SetlistSortType {
-    OLDEST("oldestFirst"),
-    LATEST("createdAt");
+    EARLIEST("earliest"),
+    LATEST("latest");
 
-    private final String value;
+    private final String name;
 
-    SetlistSortType(String value) {
-        this.value = value;
+    public static SetlistSortType getDefault() {
+        return EARLIEST;
     }
 
-    public static SetlistSortType from(String value) {
-        if (value == null || value.isBlank())
-            return OLDEST;
+    public static Optional<SetlistSortType> from(String value) {
         return Arrays.stream(values())
-                .filter(type -> type.value.equalsIgnoreCase(value))
-                .findFirst()
-                .orElse(OLDEST);
-    }
-
-    public String getValue() {
-        return value;
+            .filter(sortType -> sortType.name.equalsIgnoreCase(value))
+            .findFirst();
     }
 }
-

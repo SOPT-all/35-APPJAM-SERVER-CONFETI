@@ -2,6 +2,7 @@ package org.sopt.confeti.api.setlist.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.setlist.controller.docs.SetlistControllerV4Docs;
 import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
 import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
@@ -10,6 +11,7 @@ import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddMusicResponseDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponseDTO;
+import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -25,11 +27,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Deprecated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/my/setlists")
-public class SetlistController {
+@RequestMapping("/v4/my/setlists")
+public class SetlistControllerV4 implements SetlistControllerV4Docs {
 
     private final SetlistFacade setlistFacade;
 
@@ -37,9 +38,9 @@ public class SetlistController {
     @GetMapping("/all")
     public ResponseEntity<BaseResponse<GetAllSetlistsResponse>> getAllMySetlists(
         @UserId Long userId,
-        @RequestParam(name = "sortBy", required = false) String sortBy
+        @RequestParam(required = false) SetlistSortType sortBy
     ) {
-        GetAllSetlistsResponse data = setlistFacade.getAllMySetlists_deprecated(userId, sortBy);
+        GetAllSetlistsResponse data = setlistFacade.getAllMySetlists(userId, sortBy);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 
@@ -48,7 +49,7 @@ public class SetlistController {
     public ResponseEntity<BaseResponse<List<SetlistSummaryResponse>>> getPreviewMySetlists(
         @UserId Long userId
     ) {
-        List<SetlistSummaryResponse> data = setlistFacade.getPreviewMySetlists_deprecated(userId);
+        List<SetlistSummaryResponse> data = setlistFacade.getPreviewMySetlists(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 
