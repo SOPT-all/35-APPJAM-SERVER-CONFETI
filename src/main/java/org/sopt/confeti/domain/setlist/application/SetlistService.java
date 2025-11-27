@@ -16,6 +16,7 @@ import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.domain.setlist.Setlist;
 import org.sopt.confeti.domain.setlist.SetlistMusic;
+import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.setlist.SetlistSortTypeDeprecated;
 import org.sopt.confeti.domain.setlist.SetlistType;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistMusicRepository;
@@ -62,6 +63,24 @@ public class SetlistService {
         return new GetAllSetlistsResponse(dtoList.size(), dtoList);
     }
 
+    @Transactional(readOnly = true)
+    public GetAllSetlistsResponse getAllMySetlists(Long userId,
+        SetlistSortType sortType) {
+        List<Setlist> setlists = setlistRepository.findAllByUserId(userId);
+
+        List<SetlistSummaryResponse> dtoList = setlists.stream()
+            .map(setlist -> {
+                Performance performance = performanceService.getPerformanceByTypeAndTypeId(
+                    PerformanceType.valueOf(setlist.getType().name()), setlist.getTypeId());
+                return SetlistSummaryResponse.of(setlist, performance, s3FileHandler);
+            })
+            .sorted((a, b) -> sortType == SetlistSortType.EARLIEST
+                ? a.startAt().compareTo(b.startAt()) : b.startAt().compareTo(a.startAt()))
+            .toList();
+
+        return new GetAllSetlistsResponse(dtoList.size(), dtoList);
+    }
+
     @Deprecated
     @Transactional(readOnly = true)
     public List<SetlistSummaryResponse> getPreviewMySetlists_deprecated(Long userId) {
@@ -74,6 +93,21 @@ public class SetlistService {
                 return SetlistSummaryResponse.of(setlist, performance, s3FileHandler);
             })
             .sorted(Comparator.comparing(SetlistSummaryResponse::endAt))
+            .limit(MAX_SETLIST_PREVIEW_COUNT)
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SetlistSummaryResponse> getPreviewMySetlists(Long userId) {
+        List<Setlist> setlists = setlistRepository.findAllByUserId(userId);
+
+        return setlists.stream()
+            .map(setlist -> {
+                Performance performance = performanceService.getPerformanceByTypeAndTypeId(
+                    PerformanceType.valueOf(setlist.getType().name()), setlist.getTypeId());
+                return SetlistSummaryResponse.of(setlist, performance, s3FileHandler);
+            })
+            .sorted(Comparator.comparing(SetlistSummaryResponse::startAt))
             .limit(MAX_SETLIST_PREVIEW_COUNT)
             .toList();
     }

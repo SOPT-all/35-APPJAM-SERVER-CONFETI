@@ -10,10 +10,12 @@ import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddMusicResponseDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponseDTO;
+import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.common.constant.Default;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +38,9 @@ public class SetlistControllerV4 {
     @GetMapping("/all")
     public ResponseEntity<BaseResponse<GetAllSetlistsResponse>> getAllMySetlists(
         @UserId Long userId,
-        @RequestParam(name = "sortBy", required = false) String sortBy
+        @RequestParam(defaultValue = Default.SETLIST_SORT_TYPE) SetlistSortType sortBy
     ) {
-        GetAllSetlistsResponse data = setlistFacade.getAllMySetlists_deprecated(userId, sortBy);
+        GetAllSetlistsResponse data = setlistFacade.getAllMySetlists(userId, sortBy);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 

@@ -48,7 +48,7 @@ public class SetlistController {
     public ResponseEntity<BaseResponse<List<SetlistSummaryResponse>>> getPreviewMySetlists(
         @UserId Long userId
     ) {
-        List<SetlistSummaryResponse> data = setlistFacade.getPreviewMySetlists(userId);
+        List<SetlistSummaryResponse> data = setlistFacade.getPreviewMySetlists_deprecated(userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 

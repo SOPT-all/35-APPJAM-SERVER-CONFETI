@@ -10,6 +10,7 @@ import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistUpdateMusicOrderDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddMusicResponseDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponseDTO;
+import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.setlist.SetlistSortTypeDeprecated;
 import org.sopt.confeti.domain.setlist.application.SetlistEditService;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
@@ -31,8 +32,16 @@ public class SetlistFacade {
         return setlistService.getAllMySetlists_deprecated(userId, sortType);
     }
 
-    public List<SetlistSummaryResponse> getPreviewMySetlists(Long userId) {
+    public GetAllSetlistsResponse getAllMySetlists(Long userId, SetlistSortType sortBy) {
+        return setlistService.getAllMySetlists(userId, sortBy);
+    }
+
+    public List<SetlistSummaryResponse> getPreviewMySetlists_deprecated(Long userId) {
         return setlistService.getPreviewMySetlists_deprecated(userId);
+    }
+
+    public List<SetlistSummaryResponse> getPreviewMySetlists(Long userId) {
+        return setlistService.getPreviewMySetlists(userId);
     }
 
     public SetlistCreateResponseDTO createSetLists(Long userId,
