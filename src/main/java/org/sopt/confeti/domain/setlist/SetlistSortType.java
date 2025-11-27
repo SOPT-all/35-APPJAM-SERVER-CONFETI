@@ -1,6 +1,7 @@
 package org.sopt.confeti.domain.setlist;
 
 import java.util.Arrays;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -8,15 +9,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SetlistSortType {
     EARLIEST("earliest"),
-    LATEST("latest"),
-    UNKNOWN("unknown");
+    LATEST("latest");
 
-    private final String value;
+    private final String name;
 
-    public static SetlistSortType from(String value) {
+    public static SetlistSortType getDefault() {
+        return EARLIEST;
+    }
+
+    public static Optional<SetlistSortType> from(String value) {
         return Arrays.stream(values())
-            .filter(sortType -> sortType.value.equalsIgnoreCase(value))
-            .findFirst()
-            .orElse(UNKNOWN);
+            .filter(sortType -> sortType.name.equalsIgnoreCase(value))
+            .findFirst();
     }
 }
