@@ -16,8 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @AllArgsConstructor
 public class FestivalFavoriteService {
+
     private final FestivalFavoriteRepository festivalFavoriteRepository;
 
+    @Transactional(readOnly = true)
+    public List<Long> getRandomFavoriteUpcomingFestivalIds(long userId, int fetchSize) {
+        return festivalFavoriteRepository.findRandomFavoriteUpcomingFestivalIds(userId, fetchSize);
+    }
+
+    @Transactional
     public void save(User user, Festival festival) {
         festivalFavoriteRepository.findByUserIdAndFestivalId(user.getId(), festival.getId())
                 .ifPresent(festivalFavorite -> {
@@ -28,6 +35,7 @@ public class FestivalFavoriteService {
         festivalFavoriteRepository.save(festivalFavorite);
     }
 
+    @Transactional
     public void delete(User user, Festival festival) {
         FestivalFavorite festivalFavorite = festivalFavoriteRepository.findByUserIdAndFestivalId(user.getId(),
                         festival.getId())
@@ -36,12 +44,19 @@ public class FestivalFavoriteService {
         festivalFavoriteRepository.delete(festivalFavorite);
     }
 
+    @Transactional(readOnly = true)
     public boolean isFavorite(final long userId, final long festivalId) {
         return festivalFavoriteRepository.existsByUserIdAndFestivalId(userId, festivalId);
     }
 
+    @Transactional(readOnly = true)
     public boolean existsUpcomingReservationByUserId(final Long userId) {
         return festivalFavoriteRepository.existsUpcomingReservationByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsFavoriteUpcomingFestivals(long userId) {
+        return festivalFavoriteRepository.existsFavoriteUpcomingFestivals(userId);
     }
 
     @Transactional(readOnly = true)
