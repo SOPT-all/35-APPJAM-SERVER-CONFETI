@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.global.common.constant.PerformanceType;
-import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -44,6 +43,8 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     );
 
     Optional<Performance> findPerformanceByTypeAndTypeId(PerformanceType type, long typeId);
+
+    List<Performance> findPerformancesByTypeAndTypeIdIn(PerformanceType type, List<Long> typeIds);
 
     @Query(
             "SELECT p"
@@ -83,7 +84,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     List<Performance> findTop5ByRand();
 
     @Query(value = "SELECT p FROM Performance p WHERE p.endAt >= CURRENT_DATE ORDER BY RAND() LIMIT :limit")
-    List<Performance> findPerformancesByRand(@Param("limit") int limit);
+    List<Performance> findUpcomingPerformancesByRand(@Param("limit") int limit);
 
     Optional<Performance> findPerformanceByIdAndEndAtGreaterThanEqual(long performanceId, LocalDate date);
 
