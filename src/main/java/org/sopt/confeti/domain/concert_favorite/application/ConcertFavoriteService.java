@@ -17,6 +17,11 @@ public class ConcertFavoriteService {
     private final ConcertFavoriteRepository concertFavoriteRepository;
 
     @Transactional(readOnly = true)
+    public List<Long> getRandomFavoriteUpcomingConcertIds(long userId, int fetchSize) {
+        return concertFavoriteRepository.findRandomFavoriteUpcomingConcertIds(userId, fetchSize);
+    }
+
+    @Transactional(readOnly = true)
     public boolean isFavorite(final long userId, final long concertId) {
         return concertFavoriteRepository.existsByUserIdAndConcertId(userId, concertId);
     }
@@ -36,6 +41,11 @@ public class ConcertFavoriteService {
     @Transactional(readOnly = true)
     public boolean existsUpcomingReservationByUserId(final Long userId) {
         return concertFavoriteRepository.existsUpcomingReservationByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsFavoriteUpcomingConcerts(long userId) {
+        return concertFavoriteRepository.existsFavoriteUpcomingConcerts(userId);
     }
 
     @Transactional(readOnly = true)
