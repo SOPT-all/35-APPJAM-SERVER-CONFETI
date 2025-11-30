@@ -22,67 +22,69 @@ public interface PerformanceControllerV4Docs {
 
     @Operation(summary = "Confeti's pick 추천 공연 조회")
     @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "성공",
-                            content =
-                                    @Content(
-                                            schema =
-                                                    @Schema(
-                                                            implementation = RecommendPerformancesResponse.class
-                                                    )
-                                    )
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공",
+                content =
+                @Content(
+                    schema =
+                    @Schema(
+                        implementation = RecommendPerformancesResponse.class
                     )
-            }
+                )
+            )
+        }
     )
     @CommonErrorResponses
     ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances(
-            @RequestParam(defaultValue = "5") @Min(1) @Max(20) int limit
+        @RequestParam(defaultValue = "5") @Min(1) @Max(20) int limit
     );
 
     @Operation(
-            summary = "공연 미리듣기 조회",
-            description =
-                    """
-                    V4 변경사항
-                    - 랜덤한 공연 3개, 각 공연 당 랜덤한 음악 3개를 조회
-                    - 공연이 3개 이하일 수도, 음악이 3개 이하일 수도 있음
-                    - 아예 조회된 값이 없을 수도 있음        
-                    """
+        summary = "공연 미리듣기 조회",
+        description =
+            """
+                V4 변경사항
+                - 대상 공연 : 유저가 좋아요 누른 예정된 공연 또는 예정된 전체 공연
+                - 랜덤한 예정된 공연 3개, 각 공연 당 랜덤한 음악 3개를 조회
+                - 공연이 3개 이하일 수도, 음악이 3개 이하일 수도 있음
+                - 아예 조회된 값이 없을 수도 있음        
+                """
     )
     @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "성공"
-                    )
-            }
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
     )
     @CommonErrorResponses
     ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getSongRecommend(
-            @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer performanceLimit,
-            @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer songLimit
+        @UserId(require = false) Long userId,
+        @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer performanceLimit,
+        @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer songLimit
     );
 
     @Operation(
-            summary = "최신 공연 등록순 조회",
-            description =
-                    """
-                    V4 변경사항
-                    - 장소 응답 값 추가  
-                    """
+        summary = "최신 공연 등록순 조회",
+        description =
+            """
+                V4 변경사항
+                - 장소 응답 값 추가  
+                """
     )
     @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "성공"
-                    )
-            }
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
     )
     @CommonErrorResponses
     ResponseEntity<BaseResponse<RecentPerformancesResponse>> getRecentPerformances(
-            @UserId(require = false) Long userId
+        @UserId(require = false) Long userId
     );
 }
