@@ -1,4 +1,4 @@
-name: 클로드 코드 리뷰
+name: Claude Code Review
 
 on:
   issue_comment:
@@ -6,15 +6,16 @@ on:
   pull_request:
     types: [ opened, reopened ]
 
-
 permissions:
   contents: write
   pull-requests: write
   id-token: write
   issues: write
+  actions: read
 
 jobs:
   claude-code-action:
+    timeout-minutes: 60
     if: |
       (github.event_name == 'pull_request') ||
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude'))
@@ -27,26 +28,31 @@ jobs:
           fetch-depth: 1
 
       - name: Run Claude PR Action
-        uses: anthropics/claude-code-action@beta
+        uses: anthropics/claude-code-action@v1
         with:
-          trigger_phrase: ''
+          use_bedrock: 'false'
+          track_progress: true
+          trigger_phrase: '@claude'
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          timeout_minutes: "60"
-          direct_prompt: |
-            이 Pull Request를 리뷰해 주세요. 
-            
-            ### 기본 규칙
-            - 한국어로 답변해 주세요.
-            - 코드의 잠재적인 버그나 성능 문제를 찾아주세요.
-            - 클린 코드 원칙에 따라 개선할 점이 있다면 제안해 주세요.
-            - 변경 사항을 요약해서 설명해 주세요.
-            
-            ### 절대 규칙
-            - 절대 허구의 정보를 만들어내지 마세요.
-            - 컨텍스트 또는 결과로 정확한 응답이 불가능하면 추측을 금지합니다.
-            - 코드가 업데이트 되었을 때 클로드 코드로 작성된 이전 리뷰와 다른 내용을 작성해 주세요.
-            - 칭찬 또는 잘 구현된 부분에 대한 내용 작성을 금지합니다.
-            - [질문 및 요청] 항목에 내용이 있을 경우 해당 내용을 중점으로 답변해 주세요.
-            
-            ### [질문 및 요청]
-            ${{ github.event_name == 'issue_comment' && github.event.comment.body != '' && github.event.comment.body || '내용없음' }}
+          claude_args: |
+            --model claude-opus-4-5-20251101
+            --max-turns 15
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(git fetch:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*)"
+          prompt: |
+            # 코드 리뷰 정보
+            - REPO: ${{ github.repository }}
+            - PR NUMBER: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.event.issue.number }}
+            - 사용자 질문 및 요청: ${{ github.event_name == 'issue_comment' && github.event.comment.body != '' && github.event.comment.body || '내용없음' }}
+
+            # 코드 리뷰 규칙
+              ## 기본 규칙
+              - **한국어**로 답변해주세요.
+              - **버그 가능성, 성능 저하, 구조적 비효율성, 보안상 위험**을 우선적으로 점검하세요.
+              - **클린 코드 원칙(SOLID, 일관성, 가독성, 중복 제거 등)** 에 따라 개선 제안을 제시하세요.
+              - 코드 변경 내용을 언급할 때는 **핵심만 간결히 요약**하세요.
+              - [사용자 질문 및 요청] 항목에 내용이 있을 경우 해당 내용을 중점으로 리뷰하세요.
+
+              ## 절대 규칙
+              - **사실 기반·근거 중심·간결한** 피드백만 작성하세요. **추측, 허구, 불확실한 근거**를 절대 포함하지 마세요. 판단이 불가능한 경우, 명시적으로 “판단 불가”라고 작성하세요.
+              - **이전 Claude 리뷰와 동일하거나 중복되는 분석**을 피하세요. 반드시 새로운 관점이나 추가 위험 요인을 제시하세요.
+              - **칭찬, 긍정적 감정 표현, 배경 설명**은 금지합니다. 오직 문제점, 근거, 개선 방향만 작성하세요."
