@@ -13,6 +13,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
@@ -35,11 +37,13 @@ import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
+import org.sopt.confeti.domain.concert_favorite.ConcertFavorite;
 import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
+import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
@@ -386,12 +390,42 @@ public class PerformanceFacade {
         );
     }
 
-    public PerformancesRecommendDTO getPerformancesRecommend(int performanceLimit, int songLimit) {
-        List<PerformanceRecommendDTO> performancesRecommend = performanceService.getRandomPerformances(performanceLimit).stream()
+    public PerformancesRecommendDTO getPerformancesRecommend(Long userId, int performanceLimit, int songLimit) {
+        if (hasFavoritePerformances(userId)) {
+            return getFavoritePerformanceRecommend(userId, performanceLimit, songLimit);
+        }
+
+        List<PerformanceRecommendDTO> performancesRecommend = performanceService.getRandomUpcomingPerformances(performanceLimit).stream()
                 .map(performance -> getPerformanceRecommend(performance, songLimit))
                 .toList();
 
         return PerformancesRecommendDTO.from(performancesRecommend);
+    }
+
+    private PerformancesRecommendDTO getFavoritePerformanceRecommend(long userId, int performanceLimit, int songLimit) {
+        List<Long> festivalFavoriteIds = festivalFavoriteService.getRandomFavoriteUpcomingFestivalIds(userId, performanceLimit);
+        List<Long> concertFavoriteIds = concertFavoriteService.getRandomFavoriteUpcomingConcertIds(userId, performanceLimit);
+
+        List<PerformanceDTO> festivalPerformances = performanceService.getPerformancesByTypeAndTypeIds(PerformanceType.FESTIVAL, festivalFavoriteIds);
+        List<PerformanceDTO> concertPerformances = performanceService.getPerformancesByTypeAndTypeIds(PerformanceType.CONCERT, concertFavoriteIds);
+        List<PerformanceDTO> recommendPerformances = new ArrayList<>(Stream.concat(festivalPerformances.stream(), concertPerformances.stream()).toList());
+        Collections.shuffle(recommendPerformances);
+
+        List<PerformanceRecommendDTO> performanceRecommendDTOS = recommendPerformances.stream()
+                .limit(performanceLimit)
+                .map(performance -> getPerformanceRecommend(performance, songLimit))
+                .toList();
+
+        return PerformancesRecommendDTO.from(performanceRecommendDTOS);
+    }
+
+    private boolean hasFavoritePerformances(Long userId) {
+        if (userId == null) {
+            return false;
+        }
+
+        return concertFavoriteService.existsFavoriteUpcomingConcerts(userId) ||
+                festivalFavoriteService.existsFavoriteUpcomingFestivals(userId);
     }
 
     private PerformanceRecommendDTO getPerformanceRecommend(PerformanceDTO performance, int songLimit) {
