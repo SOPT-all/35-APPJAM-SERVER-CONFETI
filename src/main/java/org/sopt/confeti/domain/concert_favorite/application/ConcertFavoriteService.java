@@ -29,7 +29,7 @@ public class ConcertFavoriteService {
     @Transactional
     public void addFavorite(final User user, final Concert concert) {
         concertFavoriteRepository.save(
-                ConcertFavorite.create(user, concert)
+            ConcertFavorite.create(user, concert)
         );
     }
 
@@ -41,11 +41,6 @@ public class ConcertFavoriteService {
     @Transactional(readOnly = true)
     public boolean existsUpcomingReservationByUserId(final Long userId) {
         return concertFavoriteRepository.existsUpcomingReservationByUserId(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean existsFavoriteUpcomingConcerts(long userId) {
-        return concertFavoriteRepository.existsFavoriteUpcomingConcerts(userId);
     }
 
     @Transactional(readOnly = true)

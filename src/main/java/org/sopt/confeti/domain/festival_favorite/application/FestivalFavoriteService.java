@@ -27,9 +27,9 @@ public class FestivalFavoriteService {
     @Transactional
     public void save(User user, Festival festival) {
         festivalFavoriteRepository.findByUserIdAndFestivalId(user.getId(), festival.getId())
-                .ifPresent(festivalFavorite -> {
-                    throw new ConflictException(ErrorMessage.CONFLICT);
-                });
+            .ifPresent(festivalFavorite -> {
+                throw new ConflictException(ErrorMessage.CONFLICT);
+            });
 
         FestivalFavorite festivalFavorite = FestivalFavorite.create(user, festival);
         festivalFavoriteRepository.save(festivalFavorite);
@@ -37,9 +37,10 @@ public class FestivalFavoriteService {
 
     @Transactional
     public void delete(User user, Festival festival) {
-        FestivalFavorite festivalFavorite = festivalFavoriteRepository.findByUserIdAndFestivalId(user.getId(),
-                        festival.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+        FestivalFavorite festivalFavorite = festivalFavoriteRepository.findByUserIdAndFestivalId(
+                user.getId(),
+                festival.getId())
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
         festivalFavoriteRepository.delete(festivalFavorite);
     }
@@ -52,11 +53,6 @@ public class FestivalFavoriteService {
     @Transactional(readOnly = true)
     public boolean existsUpcomingReservationByUserId(final Long userId) {
         return festivalFavoriteRepository.existsUpcomingReservationByUserId(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean existsFavoriteUpcomingFestivals(long userId) {
-        return festivalFavoriteRepository.existsFavoriteUpcomingFestivals(userId);
     }
 
     @Transactional(readOnly = true)
