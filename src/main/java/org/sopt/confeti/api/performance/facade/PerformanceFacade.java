@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
@@ -37,13 +36,11 @@ import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
-import org.sopt.confeti.domain.concert_favorite.ConcertFavorite;
 import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
-import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
@@ -140,12 +137,14 @@ public class PerformanceFacade {
     @Transactional(readOnly = true)
     public PerformanceReservationDTO getPerformReservationInfo(final Long userId) {
         boolean isUserExist = userId != null && userService.existsById(userId);
-        boolean isCFExist = isUserExist && concertFavoriteService.existsUpcomingReservationByUserId(userId);
-        boolean isFFExist = isUserExist && festivalFavoriteService.existsUpcomingReservationByUserId(userId);
+        boolean isCFExist =
+            isUserExist && concertFavoriteService.existsUpcomingReservationByUserId(userId);
+        boolean isFFExist =
+            isUserExist && festivalFavoriteService.existsUpcomingReservationByUserId(userId);
 
         if (isCFExist || isFFExist) {
             List<PerformanceTicketDTO> performanceReserve = performanceService.getFavoritePerformancesReservation(
-                    userId);
+                userId);
             return PerformanceReservationDTO.from(performanceReserve);
         }
 
@@ -173,22 +172,23 @@ public class PerformanceFacade {
         List<ArtistFavorite> artistFavorites = artistFavoriteService.getArtistIdsByUserId(userId);
 
         return RecentPerformancesDTO.of(
-                PERSONALIZED,
-                performanceService.getPerformancesByArtistIds(
-                        artistFavorites.stream()
-                                .map(artistFavorite -> artistFavorite.getArtist().getId())
-                                .toList(),
-                        RECENT_PERFORMANCES_SIZE
-                )
+            PERSONALIZED,
+            performanceService.getPerformancesByArtistIds(
+                artistFavorites.stream()
+                    .map(artistFavorite -> artistFavorite.getArtist().getId())
+                    .toList(),
+                RECENT_PERFORMANCES_SIZE
+            )
         );
     }
 
     @Transactional(readOnly = true)
     public RecentPerformancesDTO getRecentPerformancesWithoutFavorites() {
-        List<Performance> performances = performanceService.getRecentPerformances(RECENT_PERFORMANCES_SIZE);
+        List<Performance> performances = performanceService.getRecentPerformances(
+            RECENT_PERFORMANCES_SIZE);
         return RecentPerformancesDTO.of(
-                UNPERSONALIZED,
-                performances
+            UNPERSONALIZED,
+            performances
         );
     }
 
@@ -198,23 +198,25 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public ArtistPerformancesDTO getPerformancesByArtistId(final Long userId, final String artistId) {
+    public ArtistPerformancesDTO getPerformancesByArtistId(final Long userId,
+        final String artistId) {
         List<PerformanceDTO> performances = performanceService.getPerformancesByArtistId(artistId);
 
         Map<String, Boolean> favoriteMap = getFavoriteMap(userId, performances);
         List<ArtistPerformancesDetailDTO> performanceList = performances.stream()
-                .map(performance -> {
-                    String key = performance.typeId() + "_" + performance.type();
-                    boolean isFavorite = favoriteMap.getOrDefault(key, false);
-                    return ArtistPerformancesDetailDTO.from(performance, isFavorite);
-                })
-                .toList();
+            .map(performance -> {
+                String key = performance.typeId() + "_" + performance.type();
+                boolean isFavorite = favoriteMap.getOrDefault(key, false);
+                return ArtistPerformancesDetailDTO.from(performance, isFavorite);
+            })
+            .toList();
 
         return ArtistPerformancesDTO.from(performanceList);
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Boolean> getFavoriteMap(final Long userId, List<PerformanceDTO> performances) {
+    public Map<String, Boolean> getFavoriteMap(final Long userId,
+        List<PerformanceDTO> performances) {
         if (userId == null || performances.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -223,7 +225,8 @@ public class PerformanceFacade {
         return fetchFavoriteMap(userId, typeToIdsMap);
     }
 
-    private Map<PerformanceType, Set<Long>> groupPerformancesByType(List<PerformanceDTO> performances) {
+    private Map<PerformanceType, Set<Long>> groupPerformancesByType(
+        List<PerformanceDTO> performances) {
         Map<PerformanceType, Set<Long>> typeToIdsMap = new HashMap<>();
 
         for (PerformanceDTO performance : performances) {
@@ -236,7 +239,8 @@ public class PerformanceFacade {
         return typeToIdsMap;
     }
 
-    private Map<String, Boolean> fetchFavoriteMap(Long userId, Map<PerformanceType, Set<Long>> typeToIdsMap) {
+    private Map<String, Boolean> fetchFavoriteMap(Long userId,
+        Map<PerformanceType, Set<Long>> typeToIdsMap) {
         Map<String, Boolean> favoriteMap = new HashMap<>();
 
         typeToIdsMap.forEach((type, ids) -> {
@@ -261,28 +265,30 @@ public class PerformanceFacade {
     @Transactional(readOnly = true)
     public RecommendPerformancesDTO getRecommendPerformances() {
         return RecommendPerformancesDTO.from(
-                performanceService.getRecommendPerformances()
+            performanceService.getRecommendPerformances()
         );
     }
 
     @Transactional(readOnly = true)
     public RecommendPerformancesDTO getRecommendPerformances(int limit) {
         return RecommendPerformancesDTO.from(
-                performanceService.getRecommendPerformances(limit)
+            performanceService.getRecommendPerformances(limit)
         );
     }
 
     @Transactional(readOnly = true)
-    public SearchACPerformancesDTO searchACPerformances(String term, int limit, PerformanceStatus status) {
+    public SearchACPerformancesDTO searchACPerformances(String term, int limit,
+        PerformanceStatus status) {
         return SearchACPerformancesDTO.from(
-                performanceSearchService.getPerformancesByTitle(term, limit, status)
+            performanceSearchService.getPerformancesByTitle(term, limit, status)
         );
     }
 
     @Transactional(readOnly = true)
     public Optional<RecommendMusicsPerformanceDTO> getRecommendPerformanceId(final Long userId) {
 
-        Optional<Performance> performance = performanceService.getPerformanceByUserFavorites(userId);
+        Optional<Performance> performance = performanceService.getPerformanceByUserFavorites(
+            userId);
         if (Objects.isNull(userId) || performance.isEmpty()) {
             performance = performanceService.getPerformanceByRand();
         }
@@ -298,7 +304,7 @@ public class PerformanceFacade {
         }
 
         List<String> artistList = performanceArtists.stream()
-                .map(PerformanceArtist::getArtistId).distinct().collect(Collectors.toList());
+            .map(PerformanceArtist::getArtistId).distinct().collect(Collectors.toList());
         Collections.shuffle(artistList);
 
         int artistCount = Math.min(artistList.size(), 3);
@@ -310,17 +316,19 @@ public class PerformanceFacade {
         Performance performance = performanceService.getPerformanceById(performanceId);
         Set<String> selectedArtistIds = setArtistsByRandom(performance);
         Set<String> existingMusicIds = (musicIds == null || musicIds.isEmpty())
-                ? Collections.emptySet()
-                : musicIds.stream().flatMap(ids -> Arrays.stream(ids.split(",")))
-                        .map(String::trim).collect(Collectors.toSet());
+            ? Collections.emptySet()
+            : musicIds.stream().flatMap(ids -> Arrays.stream(ids.split(",")))
+                .map(String::trim).collect(Collectors.toSet());
 
         List<String> artistIdList = new ArrayList<>(selectedArtistIds);
-        List<ConfetiMusic> recommendMusics = recommendMusicsByArtistCount(artistIdList, existingMusicIds);
+        List<ConfetiMusic> recommendMusics = recommendMusicsByArtistCount(artistIdList,
+            existingMusicIds);
 
         return RecommendMusicsDTO.from(recommendMusics);
     }
 
-    private List<ConfetiMusic> recommendMusicsByArtistCount(List<String> artistIdList, Set<String> existingMusicIds) {
+    private List<ConfetiMusic> recommendMusicsByArtistCount(List<String> artistIdList,
+        Set<String> existingMusicIds) {
         int artistCount = artistIdList.size();
         if (artistCount == 1) {
             return recommendForSingleArtist(artistIdList, existingMusicIds);
@@ -331,26 +339,32 @@ public class PerformanceFacade {
         return recommendForMultipleArtists(artistIdList, existingMusicIds);
     }
 
-    private List<ConfetiMusic> recommendForSingleArtist(List<String> artistIdList, Set<String> existingMusicIds) {
+    private List<ConfetiMusic> recommendForSingleArtist(List<String> artistIdList,
+        Set<String> existingMusicIds) {
         return musicAPIHandler.getFilteredTopSongsByArtist(
-                artistIdList.getFirst(), RECOMMEND_MUSIC_SIZE, existingMusicIds
+            artistIdList.getFirst(), RECOMMEND_MUSIC_SIZE, existingMusicIds
         );
     }
 
-    private List<ConfetiMusic> recommendForTwoArtists(List<String> artistIdList, Set<String> existingMusicIds) {
+    private List<ConfetiMusic> recommendForTwoArtists(List<String> artistIdList,
+        Set<String> existingMusicIds) {
         List<ConfetiMusic> musics = new ArrayList<>();
-        musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistIdList.getFirst(), 2, existingMusicIds));
-        musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistIdList.getLast(), 1, existingMusicIds));
+        musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistIdList.getFirst(), 2,
+            existingMusicIds));
+        musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistIdList.getLast(), 1,
+            existingMusicIds));
         return musics;
     }
 
-    private List<ConfetiMusic> recommendForMultipleArtists(List<String> artistIdList, Set<String> existingMusicIds) {
+    private List<ConfetiMusic> recommendForMultipleArtists(List<String> artistIdList,
+        Set<String> existingMusicIds) {
         List<ConfetiMusic> musics = new ArrayList<>();
         for (String artistId : artistIdList) {
             if (musics.size() >= RECOMMEND_MUSIC_SIZE) {
                 break;
             }
-            musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistId, 1, existingMusicIds));
+            musics.addAll(
+                musicAPIHandler.getFilteredTopSongsByArtist(artistId, 1, existingMusicIds));
         }
         return musics;
     }
@@ -370,7 +384,7 @@ public class PerformanceFacade {
         int totalCount = uniqueFestivalIds.size() + setListConcertIds.size();
 
         return ConfetiRecordDTO.of(totalCount, timetableFestivalIds.size(),
-                setListFestivalIds.size() + setListConcertIds.size());
+            setListFestivalIds.size() + setListConcertIds.size());
     }
 
     protected void validateExistUser(final long userId) {
@@ -380,71 +394,77 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public ExpectedPerformancesDTO getExpectedPerformances(GetExpectedPerformancesDTO expectedPerformancesDTO) {
-        return ExpectedPerformancesDTO.from(performanceService.getExpectedPerformances(expectedPerformancesDTO));
+    public ExpectedPerformancesDTO getExpectedPerformances(
+        GetExpectedPerformancesDTO expectedPerformancesDTO) {
+        return ExpectedPerformancesDTO.from(
+            performanceService.getExpectedPerformances(expectedPerformancesDTO));
     }
 
     public PerformanceIdsDTO getPerformances() {
         return PerformanceIdsDTO.from(
-                performanceService.getPerformances()
+            performanceService.getPerformances()
         );
     }
 
-    public PerformancesRecommendDTO getPerformancesRecommend(Long userId, int performanceLimit, int songLimit) {
-        if (hasFavoritePerformances(userId)) {
-            return getFavoritePerformanceRecommend(userId, performanceLimit, songLimit);
+    public PerformancesRecommendDTO getPerformancesRecommend(Long userId, int performanceLimit,
+        int songLimit) {
+        List<PerformanceDTO> performances = getFavoritePerformanceRecommend(userId,
+            performanceLimit);
+
+        if (performances.isEmpty()) {
+            performances = performanceService.getRandomUpcomingPerformances(performanceLimit);
         }
 
-        List<PerformanceRecommendDTO> performancesRecommend = performanceService.getRandomUpcomingPerformances(performanceLimit).stream()
-                .map(performance -> getPerformanceRecommend(performance, songLimit))
-                .toList();
+        List<PerformanceRecommendDTO> performancesRecommend = performances.stream()
+            .map(performance -> getPerformanceRecommend(performance, songLimit))
+            .toList();
 
         return PerformancesRecommendDTO.from(performancesRecommend);
     }
 
-    private PerformancesRecommendDTO getFavoritePerformanceRecommend(long userId, int performanceLimit, int songLimit) {
-        List<Long> festivalFavoriteIds = festivalFavoriteService.getRandomFavoriteUpcomingFestivalIds(userId, performanceLimit);
-        List<Long> concertFavoriteIds = concertFavoriteService.getRandomFavoriteUpcomingConcertIds(userId, performanceLimit);
-
-        List<PerformanceDTO> festivalPerformances = performanceService.getPerformancesByTypeAndTypeIds(PerformanceType.FESTIVAL, festivalFavoriteIds);
-        List<PerformanceDTO> concertPerformances = performanceService.getPerformancesByTypeAndTypeIds(PerformanceType.CONCERT, concertFavoriteIds);
-        List<PerformanceDTO> recommendPerformances = new ArrayList<>(Stream.concat(festivalPerformances.stream(), concertPerformances.stream()).toList());
-        Collections.shuffle(recommendPerformances);
-
-        List<PerformanceRecommendDTO> performanceRecommendDTOS = recommendPerformances.stream()
-                .limit(performanceLimit)
-                .map(performance -> getPerformanceRecommend(performance, songLimit))
-                .toList();
-
-        return PerformancesRecommendDTO.from(performanceRecommendDTOS);
-    }
-
-    private boolean hasFavoritePerformances(Long userId) {
+    private List<PerformanceDTO> getFavoritePerformanceRecommend(Long userId,
+        int performanceLimit) {
         if (userId == null) {
-            return false;
+            return Collections.emptyList();
         }
 
-        return concertFavoriteService.existsFavoriteUpcomingConcerts(userId) ||
-                festivalFavoriteService.existsFavoriteUpcomingFestivals(userId);
+        List<Long> festivalFavoriteIds = festivalFavoriteService.getRandomFavoriteUpcomingFestivalIds(
+            userId, performanceLimit);
+        List<Long> concertFavoriteIds = concertFavoriteService.getRandomFavoriteUpcomingConcertIds(
+            userId, performanceLimit);
+
+        List<PerformanceDTO> festivalPerformances = performanceService.getPerformancesByTypeAndTypeIds(
+            PerformanceType.FESTIVAL, festivalFavoriteIds);
+        List<PerformanceDTO> concertPerformances = performanceService.getPerformancesByTypeAndTypeIds(
+            PerformanceType.CONCERT, concertFavoriteIds);
+        List<PerformanceDTO> recommendPerformances = new ArrayList<>(
+            Stream.concat(festivalPerformances.stream(), concertPerformances.stream()).toList());
+        Collections.shuffle(recommendPerformances);
+
+        return recommendPerformances.stream()
+            .limit(performanceLimit)
+            .toList();
     }
 
-    private PerformanceRecommendDTO getPerformanceRecommend(PerformanceDTO performance, int songLimit) {
+    private PerformanceRecommendDTO getPerformanceRecommend(PerformanceDTO performance,
+        int songLimit) {
         List<SongRecommendDTO> songsRecommend = getSongsRecommend(
-                performanceService.getRandomPerformanceArtists(performance.id(), songLimit), songLimit
+            performanceService.getRandomPerformanceArtists(performance.id(), songLimit), songLimit
         );
 
         return PerformanceRecommendDTO.of(performance, songsRecommend);
     }
 
-    private List<SongRecommendDTO> getSongsRecommend(List<PerformanceArtistDTO> artists, int songLimit) {
+    private List<SongRecommendDTO> getSongsRecommend(List<PerformanceArtistDTO> artists,
+        int songLimit) {
         List<ConfetiMusic> topSongs = artists.stream()
-                .map(this::getArtistTopSongs)
-                .flatMap(Collection::stream)
-                .toList();
+            .map(this::getArtistTopSongs)
+            .flatMap(Collection::stream)
+            .toList();
 
         return pickRandomSongs(topSongs, songLimit).stream()
-                .map(SongRecommendDTO::from)
-                .toList();
+            .map(SongRecommendDTO::from)
+            .toList();
     }
 
     private List<ConfetiMusic> getArtistTopSongs(PerformanceArtistDTO artist) {

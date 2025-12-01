@@ -44,9 +44,8 @@ public class UserFavoriteController {
     @Permission(role = {Role.GENERAL})
     @PostMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<Void>> postFavoriteFestival(
-//        @UserId Long userId,
+        @UserId Long userId,
         @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId) {
-        long userId = 1L;
         userFavoriteFacade.addFestivalFavorite(userId, festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
@@ -94,10 +93,9 @@ public class UserFavoriteController {
     @Permission(role = {Role.GENERAL})
     @PostMapping("/concerts/{concertId}")
     public ResponseEntity<BaseResponse<Void>> addConcertFavorite(
-//        @UserId Long userId,
+        @UserId Long userId,
         @PathVariable(name = "concertId") Long concertId
     ) {
-        long userId = 1L;
         userFavoriteFacade.addConcertFavorite(userId, concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
