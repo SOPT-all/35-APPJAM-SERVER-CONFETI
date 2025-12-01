@@ -9,17 +9,32 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface FestivalFavoriteRepository extends JpaRepository<FestivalFavorite, Long> {
+
+    @Query(value =
+        """
+            SELECT ff.festival.id
+            FROM FestivalFavorite ff
+            WHERE ff.user.id = :userId
+            AND ff.festival.endAt >= CURRENT_DATE
+            ORDER BY RAND()
+            LIMIT :limit
+            """
+    )
+    List<Long> findRandomFavoriteUpcomingFestivalIds(@Param("userId") long userId,
+        @Param("limit") int limit);
+
     Optional<FestivalFavorite> findByUserIdAndFestivalId(long userId, long festivalId);
 
     boolean existsByUserIdAndFestivalId(long userId, long festivalId);
 
     @Query("SELECT CASE WHEN COUNT(ff) > 0 THEN true ELSE false END " +
-            "FROM FestivalFavorite ff " +
-            "WHERE ff.user.id = :userId " +
-            "AND ff.festival.reserveAt >= CURRENT_DATE ")
+        "FROM FestivalFavorite ff " +
+        "WHERE ff.user.id = :userId " +
+        "AND ff.festival.reserveAt >= CURRENT_DATE ")
     boolean existsUpcomingReservationByUserId(@Param("userId") Long userId);
 
     @Query("SELECT ff.festival.id FROM FestivalFavorite ff WHERE ff.user.id = :userId AND ff.festival.id IN :festivalIds")
-    List<Long> findFavoriteFestivalIds(@Param("userId") Long userId, @Param("festivalIds") Set<Long> festivalIds);
+    List<Long> findFavoriteFestivalIds(@Param("userId") Long userId,
+        @Param("festivalIds") Set<Long> festivalIds);
 
 }

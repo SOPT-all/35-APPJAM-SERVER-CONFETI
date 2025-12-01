@@ -17,6 +17,11 @@ public class ConcertFavoriteService {
     private final ConcertFavoriteRepository concertFavoriteRepository;
 
     @Transactional(readOnly = true)
+    public List<Long> getRandomFavoriteUpcomingConcertIds(long userId, int fetchSize) {
+        return concertFavoriteRepository.findRandomFavoriteUpcomingConcertIds(userId, fetchSize);
+    }
+
+    @Transactional(readOnly = true)
     public boolean isFavorite(final long userId, final long concertId) {
         return concertFavoriteRepository.existsByUserIdAndConcertId(userId, concertId);
     }
@@ -24,7 +29,7 @@ public class ConcertFavoriteService {
     @Transactional
     public void addFavorite(final User user, final Concert concert) {
         concertFavoriteRepository.save(
-                ConcertFavorite.create(user, concert)
+            ConcertFavorite.create(user, concert)
         );
     }
 

@@ -138,7 +138,7 @@ public class PerformanceService {
 
     @Transactional(readOnly = true)
     public List<Performance> getRecommendPerformances(int limit) {
-        return performanceRepository.findPerformancesByRand(limit);
+        return performanceRepository.findUpcomingPerformancesByRand(limit);
     }
 
     @Transactional(readOnly = true)
@@ -209,6 +209,13 @@ public class PerformanceService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
+    public List<PerformanceDTO> getPerformancesByTypeAndTypeIds(PerformanceType type, List<Long> typeIds) {
+        return performanceRepository.findPerformancesByTypeAndTypeIdIn(type, typeIds).stream()
+                .map(PerformanceDTO::from)
+                .toList();
+    }
+
     private List<Pair<PerformanceType, Long>> convertToPairs(GetExpectedPerformancesDTO expectedPerformancesDTO) {
         return expectedPerformancesDTO.expectedPerformanceDTOs().stream()
                 .map(performanceDTO -> Pair.of(performanceDTO.type(), performanceDTO.typeId()))
@@ -221,8 +228,8 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceDTO> getRandomPerformances(int fetchSize) {
-        return performanceRepository.findPerformancesByRand(fetchSize).stream()
+    public List<PerformanceDTO> getRandomUpcomingPerformances(int fetchSize) {
+        return performanceRepository.findUpcomingPerformancesByRand(fetchSize).stream()
                 .map(PerformanceDTO::from)
                 .toList();
     }
