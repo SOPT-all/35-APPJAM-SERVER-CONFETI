@@ -8,11 +8,13 @@
     name="org.sopt.confeti.global.interceptor.LoggingInterceptor">
     <appender-ref ref="REQUEST_RESPONSE_FILE"/>
   </logger>
-
   <logger additivity="false" level="ERROR"
     name="org.sopt.confeti.global.interceptor.ErrorNotificationInterceptor">
     <appender-ref ref="EXCEPTION_FILE"/>
   </logger>
+
+  <property name="LOG_PATTERN"
+    value="%-4relative %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [traceId=%X{TRACE_ID:-NO TRACE ID}] %-5level %logger{35} - message=\(%msg\)%n"/>
 
   <root level="INFO">
     <appender-ref ref="CONSOLE"/>

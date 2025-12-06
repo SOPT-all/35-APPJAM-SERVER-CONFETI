@@ -1,7 +1,7 @@
 <included>
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="WARN_ERROR_FILE">
     <encoder>
-      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+      <pattern>${LOG_PATTERN}</pattern>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>WARN</level>
