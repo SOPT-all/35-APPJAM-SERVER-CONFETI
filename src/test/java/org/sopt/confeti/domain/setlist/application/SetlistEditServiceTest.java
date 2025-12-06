@@ -57,21 +57,21 @@ class SetlistEditServiceTest {
 
         ReflectionTestUtils.setField(setlist, "id", setlistId);
 
-        SetlistSong music = SetlistSong.builder()
-            .musicId("203948575")
+        SetlistSong song = SetlistSong.builder()
+            .songId("203948575")
             .artistName("NewJeans")
             .trackName("Super Shy")
             .artworkUrl("https://img")
             .previewUrl("https://preview")
             .orders(1)
             .build();
-        music.setSetlist(setlist);
+        song.setSetlist(setlist);
 
-        List<SetlistSong> musics = List.of(music);
+        List<SetlistSong> songs = List.of(song);
 
         given(setlistRepository.findByIdAndUserId(setlistId, userId)).willReturn(
             Optional.of(setlist));
-        given(setlistSongRepository.findBySetlist(setlist)).willReturn(musics);
+        given(setlistSongRepository.findBySetlist(setlist)).willReturn(songs);
         given(redisTemplate.opsForValue()).willReturn(valueOperations);
 
         // when
@@ -89,7 +89,7 @@ class SetlistEditServiceTest {
         assertThat(captured.get(0).orders()).isEqualTo(1);
     }
 
-    void updateMusicOrder_곡_순서_변경() {
+    void updateSongOrder_곡_순서_변경() {
         // given
         Long userId = 1L;
         Long setlistId = 100L;
@@ -127,7 +127,7 @@ class SetlistEditServiceTest {
         });
     }
 
-    void deleteMusic_곡_삭제_및_순서_재정렬() {
+    void deleteSong_곡_삭제_및_순서_재정렬() {
         // given
         Long userId = 1L;
         Long setlistId = 100L;
