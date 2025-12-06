@@ -3,7 +3,7 @@ package org.sopt.confeti.api.setlist.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.setlist.facade.SetlistFacade;
-import org.sopt.confeti.api.setlist.facade.dto.request.SetlistUpdateMusicOrderDTO;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistUpdateSongOrderDTO;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Deprecated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/my/setlists")
@@ -37,9 +38,9 @@ public class SetlistEditController {
     public ResponseEntity<BaseResponse<Void>> updateMusicOrder(
         @UserId Long userId,
         @PathVariable Long setlistId,
-        @RequestBody List<SetlistUpdateMusicOrderDTO> request
+        @RequestBody List<SetlistUpdateSongOrderDTO> request
     ) {
-        setlistFacade.updateMusicOrder(userId, setlistId, request);
+        setlistFacade.updateSongOrder(userId, setlistId, request);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
@@ -49,7 +50,7 @@ public class SetlistEditController {
         @PathVariable Long setlistId,
         @PathVariable int orders
     ) {
-        String deleteTrackId = setlistFacade.deleteMusic(userId, setlistId, orders);
+        String deleteTrackId = setlistFacade.deleteSong(userId, setlistId, orders);
         return ApiResponseUtil.success(SuccessMessage.DELETED, deleteTrackId);
     }
 

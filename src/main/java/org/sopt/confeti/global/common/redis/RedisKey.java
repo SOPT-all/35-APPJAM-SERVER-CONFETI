@@ -6,11 +6,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.api.setlist.facade.dto.request.SetlistMusicEditDTO;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistSongEditDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
-import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
-import org.sopt.confeti.global.util.music.dto.music.MusicPage;
+import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSong;
+import org.sopt.confeti.global.util.music.dto.music.SongPage;
 import org.springframework.util.StringUtils;
 
 /**
@@ -25,14 +25,14 @@ public enum RedisKey {
     MUSIC_ARTISTS("apple-music-api:artists:%s", ConfetiArtist.class, Duration.ofHours(1)),
     MUSIC_ARTISTS_RELATED("apple-music-api:artists-related:%s:%d", ConfetiArtist.class,
         Duration.ofHours(1)),
-    MUSIC_ARTISTS_TOP_MUSICS("apple-music-api:artists:top-musics:%s", ConfetiMusic.class,
+    MUSIC_ARTISTS_TOP_SONGS("apple-music-api:artists:top-songs:%s", ConfetiSong.class,
         Duration.ofHours(1)),
-    MUSIC_MUSICS("apple-music-api:musics:%s", ConfetiMusic.class, Duration.ofHours(1)),
-    MUSIC_TOP_MUSICS("apple-music-api:top-musics", ConfetiMusic.class, Duration.ofHours(1)),
+    MUSIC_SONGS("apple-music-api:songs:%s", ConfetiSong.class, Duration.ofHours(1)),
+    MUSIC_TOP_SONGS("apple-music-api:top-songs", ConfetiSong.class, Duration.ofHours(1)),
     MUSIC_TOP_ARTISTS("apple-music-api:top-artists", ConfetiArtist.class, Duration.ofHours(1)),
-    MUSIC_PAGE_ARTIST_OFFSET_LIMIT("apple-music-api:music-page:artists:%s:%d:%d", MusicPage.class,
+    SONG_PAGE_ARTIST_OFFSET_LIMIT("apple-music-api:song-page:artists:%s:%d:%d", SongPage.class,
         Duration.ofHours(1)),
-    MUSIC_PAGE_KEYWORD_OFFSET_LIMIT("apple-music-api:music-page:keyword:%s:%d:%d", MusicPage.class,
+    SONG_PAGE_KEYWORD_OFFSET_LIMIT("apple-music-api:song-page:keyword:%s:%d:%d", SongPage.class,
         Duration.ofHours(1)),
 
     // user refresh token
@@ -43,27 +43,13 @@ public enum RedisKey {
         Duration.ofHours(1)),
 
     // setlist
-    SETLIST_EDIT("edit:setlist:%d:%d", SetlistMusicEditDTO.class, Duration.ofHours(1)),
+    SETLIST_EDIT("edit:setlist:%d:%d", SetlistSongEditDTO.class, Duration.ofHours(1)),
     ;
 
     private final String format;
     @Getter
     private final Class<?> type;
     private final Duration ttl;
-
-    @Getter
-    @Builder
-    @RequiredArgsConstructor
-    public static class KeyInfo<T> {
-
-        private final Class<T> type;
-        private final String key;
-        private final Duration ttl;
-
-        public boolean isValid() {
-            return StringUtils.hasText(key) && ttl != null && type != null;
-        }
-    }
 
     public <T> KeyInfo<T> createKeyInfo() {
         return createKeyInfo(null, null, null);
@@ -92,6 +78,20 @@ public enum RedisKey {
                 "RedisKey.createKeyInfo : Format String not matched with arguments. format : {}, first arg : {}, second arg : {}, third arg : {}",
                 format, firstArg, secondArg, thirdArg);
             return null;
+        }
+    }
+
+    @Getter
+    @Builder
+    @RequiredArgsConstructor
+    public static class KeyInfo<T> {
+
+        private final Class<T> type;
+        private final String key;
+        private final Duration ttl;
+
+        public boolean isValid() {
+            return StringUtils.hasText(key) && ttl != null && type != null;
         }
     }
 }

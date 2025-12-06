@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
-import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
-import org.sopt.confeti.global.util.music.dto.music.MusicPage;
+import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSong;
+import org.sopt.confeti.global.util.music.dto.music.SongPage;
 
 public interface MusicAPIHandler {
 
@@ -19,15 +19,16 @@ public interface MusicAPIHandler {
 
     Optional<ConfetiArtist> findArtistByArtistId(final String artistId);
 
-    List<ConfetiMusic> getMusicsByMusicIds(final Set<String> musicIds);
+    List<ConfetiSong> getSongsBySongIds(final Set<String> songIds);
 
-    List<ConfetiMusic> getTopMusics(final int fetchSize);
+    List<ConfetiSong> getTopSongs(final int fetchSize);
 
-    List<ConfetiMusic> getFilteredTopSongsByArtist(String artistId, int limit, Set<String> excludedMusicIds);
+    List<ConfetiSong> getFilteredTopSongsByArtist(String artistId, int limit,
+        Set<String> excludedSongIds);
 
-    MusicPage getMusicsByKeyword(String term, int offset, int limit);
+    SongPage getSongsByKeyword(String term, int offset, int limit);
 
-    MusicPage getArtistMusicsByArtistId(String artistId, int offset, int limit);
+    SongPage getArtistSongsByArtistId(String artistId, int offset, int limit);
 
-    List<ConfetiMusic> getArtistTopSongs(String id, int recommendSongFetchSize);
+    List<ConfetiSong> getArtistTopSongs(String id, int recommendSongFetchSize);
 }

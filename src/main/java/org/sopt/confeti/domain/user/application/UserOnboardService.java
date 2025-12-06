@@ -19,7 +19,8 @@ public class UserOnboardService {
     private final RedisHandler redisHandler;
 
     public UserOnboardCacheDTO getCachedOnboardArtists(long userId) {
-        Optional<UserOnboardCacheDTO> cachedTopArtists = redisHandler.get(RedisKey.USER_ONBOARD_TOP_ARTISTS.createKeyInfo(userId));
+        Optional<UserOnboardCacheDTO> cachedTopArtists = redisHandler.get(
+            RedisKey.USER_ONBOARD_TOP_ARTISTS.createKeyInfo(userId));
         return cachedTopArtists.orElse(UserOnboardCacheDTO.empty());
     }
 
@@ -37,14 +38,6 @@ public class UserOnboardService {
         } catch (NotFoundException e) {
             return Collections.emptySet();
         }
-    }
-
-    public static void argParam(Object f, Object s, Object t) {
-        // nothing
-    }
-
-    public static void vararg(Object... args) {
-        // nothing
     }
 }
 

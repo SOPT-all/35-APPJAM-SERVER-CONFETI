@@ -1,8 +1,24 @@
 package org.sopt.confeti.domain.setlist;
 
-import jakarta.persistence.*;
-import java.util.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.user.User;
 
 @Entity
@@ -28,7 +44,7 @@ public class Setlist {
     private Long typeId;
 
     @OneToMany(mappedBy = "setlist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SetlistMusic> musics = new ArrayList<>();
+    private List<SetlistSong> songs = new ArrayList<>();
 
     @Builder
     public Setlist(User user, SetlistType type, Long typeId) {
@@ -37,8 +53,8 @@ public class Setlist {
         this.typeId = typeId;
     }
 
-    public void addMusics(SetlistMusic music) {
-        musics.add(music);
-        music.setSetlist(this);
+    public void addSongs(SetlistSong song) {
+        songs.add(song);
+        song.setSetlist(this);
     }
 }

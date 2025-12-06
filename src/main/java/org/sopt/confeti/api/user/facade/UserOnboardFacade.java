@@ -26,8 +26,8 @@ import org.sopt.confeti.global.exception.BadRequestException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
-import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
-import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusicArtist;
+import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSong;
+import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSongArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,15 +59,15 @@ public class UserOnboardFacade {
 
     @Deprecated
     public UserOnboardTopArtistsDTO getTopArtists(int limit) {
-        List<ConfetiMusic> topMusics = musicAPIHandler.getTopMusics(limit);
-        Set<String> topMusicIds = topMusics.stream()
-            .map(ConfetiMusic::getId)
+        List<ConfetiSong> topSongs = musicAPIHandler.getTopSongs(limit);
+        Set<String> topSongIds = topSongs.stream()
+            .map(ConfetiSong::getId)
             .collect(Collectors.toSet());
 
-        List<ConfetiMusic> topMusicsWithArtists = musicAPIHandler.getMusicsByMusicIds(topMusicIds);
-        Set<String> topArtistIds = topMusicsWithArtists.stream()
-            .flatMap(music -> music.getArtists().stream())
-            .map(ConfetiMusicArtist::getId)
+        List<ConfetiSong> topSongsWithArtists = musicAPIHandler.getSongsBySongIds(topSongIds);
+        Set<String> topArtistIds = topSongsWithArtists.stream()
+            .flatMap(song -> song.getArtists().stream())
+            .map(ConfetiSongArtist::getId)
             .collect(Collectors.toSet());
 
         List<ConfetiArtist> topArtists = musicAPIHandler.getArtistsByArtistIds(topArtistIds);
@@ -213,15 +213,15 @@ public class UserOnboardFacade {
     }
 
     private List<ConfetiArtist> fetchAllTopArtists() {
-        List<ConfetiMusic> topMusics = musicAPIHandler.getTopMusics(DEFAULT_TOP_SONGS_FETCH_SIZE);
-        Set<String> topMusicIds = topMusics.stream()
-            .map(ConfetiMusic::getId)
+        List<ConfetiSong> topSongs = musicAPIHandler.getTopSongs(DEFAULT_TOP_SONGS_FETCH_SIZE);
+        Set<String> topSongIds = topSongs.stream()
+            .map(ConfetiSong::getId)
             .collect(Collectors.toSet());
 
-        List<ConfetiMusic> topMusicsWithArtists = musicAPIHandler.getMusicsByMusicIds(topMusicIds);
-        Set<String> topArtistIds = topMusicsWithArtists.stream()
-            .flatMap(music -> music.getArtists().stream())
-            .map(ConfetiMusicArtist::getId)
+        List<ConfetiSong> topSongsWithArtists = musicAPIHandler.getSongsBySongIds(topSongIds);
+        Set<String> topArtistIds = topSongsWithArtists.stream()
+            .flatMap(song -> song.getArtists().stream())
+            .map(ConfetiSongArtist::getId)
             .collect(Collectors.toSet());
 
         List<ConfetiArtist> topArtists = musicAPIHandler.getArtistsByArtistIds(topArtistIds);

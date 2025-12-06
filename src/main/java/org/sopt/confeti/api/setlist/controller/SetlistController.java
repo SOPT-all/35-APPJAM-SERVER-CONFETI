@@ -3,12 +3,12 @@ package org.sopt.confeti.api.setlist.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
-import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
+import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse_deprecated;
 import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.api.setlist.facade.SetlistFacade;
-import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddSongDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
-import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddMusicResponseDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddSongResponseDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponseDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
@@ -64,22 +64,23 @@ public class SetlistController {
 
     @Permission(role = {Role.GENERAL})
     @PostMapping("/{setlistId}/musics")
-    public ResponseEntity<BaseResponse<SetlistAddMusicResponseDTO>> addMusicsToSetlist(
+    public ResponseEntity<BaseResponse<SetlistAddSongResponseDTO>> addMusicsToSetlist(
         @UserId Long userId,
         @PathVariable Long setlistId,
-        @RequestBody List<SetlistAddMusicDTO> requests
+        @RequestBody List<SetlistAddSongDTO> requests
     ) {
-        SetlistAddMusicResponseDTO data = setlistFacade.addMusics(userId, setlistId, requests);
+        SetlistAddSongResponseDTO data = setlistFacade.addSongs(userId, setlistId, requests);
         return ApiResponseUtil.success(SuccessMessage.CREATED, data);
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/{setlistId}")
-    public ResponseEntity<BaseResponse<GetSetlistDetailResponse>> getSetlistDetail(
+    public ResponseEntity<BaseResponse<GetSetlistDetailResponse_deprecated>> getSetlistDetail(
         @UserId Long userId,
         @PathVariable Long setlistId
     ) {
-        GetSetlistDetailResponse data = setlistFacade.getSetlistDetail(userId, setlistId);
+        GetSetlistDetailResponse_deprecated data = setlistFacade.getSetlistDetail_deprecated(userId,
+            setlistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 }

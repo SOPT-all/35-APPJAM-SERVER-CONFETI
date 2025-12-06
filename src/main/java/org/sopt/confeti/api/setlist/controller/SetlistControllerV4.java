@@ -7,9 +7,9 @@ import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
 import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.api.setlist.facade.SetlistFacade;
-import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddMusicDTO;
+import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddSongDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
-import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddMusicResponseDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddSongResponseDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponseDTO;
 import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -64,13 +64,13 @@ public class SetlistControllerV4 implements SetlistControllerV4Docs {
     }
 
     @Permission(role = {Role.GENERAL})
-    @PostMapping("/{setlistId}/musics")
-    public ResponseEntity<BaseResponse<SetlistAddMusicResponseDTO>> addMusicsToSetlist(
+    @PostMapping("/{setlistId}/songs")
+    public ResponseEntity<BaseResponse<SetlistAddSongResponseDTO>> addSongsToSetlist(
         @UserId Long userId,
         @PathVariable Long setlistId,
-        @RequestBody List<SetlistAddMusicDTO> requests
+        @RequestBody List<SetlistAddSongDTO> requests
     ) {
-        SetlistAddMusicResponseDTO data = setlistFacade.addMusics(userId, setlistId, requests);
+        SetlistAddSongResponseDTO data = setlistFacade.addSongs(userId, setlistId, requests);
         return ApiResponseUtil.success(SuccessMessage.CREATED, data);
     }
 
