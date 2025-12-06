@@ -18,6 +18,7 @@ import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.global.annotation.Interceptor;
 import org.sopt.confeti.global.notification.SlackNotificationAgent;
 import org.sopt.confeti.global.notification.SlackNotificationType;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -26,6 +27,9 @@ import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 @Slf4j
 @Interceptor
 @RequiredArgsConstructor
+@Profile(
+    value = {"prod"}
+)
 public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomInterceptor {
 
     private static final String USER_EMPTY_MESSAGE = "• User 사용자 정보가 없습니다.";
