@@ -4,6 +4,11 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.auth.jwt.JwtTokenExtractor;
@@ -11,9 +16,6 @@ import org.sopt.confeti.auth.jwt.TokenParser;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.global.annotation.Interceptor;
-import org.sopt.confeti.global.exception.ConfetiException;
-import org.sopt.confeti.global.exception.UnauthorizedException;
-import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.notification.SlackNotificationAgent;
 import org.sopt.confeti.global.notification.SlackNotificationType;
 import org.springframework.context.annotation.Profile;
@@ -22,44 +24,35 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 @Slf4j
 @Interceptor
 @RequiredArgsConstructor
 @Profile(
-        value = { "prod" }
+    value = {"prod"}
 )
 public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomInterceptor {
 
     private static final String USER_EMPTY_MESSAGE = "• User 사용자 정보가 없습니다.";
-
+    private static final int MAX_STACK_TRACE_LENGTH = 3000;
+    private static final List<Integer> excludeErrorStatusCodes = List.of(
+        400, // Bad Request
+        401, // Unauthorized
+        403, // Forbidden
+        405, // Method Not Allowed
+        408, // Request Timeout
+        501, // Not Implemented
+        502, // Bad Gateway
+        503, // Service Unavailable
+        504  // Gateway Timeout
+    );
     private final UserRepository userRepository;
     private final JwtTokenExtractor jwtTokenExtractor;
     private final TokenParser tokenParser;
-
-    private static final int MAX_STACK_TRACE_LENGTH = 3000;
     private final SlackNotificationAgent slackNotificationAgent;
-
-    private static final List<Integer> excludeErrorStatusCodes = List.of(
-            400, // Bad Request
-            401, // Unauthorized
-            403, // Forbidden
-            405, // Method Not Allowed
-            408, // Request Timeout
-            501, // Not Implemented
-            502, // Bad Gateway
-            503, // Service Unavailable
-            504  // Gateway Timeout
-    );
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
-                                Object handler, Exception ex) {
+        Object handler, Exception ex) {
         if (handler instanceof ResourceHttpRequestHandler) {
             return;
         }
@@ -79,9 +72,11 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomI
             int status = response.getStatus();
             if (status >= 500) {
                 String errorDetails = buildErrorDetails(request, exception, status);
+                log.error(errorDetails);
                 slackNotificationAgent.notify(SlackNotificationType.CRITICAL_ERROR, errorDetails);
             } else if (status >= 400 && !excludeErrorStatusCodes.contains(status)) {
                 String errorDetails = buildErrorDetails(request, exception, status);
+                log.error(errorDetails);
                 slackNotificationAgent.notify(SlackNotificationType.HIGH_ERROR, errorDetails);
             }
         }
@@ -90,13 +85,15 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomI
     private String makeRequestInfo(HttpServletRequest request, Object handler) {
         StringBuilder info = new StringBuilder();
         info.append("🔍 요청 정보\n");
-        info.append("• URL: ").append(request.getMethod()).append(" ").append(request.getRequestURI()).append("\n");
+        info.append("• URL: ").append(request.getMethod()).append(" ")
+            .append(request.getRequestURI()).append("\n");
         info.append(getUserInfo(request));
         info.append("• Query: ").append(request.getQueryString()).append("\n");
         info.append("• Remote IP: ").append(getClientIpAddress(request)).append("\n");
 
         if (handler instanceof HandlerMethod handlerMethod) {
-            info.append("• Controller: ").append(handlerMethod.getBeanType().getSimpleName()).append("\n");
+            info.append("• Controller: ").append(handlerMethod.getBeanType().getSimpleName())
+                .append("\n");
             info.append("• Method: ").append(handlerMethod.getMethod().getName()).append("\n");
         }
 
@@ -126,7 +123,8 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomI
         }
 
         User foundedUser = user.get();
-        return String.format("• User ID: %d\n• User Name: %s\n", foundedUser.getId(), foundedUser.getName());
+        return String.format("• User ID: %d\n• User Name: %s\n", foundedUser.getId(),
+            foundedUser.getName());
     }
 
     private String buildErrorDetails(HttpServletRequest request, Exception ex, int status) {
@@ -156,13 +154,13 @@ public class ErrorNotificationInterceptor implements HandlerInterceptor, CustomI
 
     private String getClientIpAddress(HttpServletRequest request) {
         String[] headerNames = {
-                "X-Forwarded-For",
-                "X-Real-IP",
-                "X-Original-Forwarded-For",
-                "Proxy-Client-IP",
-                "WL-Proxy-Client-IP",
-                "HTTP_CLIENT_IP",
-                "HTTP_X_FORWARDED_FOR"
+            "X-Forwarded-For",
+            "X-Real-IP",
+            "X-Original-Forwarded-For",
+            "Proxy-Client-IP",
+            "WL-Proxy-Client-IP",
+            "HTTP_CLIENT_IP",
+            "HTTP_X_FORWARDED_FOR"
         };
 
         for (String headerName : headerNames) {

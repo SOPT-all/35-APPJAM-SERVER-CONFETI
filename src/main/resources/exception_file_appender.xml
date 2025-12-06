@@ -1,0 +1,13 @@
+<included>
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="EXCEPTION_FILE">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>./logs/exception/exception.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+      <totalSizeCap>100MB</totalSizeCap>
+    </rollingPolicy>
+  </appender>
+</included>
