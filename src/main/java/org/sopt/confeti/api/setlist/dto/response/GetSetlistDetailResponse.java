@@ -8,43 +8,44 @@ import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record GetSetlistDetailResponse(
-        Long setlistId,
-        String type,
-        Long typeId,
-        String posterUrl,
+    Long setlistId,
+    String type,
+    Long typeId,
+    String posterUrl,
+    String title,
+    String subTitle,
+    LocalDate startAt,
+    LocalDate endAt,
+    List<SetlistSongResponse> songs
+) {
+
+    public static GetSetlistDetailResponse of(
+        Setlist setlist,
         String title,
-        String subTitle,
+        String subtitle,
+        String posterPath,
         LocalDate startAt,
         LocalDate endAt,
-        List<SetlistMusicResponse> musics
-) {
-    public static GetSetlistDetailResponse of(
-            Setlist setlist,
-            String title,
-            String subtitle,
-            String posterPath,
-            LocalDate startAt,
-            LocalDate endAt,
-            List<SetlistMusicResponse> musics,
-            SetlistType type,
-            S3FileHandler s3FileHandler
+        List<SetlistSongResponse> songs,
+        SetlistType type,
+        S3FileHandler s3FileHandler
     ) {
         String posterUrl = s3FileHandler.getFileUrl(
-                FolderPath.combine(
-                        type == SetlistType.CONCERT ? FolderPath.CONCERT : FolderPath.FESTIVAL,
-                        FolderPath.POSTER
-                ), posterPath).toString();
+            FolderPath.combine(
+                type == SetlistType.CONCERT ? FolderPath.CONCERT : FolderPath.FESTIVAL,
+                FolderPath.POSTER
+            ), posterPath).toString();
 
         return new GetSetlistDetailResponse(
-                setlist.getId(),
-                type.name(),
-                setlist.getTypeId(),
-                posterUrl,
-                title,
-                subtitle,
-                startAt,
-                endAt,
-                musics
+            setlist.getId(),
+            type.name(),
+            setlist.getTypeId(),
+            posterUrl,
+            title,
+            subtitle,
+            startAt,
+            endAt,
+            songs
         );
     }
 }

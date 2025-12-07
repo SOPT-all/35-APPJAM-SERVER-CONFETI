@@ -4,13 +4,13 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.setlist.dto.response.search.SetlistSearchArtistMusicsResponse;
-import org.sopt.confeti.api.setlist.dto.response.search.SetlistSearchMusicsResponse;
+import org.sopt.confeti.api.setlist.dto.response.search.SetlistSearchArtistSongsResponse_deprecated;
 import org.sopt.confeti.api.setlist.dto.response.search.SetlistSearchPerformancesResponse;
+import org.sopt.confeti.api.setlist.dto.response.search.SetlistSearchSongsResponse_deprecated;
 import org.sopt.confeti.api.setlist.facade.SetlistSearchFacade;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchPerformancesDTO;
-import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArtistMusicsDTO;
-import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchMusicsDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArtistSongsDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchSongsDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Deprecated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/my/setlists/search")
@@ -49,7 +50,7 @@ public class SetlistSearchController {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/artist-musics")
-    public ResponseEntity<BaseResponse<SetlistSearchArtistMusicsResponse>> searchArtistMusics(
+    public ResponseEntity<BaseResponse<SetlistSearchArtistSongsResponse_deprecated>> searchArtistMusics(
         @UserId Long userId,
         @RequestParam(required = false) String aid,
         @RequestParam(required = false) String term,
@@ -60,22 +61,22 @@ public class SetlistSearchController {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
 
-        SetlistSearchArtistMusicsDTO artistMusics = setlistSearchFacade.searchArtistMusics(aid,
+        SetlistSearchArtistSongsDTO artistMusics = setlistSearchFacade.searchArtistSongs(aid,
             term, offset, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            SetlistSearchArtistMusicsResponse.from(artistMusics));
+            SetlistSearchArtistSongsResponse_deprecated.from(artistMusics));
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/musics")
-    public ResponseEntity<BaseResponse<SetlistSearchMusicsResponse>> searchMusics(
+    public ResponseEntity<BaseResponse<SetlistSearchSongsResponse_deprecated>> searchMusics(
         @UserId Long userId,
         @RequestParam String term,
         @RequestParam(required = false, defaultValue = "0") @Min(0) int offset,
         @RequestParam(required = false, defaultValue = "5") @Min(1) @Max(20) int limit
     ) {
-        SetlistSearchMusicsDTO musics = setlistSearchFacade.searchMusics(term, offset, limit);
+        SetlistSearchSongsDTO musics = setlistSearchFacade.searchSongs(term, offset, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            SetlistSearchMusicsResponse.from(musics));
+            SetlistSearchSongsResponse_deprecated.from(musics));
     }
 }

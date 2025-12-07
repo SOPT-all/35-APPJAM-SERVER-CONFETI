@@ -10,7 +10,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
+import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSong;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -76,8 +76,8 @@ public class Song {
             .build();
     }
 
-    public ConfetiMusic toConfetiMusic() {
-        return ConfetiMusic.builder()
+    public ConfetiSong toConfetiSong() {
+        return ConfetiSong.builder()
             .id(id)
             .trackName(trackName)
             .artworkUrl(artworkUrl)

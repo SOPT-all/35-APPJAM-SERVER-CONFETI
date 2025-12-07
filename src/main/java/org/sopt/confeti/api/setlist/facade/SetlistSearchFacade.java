@@ -9,8 +9,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchPerformancesDTO;
-import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArtistMusicsDTO;
-import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchMusicsDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArtistSongsDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchSongsDTO;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
@@ -22,7 +22,7 @@ import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.analyzer.SearchTermAnalyzer;
 import org.sopt.confeti.global.util.analyzer.dto.PerformanceSearchTermAnalyzeResult;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
-import org.sopt.confeti.global.util.music.dto.music.MusicPage;
+import org.sopt.confeti.global.util.music.dto.music.SongPage;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
@@ -43,13 +43,14 @@ public class SetlistSearchFacade {
         return Objects.isNull(that);
     }
 
-    public SetlistSearchMusicsDTO searchMusics(String term, int offset, int limit) {
-        return SetlistSearchMusicsDTO.from(
-                musicAPIHandler.getMusicsByKeyword(term, offset, limit)
+    public SetlistSearchSongsDTO searchSongs(String term, int offset, int limit) {
+        return SetlistSearchSongsDTO.from(
+            musicAPIHandler.getSongsByKeyword(term, offset, limit)
         );
     }
 
-    public SetlistSearchArtistMusicsDTO searchArtistMusics(String aid, String term, int offset, int limit) {
+    public SetlistSearchArtistSongsDTO searchArtistSongs(String aid, String term, int offset,
+        int limit) {
         String artistId = null;
 
         if (isPresent(aid)) {
@@ -66,8 +67,8 @@ public class SetlistSearchFacade {
             artistId = searchedArtistId.get();
         }
 
-        MusicPage musics = musicAPIHandler.getArtistMusicsByArtistId(artistId, offset, limit);
-        return SetlistSearchArtistMusicsDTO.from(musics);
+        SongPage songs = musicAPIHandler.getArtistSongsByArtistId(artistId, offset, limit);
+        return SetlistSearchArtistSongsDTO.from(songs);
     }
 
     @Transactional(readOnly = true)
@@ -87,34 +88,38 @@ public class SetlistSearchFacade {
             analyzeResult = SearchTermAnalyzer.analyzePerformance(term);
             Optional<String> artistId = getArtistId(analyzeResult.processedTerm());
 
-            artistId.ifPresent(s -> performances.addAll(performanceService.getAllPerformancesByArtistId(s)));
+            artistId.ifPresent(
+                s -> performances.addAll(performanceService.getAllPerformancesByArtistId(s)));
 
             performances.addAll(
-                    performanceSearchService.getPerformancesByTitleAndTypePartialMatched(analyzeResult.processedTerm(),
-                                    analyzeResult.performanceType()).stream()
-                            .map(PerformanceDTO::from)
-                            .toList()
+                performanceSearchService.getPerformancesByTitleAndTypePartialMatched(
+                        analyzeResult.processedTerm(),
+                        analyzeResult.performanceType()).stream()
+                    .map(PerformanceDTO::from)
+                    .toList()
             );
         }
 
         PerformanceSearchTermAnalyzeResult finalAnalyzeResult = analyzeResult;
         Set<PerformanceDTO> searchedPerformances = performances.stream()
-                .filter(
-                        performance -> finalAnalyzeResult.performanceType() == PerformanceType.PERFORMANCE ||
-                                performance.type() == finalAnalyzeResult.performanceType()
-                )
-                .collect(Collectors.toSet());
+            .filter(
+                performance -> finalAnalyzeResult.performanceType() == PerformanceType.PERFORMANCE
+                    ||
+                    performance.type() == finalAnalyzeResult.performanceType()
+            )
+            .collect(Collectors.toSet());
 
         return SearchPerformancesDTO.from(
-                searchedPerformances.stream()
-                        .sorted(Comparator.comparing(PerformanceDTO::startAt).reversed())
-                        .toList()
+            searchedPerformances.stream()
+                .sorted(Comparator.comparing(PerformanceDTO::startAt).reversed())
+                .toList()
         );
     }
 
     private Optional<String> getArtistId(String processedTerm) {
-        return musicAPIHandler.findArtistsByKeyword(processedTerm, SEARCH_ARTIST_BY_KEYWORD_LIMIT).stream()
-                .findFirst()
-                .map(ConfetiArtist::getId);
+        return musicAPIHandler.findArtistsByKeyword(processedTerm, SEARCH_ARTIST_BY_KEYWORD_LIMIT)
+            .stream()
+            .findFirst()
+            .map(ConfetiArtist::getId);
     }
 }

@@ -1,6 +1,6 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
-import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
+import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSong;
 
 public record SongRecommendDTO(
     String id,
@@ -10,7 +10,7 @@ public record SongRecommendDTO(
     String previewUrl
 ) {
 
-    public static SongRecommendDTO from(ConfetiMusic song) {
+    public static SongRecommendDTO from(ConfetiSong song) {
         return new SongRecommendDTO(
             song.getId(),
             song.getTrackName(),

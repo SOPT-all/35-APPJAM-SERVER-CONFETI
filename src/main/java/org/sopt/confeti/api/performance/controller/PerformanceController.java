@@ -16,8 +16,8 @@ import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceIdsResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
-import org.sopt.confeti.api.performance.dto.response.RecommendMusicsPerformanceResponse;
-import org.sopt.confeti.api.performance.dto.response.RecommendMusicsResponse;
+import org.sopt.confeti.api.performance.dto.response.RecommendMusicsPerformanceResponse_deprecated;
+import org.sopt.confeti.api.performance.dto.response.RecommendMusicsResponse_deprecated;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.SearchACPerformancesResponse;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
@@ -30,9 +30,9 @@ import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
@@ -149,27 +149,27 @@ public class PerformanceController {
     @Deprecated
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend/performance")
-    public ResponseEntity<BaseResponse<RecommendMusicsPerformanceResponse>> getRecommendPerformanceId(
+    public ResponseEntity<BaseResponse<RecommendMusicsPerformanceResponse_deprecated>> getRecommendPerformanceId(
         @UserId(require = false) Long userId
     ) {
-        Optional<RecommendMusicsPerformanceDTO> recommendMusicsDTO = performanceFacade.getRecommendPerformanceId(
+        Optional<RecommendSongsPerformanceDTO> recommendMusicsDTO = performanceFacade.getRecommendPerformanceId(
             userId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            recommendMusicsDTO.map(RecommendMusicsPerformanceResponse::from).orElse(null)
+            recommendMusicsDTO.map(RecommendMusicsPerformanceResponse_deprecated::from).orElse(null)
         );
     }
 
     @Deprecated
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend/musics")
-    public ResponseEntity<BaseResponse<RecommendMusicsResponse>> getRecommendMusics(
+    public ResponseEntity<BaseResponse<RecommendMusicsResponse_deprecated>> getRecommendMusics(
         @RequestParam Long performanceId,
         @RequestParam(required = false) List<String> musicIds
     ) {
-        RecommendMusicsDTO recommendMusicsDTO = performanceFacade.getNewRecommendMusics(
+        RecommendSongsDTO recommendSongsDTO = performanceFacade.getNewRecommendSongs(
             performanceId, musicIds);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            RecommendMusicsResponse.from(recommendMusicsDTO));
+            RecommendMusicsResponse_deprecated.from(recommendSongsDTO));
     }
 
     @Permission(role = {Role.GENERAL})

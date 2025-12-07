@@ -27,9 +27,9 @@ import org.sopt.confeti.api.performance.facade.dto.response.PerformanceRecommend
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformancesRecommendDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendMusicsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SongRecommendDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
@@ -57,7 +57,7 @@ import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
+import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSong;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,7 +66,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PerformanceFacade {
 
     private static final int RECENT_PERFORMANCES_SIZE = 7;
-    private static final int RECOMMEND_MUSIC_SIZE = 3;
+    private static final int RECOMMEND_SONG_SIZE = 3;
     private static final int RECOMMEND_SONG_FETCH_SIZE = 20;
     private static final boolean PERSONALIZED = true;
     private static final boolean UNPERSONALIZED = false;
@@ -285,7 +285,7 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public Optional<RecommendMusicsPerformanceDTO> getRecommendPerformanceId(final Long userId) {
+    public Optional<RecommendSongsPerformanceDTO> getRecommendPerformanceId(final Long userId) {
 
         Optional<Performance> performance = performanceService.getPerformanceByUserFavorites(
             userId);
@@ -293,7 +293,7 @@ public class PerformanceFacade {
             performance = performanceService.getPerformanceByRand();
         }
 
-        return performance.map(RecommendMusicsPerformanceDTO::from);
+        return performance.map(RecommendSongsPerformanceDTO::from);
     }
 
     protected Set<String> setArtistsByRandom(Performance performance) {
@@ -312,61 +312,61 @@ public class PerformanceFacade {
     }
 
     @Transactional(readOnly = true)
-    public RecommendMusicsDTO getNewRecommendMusics(long performanceId, List<String> musicIds) {
+    public RecommendSongsDTO getNewRecommendSongs(long performanceId, List<String> songIds) {
         Performance performance = performanceService.getPerformanceById(performanceId);
         Set<String> selectedArtistIds = setArtistsByRandom(performance);
-        Set<String> existingMusicIds = (musicIds == null || musicIds.isEmpty())
+        Set<String> existingSongIds = (songIds == null || songIds.isEmpty())
             ? Collections.emptySet()
-            : musicIds.stream().flatMap(ids -> Arrays.stream(ids.split(",")))
+            : songIds.stream().flatMap(ids -> Arrays.stream(ids.split(",")))
                 .map(String::trim).collect(Collectors.toSet());
 
         List<String> artistIdList = new ArrayList<>(selectedArtistIds);
-        List<ConfetiMusic> recommendMusics = recommendMusicsByArtistCount(artistIdList,
-            existingMusicIds);
+        List<ConfetiSong> recommendSongs = recommendSongsByArtistCount(artistIdList,
+            existingSongIds);
 
-        return RecommendMusicsDTO.from(recommendMusics);
+        return RecommendSongsDTO.from(recommendSongs);
     }
 
-    private List<ConfetiMusic> recommendMusicsByArtistCount(List<String> artistIdList,
-        Set<String> existingMusicIds) {
+    private List<ConfetiSong> recommendSongsByArtistCount(List<String> artistIdList,
+        Set<String> existingSongIds) {
         int artistCount = artistIdList.size();
         if (artistCount == 1) {
-            return recommendForSingleArtist(artistIdList, existingMusicIds);
+            return recommendForSingleArtist(artistIdList, existingSongIds);
         }
         if (artistCount == 2) {
-            return recommendForTwoArtists(artistIdList, existingMusicIds);
+            return recommendForTwoArtists(artistIdList, existingSongIds);
         }
-        return recommendForMultipleArtists(artistIdList, existingMusicIds);
+        return recommendForMultipleArtists(artistIdList, existingSongIds);
     }
 
-    private List<ConfetiMusic> recommendForSingleArtist(List<String> artistIdList,
-        Set<String> existingMusicIds) {
+    private List<ConfetiSong> recommendForSingleArtist(List<String> artistIdList,
+        Set<String> existingSongIds) {
         return musicAPIHandler.getFilteredTopSongsByArtist(
-            artistIdList.getFirst(), RECOMMEND_MUSIC_SIZE, existingMusicIds
+            artistIdList.getFirst(), RECOMMEND_SONG_SIZE, existingSongIds
         );
     }
 
-    private List<ConfetiMusic> recommendForTwoArtists(List<String> artistIdList,
-        Set<String> existingMusicIds) {
-        List<ConfetiMusic> musics = new ArrayList<>();
-        musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistIdList.getFirst(), 2,
-            existingMusicIds));
-        musics.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistIdList.getLast(), 1,
-            existingMusicIds));
-        return musics;
+    private List<ConfetiSong> recommendForTwoArtists(List<String> artistIdList,
+        Set<String> existingSongIds) {
+        List<ConfetiSong> songs = new ArrayList<>();
+        songs.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistIdList.getFirst(), 2,
+            existingSongIds));
+        songs.addAll(musicAPIHandler.getFilteredTopSongsByArtist(artistIdList.getLast(), 1,
+            existingSongIds));
+        return songs;
     }
 
-    private List<ConfetiMusic> recommendForMultipleArtists(List<String> artistIdList,
-        Set<String> existingMusicIds) {
-        List<ConfetiMusic> musics = new ArrayList<>();
+    private List<ConfetiSong> recommendForMultipleArtists(List<String> artistIdList,
+        Set<String> existingSongIds) {
+        List<ConfetiSong> songs = new ArrayList<>();
         for (String artistId : artistIdList) {
-            if (musics.size() >= RECOMMEND_MUSIC_SIZE) {
+            if (songs.size() >= RECOMMEND_SONG_SIZE) {
                 break;
             }
-            musics.addAll(
-                musicAPIHandler.getFilteredTopSongsByArtist(artistId, 1, existingMusicIds));
+            songs.addAll(
+                musicAPIHandler.getFilteredTopSongsByArtist(artistId, 1, existingSongIds));
         }
-        return musics;
+        return songs;
     }
 
     @Transactional(readOnly = true)
@@ -457,7 +457,7 @@ public class PerformanceFacade {
 
     private List<SongRecommendDTO> getSongsRecommend(List<PerformanceArtistDTO> artists,
         int songLimit) {
-        List<ConfetiMusic> topSongs = artists.stream()
+        List<ConfetiSong> topSongs = artists.stream()
             .map(this::getArtistTopSongs)
             .flatMap(Collection::stream)
             .toList();
@@ -467,12 +467,12 @@ public class PerformanceFacade {
             .toList();
     }
 
-    private List<ConfetiMusic> getArtistTopSongs(PerformanceArtistDTO artist) {
+    private List<ConfetiSong> getArtistTopSongs(PerformanceArtistDTO artist) {
         return musicAPIHandler.getArtistTopSongs(artist.artistId(), RECOMMEND_SONG_FETCH_SIZE);
     }
 
-    private List<ConfetiMusic> pickRandomSongs(List<ConfetiMusic> songs, int size) {
-        List<ConfetiMusic> copiedSongs = new ArrayList<>(songs);
+    private List<ConfetiSong> pickRandomSongs(List<ConfetiSong> songs, int size) {
+        List<ConfetiSong> copiedSongs = new ArrayList<>(songs);
         Collections.shuffle(copiedSongs);
         return copiedSongs.subList(0, Math.min(size, copiedSongs.size()));
     }

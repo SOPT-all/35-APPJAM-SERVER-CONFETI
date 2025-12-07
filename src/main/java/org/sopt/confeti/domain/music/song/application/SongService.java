@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.music.song.Song;
 import org.sopt.confeti.domain.music.song.application.dto.request.CreateSongDTO;
 import org.sopt.confeti.domain.music.song.infra.repository.SongRepository;
-import org.sopt.confeti.global.resolver.music_api.music.vo.ConfetiMusic;
+import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSong;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,9 +33,9 @@ public class SongService {
     }
 
     @Transactional
-    public void create(List<ConfetiMusic> confetiMusics) {
-        List<Song> songs = confetiMusics.stream()
-            .map(ConfetiMusic::toSong)
+    public void create(List<ConfetiSong> confetiSongs) {
+        List<Song> songs = confetiSongs.stream()
+            .map(ConfetiSong::toSong)
             .toList();
 
         songRepository.saveAll(songs);
