@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -20,7 +21,10 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "related_artists")
+@Table(
+    name = "related_artists",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"artist_id", "related_artist_id"})
+)
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,11 +35,11 @@ public class RelatedArtist {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "artist_id", unique = true)
+    @JoinColumn(name = "artist_id")
     private Artist artist;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "related_artist_id", unique = true)
+    @JoinColumn(name = "related_artist_id")
     private Artist relatedArtist;
 
     @CreatedDate
