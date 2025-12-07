@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/my/setlists/search")
+@RequestMapping("/v4/my/setlists/search")
 public class SetlistSearchControllerV4 {
 
     private final SetlistSearchFacade setlistSearchFacade;

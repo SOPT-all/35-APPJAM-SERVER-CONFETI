@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/my/setlists")
+@RequestMapping("/v4/my/setlists")
 public class SetlistEditControllerV4 {
 
     private final SetlistFacade setlistFacade;
