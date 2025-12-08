@@ -1,5 +1,7 @@
 package org.sopt.confeti.global.config;
 
+import java.util.concurrent.Executor;
+import org.sopt.confeti.global.common.ExecutorName;
 import org.sopt.confeti.global.common.mdc.MDCTaskDecorator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,5 +18,17 @@ public class AsyncConfig {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
         threadPoolTaskExecutor.setTaskDecorator(new MDCTaskDecorator());
         return threadPoolTaskExecutor;
+    }
+
+    @Bean(ExecutorName.PERFORMANCE_EXECUTOR)
+    public Executor performanceExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(20);
+        executor.setQueueCapacity(50);
+        executor.setThreadNamePrefix("performance-");
+        executor.setTaskDecorator(new MDCTaskDecorator());
+        executor.initialize();
+        return executor;
     }
 }
