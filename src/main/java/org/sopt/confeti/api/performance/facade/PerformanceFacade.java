@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
@@ -63,6 +64,7 @@ import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Facade
 public class PerformanceFacade {
 
@@ -449,7 +451,14 @@ public class PerformanceFacade {
 
         List<CompletableFuture<PerformanceRecommendDTO>> futures = performances.stream()
             .map(performance -> CompletableFuture.supplyAsync(
-                () -> getPerformanceRecommend(performance, songLimit), performanceExecutor))
+                    () -> getPerformanceRecommend(performance, songLimit), performanceExecutor)
+                .exceptionally(ex -> {
+                    log.warn(
+                        "PerformanceFacade.getPerformancesRecommend : Performance id : {}, Message : {}",
+                        performance.id(), ex.getMessage());
+                    return PerformanceRecommendDTO.of(performance, Collections.emptyList());
+                })
+            )
             .toList();
 
         List<PerformanceRecommendDTO> performancesRecommend = futures.stream()
