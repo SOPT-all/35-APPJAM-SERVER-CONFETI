@@ -12,9 +12,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
@@ -38,7 +40,6 @@ import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
-import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
@@ -52,6 +53,7 @@ import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceArtistDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.common.ExecutorName;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -59,10 +61,11 @@ import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSong;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Facade
-@RequiredArgsConstructor
 public class PerformanceFacade {
 
     private static final int RECENT_PERFORMANCES_SIZE = 7;
@@ -82,7 +85,33 @@ public class PerformanceFacade {
     private final MusicAPIHandler musicAPIHandler;
     private final TimetableFestivalService timetableFestivalService;
     private final SetlistService setlistService;
-    private final SearchTermService searchTermService;
+    private final Executor performanceExecutor;
+
+    public PerformanceFacade(ConcertService concertService,
+        FestivalService festivalService,
+        UserService userService,
+        FestivalFavoriteService festivalFavoriteService,
+        PerformanceService performanceService,
+        ConcertFavoriteService concertFavoriteService,
+        ArtistFavoriteService artistFavoriteService,
+        PerformanceSearchService performanceSearchService,
+        MusicAPIHandler musicAPIHandler,
+        TimetableFestivalService timetableFestivalService,
+        SetlistService setlistService,
+        @Qualifier(ExecutorName.PERFORMANCE_EXECUTOR) Executor performanceExecutor) {
+        this.concertService = concertService;
+        this.festivalService = festivalService;
+        this.userService = userService;
+        this.festivalFavoriteService = festivalFavoriteService;
+        this.performanceService = performanceService;
+        this.concertFavoriteService = concertFavoriteService;
+        this.artistFavoriteService = artistFavoriteService;
+        this.performanceSearchService = performanceSearchService;
+        this.musicAPIHandler = musicAPIHandler;
+        this.timetableFestivalService = timetableFestivalService;
+        this.setlistService = setlistService;
+        this.performanceExecutor = performanceExecutor;
+    }
 
     @Transactional(readOnly = true)
     public ConcertDetailDTO getConcertDetailInfo(final Long userId, final long concertId) {
@@ -311,6 +340,7 @@ public class PerformanceFacade {
         return new HashSet<>(artistList.subList(0, artistCount));
     }
 
+    @Deprecated
     @Transactional(readOnly = true)
     public RecommendSongsDTO getNewRecommendSongs(long performanceId, List<String> songIds) {
         Performance performance = performanceService.getPerformanceById(performanceId);
@@ -327,6 +357,7 @@ public class PerformanceFacade {
         return RecommendSongsDTO.from(recommendSongs);
     }
 
+    @Deprecated
     private List<ConfetiSong> recommendSongsByArtistCount(List<String> artistIdList,
         Set<String> existingSongIds) {
         int artistCount = artistIdList.size();
@@ -339,6 +370,7 @@ public class PerformanceFacade {
         return recommendForMultipleArtists(artistIdList, existingSongIds);
     }
 
+    @Deprecated
     private List<ConfetiSong> recommendForSingleArtist(List<String> artistIdList,
         Set<String> existingSongIds) {
         return musicAPIHandler.getFilteredTopSongsByArtist(
@@ -346,6 +378,7 @@ public class PerformanceFacade {
         );
     }
 
+    @Deprecated
     private List<ConfetiSong> recommendForTwoArtists(List<String> artistIdList,
         Set<String> existingSongIds) {
         List<ConfetiSong> songs = new ArrayList<>();
@@ -356,6 +389,7 @@ public class PerformanceFacade {
         return songs;
     }
 
+    @Deprecated
     private List<ConfetiSong> recommendForMultipleArtists(List<String> artistIdList,
         Set<String> existingSongIds) {
         List<ConfetiSong> songs = new ArrayList<>();
@@ -415,8 +449,20 @@ public class PerformanceFacade {
             performances = performanceService.getRandomUpcomingPerformances(performanceLimit);
         }
 
-        List<PerformanceRecommendDTO> performancesRecommend = performances.stream()
-            .map(performance -> getPerformanceRecommend(performance, songLimit))
+        List<CompletableFuture<PerformanceRecommendDTO>> futures = performances.stream()
+            .map(performance -> CompletableFuture.supplyAsync(
+                    () -> getPerformanceRecommend(performance, songLimit), performanceExecutor)
+                .exceptionally(ex -> {
+                    log.warn(
+                        "PerformanceFacade.getPerformancesRecommend : Performance id : {}, Message : {}",
+                        performance.id(), ex.getMessage());
+                    return PerformanceRecommendDTO.of(performance, Collections.emptyList());
+                })
+            )
+            .toList();
+
+        List<PerformanceRecommendDTO> performancesRecommend = futures.stream()
+            .map(CompletableFuture::join)
             .toList();
 
         return PerformancesRecommendDTO.from(performancesRecommend);
@@ -457,8 +503,14 @@ public class PerformanceFacade {
 
     private List<SongRecommendDTO> getSongsRecommend(List<PerformanceArtistDTO> artists,
         int songLimit) {
-        List<ConfetiSong> topSongs = artists.stream()
-            .map(this::getArtistTopSongs)
+        List<CompletableFuture<List<ConfetiSong>>> futures = artists.stream()
+            .map(artist -> CompletableFuture.supplyAsync(
+                () -> getArtistTopSongs(artist),
+                performanceExecutor))
+            .toList();
+
+        List<ConfetiSong> topSongs = futures.stream()
+            .map(CompletableFuture::join)
             .flatMap(Collection::stream)
             .toList();
 
