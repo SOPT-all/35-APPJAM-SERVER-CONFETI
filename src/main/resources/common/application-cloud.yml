@@ -1,0 +1,19 @@
+spring:
+  config:
+    import:
+      - aws-secretsmanager:/confeti-api/prod/cloud?prefix=cloud-secrets.
+
+  cloud:
+    aws:
+      s3:
+        host: https://confeti-s3-prod.s3.ap-northeast-2.amazonaws.com/
+        bucket-name: confeti-s3-prod
+      credentials:
+        access-key: ${cloud-secrets.aws.credentials.access-key}
+        secret-key: ${cloud-secrets.aws.credentials.secret-key}
+      region:
+        static: ap-northeast-2
+
+event:
+  queues:
+    confeti-server: https://sqs.ap-northeast-2.amazonaws.com/078129922291/confeti-server-event-sqs

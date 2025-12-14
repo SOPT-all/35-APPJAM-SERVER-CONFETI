@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+message-broker:
+  sqs:
+    create-event: https://sqs.ap-northeast-2.amazonaws.com/078129922291/confeti-server-create-prod
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+message-broker:
+  sqs:
+    create-event: https://sqs.ap-northeast-2.amazonaws.com/078129922291/confeti-server-create-dev

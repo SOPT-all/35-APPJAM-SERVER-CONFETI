@@ -1,0 +1,31 @@
+spring:
+  config:
+    import:
+      - aws-secretsmanager:/confeti-api/prod/dummy?prefix=dummy-secrets.
+
+api:
+  endpoints:
+    dummy:
+      base: ${dummy-secrets.dummy.base}
+      festival-page: /festivals
+      festival-fix-page: /festivals/{festivalId}
+      festival-list-page: /festival-list
+      concert-page: /concerts
+      apple-music-api-page: /apple-music-api
+      catalog-album: /albums/catalog-album
+      multiple-catalog-albums: /albums/multiple-catalog-albums
+      catalog-album-relationship: /albums/catalog-album-relationship
+      catalog-album-relationship-view: /albums/catalog-album-relationship-view
+      catalog-artist: /artists/catalog-artist
+      multiple-catalog-artists: /artists/multiple-catalog-artists
+      catalog-artist-relationship: /artists/catalog-artist-relationship
+      catalog-artist-relationship-view: /artists/catalog-artist-relationship-view
+      catalog-song: /songs/catalog-song
+      multiple-catalog-songs: /songs/multiple-catalog-songs
+      catalog-song-relationship: /songs/catalog-song-relationship
+      search-catalog-resources: /search/search-catalog-resources
+      catalog-search-hints: /search/catalog-search-hints
+      catalog-search-suggestions: /search/catalog-search-suggestions
+    es:
+      base: ${dummy-secrets.es.base}
+      batch: /batch

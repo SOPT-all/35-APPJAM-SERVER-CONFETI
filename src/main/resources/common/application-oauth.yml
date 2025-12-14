@@ -1,0 +1,19 @@
+spring:
+  config:
+    import:
+      - aws-secretsmanager:/confeti-api/auth?prefix=auth-secrets.
+
+jwt:
+  secret-key: ${auth-secrets.jwt.secret-key}
+  access-token-valid-time: 86400000
+  refresh-token-valid-time: 172800000
+
+apple:
+  client-id: ${auth-secrets.apple.client-id}
+  key-id: ${auth-secrets.apple.key-id}
+  team-id: ${auth-secrets.apple.team-id}
+  private-key: ${auth-secrets.apple.private-key}
+
+kakao:
+  client-id: ${auth-secrets.kakao.client-id}
+  admin-key: ${auth-secrets.kakao.admin-key}

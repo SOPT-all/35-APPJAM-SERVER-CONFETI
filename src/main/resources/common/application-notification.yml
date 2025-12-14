@@ -1,0 +1,36 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+    import:
+      - aws-secretsmanager:/confeti-api/prod/notification?prefix=notification-secrets.
+
+notification:
+  slack:
+    error:
+      critical:
+        url: ${notification-secrets.slack.error.critical.url}
+      high:
+        url: ${notification-secrets.slack.error.high.url}
+
+  discord:
+    webhook:
+      url: ${notification-secrets.discord.webhook.url}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+notification:
+  slack:
+    error:
+      critical:
+        url: ''
+      high:
+        url: ''
+
+  discord:
+    webhook:
+      url: ''

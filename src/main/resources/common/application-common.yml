@@ -1,0 +1,16 @@
+spring:
+  config:
+    import:
+      - classpath:common/application-dummy.yml
+      - classpath:common/application-cloud.yml
+      - classpath:common/application-elastic-search.yml
+      - classpath:common/application-apple-music.yml
+      - classpath:common/application-oauth.yml
+      - classpath:common/application-notification.yml
+      - classpath:common/application-message-broker.yml
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: Asia/Seoul
+    default-property-inclusion: non_null
