@@ -19,6 +19,7 @@ import org.sopt.confeti.api.dummy.facade.dto.festival.request.UploadFestivalFile
 import org.sopt.confeti.api.dummy.facade.dto.festival.response.DummyFestivalPreviewDTO;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -36,6 +37,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Validated
 @RequiredArgsConstructor
 @RequestMapping("${api.endpoints.dummy.base}")
+@Profile(value = {"prod"})
 public class DummyPageController {
 
     private final DummyFacade dummyFacade;
@@ -68,14 +70,14 @@ public class DummyPageController {
 
     @PostMapping("${api.endpoints.dummy.festival-page}")
     public String createFestival(
-            @Valid @ModelAttribute("festival") CreateFestivalRequest request,
-            @RequestParam("posterFile") MultipartFile poster,
-            @RequestParam("logoFile") MultipartFile logo,
-            @RequestParam(value = "reservationLogoFile", required = false) List<MultipartFile> reservationLogos,
-            RedirectAttributes redirectAttributes
+        @Valid @ModelAttribute("festival") CreateFestivalRequest request,
+        @RequestParam("posterFile") MultipartFile poster,
+        @RequestParam("logoFile") MultipartFile logo,
+        @RequestParam(value = "reservationLogoFile", required = false) List<MultipartFile> reservationLogos,
+        RedirectAttributes redirectAttributes
     ) {
         FestivalFilePathsDTO filePaths = dummyFacade.uploadFestivalFiles(
-                UploadFestivalFilesDTO.of(poster, logo, reservationLogos)
+            UploadFestivalFilesDTO.of(poster, logo, reservationLogos)
         );
 
         dummyFacade.createFestival(CreateFestivalDTO.of(request, filePaths));
@@ -87,12 +89,12 @@ public class DummyPageController {
 
     @GetMapping("${api.endpoints.dummy.festival-fix-page}")
     public String getFixFestivalPage(
-            @PathVariable Long festivalId,
-            Model model
+        @PathVariable Long festivalId,
+        Model model
     ) {
         String fixPageUrl = UriComponentsBuilder.fromUriString(dummyPageBase + fixFestivalPage)
-                .buildAndExpand(festivalId)
-                .toUriString();
+            .buildAndExpand(festivalId)
+            .toUriString();
         FixDummyFestivalDTO fixDummyFestivalDTO = dummyFacade.getFestivalInfoToFix(festivalId);
         model.addAttribute("festivalTitle", fixDummyFestivalDTO.title());
         model.addAttribute("stages", fixDummyFestivalDTO.stages());
@@ -103,14 +105,14 @@ public class DummyPageController {
 
     @PostMapping("${api.endpoints.dummy.festival-fix-page}")
     public String fixFestivalDatesAndMusics(
-            @PathVariable Long festivalId,
-            @Valid @ModelAttribute FixFestivalRequest request
+        @PathVariable Long festivalId,
+        @Valid @ModelAttribute FixFestivalRequest request
     ) {
         dummyFacade.fixFestival(
-                festivalId,
-                request.getDates().stream()
-                        .map(CreateFestivalDateDTO::from)
-                        .toList()
+            festivalId,
+            request.getDates().stream()
+                .map(CreateFestivalDateDTO::from)
+                .toList()
         );
 
         return "redirect:" + dummyPageBase + festivalListPage;
@@ -125,13 +127,13 @@ public class DummyPageController {
 
     @PostMapping("${api.endpoints.dummy.concert-page}")
     public String createConcert(
-            @Valid @ModelAttribute("concert") CreateConcertRequest request,
-            @RequestParam("posterFile") MultipartFile poster,
-            @RequestParam(value = "reservationLogoFile", required = false) List<MultipartFile> reservationLogos,
-            RedirectAttributes redirectAttributes
+        @Valid @ModelAttribute("concert") CreateConcertRequest request,
+        @RequestParam("posterFile") MultipartFile poster,
+        @RequestParam(value = "reservationLogoFile", required = false) List<MultipartFile> reservationLogos,
+        RedirectAttributes redirectAttributes
     ) {
         ConcertFilePathsDTO filePaths = dummyFacade.uploadConcertFiles(
-                UploadConcertFilesDTO.of(poster, reservationLogos)
+            UploadConcertFilesDTO.of(poster, reservationLogos)
         );
 
         dummyFacade.createConcert(CreateConcertDTO.of(request, filePaths));
@@ -149,18 +151,19 @@ public class DummyPageController {
 
     @GetMapping("${api.endpoints.dummy.festival-list-page}")
     public String getFestivalListPage(
-            Model model
+        Model model
     ) {
         List<DummyFestivalPreviewDTO> festivalPreviews = dummyFacade.getFestivalsPreview();
         List<DummyFestivalPreviewResponse> festivalPreviewResponses = festivalPreviews.stream()
-                .map(festivalPreview -> {
-                    String fixPageUrl = UriComponentsBuilder.fromUriString(dummyPageBase + fixFestivalPage)
-                            .buildAndExpand(festivalPreview.festivalId())
-                            .toUriString();
+            .map(festivalPreview -> {
+                String fixPageUrl = UriComponentsBuilder.fromUriString(
+                        dummyPageBase + fixFestivalPage)
+                    .buildAndExpand(festivalPreview.festivalId())
+                    .toUriString();
 
-                    return DummyFestivalPreviewResponse.of(festivalPreview, fixPageUrl, s3FileHandler);
-                })
-                .toList();
+                return DummyFestivalPreviewResponse.of(festivalPreview, fixPageUrl, s3FileHandler);
+            })
+            .toList();
 
         model.addAttribute("addFestivalUrl", dummyPageBase + festivalDummyPage);
         model.addAttribute("festivals", festivalPreviewResponses);

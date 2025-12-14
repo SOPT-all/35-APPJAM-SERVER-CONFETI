@@ -2,8 +2,6 @@ spring:
   config:
     activate:
       on-profile: prod
-    import:
-      - aws-secretsmanager:/confeti-api/prod/notification?prefix=notification-secrets.
 
 notification:
   slack:

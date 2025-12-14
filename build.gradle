@@ -9,6 +9,7 @@ version = '0.0.1'
 
 ext {
     set('confetiApplication', 'org.sopt.confeti.ConfetiApplication')
+    set('awspringVersion', '3.3.1')
 }
 
 bootRun {
@@ -42,8 +43,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // AWS S3
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.3.1'
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.3.1'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter:${awspringVersion}'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:${awspringVersion}'
 
     // actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -104,10 +105,10 @@ dependencies {
     implementation("com.slack.api:slack-api-client:1.45.3")
 
     // Spring Cloud AWS SQS Starter
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs:3.3.1'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs:${awspringVersion}'
 
     // Secret Manager
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter-secrets-manager:3.3.1'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-secrets-manager:${awspringVersion}'
 }
 
 dependencyManagement {

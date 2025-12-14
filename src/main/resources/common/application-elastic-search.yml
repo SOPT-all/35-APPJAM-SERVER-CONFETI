@@ -1,8 +1,4 @@
 spring:
-  config:
-    import:
-      - aws-secretsmanager:/confeti-api/prod/elastic-search?prefix=es-secrets.
-
   data:
     elasticsearch:
       uris: ${es-secrets.host}:${es-secrets.port}

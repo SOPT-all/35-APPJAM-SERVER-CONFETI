@@ -10,11 +10,13 @@ import org.sopt.confeti.global.annotation.RetryOnTokenExpire;
 import org.sopt.confeti.global.module.rest_client.builder.ApiRestClientBuilder;
 import org.sopt.confeti.global.util.music.AppleMusicAPITokenGenerator;
 import org.sopt.confeti.global.util.music.AppleMusicAPIURL;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 
 @Facade
 @RequiredArgsConstructor
+@Profile(value = {"prod"})
 public class AppleMusicAPITestFacade {
 
     private final AppleMusicAPIURL appleMusicAPIURL;
@@ -63,13 +65,13 @@ public class AppleMusicAPITestFacade {
         putIfNotEmpty(params, "include", include);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getSingleAlbumPath(id))
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getSingleAlbumPath(id))
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
@@ -79,47 +81,49 @@ public class AppleMusicAPITestFacade {
         putIfNotEmpty(params, "include", include);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getMultipleAlbumsPath())
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getMultipleAlbumsPath())
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
-    public Object requestCatalogAlbumRelationship(String id, String relationship, List<String> include, Integer limit) {
+    public Object requestCatalogAlbumRelationship(String id, String relationship,
+        List<String> include, Integer limit) {
         Map<String, String> params = new HashMap<>();
         putIfNotEmpty(params, "include", include);
         putIfNotEmpty(params, "limit", limit);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getAlbumRelationshipByNamePath(id, relationship))
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getAlbumRelationshipByNamePath(id, relationship))
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
-    public Object requestCatalogAlbumRelationshipView(String id, String view, List<String> include, Integer limit,
-                                                      String with) {
+    public Object requestCatalogAlbumRelationshipView(String id, String view, List<String> include,
+        Integer limit,
+        String with) {
         Map<String, String> params = new HashMap<>();
         putIfNotEmpty(params, "include", include);
         putIfNotEmpty(params, "limit", limit);
         putIfNotEmpty(params, "with", with);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getAlbumRelationshipViewByNamePath(id, view))
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getAlbumRelationshipViewByNamePath(id, view))
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
@@ -129,13 +133,13 @@ public class AppleMusicAPITestFacade {
         putIfNotEmpty(params, "include", include);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getSingleArtistPath(id))
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getSingleArtistPath(id))
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
@@ -145,48 +149,50 @@ public class AppleMusicAPITestFacade {
         putIfNotEmpty(params, "include", include);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getMultipleArtistsPath())
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getMultipleArtistsPath())
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
-    public Object requestCatalogArtistRelationship(String id, String relationship, List<String> include,
-                                                   Integer limit) {
+    public Object requestCatalogArtistRelationship(String id, String relationship,
+        List<String> include,
+        Integer limit) {
         Map<String, String> params = new HashMap<>();
         putIfNotEmpty(params, "include", include);
         putIfNotEmpty(params, "limit", limit);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getArtistRelationshipByNamePath(id, relationship))
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getArtistRelationshipByNamePath(id, relationship))
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
-    public Object requestCatalogArtistRelationshipView(String id, String view, List<String> include, Integer limit,
-                                                       String with) {
+    public Object requestCatalogArtistRelationshipView(String id, String view, List<String> include,
+        Integer limit,
+        String with) {
         Map<String, String> params = new HashMap<>();
         putIfNotEmpty(params, "include", include);
         putIfNotEmpty(params, "limit", limit);
         putIfNotEmpty(params, "with", with);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getArtistRelationshipViewByNamePath(id, view))
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getArtistRelationshipViewByNamePath(id, view))
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
@@ -195,13 +201,13 @@ public class AppleMusicAPITestFacade {
         putIfNotEmpty(params, "include", include);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getSingleSongPath(id))
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getSingleSongPath(id))
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
@@ -211,29 +217,30 @@ public class AppleMusicAPITestFacade {
         putIfNotEmpty(params, "include", include);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getMultipleSongsPath())
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getMultipleSongsPath())
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
-    public Object requestCatalogSongRelationship(String id, String relationship, List<String> include, Integer limit) {
+    public Object requestCatalogSongRelationship(String id, String relationship,
+        List<String> include, Integer limit) {
         Map<String, String> params = new HashMap<>();
         putIfNotEmpty(params, "include", include);
         putIfNotEmpty(params, "limit", limit);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getSongRelationshipByNamePath(id, relationship))
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getSongRelationshipByNamePath(id, relationship))
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
@@ -245,13 +252,13 @@ public class AppleMusicAPITestFacade {
         putIfNotEmpty(params, "offset", offset);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getSingleSearchPath())
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getSingleSearchPath())
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
@@ -261,21 +268,21 @@ public class AppleMusicAPITestFacade {
         putIfNotEmpty(params, "limit", limit);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getSearchHintsPath())
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getSearchHintsPath())
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 
     @RetryOnTokenExpire
     public Object requestSearchSuggestions(
-            List<String> kinds,
-            Integer limit,
-            String term,
-            List<String> types
+        List<String> kinds,
+        Integer limit,
+        String term,
+        List<String> types
     ) {
         Map<String, String> params = new HashMap<>();
         putIfNotEmpty(params, "kinds", kinds);
@@ -284,12 +291,12 @@ public class AppleMusicAPITestFacade {
         putIfNotEmpty(params, "types", types);
 
         return restClient.request()
-                .get()
-                .baseUrl(appleMusicAPIURL.getBaseUrl())
-                .path(appleMusicAPIURL.getSearchSuggestionsPath())
-                .params(MultiValueMap.fromSingleValue(params))
-                .build()
-                .connect(headers)
-                .retrieve(Object.class);
+            .get()
+            .baseUrl(appleMusicAPIURL.getBaseUrl())
+            .path(appleMusicAPIURL.getSearchSuggestionsPath())
+            .params(MultiValueMap.fromSingleValue(params))
+            .build()
+            .connect(headers)
+            .retrieve(Object.class);
     }
 }

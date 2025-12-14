@@ -1,7 +1,7 @@
 spring:
   config:
-    import:
-      - aws-secretsmanager:/confeti-api/prod/dummy?prefix=dummy-secrets.
+    activate:
+      on-profile: prod
 
 api:
   endpoints:

@@ -4,6 +4,11 @@ spring:
       - classpath:common/application-common.yml
       - aws-secretsmanager:/confeti-api/prod/database?prefix=db-secrets.
       - aws-secretsmanager:/confeti-api/auth?prefix=auth-secrets.
+      - aws-secretsmanager:/confeti-api/prod/cloud?prefix=cloud-secrets.
+      - aws-secretsmanager:/confeti-api/prod/elastic-search?prefix=es-secrets.
+      - aws-secretsmanager:/confeti-api/prod/notification?prefix=notification-secrets.
+      - aws-secretsmanager:/confeti-api/prod/dummy?prefix=dummy-secrets.
+      - aws-secretsmanager:/confeti-api/prod/apple-music?prefix=apple-music-secrets.
 
   application:
     name: confeti-api-prod

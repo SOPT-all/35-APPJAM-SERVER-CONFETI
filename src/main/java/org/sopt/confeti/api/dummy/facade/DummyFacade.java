@@ -24,10 +24,12 @@ import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.S3FileHandler;
+import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
 @RequiredArgsConstructor
+@Profile(value = {"prod"})
 public class DummyFacade {
 
     private final S3FileHandler s3FileHandler;
@@ -37,13 +39,13 @@ public class DummyFacade {
 
     public FestivalFilePathsDTO uploadFestivalFiles(UploadFestivalFilesDTO files) {
         String posterPath = s3FileHandler.uploadFile(files.poster(),
-                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER));
+            FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER));
         String logoPath = s3FileHandler.uploadFile(files.logo(),
-                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO));
+            FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO));
         List<String> reservationLogoPaths = files.reservationLogos().stream()
-                .map(reservationLogo -> s3FileHandler.uploadFile(reservationLogo,
-                        FolderPath.combine(FolderPath.FESTIVAL, FolderPath.RESERVATION, FolderPath.LOGO)))
-                .toList();
+            .map(reservationLogo -> s3FileHandler.uploadFile(reservationLogo,
+                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.RESERVATION, FolderPath.LOGO)))
+            .toList();
 
         return FestivalFilePathsDTO.of(posterPath, logoPath, reservationLogoPaths);
     }
@@ -56,11 +58,11 @@ public class DummyFacade {
 
     public ConcertFilePathsDTO uploadConcertFiles(UploadConcertFilesDTO files) {
         String posterPath = s3FileHandler.uploadFile(files.poster(),
-                FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER));
+            FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER));
         List<String> reservationLogoPaths = files.reservationLogos().stream()
-                .map(reservationLogo -> s3FileHandler.uploadFile(reservationLogo,
-                        FolderPath.combine(FolderPath.CONCERT, FolderPath.RESERVATION, FolderPath.LOGO)))
-                .toList();
+            .map(reservationLogo -> s3FileHandler.uploadFile(reservationLogo,
+                FolderPath.combine(FolderPath.CONCERT, FolderPath.RESERVATION, FolderPath.LOGO)))
+            .toList();
 
         return ConcertFilePathsDTO.of(posterPath, reservationLogoPaths);
     }
@@ -77,10 +79,10 @@ public class DummyFacade {
 
         validateFestivalFirstDateExist(festival);
         return FixDummyFestivalDTO.of(
-                festival.getTitle(),
-                festival.getDates()
-                        .getFirst()
-                        .getStages()
+            festival.getTitle(),
+            festival.getDates()
+                .getFirst()
+                .getStages()
         );
     }
 
@@ -94,22 +96,23 @@ public class DummyFacade {
     @Transactional
     public void fixFestival(long festivalId, List<CreateFestivalDateDTO> dates) {
         festivalService.addDates(festivalId, dates);
-        performanceService.addPerformanceArtists(PerformanceType.FESTIVAL, festivalId, getPerformanceArtists(dates));
+        performanceService.addPerformanceArtists(PerformanceType.FESTIVAL, festivalId,
+            getPerformanceArtists(dates));
     }
 
     private List<PerformanceArtist> getPerformanceArtists(List<CreateFestivalDateDTO> dates) {
         return dates.stream()
-                .flatMap(date -> date.stages().stream())
-                .flatMap(stage -> stage.times().stream())
-                .flatMap(time -> time.artists().stream())
-                .map(PerformanceArtist::create)
-                .toList();
+            .flatMap(date -> date.stages().stream())
+            .flatMap(stage -> stage.times().stream())
+            .flatMap(time -> time.artists().stream())
+            .map(PerformanceArtist::create)
+            .toList();
     }
 
     @Transactional(readOnly = true)
     public List<DummyFestivalPreviewDTO> getFestivalsPreview() {
         return festivalService.getAll().stream()
-                .map(DummyFestivalPreviewDTO::from)
-                .toList();
+            .map(DummyFestivalPreviewDTO::from)
+            .toList();
     }
 }

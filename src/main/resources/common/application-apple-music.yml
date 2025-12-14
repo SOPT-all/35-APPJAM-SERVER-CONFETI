@@ -1,10 +1,11 @@
 spring:
   config:
-    import:
-      - aws-secretsmanager:/confeti-api/prod/apple-music?prefix=apple-music-secrets.
-
+    activate:
+      on-profile: prod
 apple-music:
   api:
+    host: https://external.confeti.xyz
+    path: /apple-music-api
     endpoints:
       base-url: https://api.music.apple.com
       path-prefix: /v1/catalog/kr
@@ -39,15 +40,6 @@ apple-music:
     team-id: ${apple-music-secrets.team-id}
     private-key: ${apple-music-secrets.private-key}
     expiration: 172800000
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-apple-music:
-  api:
-    host: https://external.confeti.xyz
-    path: /apple-music-api
 
 ---
 spring:

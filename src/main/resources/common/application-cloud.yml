@@ -1,8 +1,4 @@
 spring:
-  config:
-    import:
-      - aws-secretsmanager:/confeti-api/prod/cloud?prefix=cloud-secrets.
-
   cloud:
     aws:
       s3:
