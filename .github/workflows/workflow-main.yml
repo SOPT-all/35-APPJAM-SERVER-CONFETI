@@ -164,5 +164,5 @@ jobs:
           script: |
             cd ~
             docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
-            cd server
+            cd confeti-api-server
             bash deploy.sh
