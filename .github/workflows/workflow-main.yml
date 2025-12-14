@@ -1,5 +1,6 @@
 # Workflow 이름
 name: CD workflow
+run-name: confeti-cd-prod-${{ github.ref_name }}-${{ github.run_number }} by @${{ github.actor }}
 
 # Event Trigger 환경
 on:
@@ -19,7 +20,9 @@ jobs:
     steps:
       # GitHub repository 코드 체크아웃
       - name: Checkout the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       # JDK 21 설치
       - name: Set up JDK 21
@@ -35,103 +38,74 @@ jobs:
             mkdir -p ./src/main/resources
           fi
 
-      # application.yml 파일 생성
-      - name: make application.yml
+      # application-prod.yml 파일 생성
+      - name: make application-prod.yml
         run: |
-          touch ./src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
+          touch ./src/main/resources/application-prod.yml
+          echo "${{ secrets.APPLICATION_PROD_YML }}" > ./src/main/resources/application-prod.yml
         shell: bash
 
-      # application-common.yml 파일 생성
-      - name: make application-common.yml
+      # common 폴더 생성
+      - name: Create common folder if not exist
         run: |
-          touch ./src/main/resources/application-common.yml
-          echo "${{ secrets.APPLICATION_COMMON_YML }}" > ./src/main/resources/application-common.yml
-        shell: bash
-
-      # cloud 폴더 생성
-      - name: Create cloud folder if not exist
-        run: |
-          if [ ! -d "./src/main/resources/cloud" ]; then
-            mkdir -p ./src/main/resources/cloud
-          fi
-
-      # application-cloud.yml 파일 생성
-      - name: make application-cloud.yml
-        run: |
-          touch ./src/main/resources/cloud/application-cloud.yml
-          echo "${{ secrets.APPLICATION_CLOUD_YML }}" > ./src/main/resources/cloud/application-cloud.yml
-        shell: bash
-
-      # application-elastic-search.yml 파일 생성
-      - name: make application-elastic-search.yml
-        run: |
-          touch ./src/main/resources/cloud/application-elastic-search.yml
-          echo "${{ secrets.APPLICATION_ELASTIC_SEARCH_YML }}" > ./src/main/resources/cloud/application-elastic-search.yml
-        shell: bash
-
-      # openapi 폴더 생성
-      - name: Create cloud folder if not exist
-        run: |
-          if [ ! -d "./src/main/resources/openapi" ]; then
-            mkdir -p ./src/main/resources/openapi
+          if [ ! -d "./src/main/resources/common" ]; then
+            mkdir -p ./src/main/resources/common
           fi
 
       # application-apple-music.yml 파일 생성
       - name: make application-apple-music.yml
         run: |
-          touch ./src/main/resources/openapi/application-apple-music.yml
-          echo "${{ secrets.APPLICATION_APPLE_MUSIC_YML }}" > ./src/main/resources/openapi/application-apple-music.yml
+          touch ./src/main/resources/common/application-apple-music.yml
+          echo "${{ secrets.APPLICATION_APPLE_MUSIC_YML }}" > ./src/main/resources/common/application-apple-music.yml
         shell: bash
 
-      # oauth 폴더 생성
-      - name: Create oauth folder if not exist
+      # application-cloud.yml 파일 생성
+      - name: make application-cloud.yml
         run: |
-          if [ ! -d "./src/main/resources/oauth" ]; then
-            mkdir -p ./src/main/resources/oauth
-          fi
-
-      # application-kakao.yml 파일 생성
-      - name: make application-kakao.yml
-        run: |
-          touch ./src/main/resources/oauth/application-kakao.yml
-          echo "${{ secrets.APPLICATION_KAKAO_YML }}" > ./src/main/resources/oauth/application-kakao.yml
-
+          touch ./src/main/resources/common/application-cloud.yml
+          echo "${{ secrets.APPLICATION_CLOUD_YML }}" > ./src/main/resources/common/application-cloud.yml
         shell: bash
 
-      # application-apple.yml 파일 생성
-      - name: make application-apple.yml
+      # application-common.yml 파일 생성
+      - name: make application-common.yml
         run: |
-          touch ./src/main/resources/oauth/application-apple.yml
-          echo "${{ secrets.APPLICATION_APPLE_YML }}" > ./src/main/resources/oauth/application-apple.yml
+          touch ./src/main/resources/common/application-common.yml
+          echo "${{ secrets.APPLICATION_COMMON_YML }}" > ./src/main/resources/common/application-common.yml
         shell: bash
 
-      # notification 폴더 생성
-      - name: Create notification folder if not exist
+      # application-dummy.yml 파일 생성
+      - name: make application-dummy.yml
         run: |
-          if [ ! -d "./src/main/resources/notification" ]; then
-               mkdir -p ./src/main/resources/notification
-          fi
+          touch ./src/main/resources/common/application-dummy.yml
+          echo "${{ secrets.APPLICATION_DUMMY_YML }}" > ./src/main/resources/common/application-dummy.yml
+        shell: bash
+
+      # application-elastic-search.yml 파일 생성
+      - name: make application-elastic-search.yml
+        run: |
+          touch ./src/main/resources/common/application-elastic-search.yml
+          echo "${{ secrets.APPLICATION_ELASTIC_SEARCH_YML }}" > ./src/main/resources/common/application-elastic-search.yml
+        shell: bash
+
+      # application-message-broker.yml 파일 생성
+      - name: make application-message-broker.yml
+        run: |
+          touch ./src/main/resources/common/application-message-broker.yml
+          echo "${{ secrets.APPLICATION_MESSAGE_BROKER_YML }}" > ./src/main/resources/common/application-message-broker.yml
+        shell: bash
 
       # application-notification.yml 파일 생성
       - name: make application-notification.yml
         run: |
-          touch ./src/main/resources/notification/application-notification.yml
-          echo "${{ secrets.APPLICATION_NOTIFICATION_YML }}" > ./src/main/resources/notification/application-notification.yml
+          touch ./src/main/resources/common/application-notification.yml
+          echo "${{ secrets.APPLICATION_NOTIFICATION_YML }}" > ./src/main/resources/common/application-notification.yml
         shell: bash
 
-      # messagebroker 폴더 생성
-      - name: Create messagebroker folder if not exist
+      # application-oauth.yml 파일 생성
+      - name: make application-oauth.yml
         run: |
-          if [ ! -d "./src/main/resources/messagebroker" ]; then
-               mkdir -p ./src/main/resources/messagebroker
-          fi
-
-      # application-messagebroker.yml 파일 생성
-      - name: make application-message-broker.yml
-        run: |
-          touch ./src/main/resources/messagebroker/application-message-broker.yml
-          echo "${{ secrets.APPLICATION_MESSAGE_BROKER_YML }}" > ./src/main/resources/messagebroker/application-message-broker.yml
+          touch ./src/main/resources/common/application-oauth.yml
+          echo "${{ secrets.APPLICATION_OAUTH_YML }}" > ./src/main/resources/common/application-oauth.yml
         shell: bash
 
       # 빌드 속도 향상을 위한 Gradle 캐싱
@@ -180,7 +154,7 @@ jobs:
       # 원격 서버에 배포
       - name: docker container deploy
         uses: appleboy/ssh-action@master
-        timeout-minutes: 20
+        timeout-minutes: 30
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
