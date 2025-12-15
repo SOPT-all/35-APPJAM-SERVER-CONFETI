@@ -4,11 +4,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Profile(value = {"prod"})
 public class AppleMusicAPIURL {
 
     @Getter
@@ -101,8 +103,8 @@ public class AppleMusicAPIURL {
 
     public String getSingleArtistPath(String id) {
         return UriComponentsBuilder.fromUriString(getArtistsBasePath() + artistsPathSingle)
-                .buildAndExpand(id)
-                .toUriString();
+            .buildAndExpand(id)
+            .toUriString();
     }
 
     public String getMultipleArtistsPath() {
@@ -110,27 +112,29 @@ public class AppleMusicAPIURL {
     }
 
     public String getArtistRelationshipByNamePath(String id, String relationship) {
-        return UriComponentsBuilder.fromUriString(getArtistsBasePath() + artistsPathRelationshipByName)
-                .buildAndExpand(id, relationship)
-                .toUriString();
+        return UriComponentsBuilder.fromUriString(
+                getArtistsBasePath() + artistsPathRelationshipByName)
+            .buildAndExpand(id, relationship)
+            .toUriString();
     }
 
     public String getArtistRelationshipViewByNamePath(String id, String view) {
-        return UriComponentsBuilder.fromUriString(getArtistsBasePath() + artistsPathRelationshipViewByName)
-                .buildAndExpand(id, view)
-                .toUriString();
+        return UriComponentsBuilder.fromUriString(
+                getArtistsBasePath() + artistsPathRelationshipViewByName)
+            .buildAndExpand(id, view)
+            .toUriString();
     }
 
     public String getArtistSongsPath(String id) {
         return UriComponentsBuilder.fromUriString(getArtistsBasePath() + artistsPathSongs)
-                .buildAndExpand(id)
-                .toUriString();
+            .buildAndExpand(id)
+            .toUriString();
     }
 
     public String getSingleAlbumPath(String id) {
         return UriComponentsBuilder.fromUriString(getAlbumsBasePath() + albumsPathSingle)
-                .buildAndExpand(id)
-                .toUriString();
+            .buildAndExpand(id)
+            .toUriString();
     }
 
     public String getMultipleAlbumsPath() {
@@ -138,21 +142,23 @@ public class AppleMusicAPIURL {
     }
 
     public String getAlbumRelationshipByNamePath(String id, String relationship) {
-        return UriComponentsBuilder.fromUriString(getAlbumsBasePath() + albumsPathRelationshipByName)
-                .buildAndExpand(id, relationship)
-                .toUriString();
+        return UriComponentsBuilder.fromUriString(
+                getAlbumsBasePath() + albumsPathRelationshipByName)
+            .buildAndExpand(id, relationship)
+            .toUriString();
     }
 
     public String getAlbumRelationshipViewByNamePath(String id, String view) {
-        return UriComponentsBuilder.fromUriString(getAlbumsBasePath() + albumsPathRelationshipViewByName)
-                .buildAndExpand(id, view)
-                .toUriString();
+        return UriComponentsBuilder.fromUriString(
+                getAlbumsBasePath() + albumsPathRelationshipViewByName)
+            .buildAndExpand(id, view)
+            .toUriString();
     }
 
     public String getSingleSongPath(String id) {
         return UriComponentsBuilder.fromUriString(getSongsBasePath() + songsPathSingle)
-                .buildAndExpand(id)
-                .toUriString();
+            .buildAndExpand(id)
+            .toUriString();
     }
 
     public String getMultipleSongsPath() {
@@ -161,8 +167,8 @@ public class AppleMusicAPIURL {
 
     public String getSongRelationshipByNamePath(String id, String relationship) {
         return UriComponentsBuilder.fromUriString(getSongsBasePath() + songsPathRelationshipByName)
-                .buildAndExpand(id, relationship)
-                .toUriString();
+            .buildAndExpand(id, relationship)
+            .toUriString();
     }
 
     public String getSingleSearchPath() {

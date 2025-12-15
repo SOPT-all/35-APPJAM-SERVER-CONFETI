@@ -14,10 +14,12 @@ import org.sopt.confeti.global.annotation.Generator;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 
 @Slf4j
 @Generator
 @RequiredArgsConstructor
+@Profile(value = {"prod"})
 public class AppleMusicAPITokenGenerator {
 
     private final String PRIVATE_KEY_ALGORITHM = "EC";
@@ -43,10 +45,10 @@ public class AppleMusicAPITokenGenerator {
         claims.put("exp", new Date(now.getTime() + expiration));
 
         return Jwts.builder()
-                .header().keyId(keyId).add("alg", "ES256").and()
-                .claims(claims)
-                .signWith(getPrivateKey())
-                .compact();
+            .header().keyId(keyId).add("alg", "ES256").and()
+            .claims(claims)
+            .signWith(getPrivateKey())
+            .compact();
     }
 
     private PrivateKey getPrivateKey() {

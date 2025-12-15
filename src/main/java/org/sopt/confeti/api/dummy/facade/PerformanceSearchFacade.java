@@ -7,10 +7,12 @@ import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchServi
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
+import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
 @RequiredArgsConstructor
+@Profile(value = {"prod"})
 public class PerformanceSearchFacade {
 
     private final PerformanceSearchService performanceSearchService;
@@ -21,8 +23,8 @@ public class PerformanceSearchFacade {
         performanceSearchService.deleteAll();
         List<PerformanceDTO> performances = performanceService.getAllPerformances();
         List<PerformanceDocument> performanceDocuments = performances.stream()
-                .map(PerformanceDocument::create)
-                .toList();
+            .map(PerformanceDocument::create)
+            .toList();
 
         performanceSearchService.save(performanceDocuments);
     }

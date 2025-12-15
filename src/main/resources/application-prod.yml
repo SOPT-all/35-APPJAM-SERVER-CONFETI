@@ -1,0 +1,103 @@
+spring:
+  config:
+    import:
+      - classpath:common/application-common.yml
+      - aws-secretsmanager:/confeti-api/prod/database?prefix=db-secrets.
+      - aws-secretsmanager:/confeti-api/auth?prefix=auth-secrets.
+      - aws-secretsmanager:/confeti-api/prod/cloud?prefix=cloud-secrets.
+      - aws-secretsmanager:/confeti-api/prod/elastic-search?prefix=es-secrets.
+      - aws-secretsmanager:/confeti-api/prod/notification?prefix=notification-secrets.
+      - aws-secretsmanager:/confeti-api/prod/dummy?prefix=dummy-secrets.
+      - aws-secretsmanager:/confeti-api/prod/apple-music?prefix=apple-music-secrets.
+
+  application:
+    name: confeti-api-prod
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${db-secrets.host}:${db-secrets.port}/${db-secrets.dbname}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
+    username: ${db-secrets.username}
+    password: ${db-secrets.password}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 30MB
+      max-request-size: 30MB
+
+  redis:
+    command-timeout: 3
+    connect-timeout: 5
+    shutdown-timeout: 200
+    sentinel:
+      master: mymaster
+      nodes:
+        - host: redis-sentinel-1
+          port: 26379
+        - host: redis-sentinel-2
+          port: 26379
+        - host: redis-sentinel-3
+          port: 26379
+
+springdoc:
+  packages-to-scan: org.sopt.confeti.api
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  cache:
+    disabled: true
+  api-docs:
+    path: /openapi
+    groups:
+      enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+
+logging:
+  level:
+    org.sopt.confeti: info
+    org.springframework.data.elasticsearch: info
+    org.springframework.web: info
+
+---
+server:
+  port: 8081
+  tomcat:
+    threads:
+      max: 50         # 최대 스레드 개수
+      min-spare: 5    # 최소 스페어(항상 유지) 스레드 개수
+    max-connections: 200  # 최대 커넥션 수
+    accept-count: 50
+spring:
+  config:
+    activate:
+      on-profile: blue
+---
+server:
+  port: 8082
+  tomcat:
+    threads:
+      max: 50         # 최대 스레드 개수
+      min-spare: 5    # 최소 스페어(항상 유지) 스레드 개수
+    max-connections: 200  # 최대 커넥션 수
+    accept-count: 50
+spring:
+  config:
+    activate:
+      on-profile: green

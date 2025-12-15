@@ -1,0 +1,52 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+apple-music:
+  api:
+    host: https://external.confeti.xyz
+    path: /apple-music-api
+    endpoints:
+      base-url: https://api.music.apple.com
+      path-prefix: /v1/catalog/kr
+      artists-path:
+        base: /artists
+        single: /{id}
+        multiple: ""
+        relationship-by-name: /{id}/{relationship}
+        relationship-view-by-name: /{id}/view/{view}
+        songs: /{id}/songs
+      albums-path:
+        base: /albums
+        single: /{id}
+        multiple: ""
+        relationship-by-name: /{id}/{relationship}
+        relationship-view-by-name: /{id}/view/{view}
+      songs-path:
+        base: /songs
+        single: /{id}
+        multiple: ""
+        relationship-by-name: /{id}/{relationship}
+      search-path:
+        base: /search
+        single: ""
+        hints: /hints
+        suggestions: /suggestions
+      charts-path:
+        base: /charts
+
+  credentials:
+    key-id: ${apple-music-secrets.key-id}
+    team-id: ${apple-music-secrets.team-id}
+    private-key: ${apple-music-secrets.private-key}
+    expiration: 172800000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+apple-music:
+  api:
+    host: http://localhost:4290
+    path: /apple-music-api

@@ -1,0 +1,6 @@
+spring:
+  data:
+    elasticsearch:
+      uris: ${es-secrets.host}:${es-secrets.port}
+      username: ${es-secrets.username}
+      password: ${es-secrets.password}

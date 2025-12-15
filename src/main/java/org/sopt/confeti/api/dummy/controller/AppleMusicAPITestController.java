@@ -6,6 +6,7 @@ import org.sopt.confeti.api.dummy.facade.AppleMusicAPITestFacade;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("${api.endpoints.dummy.base}${api.endpoints.dummy.apple-music-api-page}")
+@Profile(value = {"prod"})
 public class AppleMusicAPITestController {
 
     private final AppleMusicAPITestFacade appleMusicAPITestFacade;
