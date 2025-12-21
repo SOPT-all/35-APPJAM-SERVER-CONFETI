@@ -59,6 +59,7 @@ public class AuthController {
      */
     @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @PostMapping("/onboard")
+    @Deprecated
     public ResponseEntity<BaseResponse<Void>> onboard(
         @UserId Long userId,
         @Valid @RequestBody OnboardRequest request

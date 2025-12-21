@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "유저 온보딩")
-public interface UserOnboardControllerV4Docs {
+public interface UserOnboardControllerDocs {
 
     @Operation(summary = "온보딩 진행 중 favorite 으로 선택했던 아티스트 목록 조회")
     @ApiResponses(

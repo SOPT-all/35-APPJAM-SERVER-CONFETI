@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "My 셋리스트")
-public interface SetlistControllerV4Docs {
+public interface SetlistControllerDocs {
 
     @Operation(summary = "MY 셋리스트 > 공연 전체보기 목록 조회")
     @ApiResponses(
