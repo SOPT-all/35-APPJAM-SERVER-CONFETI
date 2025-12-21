@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @Component
 public class ApiVersionValidator implements ApplicationRunner {
 
-    private static final String VERSION_REGEX = "^v[1-9]\\d*$";
+    private static final String VERSION_REGEX = "^[1-9]\\d*$";
     private static final Pattern VERSION_PATTERN = Pattern.compile(VERSION_REGEX);
 
     private final RequestMappingHandlerMapping handlerMapping;

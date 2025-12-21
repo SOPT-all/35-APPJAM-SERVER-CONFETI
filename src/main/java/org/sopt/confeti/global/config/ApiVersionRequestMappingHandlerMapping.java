@@ -3,6 +3,7 @@ package org.sopt.confeti.global.config;
 import java.lang.reflect.Method;
 import org.jetbrains.annotations.NotNull;
 import org.sopt.confeti.global.annotation.ApiVersion;
+import org.sopt.confeti.global.annotation.ApiVersionConstant;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -19,7 +20,7 @@ public class ApiVersionRequestMappingHandlerMapping extends RequestMappingHandle
                 ApiVersion.class);
             if (apiVersion != null) {
                 RequestMappingInfo versionMappingInfo = RequestMappingInfo
-                    .paths("/" + apiVersion.value())
+                    .paths(String.format("/%s%s", ApiVersionConstant.PREFIX, apiVersion.value()))
                     .build();
                 mappingInfo = versionMappingInfo.combine(mappingInfo);
             }

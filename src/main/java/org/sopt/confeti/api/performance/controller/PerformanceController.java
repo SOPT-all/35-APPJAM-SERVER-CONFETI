@@ -135,7 +135,7 @@ public class PerformanceController implements PerformanceControllerDocs {
             RecommendPerformancesResponse.of(recommendPerformances, s3FileHandler));
     }
 
-    @ApiVersion("v2")
+    @ApiVersion("2")
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend")
     public ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances(
@@ -162,7 +162,7 @@ public class PerformanceController implements PerformanceControllerDocs {
             SearchACPerformancesResponse.of(performancesDTO, s3FileHandler));
     }
 
-    @ApiVersion("v2")
+    @ApiVersion("2")
     @Permission(role = {Role.GENERAL})
     @GetMapping("/song/recommend")
     public ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getSongRecommend(

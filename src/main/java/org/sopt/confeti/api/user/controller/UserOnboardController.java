@@ -77,7 +77,7 @@ public class UserOnboardController implements UserOnboardControllerDocs {
     /**
      * 개발을 위해 임시로 Role.GENERAL 접근 허용
      */
-    @ApiVersion("v2")
+    @ApiVersion("2")
     @Permission(role = {Role.ONBOARDING, Role.GENERAL})
     @GetMapping("/artists")
     public ResponseEntity<BaseResponse<UserOnboardArtistsResponse>> getOnboardArtists(

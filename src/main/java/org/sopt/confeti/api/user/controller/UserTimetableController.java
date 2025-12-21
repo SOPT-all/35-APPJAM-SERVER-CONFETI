@@ -152,7 +152,7 @@ public class UserTimetableController implements UserTimetableControllerDocs {
             UserTimetablesResponse.of(timetables, s3FileHandler));
     }
 
-    @ApiVersion("v2")
+    @ApiVersion("2")
     @GetMapping
     public ResponseEntity<BaseResponse<UserTimetableCursorResponse>> getTimetables(
         @UserId Long userId,
@@ -198,7 +198,7 @@ public class UserTimetableController implements UserTimetableControllerDocs {
             UserTimetableFestivalResponse.from(festivalBasicDTO));
     }
 
-    @ApiVersion("v2")
+    @ApiVersion("2")
     @Permission(role = {Role.GENERAL})
     @PatchMapping("/festivals")
     public ResponseEntity<BaseResponse<Void>> updateTimetableFestival(

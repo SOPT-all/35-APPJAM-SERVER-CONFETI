@@ -47,7 +47,7 @@ public class SetlistController implements SetlistControllerDocs {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 
-    @ApiVersion("v2")
+    @ApiVersion("2")
     @Permission(role = {Role.GENERAL})
     @GetMapping("/all")
     public ResponseEntity<BaseResponse<GetAllSetlistsResponse>> getAllMySetlists(
@@ -68,7 +68,7 @@ public class SetlistController implements SetlistControllerDocs {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 
-    @ApiVersion("v2")
+    @ApiVersion("2")
     @Permission(role = {Role.GENERAL})
     @GetMapping("/preview")
     public ResponseEntity<BaseResponse<List<SetlistSummaryResponse>>> getPreviewMySetlists(
@@ -111,7 +111,7 @@ public class SetlistController implements SetlistControllerDocs {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, data);
     }
 
-    @ApiVersion("v2")
+    @ApiVersion("2")
     @Permission(role = {Role.GENERAL})
     @GetMapping("/{setlistId}")
     public ResponseEntity<BaseResponse<GetSetlistDetailResponse>> getSetlistDetail(
