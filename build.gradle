@@ -108,6 +108,10 @@ dependencies {
 
     // Secret Manager
     implementation "io.awspring.cloud:spring-cloud-aws-starter-secrets-manager:${awspringVersion}"
+
+    // Google Auto Service
+    compileOnly 'com.google.auto.service:auto-service:1.1.1'
+    annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
 }
 
 dependencyManagement {

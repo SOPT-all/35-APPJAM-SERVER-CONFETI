@@ -1,8 +1,6 @@
-package org.sopt.confeti.api.performance.controller;
+package org.sopt.confeti.api.performance.controller.docs;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,21 +16,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "공연")
-public interface PerformanceControllerV4Docs {
+public interface PerformanceControllerDocs {
 
-    @Operation(summary = "Confeti's pick 추천 공연 조회")
+    @Operation(
+        summary = "Confeti's pick 추천 공연 조회",
+        description =
+            """
+                V2 변경사항
+                - 공연 개수를 클라이언트에서 정할 수 있도록 수정 (1 ~ 20, default 5)
+                """
+    )
     @ApiResponses(
         value = {
             @ApiResponse(
                 responseCode = "200",
-                description = "성공",
-                content =
-                @Content(
-                    schema =
-                    @Schema(
-                        implementation = RecommendPerformancesResponse.class
-                    )
-                )
+                description = "성공"
             )
         }
     )
@@ -45,7 +43,7 @@ public interface PerformanceControllerV4Docs {
         summary = "공연 미리듣기 조회",
         description =
             """
-                V4 변경사항
+                V2 변경사항
                 - 대상 공연 : 유저가 좋아요 누른 예정된 공연 또는 예정된 전체 공연
                 - 랜덤한 예정된 공연 3개, 각 공연 당 랜덤한 음악 3개를 조회
                 - 공연이 3개 이하일 수도, 음악이 3개 이하일 수도 있음
@@ -71,7 +69,7 @@ public interface PerformanceControllerV4Docs {
         summary = "최신 공연 등록순 조회",
         description =
             """
-                V4 변경사항
+                최근 변경사항
                 - 장소 응답 값 추가  
                 """
     )

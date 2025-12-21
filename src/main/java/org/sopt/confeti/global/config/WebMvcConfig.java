@@ -2,20 +2,22 @@ package org.sopt.confeti.global.config;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.global.interceptor.CustomInterceptor;
 import org.sopt.confeti.global.converter.StringToPerformanceTypeConverter;
+import org.sopt.confeti.global.interceptor.CustomInterceptor;
 import org.sopt.confeti.global.resolver.auth.TokenArgumentResolver;
 import org.sopt.confeti.global.resolver.auth.UserIdArgumentResolver;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 @Configuration
 @RequiredArgsConstructor
-public class WebMvcConfig implements WebMvcConfigurer {
+public class WebMvcConfig implements WebMvcConfigurer, WebMvcRegistrations {
 
     private final UserIdArgumentResolver userIdArgumentResolver;
     private final TokenArgumentResolver tokenArgumentResolver;
@@ -37,5 +39,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
         customInterceptors.forEach(interceptor -> {
             registry.addInterceptor((HandlerInterceptor) interceptor);
         });
+    }
+
+    @Override
+    public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+        return new ApiVersionRequestMappingHandlerMapping();
     }
 }

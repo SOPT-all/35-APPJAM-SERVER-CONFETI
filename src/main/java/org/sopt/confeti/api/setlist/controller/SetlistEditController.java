@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Deprecated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/my/setlists")
@@ -34,6 +33,7 @@ public class SetlistEditController {
         return ApiResponseUtil.success(SuccessMessage.CREATED);
     }
 
+    @Deprecated
     @PatchMapping("/{setlistId}/edit/musics/order")
     public ResponseEntity<BaseResponse<Void>> updateMusicOrder(
         @UserId Long userId,
@@ -44,8 +44,29 @@ public class SetlistEditController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @PatchMapping("/{setlistId}/edit/songs/order")
+    public ResponseEntity<BaseResponse<Void>> updateSongOrder(
+        @UserId Long userId,
+        @PathVariable Long setlistId,
+        @RequestBody List<SetlistUpdateSongOrderDTO> request
+    ) {
+        setlistFacade.updateSongOrder(userId, setlistId, request);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @Deprecated
     @DeleteMapping("/{setlistId}/musics/{orders}")
     public ResponseEntity<BaseResponse<String>> deleteMusic(
+        @UserId Long userId,
+        @PathVariable Long setlistId,
+        @PathVariable int orders
+    ) {
+        String deleteTrackId = setlistFacade.deleteSong(userId, setlistId, orders);
+        return ApiResponseUtil.success(SuccessMessage.DELETED, deleteTrackId);
+    }
+
+    @DeleteMapping("/{setlistId}/songs/{orders}")
+    public ResponseEntity<BaseResponse<String>> deleteSong(
         @UserId Long userId,
         @PathVariable Long setlistId,
         @PathVariable int orders

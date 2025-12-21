@@ -11,6 +11,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -46,6 +47,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<BaseResponse<Void>> handleNotFoundException(NotFoundException e,
         HttpServletRequest request) {
+        request.setAttribute("exception", e);
+        return ApiResponseUtil.failure(ErrorMessage.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<BaseResponse<Void>> handleNoResourceFoundException(
+        NoResourceFoundException e, HttpServletRequest request) {
         request.setAttribute("exception", e);
         return ApiResponseUtil.failure(ErrorMessage.NOT_FOUND);
     }

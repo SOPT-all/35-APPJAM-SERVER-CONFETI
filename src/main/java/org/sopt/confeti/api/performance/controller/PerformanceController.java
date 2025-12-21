@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.performance.controller.docs.PerformanceControllerDocs;
 import org.sopt.confeti.api.performance.dto.request.GetExpectedPerformanceRequest;
 import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
@@ -15,6 +16,7 @@ import org.sopt.confeti.api.performance.dto.response.ExpectedPerformancesRespons
 import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceIdsResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
+import org.sopt.confeti.api.performance.dto.response.PerformancesRecommendResponse;
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendMusicsPerformanceResponse_deprecated;
 import org.sopt.confeti.api.performance.dto.response.RecommendMusicsResponse_deprecated;
@@ -29,12 +31,14 @@ import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformances
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.PerformancesRecommendDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
+import org.sopt.confeti.global.annotation.ApiVersion;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
@@ -59,8 +63,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Validated
 @RequestMapping("/performances")
-@Deprecated
-public class PerformanceController {
+public class PerformanceController implements PerformanceControllerDocs {
 
     private final PerformanceFacade performanceFacade;
     private final S3FileHandler s3FileHandler;
@@ -124,9 +127,22 @@ public class PerformanceController {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend")
-    public ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances(
+    @Deprecated
+    public ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances_deprecated(
     ) {
         RecommendPerformancesDTO recommendPerformances = performanceFacade.getRecommendPerformances();
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            RecommendPerformancesResponse.of(recommendPerformances, s3FileHandler));
+    }
+
+    @ApiVersion("2")
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/recommend")
+    public ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances(
+        @RequestParam(defaultValue = "5") @Min(1) @Max(20) int limit
+    ) {
+        RecommendPerformancesDTO recommendPerformances = performanceFacade.getRecommendPerformances(
+            limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             RecommendPerformancesResponse.of(recommendPerformances, s3FileHandler));
     }
@@ -144,6 +160,21 @@ public class PerformanceController {
             status);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             SearchACPerformancesResponse.of(performancesDTO, s3FileHandler));
+    }
+
+    @ApiVersion("2")
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/song/recommend")
+    public ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getSongRecommend(
+        @UserId(require = false) Long userId,
+        @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer performanceLimit,
+        @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer songLimit
+    ) {
+        PerformancesRecommendDTO performancesRecommendDTO = performanceFacade.getPerformancesRecommend(
+            userId, performanceLimit, songLimit);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            PerformancesRecommendResponse.of(performancesRecommendDTO, s3FileHandler)
+        );
     }
 
     @Deprecated
