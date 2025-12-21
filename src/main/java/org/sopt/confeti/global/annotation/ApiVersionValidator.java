@@ -16,8 +16,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @Component
 public class ApiVersionValidator implements ApplicationRunner {
 
-    private static final String versionRegex = "^v[1-9]\\d*$";
-    private static final Pattern versionPattern = Pattern.compile(versionRegex);
+    private static final String VERSION_REGEX = "^v[1-9]\\d*$";
+    private static final Pattern VERSION_PATTERN = Pattern.compile(VERSION_REGEX);
 
     private final RequestMappingHandlerMapping handlerMapping;
 
@@ -60,9 +60,9 @@ public class ApiVersionValidator implements ApplicationRunner {
     }
 
     private void validateFormat(String version) {
-        if (!versionPattern.matcher(version).matches()) {
+        if (!VERSION_PATTERN.matcher(version).matches()) {
             throw new IllegalStateException(
-                "@ApiVersion의 version 값이 올바르지 않습니다. 정규식 (" + versionRegex + ")를 따라야 합니다.");
+                "@ApiVersion의 version 값이 올바르지 않습니다. 정규식 (" + VERSION_REGEX + ")를 따라야 합니다.");
         }
     }
 }

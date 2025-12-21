@@ -198,6 +198,7 @@ public class UserTimetableController implements UserTimetableControllerDocs {
             UserTimetableFestivalResponse.from(festivalBasicDTO));
     }
 
+    @ApiVersion("v2")
     @Permission(role = {Role.GENERAL})
     @PatchMapping("/festivals")
     public ResponseEntity<BaseResponse<Void>> updateTimetableFestival(
