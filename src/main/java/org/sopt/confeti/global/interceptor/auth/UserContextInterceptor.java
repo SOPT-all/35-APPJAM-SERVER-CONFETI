@@ -93,7 +93,8 @@ public class UserContextInterceptor implements HandlerInterceptor, CustomInterce
     private void checkAndClearUserContext() {
         if (UserContext.exists()) {
             log.warn(
-                "UserContextInterceptor.checkAndClearUserContext : 이전 요청의 UserContext 정보가 남아있습니다.");
+                "UserContextInterceptor.checkAndClearUserContext : 이전 요청의 UserContext 정보가 남아있습니다. Thread : {}",
+                Thread.currentThread());
             UserContext.clear();
         }
     }

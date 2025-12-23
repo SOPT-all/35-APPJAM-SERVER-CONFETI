@@ -19,7 +19,7 @@ public class UserContextDecorator implements TaskDecorator {
                 userInfo.ifPresent(UserContext::set);
                 runnable.run();
             } finally {
-                userInfo.ifPresent(info -> UserContext.clear());
+                UserContext.clear();
             }
         };
     }
