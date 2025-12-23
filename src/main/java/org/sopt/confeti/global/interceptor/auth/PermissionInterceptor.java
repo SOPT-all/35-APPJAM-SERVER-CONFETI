@@ -34,7 +34,7 @@ public class PermissionInterceptor implements HandlerInterceptor, CustomIntercep
 
         return UserContext.getOptional()
             .map(info -> hasRequiredRole(info.role(), permission))
-            .orElse(true);
+            .orElseGet(() -> !permission.required());
     }
 
     @Override

@@ -23,6 +23,7 @@ import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
 import org.sopt.confeti.domain.setlist.Setlist;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.domain.user.constant.Role;
+import org.sopt.confeti.global.interceptor.auth.UserInfo;
 
 @Entity
 @Table(name = "users")

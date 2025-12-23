@@ -2,7 +2,6 @@ package org.sopt.confeti.global.interceptor.auth;
 
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
-import org.sopt.confeti.domain.user.UserInfo;
 import org.springframework.core.task.TaskDecorator;
 
 /**

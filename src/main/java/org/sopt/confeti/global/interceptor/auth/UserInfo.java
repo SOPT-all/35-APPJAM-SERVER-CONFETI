@@ -1,6 +1,7 @@
-package org.sopt.confeti.domain.user;
+package org.sopt.confeti.global.interceptor.auth;
 
 import lombok.Builder;
+import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.domain.user.constant.Role;
 
 @Builder

@@ -4,6 +4,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import org.sopt.confeti.global.common.ExecutorName;
 import org.sopt.confeti.global.common.mdc.MDCTaskDecorator;
+import org.sopt.confeti.global.interceptor.auth.UserContextDecorator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -14,10 +15,15 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableAsync
 public class AsyncConfig {
 
+    private final CompositeTaskDecorator compositeTaskDecorator = CompositeTaskDecorator.with(
+        new MDCTaskDecorator(),
+        new UserContextDecorator()
+    );
+
     @Bean
     public TaskExecutor getTaskExecutor() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-        threadPoolTaskExecutor.setTaskDecorator(new MDCTaskDecorator());
+        threadPoolTaskExecutor.setTaskDecorator(compositeTaskDecorator);
         threadPoolTaskExecutor.initialize();
         return threadPoolTaskExecutor;
     }
@@ -29,7 +35,7 @@ public class AsyncConfig {
         executor.setMaxPoolSize(20);
         executor.setQueueCapacity(50);
         executor.setThreadNamePrefix("performance-");
-        executor.setTaskDecorator(new MDCTaskDecorator());
+        executor.setTaskDecorator(compositeTaskDecorator);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         return executor;

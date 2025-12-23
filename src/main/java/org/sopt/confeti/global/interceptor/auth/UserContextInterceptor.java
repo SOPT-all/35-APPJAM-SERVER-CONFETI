@@ -6,11 +6,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.sopt.confeti.auth.jwt.JwtTokenExtractor;
 import org.sopt.confeti.auth.jwt.TokenParser;
 import org.sopt.confeti.domain.user.User;
-import org.sopt.confeti.domain.user.UserInfo;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
 import org.sopt.confeti.global.annotation.Interceptor;
 import org.sopt.confeti.global.exception.UnauthorizedException;
@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
+@Slf4j
 @Interceptor
 @RequiredArgsConstructor
 public class UserContextInterceptor implements HandlerInterceptor, CustomInterceptor {
@@ -35,15 +36,19 @@ public class UserContextInterceptor implements HandlerInterceptor, CustomInterce
             return true;
         }
 
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (token == null) {
-            return true;
-        }
+        checkAndClearUserContext();
 
         Optional<Long> userId = getUserId(request);
         userId.ifPresent(this::setUserInfoToContext);
 
         return true;
+    }
+
+    @Override
+    public void afterCompletion(@NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        @NotNull Object handler, Exception ex) {
+        UserContext.clear();
     }
 
     @Override
@@ -83,5 +88,13 @@ public class UserContextInterceptor implements HandlerInterceptor, CustomInterce
         }
 
         return Optional.of(token);
+    }
+
+    private void checkAndClearUserContext() {
+        if (UserContext.exists()) {
+            log.warn(
+                "UserContextInterceptor.checkAndClearUserContext : 이전 요청의 UserContext 정보가 남아있습니다.");
+            UserContext.clear();
+        }
     }
 }
