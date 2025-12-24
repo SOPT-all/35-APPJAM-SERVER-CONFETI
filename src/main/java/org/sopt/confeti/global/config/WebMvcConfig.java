@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.converter.StringToPerformanceTypeConverter;
 import org.sopt.confeti.global.interceptor.CustomInterceptor;
+import org.sopt.confeti.global.interceptor.InterceptorOrder;
 import org.sopt.confeti.global.resolver.auth.TokenArgumentResolver;
 import org.sopt.confeti.global.resolver.auth.UserIdArgumentResolver;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
@@ -39,9 +40,8 @@ public class WebMvcConfig implements WebMvcConfigurer, WebMvcRegistrations {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         customInterceptors.forEach(interceptor -> {
-            int order = interceptor.order();
+            int order = InterceptorOrder.getOrder(interceptor.getClass());
             registry.addInterceptor((HandlerInterceptor) interceptor).order(order);
-            log.debug("{}, {}", interceptor.getClass().getSimpleName(), order);
         });
     }
 

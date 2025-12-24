@@ -51,11 +51,6 @@ public class UserContextInterceptor implements HandlerInterceptor, CustomInterce
         UserContext.clear();
     }
 
-    @Override
-    public int order() {
-        return 1;
-    }
-
     private void setUserInfoToContext(long userId) {
         UserInfo userInfo = userRepository.findById(userId)
             .map(User::toUserInfo)

@@ -37,11 +37,6 @@ public class PermissionInterceptor implements HandlerInterceptor, CustomIntercep
             .orElseGet(() -> !permission.required());
     }
 
-    @Override
-    public int order() {
-        return 2;
-    }
-
     private boolean hasRequiredRole(Role role, Permission permission) {
         boolean permitted = Set.of(permission.role()).stream()
             .anyMatch(permittedRole -> permittedRole == role);
