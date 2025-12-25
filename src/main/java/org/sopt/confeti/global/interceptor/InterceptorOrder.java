@@ -5,12 +5,13 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.global.interceptor.auth.PermissionInterceptor;
 import org.sopt.confeti.global.interceptor.auth.UserContextInterceptor;
+import org.springframework.core.Ordered;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class InterceptorOrder {
 
     private static final int NOT_FOUND_INDEX = -1;
-    private static final int DEFAULT_INDEX = 100;
+    private static final int DEFAULT_INDEX = Ordered.LOWEST_PRECEDENCE;
 
     private static final List<Class<? extends CustomInterceptor>> interceptors = List.of(
         UserContextInterceptor.class,
