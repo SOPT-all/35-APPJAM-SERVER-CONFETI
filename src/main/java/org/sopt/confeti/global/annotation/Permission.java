@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public @interface Permission {
 
-    Role[] role() default Role.ONBOARDING;
+    Role[] role() default Role.GENERAL;
 
     boolean required() default true;
 }

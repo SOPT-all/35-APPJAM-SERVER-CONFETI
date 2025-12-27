@@ -3,6 +3,7 @@ package org.sopt.confeti.global.interceptor;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.sopt.confeti.global.interceptor.auth.OnboardingInterceptor;
 import org.sopt.confeti.global.interceptor.auth.PermissionInterceptor;
 import org.sopt.confeti.global.interceptor.auth.UserContextInterceptor;
 import org.springframework.core.Ordered;
@@ -15,6 +16,7 @@ public final class InterceptorOrder {
 
     private static final List<Class<? extends CustomInterceptor>> interceptors = List.of(
         UserContextInterceptor.class,
+        OnboardingInterceptor.class,
         PermissionInterceptor.class
     );
 
