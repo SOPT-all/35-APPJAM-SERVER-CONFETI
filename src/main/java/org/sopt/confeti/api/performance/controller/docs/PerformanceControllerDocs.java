@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Min;
 import org.sopt.confeti.api.performance.dto.response.PerformancesRecommendResponse;
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
-import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +59,6 @@ public interface PerformanceControllerDocs {
     )
     @CommonErrorResponses
     ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getSongRecommend(
-        @UserId(require = false) Long userId,
         @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer performanceLimit,
         @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer songLimit
     );
@@ -82,7 +80,5 @@ public interface PerformanceControllerDocs {
         }
     )
     @CommonErrorResponses
-    ResponseEntity<BaseResponse<RecentPerformancesResponse>> getRecentPerformances(
-        @UserId(require = false) Long userId
-    );
+    ResponseEntity<BaseResponse<RecentPerformancesResponse>> getRecentPerformances();
 }

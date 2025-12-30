@@ -33,6 +33,7 @@ import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.user_timetable.UserTimetable;
 import org.sopt.confeti.domain.user_timetable.application.UserTimetableService;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.TimetableSortType;
@@ -40,6 +41,7 @@ import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
+import org.sopt.confeti.global.interceptor.auth.UserContext;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,17 +59,17 @@ public class UserTimetableFacade {
     private final FestivalDateService festivalDateService;
     private final UserTimetableService userTimetableService;
 
-    @Transactional(readOnly = true)
-    public UserTimetableDetailFestivalsDTO getTimetablesListAndDate(long userId) {
-        validateExistUser(userId);
-
-        List<TimetableFestival> festivalList = timetableFestivalService.getFetivalList(userId);
+    @ReadOnlyTransactional
+    public UserTimetableDetailFestivalsDTO getTimetablesListAndDate() {
+        List<TimetableFestival> festivalList = timetableFestivalService.getFetivalList(
+            UserContext.get().id());
         return UserTimetableDetailFestivalsDTO.from(festivalList);
     }
 
     @Transactional
-    public void removeTimetableFestival(final long userId, final long festivalId) {
-        validateExistUser(userId);
+    public void removeTimetableFestival(long festivalId) {
+        long userId = UserContext.get().id();
+
         validateExistFestival(festivalId);
         validateExistTimetableFestival(userId, festivalId);
 
@@ -75,7 +77,9 @@ public class UserTimetableFacade {
     }
 
     @Transactional
-    public void addTimetableFestivals(final long userId, final AddTimetableFestivalDTO from) {
+    public void addTimetableFestivals(AddTimetableFestivalDTO from) {
+        long userId = UserContext.get().id();
+
         User user = userService.findUserTimetablesById(userId);
         List<Festival> addFestivals = festivalService.findFestivalsByIdIn(
             from.festivals().stream()
@@ -108,38 +112,34 @@ public class UserTimetableFacade {
         }
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateCountTimetableFestival(final long currentCount, final int addCount) {
         if (currentCount + addCount > TIMETABLE_FESTIVAL_COUNT_MAXIMUM) {
             throw new ConflictException(ErrorMessage.TIMETABLE_FESTIVAL_IS_FULL);
         }
     }
 
-    @Transactional(readOnly = true)
-    protected void validateExistUser(final long userId) {
-        if (!userService.existsById(userId)) {
-            throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
-        }
-    }
-
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateExistFestival(final long festivalId) {
         if (!festivalService.existsById(festivalId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateExistTimetableFestival(final long userId, final long festivalId) {
         if (!timetableFestivalService.existsByUserIdAndFestivalId(userId, festivalId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
-    @Transactional(readOnly = true)
-    public CursorPage<TimetableToAddDTO> getTimetablesToAdd(final long userId, final Long cursor) {
+    @ReadOnlyTransactional
+    public CursorPage<TimetableToAddDTO> getTimetablesToAdd(Long cursor) {
+        long userId = UserContext.get().id();
+
         if (cursor == null) {
-            List<Festival> festivals = festivalService.findFestivalsUsingInitCursor(userId,
+            List<Festival> festivals = festivalService.findFestivalsUsingInitCursor(
+                UserContext.get().id(),
                 TIMETABLE_FESTIVALS_TO_ADD_SIZE);
             return CursorPage.of(
                 festivals.stream()
@@ -163,20 +163,19 @@ public class UserTimetableFacade {
         );
     }
 
-    public UserTimetableFestivalBasicDTO getTimetableInfo(final long userId,
-        final long festivalDateId) {
+    public UserTimetableFestivalBasicDTO getTimetableInfo(long festivalDateId) {
         FestivalDate festivalDate = festivalDateService.findFestivalDateId(festivalDateId);
-        return getUserTimetableDTO(userId, festivalDate);
+        return getUserTimetableDTO(UserContext.get().id(), festivalDate);
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateUserExists(final long userId) {
         if (!userService.existsById(userId)) {
             throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
         }
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public FestivalCursorDTO getFestivalCursor(final long userId, final long cursor) {
         return festivalService.findFestivalCursor(userId, cursor)
             .orElseThrow(
@@ -185,10 +184,9 @@ public class UserTimetableFacade {
     }
 
     @Transactional
-    public void patchTimetableFestivals(final long userId, final PatchTimetableDTO timetableDTO) {
-        validateUserExists(userId);
-
-        List<UserTimetable> userTimetables = userTimetableService.getUserTimeTables(userId);
+    public void patchTimetableFestivals(PatchTimetableDTO timetableDTO) {
+        List<UserTimetable> userTimetables = userTimetableService.getUserTimeTables(
+            UserContext.get().id());
         validateExistUserTimetables(userTimetables);
         validateExistTimetableIds(userTimetables, timetableDTO);
 
@@ -196,7 +194,7 @@ public class UserTimetableFacade {
     }
 
     @Deprecated
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public UserTimetablesDTO getTimetables_deprecated(final long userId, final String sortBy) {
         validateUserExists(userId);
         validateSortType(sortBy);
@@ -207,21 +205,18 @@ public class UserTimetableFacade {
         return UserTimetablesDTO.from(userTimetables);
     }
 
-    @Transactional(readOnly = true)
-    public CursorPage<TimetableFestival> getTimetableCursorPage(long userId,
-        TimetableSortType sortBy, CursorData cursor, PerformanceStatus performanceStatus) {
-        validateUserExists(userId);
-
-        return sortBy.getTimetableCursorPage(timetableFestivalService, userId, cursor,
+    @ReadOnlyTransactional
+    public CursorPage<TimetableFestival> getTimetableCursorPage(TimetableSortType sortBy,
+        CursorData cursor, PerformanceStatus performanceStatus) {
+        return sortBy.getTimetableCursorPage(timetableFestivalService, UserContext.get().id(),
+            cursor,
             performanceStatus);
     }
 
-    @Transactional(readOnly = true)
-    public UserTimetablesDTO getTimetablesPreview(final long userId) {
-        validateUserExists(userId);
-
+    @ReadOnlyTransactional
+    public UserTimetablesDTO getTimetablesPreview() {
         List<TimetableFestival> userTimetables = timetableFestivalService.getTimetablesPreview(
-            userId);
+            UserContext.get().id());
         return UserTimetablesDTO.from(userTimetables);
     }
 
@@ -268,7 +263,7 @@ public class UserTimetableFacade {
         }
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateExistTimetableIds(List<UserTimetable> userTimetables,
         PatchTimetableDTO timetableDTO) {
         Set<Long> existingIds = userTimetables.stream()
@@ -282,45 +277,44 @@ public class UserTimetableFacade {
         }
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateSortType(final String sortBy) {
         if (!sortBy.equalsIgnoreCase("createdAt") && !sortBy.equalsIgnoreCase("oldestFirst")) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
 
-    @Transactional(readOnly = true)
-    public UserTimetableHistoryDTO getHasTimetableHistory(long userId) {
-        boolean hasTimetableHistory = userService.getHasTimetableHistory(userId);
+    @ReadOnlyTransactional
+    public UserTimetableHistoryDTO getHasTimetableHistory() {
+        boolean hasTimetableHistory = userService.getHasTimetableHistory(UserContext.get().id());
         return UserTimetableHistoryDTO.from(hasTimetableHistory);
     }
 
-    public UserTimetableEntireFestivalDTO getEntireFestivalInfo(long userId, long festivalId) {
-        TimetableFestival festival = timetableFestivalService.getEntireFestivalInfo(userId,
+    public UserTimetableEntireFestivalDTO getEntireFestivalInfo(long festivalId) {
+        TimetableFestival festival = timetableFestivalService.getEntireFestivalInfo(
+            UserContext.get().id(),
             festivalId);
         return UserTimetableEntireFestivalDTO.from(festival);
     }
 
-    public UserTimetableFestivalBasicDTO getEntireFestivalDateInfo(final long userId,
-        final long festivalDateId) {
+    public UserTimetableFestivalBasicDTO getEntireFestivalDateInfo(long festivalDateId) {
         FestivalDate festivalDate = festivalDateService.findEntireFestivalDateById(festivalDateId);
-        return getUserTimetableDTO(userId, festivalDate);
+        return getUserTimetableDTO(UserContext.get().id(), festivalDate);
     }
 
     @Transactional
     public void updateTimetableFestivals(
-        final long userId,
         final PatchTimetableFestivalDTO patchTimetableFestivalDTO
     ) {
         timetableFestivalService.removeTimetableFestivals(
-            userId, patchTimetableFestivalDTO.deleteTimetableIds());
+            UserContext.get().id(), patchTimetableFestivalDTO.deleteTimetableIds());
     }
 
-    @Transactional(readOnly = true)
-    public TimetableDatesDTO getTimetableDates(Long userId, Long timetableFestivalId) {
+    @ReadOnlyTransactional
+    public TimetableDatesDTO getTimetableDates(Long timetableFestivalId) {
         TimetableFestival timetableFestival = timetableFestivalService.getWithFestival(
             timetableFestivalId);
-        timetableFestival.validateOwner(userId);
+        timetableFestival.validateOwner(UserContext.get().id());
 
         Festival festival = timetableFestival.getFestival();
         List<FestivalDate> festivalDates = festivalDateService.findAllByFestivalId(

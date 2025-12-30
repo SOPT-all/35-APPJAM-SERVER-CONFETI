@@ -40,7 +40,6 @@ import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformances
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.ApiVersion;
 import org.sopt.confeti.global.annotation.Permission;
-import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.Default;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
@@ -68,64 +67,48 @@ public class PerformanceController implements PerformanceControllerDocs {
     private final PerformanceFacade performanceFacade;
     private final S3FileHandler s3FileHandler;
 
-    @Permission(role = {Role.GENERAL})
     @GetMapping("/concerts/{concertId}")
     public ResponseEntity<BaseResponse<ConcertDetailResponse>> getConcertInfo(
-        @UserId(require = false) Long userId,
         @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId
     ) {
-        ConcertDetailDTO concertDetailDTO = performanceFacade.getConcertDetailInfo(userId,
-            concertId);
+        ConcertDetailDTO concertDetailDTO = performanceFacade.getConcertDetailInfo(concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             ConcertDetailResponse.of(concertDetailDTO, s3FileHandler));
     }
 
-    @Permission(role = {Role.GENERAL})
     @GetMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<FestivalDetailResponse>> getFestivalInfo(
-        @UserId(require = false) Long userId,
         @PathVariable("festivalId") @Min(RequestConstraint.ID) Long festivalId
     ) {
-        FestivalDetailDTO festivalDetailDTO = performanceFacade.getFestivalDetailInfo(userId,
-            festivalId);
+        FestivalDetailDTO festivalDetailDTO = performanceFacade.getFestivalDetailInfo(festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             FestivalDetailResponse.of(festivalDetailDTO, s3FileHandler));
     }
 
-    @Permission(role = {Role.GENERAL})
     @GetMapping("/reservation")
-    public ResponseEntity<BaseResponse<PerformanceReservationResponse>> getPerformReservationInfo(
-        @UserId(require = false) Long userId
-    ) {
-        PerformanceReservationDTO performanceReservationDTO = performanceFacade.getPerformReservationInfo(
-            userId);
+    public ResponseEntity<BaseResponse<PerformanceReservationResponse>> getPerformReservationInfo() {
+        PerformanceReservationDTO performanceReservationDTO = performanceFacade.getPerformReservationInfo();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             PerformanceReservationResponse.from(performanceReservationDTO));
     }
 
-    @Permission(role = {Role.GENERAL})
     @GetMapping("/association/{artistId}")
     public ResponseEntity<BaseResponse<ArtistPerformancesResponse>> getPerformanceByArtist(
-        @UserId(require = false) Long userId,
         @PathVariable(name = "artistId") String artistId
     ) {
-        ArtistPerformancesDTO performances = performanceFacade.getPerformancesByArtistId(userId,
-            artistId);
+        ArtistPerformancesDTO performances = performanceFacade.getPerformancesByArtistId(artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             ArtistPerformancesResponse.of(performances, s3FileHandler));
     }
 
-    @Permission(role = {Role.GENERAL})
     @GetMapping("/info")
     public ResponseEntity<BaseResponse<RecentPerformancesResponse>> getRecentPerformances(
-        @UserId(require = false) Long userId
     ) {
-        RecentPerformancesDTO recentPerformances = performanceFacade.getRecentPerformances(userId);
+        RecentPerformancesDTO recentPerformances = performanceFacade.getRecentPerformances();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             RecentPerformancesResponse.of(recentPerformances, s3FileHandler));
     }
 
-    @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend")
     @Deprecated
     public ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances_deprecated(
@@ -136,7 +119,6 @@ public class PerformanceController implements PerformanceControllerDocs {
     }
 
     @ApiVersion("2")
-    @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend")
     public ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances(
         @RequestParam(defaultValue = "5") @Min(1) @Max(20) int limit
@@ -147,10 +129,8 @@ public class PerformanceController implements PerformanceControllerDocs {
             RecommendPerformancesResponse.of(recommendPerformances, s3FileHandler));
     }
 
-    @Permission(role = {Role.GENERAL})
     @GetMapping("/search/ac")
     public ResponseEntity<BaseResponse<SearchACPerformancesResponse>> searchAutoComplete(
-        @UserId(require = false) Long userId,
         @RequestParam @NotBlank String term,
         @RequestParam(required = false, defaultValue = "1") @Min(1) @Max(10) Integer limit,
         @RequestParam(required = false, defaultValue = Default.PERFORMANCE_STATUS) PerformanceStatus status
@@ -163,35 +143,29 @@ public class PerformanceController implements PerformanceControllerDocs {
     }
 
     @ApiVersion("2")
-    @Permission(role = {Role.GENERAL})
     @GetMapping("/song/recommend")
     public ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getSongRecommend(
-        @UserId(require = false) Long userId,
         @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer performanceLimit,
         @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer songLimit
     ) {
         PerformancesRecommendDTO performancesRecommendDTO = performanceFacade.getPerformancesRecommend(
-            userId, performanceLimit, songLimit);
+            performanceLimit, songLimit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             PerformancesRecommendResponse.of(performancesRecommendDTO, s3FileHandler)
         );
     }
 
     @Deprecated
-    @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend/performance")
     public ResponseEntity<BaseResponse<RecommendMusicsPerformanceResponse_deprecated>> getRecommendPerformanceId(
-        @UserId(require = false) Long userId
     ) {
-        Optional<RecommendSongsPerformanceDTO> recommendMusicsDTO = performanceFacade.getRecommendPerformanceId(
-            userId);
+        Optional<RecommendSongsPerformanceDTO> recommendMusicsDTO = performanceFacade.getRecommendPerformanceId();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             recommendMusicsDTO.map(RecommendMusicsPerformanceResponse_deprecated::from).orElse(null)
         );
     }
 
     @Deprecated
-    @Permission(role = {Role.GENERAL})
     @GetMapping("/recommend/musics")
     public ResponseEntity<BaseResponse<RecommendMusicsResponse_deprecated>> getRecommendMusics(
         @RequestParam Long performanceId,
@@ -206,17 +180,14 @@ public class PerformanceController implements PerformanceControllerDocs {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/record")
     public ResponseEntity<BaseResponse<ConfetiRecordResponse>> getConfetiRecord(
-        @UserId Long userId
     ) {
-        ConfetiRecordDTO recordDTO = performanceFacade.getConfetiRecord(userId);
+        ConfetiRecordDTO recordDTO = performanceFacade.getConfetiRecord();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             ConfetiRecordResponse.from(recordDTO));
     }
 
-    @Permission(role = {Role.GENERAL})
     @GetMapping("/expected")
     public ResponseEntity<BaseResponse<ExpectedPerformancesResponse>> getExpectedPerformances(
-        @UserId(require = false) Long userId,
         @RequestParam String items
     ) {
         List<GetExpectedPerformanceRequest> performanceRequests = decodeToExpectedPerformancesRequest(
@@ -244,7 +215,6 @@ public class PerformanceController implements PerformanceControllerDocs {
         }
     }
 
-    @Permission(role = {Role.GENERAL})
     @GetMapping
     public ResponseEntity<BaseResponse<PerformanceIdsResponse>> getPerformances() {
         PerformanceIdsDTO performances = performanceFacade.getPerformances();

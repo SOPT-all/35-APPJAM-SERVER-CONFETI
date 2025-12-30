@@ -23,10 +23,12 @@ import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
+import org.sopt.confeti.global.interceptor.auth.UserContext;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
@@ -36,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserFavoriteFacade {
 
+    private static final String TYPE_ALL = "ALL";
     private final UserService userService;
     private final FestivalService festivalService;
     private final FestivalFavoriteService festivalFavoriteService;
@@ -45,10 +48,9 @@ public class UserFavoriteFacade {
     private final MusicAPIHandler musicAPIHandler;
     private final PerformanceService performanceService;
 
-    private static final String TYPE_ALL = "ALL";
-
     @Transactional
-    public void addFestivalFavorite(long userId, long festivalId) {
+    public void addFestivalFavorite(long festivalId) {
+        long userId = UserContext.get().id();
         User user = userService.findById(userId);
         Festival festival = festivalService.findById(festivalId);
         validateNotExistFestivalFavorite(userId, festivalId);
@@ -57,8 +59,8 @@ public class UserFavoriteFacade {
     }
 
     @Transactional
-    public void removeFestivalFavorite(long userId, long festivalId) {
-        // TODO: 페스티벌 좋아요 삭제 시 엔티티 값을 사용하지 않으므로 아이디 값으로 삭제하도록 리펙토링 예정
+    public void removeFestivalFavorite(long festivalId) {
+        long userId = UserContext.get().id();
         User user = userService.findById(userId);
         Festival festival = festivalService.findById(festivalId);
         validateExistFestivalFavorite(userId, festivalId);
@@ -66,30 +68,30 @@ public class UserFavoriteFacade {
         festivalFavoriteService.delete(user, festival);
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateExistFestivalFavorite(final long userId, final long festivalId) {
         if (!festivalFavoriteService.isFavorite(userId, festivalId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateNotExistFestivalFavorite(final long userId, final long festivalId) {
         if (festivalFavoriteService.isFavorite(userId, festivalId)) {
             throw new ConflictException(ErrorMessage.CONFLICT);
         }
     }
 
-    @Transactional(readOnly = true)
-    public UserFavoriteArtistsPreviewDTO getFavoriteArtistsPreview(long userId) {
-        validateExistUser(userId);
-
-        List<ArtistFavorite> artists = artistFavoriteService.getFavoriteArtistsPreview(userId);
+    @ReadOnlyTransactional
+    public UserFavoriteArtistsPreviewDTO getFavoriteArtistsPreview() {
+        List<ArtistFavorite> artists = artistFavoriteService.getFavoriteArtistsPreview(
+            UserContext.get().id());
         return UserFavoriteArtistsPreviewDTO.from(artists);
     }
 
     @Transactional
-    public void addArtistFavorite(final long userId, final String artistId) {
+    public void addArtistFavorite(String artistId) {
+        long userId = UserContext.get().id();
         User user = userService.findById(userId);
         validateExistArtist(artistId);
         validateNotExistArtistFavorite(userId, artistId);
@@ -98,8 +100,8 @@ public class UserFavoriteFacade {
     }
 
     @Transactional
-    public void removeArtistFavorite(final long userId, final String artistId) {
-        validateExistUser(userId);
+    public void removeArtistFavorite(String artistId) {
+        long userId = UserContext.get().id();
         validateExistArtistFavorite(userId, artistId);
 
         artistFavoriteService.removeFavorite(userId, artistId);
@@ -112,14 +114,14 @@ public class UserFavoriteFacade {
         }
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateExistArtistFavorite(final long userId, final String artistId) {
         if (!artistFavoriteService.isFavorite(userId, artistId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateNotExistArtistFavorite(final long userId, final String artistId) {
         if (artistFavoriteService.isFavorite(userId, artistId)) {
             throw new ConflictException(ErrorMessage.CONFLICT);
@@ -127,7 +129,8 @@ public class UserFavoriteFacade {
     }
 
     @Transactional
-    public void addConcertFavorite(final long userId, final long concertId) {
+    public void addConcertFavorite(long concertId) {
+        long userId = UserContext.get().id();
         User user = userService.findById(userId);
         Concert concert = concertService.findById(concertId);
 
@@ -137,88 +140,80 @@ public class UserFavoriteFacade {
     }
 
     @Transactional
-    public void removeConcertFavorite(final long userId, final long concertId) {
-        validateExistUser(userId);
+    public void removeConcertFavorite(long concertId) {
+        long userId = UserContext.get().id();
+
         validateExistConcert(concertId);
         validateExistConcertFavorite(userId, concertId);
 
         concertFavoriteService.removeFavorite(userId, concertId);
     }
 
-    @Transactional(readOnly = true)
-    public UserFavoritePerformancesDTO getFavoritePerformances(final long userId) {
-        validateExistUser(userId);
-
-        List<PerformancePreviewDTO> performances = performanceService.getFavoritePerformancesPreview(userId);
+    @ReadOnlyTransactional
+    public UserFavoritePerformancesDTO getFavoritePerformances() {
+        List<PerformancePreviewDTO> performances = performanceService.getFavoritePerformancesPreview(
+            UserContext.get().id());
         return UserFavoritePerformancesDTO.from(performances);
     }
 
-    @Transactional(readOnly = true)
-    public UserFavoritePerformancesAllDTO getFavoritePerformancesAll(final long userId, final String type) {
-        validateExistUser(userId);
+    @ReadOnlyTransactional
+    public UserFavoritePerformancesAllDTO getFavoritePerformancesAll(String type) {
         validateType(type);
 
-        List<PerformanceDTO> performances = performanceService.getFavoritePerformancesAll(userId, type);
+        List<PerformanceDTO> performances = performanceService.getFavoritePerformancesAll(
+            UserContext.get().id(), type);
         return UserFavoritePerformancesAllDTO.from(performances);
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateExistConcertFavorite(final long userId, final long concertId) {
         if (!concertFavoriteService.isFavorite(userId, concertId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateNotExistConcertFavorite(final long userId, final long concertId) {
         if (concertFavoriteService.isFavorite(userId, concertId)) {
             throw new ConflictException(ErrorMessage.CONFLICT);
         }
     }
 
-    @Transactional(readOnly = true)
-    protected void validateExistUser(final long userId) {
-        if (!userService.existsById(userId)) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
-    }
-
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateExistConcert(final long concertId) {
         if (!concertService.existsById(concertId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateType(final String type) {
         if (!type.equalsIgnoreCase(PerformanceType.FESTIVAL.getName()) && !type.equalsIgnoreCase(
-                PerformanceType.CONCERT.getName()) && !type.equalsIgnoreCase(TYPE_ALL)) {
+            PerformanceType.CONCERT.getName()) && !type.equalsIgnoreCase(TYPE_ALL)) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }
 
-    @Transactional(readOnly = true)
-    public UpcomingPerformanceDTO getUpcomingPerformance(final long userId) {
-        validateExistUser(userId);
-
-        Performance performance = performanceService.getUpcomingPerformanceByUserId(userId);
+    @ReadOnlyTransactional
+    public UpcomingPerformanceDTO getUpcomingPerformance() {
+        Performance performance = performanceService.getUpcomingPerformanceByUserId(
+            UserContext.get().id());
         if (performance == null) {
             return null;
         }
         return UpcomingPerformanceDTO.from(performance);
     }
 
-    @Transactional(readOnly = true)
-    public UserFavoriteArtistsDTO getFavoriteArtists(long userId, String sortBy) {
-        validateExistUser(userId);
+    @ReadOnlyTransactional
+    public UserFavoriteArtistsDTO getFavoriteArtists(String sortBy) {
         validateSortType(sortBy);
 
-        List<ArtistFavorite> artists = artistFavoriteService.getFavoriteArtists(userId, sortBy);
+        List<ArtistFavorite> artists = artistFavoriteService.getFavoriteArtists(
+            UserContext.get().id(), sortBy);
         return UserFavoriteArtistsDTO.from(artists);
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     protected void validateSortType(final String sortBy) {
         if (!sortBy.equalsIgnoreCase("createdAt") && !sortBy.equalsIgnoreCase("alphabetically")) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);

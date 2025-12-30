@@ -19,11 +19,10 @@ import org.sopt.confeti.api.user.facade.dto.response.onboard.GetOnboardStatusDTO
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardFavoriteArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedArtistsDTO;
-import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.ApiVersion;
-import org.sopt.confeti.global.annotation.Permission;
-import org.sopt.confeti.global.annotation.UserId;
+import org.sopt.confeti.global.annotation.Onboarding;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.interceptor.auth.UserContext;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
@@ -45,142 +44,107 @@ public class UserOnboardController implements UserOnboardControllerDocs {
 
     private final UserOnboardFacade userOnboardFacade;
 
-    /**
-     * 개발을 위해 임시로 Role.GENERAL 접근 허용
-     */
     @Deprecated
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @Onboarding
     @GetMapping("/artists/{artistId}/related")
     public ResponseEntity<BaseResponse<UserOnboardRelatedArtistsResponse>> getRelatedArtists(
-        @UserId Long userId,
         @PathVariable String artistId,
         @RequestParam(defaultValue = "1") @Min(1) @Max(30) Integer limit
     ) {
-        UserOnboardRelatedArtistsDTO relatedArtists = userOnboardFacade.getRelatedArtists(userId,
+        UserOnboardRelatedArtistsDTO relatedArtists = userOnboardFacade.getRelatedArtists(
+            UserContext.get().id(),
             artistId, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserOnboardRelatedArtistsResponse.from(relatedArtists));
     }
 
+    @Onboarding
     @GetMapping("/artists/search")
     public ResponseEntity<BaseResponse<UserOnboardRelatedArtistsResponse>> getArtistsRelatedTerm(
-        @UserId Long userId,
         @RequestParam String term,
         @RequestParam(defaultValue = "1") @Min(1) @Max(25) Integer limit
     ) {
         UserOnboardRelatedArtistsDTO relatedArtistsDTO = userOnboardFacade.getArtistsRelatedTerm(
-            userId, term, limit);
+            term, limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserOnboardRelatedArtistsResponse.from(relatedArtistsDTO));
     }
 
-    /**
-     * 개발을 위해 임시로 Role.GENERAL 접근 허용
-     */
     @ApiVersion("2")
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @Onboarding
     @GetMapping("/artists")
     public ResponseEntity<BaseResponse<UserOnboardArtistsResponse>> getOnboardArtists(
-        @UserId Long userId,
         @RequestParam(required = false, defaultValue = "50") @Min(1) @Max(200) int limit,
         @RequestParam(required = false) String targetArtistId
     ) {
-        UserOnboardArtistsDTO onboardArtists = userOnboardFacade.getOnboardArtists(limit, userId,
+        UserOnboardArtistsDTO onboardArtists = userOnboardFacade.getOnboardArtists(limit,
             Optional.ofNullable(targetArtistId));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserOnboardArtistsResponse.from(onboardArtists));
     }
 
-    /**
-     * 개발을 위해 임시로 Role.GENERAL 접근 허용
-     */
     @Deprecated
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @Onboarding
     @GetMapping("/artists")
     public ResponseEntity<BaseResponse<UserOnboardTopArtistsResponse>> getTopArtists(
-        @UserId Long userId,
         @RequestParam(required = false, defaultValue = "100") @Min(1) @Max(200) int limit
     ) {
         UserOnboardTopArtistsDTO topArtists = userOnboardFacade.getTopArtists(limit);
-        userOnboardFacade.cacheTopArtistsToUser(userId, topArtists);
+        userOnboardFacade.cacheTopArtistsToUser(topArtists);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserOnboardTopArtistsResponse.from(topArtists));
     }
 
-    /**
-     * 개발을 위해 임시로 Role.GENERAL 접근 허용
-     */
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @Onboarding
     @PostMapping("/artists/{artistId}")
     public ResponseEntity<BaseResponse<Void>> addArtist(
-        @UserId Long userId,
         @PathVariable String artistId
     ) {
-        userOnboardFacade.cacheExposedArtist(userId, artistId);
+        userOnboardFacade.cacheExposedArtist(artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL, Role.ADMIN})
+    @Onboarding
     @GetMapping("/status")
-    public ResponseEntity<BaseResponse<GetOnboardStatusResponse>> getOnboardStatus(
-        @UserId Long userId) {
-        GetOnboardStatusDTO onboardStatusDTO = userOnboardFacade.getOnboardStatus(userId);
+    public ResponseEntity<BaseResponse<GetOnboardStatusResponse>> getOnboardStatus() {
+        GetOnboardStatusDTO onboardStatusDTO = userOnboardFacade.getOnboardStatus();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             GetOnboardStatusResponse.from(onboardStatusDTO));
     }
 
-    /**
-     * 개발을 위해 임시로 Role.GENERAL 접근 허용
-     */
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @Onboarding
     @GetMapping("/artists/favorite")
-    public ResponseEntity<BaseResponse<UserOnboardFavoriteArtistsResponse>> getFavoriteArtists(
-        @UserId Long userId
-    ) {
-        UserOnboardFavoriteArtistsDTO favoriteArtists = userOnboardFacade.getFavoriteArtists(
-            userId);
+    public ResponseEntity<BaseResponse<UserOnboardFavoriteArtistsResponse>> getFavoriteArtists() {
+        UserOnboardFavoriteArtistsDTO favoriteArtists = userOnboardFacade.getFavoriteArtists();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserOnboardFavoriteArtistsResponse.from(favoriteArtists));
     }
 
-    /**
-     * 개발을 위해 임시로 Role.GENERAL 접근 허용
-     */
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @Onboarding
     @PatchMapping("/artists/favorite")
     public ResponseEntity<BaseResponse<Void>> patchFavoriteArtists(
-        @UserId Long userId,
         @Valid @RequestBody PatchOnboardFavoriteArtistsRequest request
     ) {
-        userOnboardFacade.patchFavoriteArtist(userId, request.toDto());
+        userOnboardFacade.patchFavoriteArtist(request.toDto());
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
-    /**
-     * 개발을 위해 임시로 Role.GENERAL 접근 허용
-     */
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @Onboarding
     @PostMapping("/artists/favorite")
     public ResponseEntity<BaseResponse<UserOnboardFavoriteArtistsResponse>> addFavoriteArtists(
-        @UserId Long userId,
         @Valid @RequestBody AddOnboardFavoriteArtistRequest request
     ) {
         UserOnboardFavoriteArtistsDTO favoriteArtists = userOnboardFacade.addFavoriteArtists(
-            userId, request.toDTO());
+            request.toDTO());
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserOnboardFavoriteArtistsResponse.from(favoriteArtists));
     }
 
-    /**
-     * 개발을 위해 임시로 Role.GENERAL 접근 허용
-     */
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @Onboarding
     @PostMapping
-    public ResponseEntity<BaseResponse<Void>> onboard(
-        @UserId Long userId
-    ) {
-        userOnboardFacade.onboard(userId);
-        userOnboardFacade.flushCachedOnboardArtists(userId);
+    public ResponseEntity<BaseResponse<Void>> onboard() {
+        userOnboardFacade.onboard();
+        userOnboardFacade.flushCachedOnboardArtists();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }

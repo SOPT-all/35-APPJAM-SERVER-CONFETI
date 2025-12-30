@@ -10,7 +10,6 @@ import org.sopt.confeti.api.user.dto.response.TimetableDatesResponse;
 import org.sopt.confeti.api.user.dto.response.UserTimetableCursorResponse;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
-import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.Default;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
@@ -39,7 +38,6 @@ public interface UserTimetableControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<Void>> addTimetableFestival(
-        @UserId Long userId,
         @RequestBody AddTimetableFestivalRequest addTimetableFestivalRequest
     );
 
@@ -69,7 +67,6 @@ public interface UserTimetableControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<UserTimetableCursorResponse>> getTimetables(
-        @UserId Long userId,
         @RequestParam(required = false) TimetableSortType sortBy,
         @RequestParam(required = false) String cursor,
         @RequestParam(defaultValue = Default.PERFORMANCE_STATUS) PerformanceStatus status
@@ -86,7 +83,6 @@ public interface UserTimetableControllerDocs {
     )
     @PatchMapping("/festivals")
     ResponseEntity<BaseResponse<Void>> updateTimetableFestival(
-        @UserId Long userId,
         @RequestBody PatchTimetableFestivalRequest patchTimetableFestivalRequest
     );
 
@@ -103,7 +99,6 @@ public interface UserTimetableControllerDocs {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/{timetableFestivalId}/dates")
     ResponseEntity<BaseResponse<TimetableDatesResponse>> getTimetableDates(
-        @UserId Long userId,
         @PathVariable Long timetableFestivalId
     );
 }

@@ -11,7 +11,6 @@ import org.sopt.confeti.api.user.dto.request.onboard.AddOnboardFavoriteArtistReq
 import org.sopt.confeti.api.user.dto.request.onboard.PatchOnboardFavoriteArtistsRequest;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardArtistsResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardFavoriteArtistsResponse;
-import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.swagger.AuthErrorResponses;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
@@ -34,9 +33,7 @@ public interface UserOnboardControllerDocs {
     )
     @AuthErrorResponses
     @CommonErrorResponses
-    ResponseEntity<BaseResponse<UserOnboardFavoriteArtistsResponse>> getFavoriteArtists(
-        @UserId Long userId
-    );
+    ResponseEntity<BaseResponse<UserOnboardFavoriteArtistsResponse>> getFavoriteArtists();
 
     @Operation(
         summary = "회원가입한 유저의 온보딩 완료 요청 API",
@@ -57,9 +54,7 @@ public interface UserOnboardControllerDocs {
     )
     @CommonErrorResponses
     @AuthErrorResponses
-    ResponseEntity<BaseResponse<Void>> onboard(
-        @UserId Long userId
-    );
+    ResponseEntity<BaseResponse<Void>> onboard();
 
     @Operation(
         summary = "온보딩 진행 중 favorite 으로 선택했던 아티스트 목록 수정 API",
@@ -79,7 +74,6 @@ public interface UserOnboardControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<Void>> patchFavoriteArtists(
-        @UserId Long userId,
         @Valid @RequestBody PatchOnboardFavoriteArtistsRequest request
     );
 
@@ -104,7 +98,6 @@ public interface UserOnboardControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<UserOnboardArtistsResponse>> getOnboardArtists(
-        @UserId Long userId,
         @RequestParam(required = false, defaultValue = "50") @Min(1) @Max(200) int limit,
         @RequestParam(required = false) String targetArtistId
     );
@@ -129,7 +122,6 @@ public interface UserOnboardControllerDocs {
     @CommonErrorResponses
     @PostMapping("/artists/favorite")
     ResponseEntity<BaseResponse<UserOnboardFavoriteArtistsResponse>> addFavoriteArtists(
-        @UserId Long userId,
         @Valid @RequestBody AddOnboardFavoriteArtistRequest request
     );
 }

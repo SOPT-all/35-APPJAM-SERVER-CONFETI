@@ -8,7 +8,6 @@ import java.util.List;
 import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
 import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.domain.setlist.SetlistSortType;
-import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.swagger.AuthErrorResponses;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
@@ -32,7 +31,6 @@ public interface SetlistControllerDocs {
     @CommonErrorResponses
     @GetMapping("/all")
     ResponseEntity<BaseResponse<GetAllSetlistsResponse>> getAllMySetlists(
-        @UserId Long userId,
         @RequestParam(required = false) SetlistSortType sortBy
     );
 
@@ -48,7 +46,5 @@ public interface SetlistControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     @GetMapping("/preview")
-    ResponseEntity<BaseResponse<List<SetlistSummaryResponse>>> getPreviewMySetlists(
-        @UserId Long userId
-    );
+    ResponseEntity<BaseResponse<List<SetlistSummaryResponse>>> getPreviewMySetlists();
 }

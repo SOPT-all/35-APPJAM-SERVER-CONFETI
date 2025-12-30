@@ -15,7 +15,6 @@ import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArti
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchSongsDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
-import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -39,7 +38,6 @@ public class SetlistSearchController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/performances")
     public ResponseEntity<BaseResponse<SetlistSearchPerformancesResponse>> searchPerformances(
-        @UserId Long userId,
         @RequestParam(required = false) String aid,
         @RequestParam(required = false) Long pid,
         @RequestParam(required = false) String term
@@ -53,7 +51,6 @@ public class SetlistSearchController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/artist-musics")
     public ResponseEntity<BaseResponse<SetlistSearchArtistSongsResponse_deprecated>> searchArtistMusics(
-        @UserId Long userId,
         @RequestParam(required = false) String aid,
         @RequestParam(required = false) String term,
         @RequestParam(required = false, defaultValue = "0") @Min(0) int offset,
@@ -72,7 +69,6 @@ public class SetlistSearchController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/artist-songs")
     public ResponseEntity<BaseResponse<SetlistSearchArtistSongsResponse>> searchArtistSongs(
-        @UserId Long userId,
         @RequestParam(required = false) String aid,
         @RequestParam(required = false) String term,
         @RequestParam(required = false, defaultValue = "0") @Min(0) int offset,
@@ -92,7 +88,6 @@ public class SetlistSearchController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/musics")
     public ResponseEntity<BaseResponse<SetlistSearchSongsResponse_deprecated>> searchMusics(
-        @UserId Long userId,
         @RequestParam String term,
         @RequestParam(required = false, defaultValue = "0") @Min(0) int offset,
         @RequestParam(required = false, defaultValue = "5") @Min(1) @Max(20) int limit
@@ -105,7 +100,6 @@ public class SetlistSearchController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/songs")
     public ResponseEntity<BaseResponse<SetlistSearchSongsResponse>> searchSongs(
-        @UserId Long userId,
         @RequestParam String term,
         @RequestParam(required = false, defaultValue = "0") @Min(0) int offset,
         @RequestParam(required = false, defaultValue = "5") @Min(1) @Max(20) int limit

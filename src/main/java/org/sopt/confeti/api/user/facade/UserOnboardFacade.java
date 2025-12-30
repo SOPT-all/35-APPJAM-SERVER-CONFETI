@@ -20,10 +20,12 @@ import org.sopt.confeti.domain.user.application.UserOnboardService;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.sopt.confeti.global.common.redis.RedisKey;
 import org.sopt.confeti.global.exception.BadRequestException;
 import org.sopt.confeti.global.exception.NotFoundException;
+import org.sopt.confeti.global.interceptor.auth.UserContext;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSong;
@@ -47,8 +49,9 @@ public class UserOnboardFacade {
     private final ArtistFavoriteService artistFavoriteService;
     private final RedisHandler redisHandler;
 
-    public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(long userId, String term, int limit) {
-        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
+    public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(String term, int limit) {
+        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(
+            UserContext.get().id());
         List<ConfetiArtist> searchedArtists = musicAPIHandler.findArtistsByKeyword(term,
             FIXED_SEARCH_ARTISTS_FETCH_SIZE);
         List<ConfetiArtist> filteredArtists = getFilteredArtists(searchedArtists,
@@ -76,9 +79,10 @@ public class UserOnboardFacade {
 
     public UserOnboardArtistsDTO getOnboardArtists(
         int limit,
-        long userId,
         Optional<String> targetArtistId
     ) {
+        long userId = UserContext.get().id();
+
         if (targetArtistId.isPresent()) {
             return getRelatedArtistsV4(userId, targetArtistId.get(), limit);
         }
@@ -125,7 +129,9 @@ public class UserOnboardFacade {
     }
 
     @Deprecated
-    public void cacheTopArtistsToUser(Long userId, UserOnboardTopArtistsDTO topArtists) {
+    public void cacheTopArtistsToUser(UserOnboardTopArtistsDTO topArtists) {
+        long userId = UserContext.get().id();
+
         if (!userService.existsById(userId)) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
@@ -133,7 +139,9 @@ public class UserOnboardFacade {
         userOnboardService.cacheOnboardArtists(userId, UserOnboardCacheDTO.from(topArtists));
     }
 
-    public void cacheExposedArtist(long userId, String artistId) {
+    public void cacheExposedArtist(String artistId) {
+        long userId = UserContext.get().id();
+
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
         Set<ConfetiArtist> favoriteArtistIds = cachedArtists.favoriteArtists();
         Set<String> exposedArtistIds = cachedArtists.exposedArtistIds();
@@ -144,20 +152,22 @@ public class UserOnboardFacade {
             UserOnboardCacheDTO.of(favoriteArtistIds, exposedArtistIds));
     }
 
-    @Transactional(readOnly = true)
-    public GetOnboardStatusDTO getOnboardStatus(long userId) {
-        Role userRole = userService.getRole(userId);
-        return GetOnboardStatusDTO.from(userRole);
+    @ReadOnlyTransactional
+    public GetOnboardStatusDTO getOnboardStatus() {
+        return GetOnboardStatusDTO.from(UserContext.get().role());
     }
 
-    public UserOnboardFavoriteArtistsDTO getFavoriteArtists(long userId) {
-        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
+    public UserOnboardFavoriteArtistsDTO getFavoriteArtists() {
+        UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(
+            UserContext.get().id());
         List<ConfetiArtist> favoriteArtists = cachedArtists.favoriteArtists().stream().toList();
         return UserOnboardFavoriteArtistsDTO.from(favoriteArtists);
     }
 
     @Transactional
-    public void onboard(long userId) {
+    public void onboard() {
+        long userId = UserContext.get().id();
+
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
         validOnboardArtists(cachedArtists);
 
@@ -168,15 +178,17 @@ public class UserOnboardFacade {
         user.setRole(Role.GENERAL);
     }
 
-    public void flushCachedOnboardArtists(long userId) {
-        userOnboardService.flushCachedOnboardArtists(userId);
+    public void flushCachedOnboardArtists() {
+        userOnboardService.flushCachedOnboardArtists(UserContext.get().id());
     }
 
     public void cacheTopArtists(List<ConfetiArtist> topArtists) {
         redisHandler.set(RedisKey.MUSIC_TOP_ARTISTS.createKeyInfo(), topArtists);
     }
 
-    public void patchFavoriteArtist(long userId, PatchOnboardFavoriteArtistsDTO requestDto) {
+    public void patchFavoriteArtist(PatchOnboardFavoriteArtistsDTO requestDto) {
+        long userId = UserContext.get().id();
+
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
 
         UserOnboardCacheDTO newUserOnboardCacheDTO
@@ -186,9 +198,10 @@ public class UserOnboardFacade {
     }
 
     public UserOnboardFavoriteArtistsDTO addFavoriteArtists(
-        long userId,
         AddOnboardFavoriteArtistDTO requestDTO
     ) {
+        long userId = UserContext.get().id();
+
         List<ConfetiArtist> newFavoriteArtists = musicAPIHandler.getArtistsByArtistIds(
             requestDTO.artistIds());
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
