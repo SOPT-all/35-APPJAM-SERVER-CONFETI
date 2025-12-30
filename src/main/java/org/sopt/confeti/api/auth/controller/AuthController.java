@@ -10,10 +10,11 @@ import org.sopt.confeti.auth.Token;
 import org.sopt.confeti.auth.command.LoginCommand;
 import org.sopt.confeti.auth.dto.LoginResult;
 import org.sopt.confeti.domain.user.constant.Role;
+import org.sopt.confeti.global.annotation.Onboarding;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.annotation.RefreshToken;
-import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.interceptor.auth.UserContext;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,8 @@ public class AuthController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, result);
     }
 
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @Onboarding
+    @Permission(role = {Role.GENERAL})
     @PostMapping("/reissue")
     public ResponseEntity<BaseResponse<Token>> reissue(
         @RefreshToken String refreshToken
@@ -47,34 +49,33 @@ public class AuthController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, token);
     }
 
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @Onboarding
+    @Permission(role = {Role.GENERAL})
     @PostMapping("/logout")
-    public ResponseEntity<BaseResponse<Void>> logout(@UserId Long userId) {
-        authFacade.logout(userId);
+    public ResponseEntity<BaseResponse<Void>> logout() {
+        authFacade.logout();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     /**
      * 개발을 위해 임시로 Role.GENERAL 접근 허용
      */
-    @Permission(role = {Role.ONBOARDING, Role.GENERAL})
+    @Onboarding
     @PostMapping("/onboard")
     @Deprecated
     public ResponseEntity<BaseResponse<Void>> onboard(
-        @UserId Long userId,
         @Valid @RequestBody OnboardRequest request
     ) {
-        authFacade.onboard(userId, OnboardDTO.from(request));
-        authFacade.flushCachedTopArtists(userId);
+        authFacade.onboard(UserContext.get().id(), OnboardDTO.from(request));
+        authFacade.flushCachedTopArtists(UserContext.get().id());
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Permission(role = {Role.GENERAL})
     @DeleteMapping("/withdraw")
     public ResponseEntity<BaseResponse<Void>> withdraw(
-        @UserId Long userId
     ) {
-        authFacade.withdraw(userId);
+        authFacade.withdraw();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }

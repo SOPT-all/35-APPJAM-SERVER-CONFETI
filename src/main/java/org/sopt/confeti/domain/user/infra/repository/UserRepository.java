@@ -8,11 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+
     @Query(value =
-            "SELECT DISTINCT u" +
-                    " FROM User u" +
-                    " LEFT JOIN FETCH u.timetableFestivals tf" +
-                    " WHERE u.id = :userId"
+        "SELECT DISTINCT u" +
+            " FROM User u" +
+            " LEFT JOIN FETCH u.timetableFestivals tf" +
+            " WHERE u.id = :userId"
     )
     Optional<User> findUserTimetablesById(final @Param("userId") long userId);
 

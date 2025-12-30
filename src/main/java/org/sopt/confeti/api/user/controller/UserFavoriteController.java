@@ -16,7 +16,6 @@ import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesAll
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
-import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
@@ -44,28 +43,23 @@ public class UserFavoriteController {
     @Permission(role = {Role.GENERAL})
     @PostMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<Void>> postFavoriteFestival(
-        @UserId Long userId,
         @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId) {
-        userFavoriteFacade.addFestivalFavorite(userId, festivalId);
+        userFavoriteFacade.addFestivalFavorite(festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Permission(role = {Role.GENERAL})
     @DeleteMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<Void>> deleteFavoriteFestival(
-        @UserId Long userId,
         @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId) {
-        userFavoriteFacade.removeFestivalFavorite(userId, festivalId);
+        userFavoriteFacade.removeFestivalFavorite(festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/artists/preview")
-    public ResponseEntity<BaseResponse<UserFavoriteArtistsPreviewResponse>> getFavoriteArtistsPreview(
-        @UserId Long userId
-    ) {
-        UserFavoriteArtistsPreviewDTO userFavoriteArtistsPreviewDTO = userFavoriteFacade.getFavoriteArtistsPreview(
-            userId);
+    public ResponseEntity<BaseResponse<UserFavoriteArtistsPreviewResponse>> getFavoriteArtistsPreview() {
+        UserFavoriteArtistsPreviewDTO userFavoriteArtistsPreviewDTO = userFavoriteFacade.getFavoriteArtistsPreview();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserFavoriteArtistsPreviewResponse.from(userFavoriteArtistsPreviewDTO.artists()));
     }
@@ -73,50 +67,44 @@ public class UserFavoriteController {
     @Permission(role = {Role.GENERAL})
     @PostMapping("/artists/{artistId}")
     public ResponseEntity<BaseResponse<Void>> addArtistFavorite(
-        @UserId Long userId,
         @PathVariable(name = "artistId") String artistId
     ) {
-        userFavoriteFacade.addArtistFavorite(userId, artistId);
+        userFavoriteFacade.addArtistFavorite(artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Permission(role = {Role.GENERAL})
     @DeleteMapping("/artists/{artistId}")
     public ResponseEntity<BaseResponse<Void>> removeArtistFavorite(
-        @UserId Long userId,
         @PathVariable(name = "artistId") String artistId
     ) {
-        userFavoriteFacade.removeArtistFavorite(userId, artistId);
+        userFavoriteFacade.removeArtistFavorite(artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Permission(role = {Role.GENERAL})
     @PostMapping("/concerts/{concertId}")
     public ResponseEntity<BaseResponse<Void>> addConcertFavorite(
-        @UserId Long userId,
         @PathVariable(name = "concertId") Long concertId
     ) {
-        userFavoriteFacade.addConcertFavorite(userId, concertId);
+        userFavoriteFacade.addConcertFavorite(concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Permission(role = {Role.GENERAL})
     @DeleteMapping("/concerts/{concertId}")
     public ResponseEntity<BaseResponse<Void>> removeConcertFavorite(
-        @UserId Long userId,
         @PathVariable(name = "concertId") Long concertId
     ) {
-        userFavoriteFacade.removeConcertFavorite(userId, concertId);
+        userFavoriteFacade.removeConcertFavorite(concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/performances/preview")
     public ResponseEntity<BaseResponse<UserFavoritePerformancesResponse>> getFavoritePerformances(
-        @UserId Long userId
     ) {
-        UserFavoritePerformancesDTO userFavoritePerformancesDTO = userFavoriteFacade.getFavoritePerformances(
-            userId);
+        UserFavoritePerformancesDTO userFavoritePerformancesDTO = userFavoriteFacade.getFavoritePerformances();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserFavoritePerformancesResponse.of(userFavoritePerformancesDTO, s3FileHandler));
     }
@@ -124,11 +112,10 @@ public class UserFavoriteController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/performances")
     public ResponseEntity<BaseResponse<UserFavoritePerformancesAllResponse>> getFavoritePerformancesAll(
-        @RequestParam(value = "type") String type,
-        @UserId Long userId
+        @RequestParam(value = "type") String type
     ) {
         UserFavoritePerformancesAllDTO userFavoritePerformancesAllDTO = userFavoriteFacade.getFavoritePerformancesAll(
-            userId, type);
+            type);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserFavoritePerformancesAllResponse.of(userFavoritePerformancesAllDTO, s3FileHandler));
     }
@@ -140,10 +127,8 @@ public class UserFavoriteController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/performance")
     public ResponseEntity<BaseResponse<Object>> getUpcomingPerformance(
-        @UserId Long userId
     ) {
-        UpcomingPerformanceDTO upcomingPerformanceDTO = userFavoriteFacade.getUpcomingPerformance(
-            userId);
+        UpcomingPerformanceDTO upcomingPerformanceDTO = userFavoriteFacade.getUpcomingPerformance();
         if (upcomingPerformanceDTO == null) {
             return ApiResponseUtil.success(SuccessMessage.SUCCESS, Collections.emptyMap());
         }
@@ -154,11 +139,10 @@ public class UserFavoriteController {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/artists")
     public ResponseEntity<BaseResponse<UserFavoriteArtistsResponse>> getFavoriteArtists(
-        @UserId Long userId,
         @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy
     ) {
         UserFavoriteArtistsDTO userFavoriteArtistsDTO = userFavoriteFacade.getFavoriteArtists(
-            userId, sortBy);
+            sortBy);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserFavoriteArtistsResponse.from(userFavoriteArtistsDTO.artists()));
     }

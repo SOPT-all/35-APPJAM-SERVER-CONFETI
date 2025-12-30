@@ -4,8 +4,10 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.setlist.facade.SetlistFacade;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistUpdateSongOrderDTO;
-import org.sopt.confeti.global.annotation.UserId;
+import org.sopt.confeti.domain.user.constant.Role;
+import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.interceptor.auth.UserContext;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
@@ -24,72 +26,73 @@ public class SetlistEditController {
 
     private final SetlistFacade setlistFacade;
 
+    @Permission(role = {Role.GENERAL})
     @PostMapping("/{setlistId}/edit/start")
     public ResponseEntity<BaseResponse<Void>> startEdit(
-        @UserId Long userId,
         @PathVariable Long setlistId
     ) {
-        setlistFacade.startEdit(userId, setlistId);
+        setlistFacade.startEdit(setlistId);
         return ApiResponseUtil.success(SuccessMessage.CREATED);
     }
 
+    @Permission(role = {Role.GENERAL})
     @Deprecated
     @PatchMapping("/{setlistId}/edit/musics/order")
     public ResponseEntity<BaseResponse<Void>> updateMusicOrder(
-        @UserId Long userId,
         @PathVariable Long setlistId,
         @RequestBody List<SetlistUpdateSongOrderDTO> request
     ) {
-        setlistFacade.updateSongOrder(userId, setlistId, request);
+        setlistFacade.updateSongOrder_deprecated(UserContext.get().id(), setlistId, request);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @Permission(role = {Role.GENERAL})
     @PatchMapping("/{setlistId}/edit/songs/order")
     public ResponseEntity<BaseResponse<Void>> updateSongOrder(
-        @UserId Long userId,
         @PathVariable Long setlistId,
         @RequestBody List<SetlistUpdateSongOrderDTO> request
     ) {
-        setlistFacade.updateSongOrder(userId, setlistId, request);
+        setlistFacade.updateSongOrder(setlistId, request);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @Permission(role = {Role.GENERAL})
     @Deprecated
     @DeleteMapping("/{setlistId}/musics/{orders}")
     public ResponseEntity<BaseResponse<String>> deleteMusic(
-        @UserId Long userId,
         @PathVariable Long setlistId,
         @PathVariable int orders
     ) {
-        String deleteTrackId = setlistFacade.deleteSong(userId, setlistId, orders);
+        String deleteTrackId = setlistFacade.deleteSong_deprecated(UserContext.get().id(),
+            setlistId, orders);
         return ApiResponseUtil.success(SuccessMessage.DELETED, deleteTrackId);
     }
 
+    @Permission(role = {Role.GENERAL})
     @DeleteMapping("/{setlistId}/songs/{orders}")
     public ResponseEntity<BaseResponse<String>> deleteSong(
-        @UserId Long userId,
         @PathVariable Long setlistId,
         @PathVariable int orders
     ) {
-        String deleteTrackId = setlistFacade.deleteSong(userId, setlistId, orders);
+        String deleteTrackId = setlistFacade.deleteSong(setlistId, orders);
         return ApiResponseUtil.success(SuccessMessage.DELETED, deleteTrackId);
     }
 
+    @Permission(role = {Role.GENERAL})
     @PatchMapping("/{setlistId}/edit/complete")
     public ResponseEntity<BaseResponse<Void>> completeEdit(
-        @UserId Long userId,
         @PathVariable Long setlistId
     ) {
-        setlistFacade.completeEdit(userId, setlistId);
+        setlistFacade.completeEdit(setlistId);
         return ApiResponseUtil.success(SuccessMessage.UPDATED);
     }
 
+    @Permission(role = {Role.GENERAL})
     @DeleteMapping("/{setlistId}/edit/cancel")
     public ResponseEntity<BaseResponse<Void>> cancelEdit(
-        @UserId Long userId,
         @PathVariable Long setlistId
     ) {
-        setlistFacade.cancelEdit(userId, setlistId);
+        setlistFacade.cancelEdit(setlistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }

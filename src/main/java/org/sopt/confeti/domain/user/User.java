@@ -23,6 +23,7 @@ import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
 import org.sopt.confeti.domain.setlist.Setlist;
 import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
 import org.sopt.confeti.domain.user.constant.Role;
+import org.sopt.confeti.global.interceptor.auth.UserInfo;
 
 @Entity
 @Table(name = "users")
@@ -74,7 +75,8 @@ public class User {
     private List<Setlist> setlists = new ArrayList<>();
 
     @Builder
-    public User(OAuthProvider provider, String socialId, String name, String profilePath, Role role) {
+    public User(OAuthProvider provider, String socialId, String name, String profilePath,
+        Role role) {
         this.provider = provider;
         this.socialId = socialId;
         this.name = name;
@@ -85,15 +87,27 @@ public class User {
 
     public static User create(AuthUser authUser) {
         return User.builder()
-                .provider(authUser.getProvider())
-                .socialId(authUser.getSocialId())
-                .name(authUser.getSocialNickname())
-                .profilePath(authUser.getSocialProfile())
-                .role(authUser.getRole())
-                .build();
+            .provider(authUser.getProvider())
+            .socialId(authUser.getSocialId())
+            .name(authUser.getSocialNickname())
+            .profilePath(authUser.getSocialProfile())
+            .role(authUser.getRole())
+            .build();
     }
 
     public AuthUser toAuthUser() {
         return AuthUser.createWithId(id, provider, socialId, name, profilePath, role);
+    }
+
+    public UserInfo toUserInfo() {
+        return UserInfo.builder()
+            .id(id)
+            .provider(provider)
+            .socialId(socialId)
+            .name(name)
+            .profilePath(profilePath)
+            .role(role)
+            .hasTimetableHistory(hasTimetableHistory)
+            .build();
     }
 }

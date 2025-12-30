@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.request.PatchUserInfoRequest;
 import org.sopt.confeti.api.user.dto.response.UserInfoResponse;
 import org.sopt.confeti.api.user.facade.UserInfoFacade;
-import org.sopt.confeti.api.user.facade.dto.response.UserInfoDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
-import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.interceptor.auth.UserContext;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -29,21 +28,17 @@ public class UserInfoController {
 
     @Permission(role = {Role.GENERAL})
     @GetMapping
-    public ResponseEntity<BaseResponse<UserInfoResponse>> getUserInfo(
-        @UserId Long userId
-    ) {
-        UserInfoDTO userInfo = userInfoFacade.getUserInfo(userId);
+    public ResponseEntity<BaseResponse<UserInfoResponse>> getUserInfo() {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserInfoResponse.of(userInfo, s3FileHandler));
+            UserInfoResponse.of(UserContext.get(), s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
     @PatchMapping
     public ResponseEntity<BaseResponse<Void>> patchUserInfo(
-        @UserId Long userId,
         @ModelAttribute PatchUserInfoRequest patchUserInfoRequest
     ) {
-        userInfoFacade.patchUserInfo(userId, patchUserInfoRequest);
+        userInfoFacade.patchUserInfo(patchUserInfoRequest);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }

@@ -1,23 +1,24 @@
 package org.sopt.confeti.api.user.dto.response;
 
-import org.sopt.confeti.api.user.facade.dto.response.UserInfoDTO;
 import org.sopt.confeti.domain.user.OAuthProvider;
 import org.sopt.confeti.global.common.constant.FolderPath;
+import org.sopt.confeti.global.interceptor.auth.UserInfo;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record UserInfoResponse(
-        Long userId,
-        String profileUrl,
-        String name,
-        OAuthProvider provider
+    Long userId,
+    String profileUrl,
+    String name,
+    OAuthProvider provider
 ) {
-    public static UserInfoResponse of(final UserInfoDTO userInfoDTO, final S3FileHandler s3FileHandler) {
+
+    public static UserInfoResponse of(UserInfo userInfo, S3FileHandler s3FileHandler) {
         return new UserInfoResponse(
-                userInfoDTO.userId(),
-                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.USER, FolderPath.PROFILE),
-                        userInfoDTO.profilePath()).toString(),
-                userInfoDTO.name(),
-                userInfoDTO.provider()
+            userInfo.id(),
+            s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.USER, FolderPath.PROFILE),
+                userInfo.profilePath()).toString(),
+            userInfo.name(),
+            userInfo.provider()
         );
     }
 }

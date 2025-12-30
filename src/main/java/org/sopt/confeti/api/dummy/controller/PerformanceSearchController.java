@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.dummy.facade.PerformanceSearchFacade;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
-import org.sopt.confeti.global.annotation.UserId;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -25,7 +24,6 @@ public class PerformanceSearchController {
     @Permission(role = {Role.ADMIN})
     @PatchMapping("${api.endpoints.es.batch}")
     public ResponseEntity<BaseResponse<Void>> batch(
-        @UserId Long userId
     ) {
         performanceSearchFacade.batch();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);

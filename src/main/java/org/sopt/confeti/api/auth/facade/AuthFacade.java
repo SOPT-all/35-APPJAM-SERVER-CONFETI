@@ -24,6 +24,8 @@ import org.sopt.confeti.domain.user.application.UserOnboardService;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.interceptor.auth.UserContext;
+import org.sopt.confeti.global.interceptor.auth.UserInfo;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -64,8 +66,8 @@ public class AuthFacade {
     }
 
     @Transactional
-    public void logout(Long userId) {
-        logoutService.logout(userId);
+    public void logout() {
+        logoutService.logout();
     }
 
     @Deprecated
@@ -86,8 +88,9 @@ public class AuthFacade {
     }
 
     @Transactional
-    public void withdraw(long userId) {
-        User user = userService.findById(userId);
+    public void withdraw() {
+        UserInfo userInfo = UserContext.get();
+        User user = userService.findById(userInfo.id());
 
         if (user.getProvider() == OAuthProvider.KAKAO) {
             withdrawService.unlinkKakaoAccount(user.getSocialId());
@@ -97,8 +100,8 @@ public class AuthFacade {
             withdrawService.unlinkAppleAccount(user.getId());
         }
 
+        withdrawService.deleteAllExistAppleTokensByUserId(userInfo.id());
+        withdrawService.deleteAllExistRefreshTokensByUserId(userInfo.id());
         userService.deleteUser(user);
-        withdrawService.deleteAllExistAppleTokensByUserId(userId);
-        withdrawService.deleteAllExistRefreshTokensByUserId(userId);
     }
 }

@@ -18,6 +18,7 @@ import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.interceptor.auth.UserContext;
 
 @Facade
 @RequiredArgsConstructor
@@ -33,28 +34,27 @@ public class SetlistFacade {
         return setlistService.getAllMySetlists_deprecated(userId, sortType);
     }
 
-    public GetAllSetlistsResponse getAllMySetlists(Long userId, SetlistSortType sortBy) {
-        return setlistService.getAllMySetlists(userId, sortBy);
+    public GetAllSetlistsResponse getAllMySetlists(SetlistSortType sortBy) {
+        return setlistService.getAllMySetlists(UserContext.get().id(), sortBy);
     }
 
     public List<SetlistSummaryResponse> getPreviewMySetlists_deprecated(Long userId) {
         return setlistService.getPreviewMySetlists_deprecated(userId);
     }
 
-    public List<SetlistSummaryResponse> getPreviewMySetlists(Long userId) {
-        return setlistService.getPreviewMySetlists(userId);
+    public List<SetlistSummaryResponse> getPreviewMySetlists() {
+        return setlistService.getPreviewMySetlists(UserContext.get().id());
     }
 
-    public SetlistCreateResponseDTO createSetLists(Long userId,
-        List<SetlistCreateRequestDTO> requests) {
-        User user = userService.findById(userId);
+    public SetlistCreateResponseDTO createSetLists(List<SetlistCreateRequestDTO> requests) {
+        User user = userService.findById(UserContext.get().id());
         return new SetlistCreateResponseDTO(setlistService.createSetLists(user, requests));
     }
 
-    public SetlistAddSongResponseDTO addSongs(Long userId, Long setlistId,
+    public SetlistAddSongResponseDTO addSongs(Long setlistId,
         List<SetlistAddSongDTO> requests) {
         return new SetlistAddSongResponseDTO(
-            setlistService.addSongs(userId, setlistId, requests));
+            setlistService.addSongs(UserContext.get().id(), setlistId, requests));
     }
 
     @Deprecated
@@ -63,28 +63,36 @@ public class SetlistFacade {
         return setlistService.getSetlistDetail_deprecated(userId, setlistId);
     }
 
-    public GetSetlistDetailResponse getSetlistDetail(Long userId, Long setlistId) {
-        return setlistService.getSetlistDetail(userId, setlistId);
+    public GetSetlistDetailResponse getSetlistDetail(Long setlistId) {
+        return setlistService.getSetlistDetail(UserContext.get().id(), setlistId);
     }
 
-    public void startEdit(Long userId, Long setlistId) {
-        setlistEditService.startEdit(userId, setlistId);
+    public void startEdit(Long setlistId) {
+        setlistEditService.startEdit(UserContext.get().id(), setlistId);
     }
 
-    public void updateSongOrder(Long userId, Long setlistId,
+    public void updateSongOrder_deprecated(Long userId, Long setlistId,
         List<SetlistUpdateSongOrderDTO> requests) {
         setlistEditService.updateSongOrder(userId, setlistId, requests);
     }
 
-    public String deleteSong(Long userId, Long setlistId, int orders) {
+    public void updateSongOrder(Long setlistId, List<SetlistUpdateSongOrderDTO> requests) {
+        setlistEditService.updateSongOrder(UserContext.get().id(), setlistId, requests);
+    }
+
+    public String deleteSong_deprecated(Long userId, Long setlistId, int orders) {
         return setlistEditService.deleteSong(userId, setlistId, orders);
     }
 
-    public void completeEdit(Long userId, Long setlistId) {
-        setlistEditService.completeEdit(userId, setlistId);
+    public String deleteSong(Long setlistId, int orders) {
+        return setlistEditService.deleteSong(UserContext.get().id(), setlistId, orders);
     }
 
-    public void cancelEdit(Long userId, Long setlistId) {
-        setlistEditService.cancelEdit(userId, setlistId);
+    public void completeEdit(Long setlistId) {
+        setlistEditService.completeEdit(UserContext.get().id(), setlistId);
+    }
+
+    public void cancelEdit(Long setlistId) {
+        setlistEditService.cancelEdit(UserContext.get().id(), setlistId);
     }
 }

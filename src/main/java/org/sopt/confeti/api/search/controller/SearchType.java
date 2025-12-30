@@ -9,24 +9,22 @@ import org.sopt.confeti.global.message.ErrorMessage;
 public enum SearchType {
     AID {
         @Override
-        public SearchResultDTO search(SearchFacade facade, Long userId, String aid, Long pid, String term) {
-            return facade.getHomeSearchResultWithAid(userId, aid);
+        public SearchResultDTO search(SearchFacade facade, String aid, Long pid, String term) {
+            return facade.getHomeSearchResultWithAid(aid);
         }
     },
     PID {
         @Override
-        public SearchResultDTO search(SearchFacade facade, Long userId, String aid, Long pid, String term) {
-            return facade.getHomeSearchResultWithPid(userId, pid);
+        public SearchResultDTO search(SearchFacade facade, String aid, Long pid, String term) {
+            return facade.getHomeSearchResultWithPid(pid);
         }
     },
     TERM {
         @Override
-        public SearchResultDTO search(SearchFacade facade, Long userId, String aid, Long pid, String term) {
-            return facade.getHomeSearchResultWithTerm(userId, term);
+        public SearchResultDTO search(SearchFacade facade, String aid, Long pid, String term) {
+            return facade.getHomeSearchResultWithTerm(term);
         }
     };
-
-    public abstract SearchResultDTO search(SearchFacade searchFacade, Long userId, String aid, Long pid, String term);
 
     public static SearchType resolve(String aid, Long pid, String term) {
         if (Objects.nonNull(aid)) {
@@ -41,4 +39,7 @@ public enum SearchType {
 
         throw new ConfetiException(ErrorMessage.BAD_REQUEST);
     }
+
+    public abstract SearchResultDTO search(SearchFacade searchFacade, String aid, Long pid,
+        String term);
 }
