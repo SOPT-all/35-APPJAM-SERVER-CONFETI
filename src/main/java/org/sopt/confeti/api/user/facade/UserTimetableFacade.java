@@ -59,7 +59,7 @@ public class UserTimetableFacade {
     private final FestivalDateService festivalDateService;
     private final UserTimetableService userTimetableService;
 
-    @ReadOnlyTransactional
+    @Transactional(readOnly = true)
     public UserTimetableDetailFestivalsDTO getTimetablesListAndDate() {
         List<TimetableFestival> festivalList = timetableFestivalService.getFetivalList(
             UserContext.get().id());
@@ -213,7 +213,7 @@ public class UserTimetableFacade {
             performanceStatus);
     }
 
-    @ReadOnlyTransactional
+    @Transactional(readOnly = true)
     public UserTimetablesDTO getTimetablesPreview() {
         List<TimetableFestival> userTimetables = timetableFestivalService.getTimetablesPreview(
             UserContext.get().id());
@@ -310,7 +310,7 @@ public class UserTimetableFacade {
             UserContext.get().id(), patchTimetableFestivalDTO.deleteTimetableIds());
     }
 
-    @ReadOnlyTransactional
+    @Transactional(readOnly = true)
     public TimetableDatesDTO getTimetableDates(Long timetableFestivalId) {
         TimetableFestival timetableFestival = timetableFestivalService.getWithFestival(
             timetableFestivalId);
