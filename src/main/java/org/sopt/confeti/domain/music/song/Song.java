@@ -26,10 +26,10 @@ public class Song {
     @Column(nullable = false)
     private String id;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 1000, nullable = false)
     private String trackName;
 
-    @Column(length = 100)
+    @Column(length = 1000)
     private String artistName;
 
     /*
