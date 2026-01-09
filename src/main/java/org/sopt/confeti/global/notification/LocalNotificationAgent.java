@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @Profile(
-    value = {"local"}
+    value = {"local", "dev"}
 )
 public class LocalNotificationAgent implements NotificationAgent {
 
