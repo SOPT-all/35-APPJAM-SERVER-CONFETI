@@ -9,9 +9,13 @@ import io.awspring.cloud.sqs.operations.SqsTemplate;
 import java.time.Duration;
 import java.util.concurrent.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.client.config.SdkAdvancedAsyncClientOption;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
@@ -20,9 +24,16 @@ public class SqsConfig {
 
     @Bean
     public SqsAsyncClient sqsAsyncClient(
-        @Qualifier(MESSAGE_PROVIDER_POOL) Executor providerExecutor
+        @Qualifier(MESSAGE_PROVIDER_POOL) Executor providerExecutor,
+        @Value("${spring.cloud.aws.credentials.access-key}") String accessKey,
+        @Value("${spring.cloud.aws.credentials.secret-key}") String secretKey,
+        @Value("${spring.cloud.aws.region.static}") String region
     ) {
+        AwsCredentialsProvider myCredentialsProvider = StaticCredentialsProvider.create(
+            AwsBasicCredentials.create(accessKey, secretKey)
+        );
         return SqsAsyncClient.builder()
+            .credentialsProvider(myCredentialsProvider)
             .asyncConfiguration(
                 config -> config.advancedOption(
                     SdkAdvancedAsyncClientOption.FUTURE_COMPLETION_EXECUTOR, providerExecutor))
