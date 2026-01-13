@@ -9,6 +9,7 @@ spring:
       - aws-secretsmanager:/confeti-api/prod/notification?prefix=notification-secrets.
       - aws-secretsmanager:/confeti-api/prod/dummy?prefix=dummy-secrets.
       - aws-secretsmanager:/confeti-api/prod/apple-music?prefix=apple-music-secrets.
+      - aws-secretsmanager:/confeti/prod/external-secrets?prefix=external-secrets.
 
   application:
     name: confeti-api-prod

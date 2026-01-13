@@ -4,7 +4,7 @@ spring:
       on-profile: prod
 apple-music:
   api:
-    host: https://external.confeti.xyz
+    host: https://${external-secrets.host}
     path: /apple-music-api
     endpoints:
       base-url: https://api.music.apple.com
