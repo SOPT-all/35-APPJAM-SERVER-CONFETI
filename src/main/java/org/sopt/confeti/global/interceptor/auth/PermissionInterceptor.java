@@ -13,7 +13,6 @@ import org.sopt.confeti.global.interceptor.CustomInterceptor;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 @Interceptor
 public class PermissionInterceptor implements HandlerInterceptor, CustomInterceptor {
@@ -22,7 +21,7 @@ public class PermissionInterceptor implements HandlerInterceptor, CustomIntercep
     public boolean preHandle(@NotNull HttpServletRequest request,
         @NotNull HttpServletResponse response,
         @NotNull Object handler) {
-        if (handler instanceof ResourceHttpRequestHandler) {
+        if (!(handler instanceof HandlerMethod)) {
             return true;
         }
 
