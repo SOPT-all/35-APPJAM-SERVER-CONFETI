@@ -82,7 +82,7 @@ public class UserFavoriteFacade {
         }
     }
 
-    @ReadOnlyTransactional
+    @Transactional(readOnly = true)
     public UserFavoriteArtistsPreviewDTO getFavoriteArtistsPreview() {
         List<ArtistFavorite> artists = artistFavoriteService.getFavoriteArtistsPreview(
             UserContext.get().id());
@@ -204,7 +204,7 @@ public class UserFavoriteFacade {
         return UpcomingPerformanceDTO.from(performance);
     }
 
-    @ReadOnlyTransactional
+    @Transactional(readOnly = true)
     public UserFavoriteArtistsDTO getFavoriteArtists(String sortBy) {
         validateSortType(sortBy);
 

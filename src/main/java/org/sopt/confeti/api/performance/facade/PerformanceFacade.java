@@ -187,7 +187,7 @@ public class PerformanceFacade {
             .orElseGet(this::getRecentPerformancesWithoutFavorites);
     }
 
-    @ReadOnlyTransactional
+    @Transactional(readOnly = true)
     public RecentPerformancesDTO getRecentPerformancesWithFavorites(final long userId) {
         List<ArtistFavorite> artistFavorites = artistFavoriteService.getArtistIdsByUserId(userId);
 
