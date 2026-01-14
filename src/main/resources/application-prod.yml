@@ -16,7 +16,7 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${db-secrets.host}:${db-secrets.port}/${db-secrets.dbname}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
+    url: jdbc:mysql://${db-secrets.host}:${db-secrets.port}/${db-secrets.dbname}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8mb4&connectionCollation=utf8mb4_unicode_ci&serverTimezone=Asia/Seoul
     username: ${db-secrets.username}
     password: ${db-secrets.password}
 
@@ -27,6 +27,9 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 100
+        connection:
+          characterEncoding: utf8mb4
+          useUnicode: true
 
   servlet:
     multipart:
