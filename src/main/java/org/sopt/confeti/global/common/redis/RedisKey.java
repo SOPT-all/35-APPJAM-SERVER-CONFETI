@@ -48,8 +48,8 @@ public enum RedisKey {
     SETLIST_EDIT("edit:setlist:%d:%d", SetlistSongEditDTO.class, Duration.ofHours(1)),
 
     // performances
-    PERFORMANCE_FESTIVALS("performance:festivals:%d", FestivalDetailDTO.class, Duration.ofHours(1)),
-    PERFORMANCE_CONCERTS("performance:concerts:%d", ConcertDetailDTO.class, Duration.ofHours(1));
+    PERFORMANCE_FESTIVALS("performance:festivals:%d", FestivalDetailDTO.class, Duration.ofHours(4)),
+    PERFORMANCE_CONCERTS("performance:concerts:%d", ConcertDetailDTO.class, Duration.ofHours(4));
 
     private final String format;
     @Getter

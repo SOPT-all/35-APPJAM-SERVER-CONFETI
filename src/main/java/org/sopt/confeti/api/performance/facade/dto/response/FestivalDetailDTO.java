@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.global.annotation.RedisSerializable;
 
+@RedisSerializable
 public record FestivalDetailDTO(
     long festivalId,
     String title,
