@@ -1,6 +1,5 @@
 package org.sopt.confeti.domain.festival_artist;
 
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalArtistDTO;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
-import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
+import org.sopt.confeti.domain.music.artist.Artist;
 
 @Entity
 @Table(name = "festival_artists")
@@ -28,24 +27,23 @@ public class FestivalArtist {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Embedded
-    private ConfetiArtist artist;
-
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "festival_time_id", nullable = false)
     private FestivalTime festivalTime;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artist_id")
+    private Artist artist;
+
     @Builder
-    public FestivalArtist(ConfetiArtist artist) {
+    public FestivalArtist(Artist artist) {
         this.artist = artist;
     }
 
     public static FestivalArtist create(CreateFestivalArtistDTO festivalArtistDTO) {
         return FestivalArtist.builder()
-                .artist(
-                        ConfetiArtist.from(festivalArtistDTO.artistId())
-                )
-                .build();
+            .artist(Artist.create(festivalArtistDTO.artistId()))
+            .build();
     }
 }
