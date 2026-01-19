@@ -1,6 +1,5 @@
 package org.sopt.confeti.api.performance.facade;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,9 +19,11 @@ import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformanc
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailWithFavoriteDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailWithFavoriteDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceRecommendDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
@@ -35,11 +36,9 @@ import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformances
 import org.sopt.confeti.api.performance.facade.dto.response.SongRecommendDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
-import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
-import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
@@ -56,7 +55,6 @@ import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.ExecutorName;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.PerformanceType;
-import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
 import org.sopt.confeti.global.interceptor.auth.UserContext;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -114,50 +112,28 @@ public class PerformanceFacade {
         this.performanceExecutor = performanceExecutor;
     }
 
-    @Transactional(readOnly = true)
-    public ConcertDetailDTO getConcertDetailInfo(long concertId) {
-        Concert concert = concertService.getConcertDetailByConcertId(concertId);
-        validateConcertNotPassed(concert);
-
-        return ConcertDetailDTO.of(concert, getConcertFavorite(concertId));
+    public ConcertDetailWithFavoriteDTO getExpectedConcertDetail(long concertId) {
+        ConcertDetailDTO concertDetail = concertService.getExpectedConcertDetailByConcertId(
+            concertId);
+        return ConcertDetailWithFavoriteDTO.of(concertDetail, getConcertFavorite(concertId));
     }
 
-    @ReadOnlyTransactional
     public boolean getConcertFavorite(long concertId) {
         return UserContext.getOptional()
             .map(userInfo -> concertFavoriteService.isFavorite(userInfo.id(), concertId))
             .orElse(false);
     }
 
-    @ReadOnlyTransactional
-    protected void validateConcertNotPassed(final Concert concert) {
-        if (LocalDate.now().isAfter(concert.getEndAt())) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
+    public FestivalDetailWithFavoriteDTO getExpectedFestivalDetail(long festivalId) {
+        FestivalDetailDTO festivalDetail = festivalService.getExpectedFestivalDetailByFestivalId(
+            festivalId);
+        return FestivalDetailWithFavoriteDTO.of(festivalDetail, getIsFavorite(festivalId));
     }
 
-    @Transactional(readOnly = true)
-    public FestivalDetailDTO getFestivalDetailInfo(long festivalId) {
-        boolean isFavorite = getIsFavorite(festivalId);
-
-        Festival festival = festivalService.getFestivalDetailByFestivalId(festivalId);
-        validateFestivalNotPassed(festival);
-
-        return FestivalDetailDTO.of(festival, isFavorite);
-    }
-
-    @ReadOnlyTransactional
     protected boolean getIsFavorite(long festivalId) {
         return UserContext.getOptional()
             .map(userInfo -> festivalFavoriteService.isFavorite(userInfo.id(), festivalId))
             .orElse(false);
-    }
-
-    @ReadOnlyTransactional
-    protected void validateFestivalNotPassed(final Festival festival) {
-        if (LocalDate.now().isAfter(festival.getEndAt())) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
     }
 
     @ReadOnlyTransactional

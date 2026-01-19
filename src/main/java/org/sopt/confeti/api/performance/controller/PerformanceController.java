@@ -25,10 +25,10 @@ import org.sopt.confeti.api.performance.dto.response.SearchACPerformancesRespons
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
 import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailWithFavoriteDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailWithFavoriteDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformancesRecommendDTO;
@@ -71,18 +71,19 @@ public class PerformanceController implements PerformanceControllerDocs {
     public ResponseEntity<BaseResponse<ConcertDetailResponse>> getConcertInfo(
         @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId
     ) {
-        ConcertDetailDTO concertDetailDTO = performanceFacade.getConcertDetailInfo(concertId);
+        ConcertDetailWithFavoriteDTO concertDetail = performanceFacade.getExpectedConcertDetail(concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            ConcertDetailResponse.of(concertDetailDTO, s3FileHandler));
+            ConcertDetailResponse.of(concertDetail, s3FileHandler));
     }
 
     @GetMapping("/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<FestivalDetailResponse>> getFestivalInfo(
         @PathVariable("festivalId") @Min(RequestConstraint.ID) Long festivalId
     ) {
-        FestivalDetailDTO festivalDetailDTO = performanceFacade.getFestivalDetailInfo(festivalId);
+        FestivalDetailWithFavoriteDTO festivalDetail = performanceFacade.getExpectedFestivalDetail(
+            festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            FestivalDetailResponse.of(festivalDetailDTO, s3FileHandler));
+            FestivalDetailResponse.of(festivalDetail, s3FileHandler));
     }
 
     @GetMapping("/reservation")
