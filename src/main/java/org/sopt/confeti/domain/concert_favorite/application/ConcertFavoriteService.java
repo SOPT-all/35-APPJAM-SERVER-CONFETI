@@ -7,6 +7,7 @@ import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert_favorite.ConcertFavorite;
 import org.sopt.confeti.domain.concert_favorite.infra.repository.ConcertFavoriteRepository;
 import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +22,7 @@ public class ConcertFavoriteService {
         return concertFavoriteRepository.findRandomFavoriteUpcomingConcertIds(userId, fetchSize);
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public boolean isFavorite(final long userId, final long concertId) {
         return concertFavoriteRepository.existsByUserIdAndConcertId(userId, concertId);
     }

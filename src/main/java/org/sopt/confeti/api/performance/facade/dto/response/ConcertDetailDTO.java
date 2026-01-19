@@ -18,11 +18,10 @@ public record ConcertDetailDTO(
         String time,
         String price,
         String address,
-        boolean isFavorite,
         List<ConcertReservationDTO> reservations,
         List<ConcertArtistDTO> artists
 ) {
-    public static ConcertDetailDTO of(final Concert concert, final boolean isFavorite) {
+    public static ConcertDetailDTO from(Concert concert) {
         return new ConcertDetailDTO(
                 concert.getId(),
                 concert.getTitle(),
@@ -36,7 +35,6 @@ public record ConcertDetailDTO(
                 concert.getTime(),
                 concert.getPrice(),
                 concert.getAddress(),
-                isFavorite,
                 concert.getReservationUrls().stream()
                         .map(ConcertReservationDTO::from)
                         .toList(),

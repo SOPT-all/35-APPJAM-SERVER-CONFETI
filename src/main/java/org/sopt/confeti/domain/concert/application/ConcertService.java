@@ -1,15 +1,14 @@
 package org.sopt.confeti.domain.concert.application;
 
-import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
+import org.sopt.confeti.global.common.redis.RedisHandler;
+import org.sopt.confeti.global.common.redis.RedisKey;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.resolver.music_api.MusicAPIResolver;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,22 +16,26 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ConcertService {
 
-    private static final int INIT_PAGE = 0;
-    private static final String START_AT_COLUMN = "startAt";
-
+    private final RedisHandler redisHandler;
     private final ConcertRepository concertRepository;
-    private final MusicAPIResolver musicAPIResolver;
 
+    // TODO: AOP 방식으로 캐싱 전략 수정
     @Transactional(readOnly = true)
-    public Concert getConcertDetailByConcertId(final long concertId) {
-        Concert concert = concertRepository.findById(concertId)
-            .orElseThrow(
-                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-            );
+    public ConcertDetailDTO getExpectedConcertDetailByConcertId(long concertId) {
+        Optional<ConcertDetailDTO> cachedConcert = redisHandler.get(
+            RedisKey.PERFORMANCE_CONCERTS.createKeyInfo(concertId));
+        if (cachedConcert.isPresent()) {
+            return cachedConcert.get();
+        }
 
-        musicAPIResolver.load(concert);
+        Concert concert = concertRepository.findExpectedWithArtistsById(concertId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        return concert;
+        concertRepository.findExpectedWithReservationUrlsById(concertId);
+
+        ConcertDetailDTO concertDetail = ConcertDetailDTO.from(concert);
+        redisHandler.set(RedisKey.PERFORMANCE_CONCERTS.createKeyInfo(concertId), concertDetail);
+        return concertDetail;
     }
 
     @Transactional(readOnly = true)
@@ -46,21 +49,6 @@ public class ConcertService {
             .orElseThrow(
                 () -> new NotFoundException(ErrorMessage.NOT_FOUND)
             );
-    }
-
-    private PageRequest getPageRequest(final int size, final Sort sort) {
-        return PageRequest.of(INIT_PAGE, size, sort);
-    }
-
-    private Sort getRecentConcertsSort() {
-        return Sort.by(
-            Order.asc(START_AT_COLUMN)
-        );
-    }
-
-    @Transactional(readOnly = true)
-    public List<Concert> getConcerts(final List<Long> concertIds) {
-        return concertRepository.findAllByIdIn(concertIds);
     }
 
     @Transactional

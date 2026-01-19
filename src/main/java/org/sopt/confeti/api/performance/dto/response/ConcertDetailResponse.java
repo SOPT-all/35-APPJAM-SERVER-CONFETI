@@ -1,7 +1,7 @@
 package org.sopt.confeti.api.performance.dto.response;
 
 import java.util.List;
-import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailWithFavoriteDTO;
 import org.sopt.confeti.global.common.constant.ArtistConstant;
 import org.sopt.confeti.global.util.S3FileHandler;
 
@@ -10,7 +10,7 @@ public record ConcertDetailResponse(
         boolean isOpen,
         List<ConcertDetailArtistResponse> concertArtists
 ) {
-    public static ConcertDetailResponse of(final ConcertDetailDTO concertDetailDTO, final S3FileHandler s3FileHandler) {
+    public static ConcertDetailResponse of(final ConcertDetailWithFavoriteDTO concertDetailDTO, final S3FileHandler s3FileHandler) {
         List<ConcertDetailArtistResponse> concertArtists = concertDetailDTO.artists().stream()
                 .map(ConcertDetailArtistResponse::from)
                 .toList();
