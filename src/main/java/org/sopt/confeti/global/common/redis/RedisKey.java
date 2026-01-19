@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistSongEditDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
@@ -44,7 +46,10 @@ public enum RedisKey {
 
     // setlist
     SETLIST_EDIT("edit:setlist:%d:%d", SetlistSongEditDTO.class, Duration.ofHours(1)),
-    ;
+
+    // performances
+    PERFORMANCE_FESTIVALS("performance:festivals:%d", FestivalDetailDTO.class, Duration.ofHours(1)),
+    PERFORMANCE_CONCERTS("performance:concerts:%d", ConcertDetailDTO.class, Duration.ofHours(1));
 
     private final String format;
     @Getter
