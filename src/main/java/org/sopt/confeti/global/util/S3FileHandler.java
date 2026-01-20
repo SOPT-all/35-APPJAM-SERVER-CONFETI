@@ -48,15 +48,16 @@ public class S3FileHandler {
      * 파일 업로드
      */
     public String uploadFile(MultipartFile file, String folderPath) {
-        final String fileName = fileNameGenerator.generate(Objects.requireNonNull(file.getOriginalFilename()));
+        final String fileName = fileNameGenerator.generate(
+            Objects.requireNonNull(file.getOriginalFilename()));
         checkFileNotExist(folderPath, fileName);
 
         final ObjectMetadata metadata = getMetadata(file);
 
         try {
             upload(
-                    folderPath + fileName,
-                    file.getInputStream(), metadata
+                folderPath + fileName,
+                file.getInputStream(), metadata
             );
         } catch (IOException e) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
@@ -71,8 +72,8 @@ public class S3FileHandler {
 
         try (FileInputStream inputStream = new FileInputStream(file)) {
             upload(
-                    folderPath + fileName,
-                    inputStream, metadata
+                folderPath + fileName,
+                inputStream, metadata
             );
         } catch (IOException e) {
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
@@ -83,9 +84,9 @@ public class S3FileHandler {
 
     private ObjectMetadata getMetadata(MultipartFile file) {
         return new ObjectMetadata.Builder()
-                .contentLength(file.getSize())
-                .contentType(file.getContentType())
-                .build();
+            .contentLength(file.getSize())
+            .contentType(file.getContentType())
+            .build();
     }
 
     private ObjectMetadata getMetadata(File file) {
@@ -98,9 +99,9 @@ public class S3FileHandler {
         }
 
         return new ObjectMetadata.Builder()
-                .contentLength(file.length())
-                .contentType(contentType)
-                .build();
+            .contentLength(file.length())
+            .contentType(contentType)
+            .build();
     }
 
     @Async
@@ -122,10 +123,9 @@ public class S3FileHandler {
      * Public 설정이 된 파일 조회 URL 생성
      */
     public URL getFileUrl(String folderPath, String key) {
-        checkFileExist(folderPath, key);
-
         try {
-            return new URI(host + folderPath + URLEncoder.encode(key, StandardCharsets.UTF_8)).toURL();
+            return new URI(
+                host + folderPath + URLEncoder.encode(key, StandardCharsets.UTF_8)).toURL();
         } catch (URISyntaxException | MalformedURLException e) {
             throw new ConfetiException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
@@ -135,10 +135,9 @@ public class S3FileHandler {
      * Public 설정이 되지 않은 파일 조회 URL 생성
      */
     public URL getFileSignedUrl(String folderPath, String key) {
-        checkFileExist(folderPath, key);
-
-        return s3Operations.createSignedGetURL(bucket, folderPath + URLEncoder.encode(key, StandardCharsets.UTF_8),
-                urlDuration);
+        return s3Operations.createSignedGetURL(bucket,
+            folderPath + URLEncoder.encode(key, StandardCharsets.UTF_8),
+            urlDuration);
     }
 
     /**
@@ -146,7 +145,8 @@ public class S3FileHandler {
      */
     private void checkFileExist(String folderPath, String key) {
         if (!s3Operations.objectExists(bucket, folderPath + key)) {
-            log.error("S3FileHandler.checkFileExist: Not exist file. folderPath: {}, key: {}", folderPath, key);
+            log.error("S3FileHandler.checkFileExist: Not exist file. folderPath: {}, key: {}",
+                folderPath, key);
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
@@ -163,18 +163,19 @@ public class S3FileHandler {
     /**
      * 파일 복사
      */
-    public String copyFile(String originFolderPath, String originKey, String targetFolderPath, String targetKey) {
+    public String copyFile(String originFolderPath, String originKey, String targetFolderPath,
+        String targetKey) {
         checkFileExist(originFolderPath, originKey);
         checkFileNotExist(targetFolderPath, targetKey);
 
         String targetFileName = fileNameGenerator.generate(targetKey);
 
         CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
-                .sourceBucket(bucket)
-                .sourceKey(originFolderPath + originKey)
-                .destinationBucket(bucket)
-                .destinationKey(targetFolderPath + targetFileName)
-                .build();
+            .sourceBucket(bucket)
+            .sourceKey(originFolderPath + originKey)
+            .destinationBucket(bucket)
+            .destinationKey(targetFolderPath + targetFileName)
+            .build();
 
         copyFileAsync(copyObjectRequest);
 

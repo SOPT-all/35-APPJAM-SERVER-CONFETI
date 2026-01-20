@@ -1,20 +1,21 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
 import org.sopt.confeti.domain.concert_artist.ConcertArtist;
-import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
+import org.sopt.confeti.domain.music.artist.Artist;
 
 public record ConcertArtistDTO(
-        String artistId,
-        String name,
-        String profileUrl
+    String artistId,
+    String name,
+    String profileUrl
 ) {
+
     public static ConcertArtistDTO of(final ConcertArtist concertArtist) {
-        ConfetiArtist confetiArtist = concertArtist.getArtist();
+        Artist artist = concertArtist.getArtist();
 
         return new ConcertArtistDTO(
-                confetiArtist.getId(),
-                confetiArtist.getName(),
-                confetiArtist.getProfileUrl()
+            artist.getId(),
+            artist.getName(),
+            artist.getProfileUrl()
         );
     }
 }

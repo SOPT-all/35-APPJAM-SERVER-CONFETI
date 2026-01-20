@@ -39,7 +39,7 @@ public class Artist {
     @Column(nullable = false)
     private String id;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100)
     private String name;
 
     /*
@@ -67,6 +67,12 @@ public class Artist {
         this.id = artistId;
         this.name = name;
         this.artworkUrl = artworkUrl;
+    }
+
+    public static Artist create(String artistId) {
+        return Artist.builder()
+            .artistId(artistId)
+            .build();
     }
 
     public static Artist create(String artistId, String name, String artworkUrl) {

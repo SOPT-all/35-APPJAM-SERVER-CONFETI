@@ -39,4 +39,9 @@ public class FestivalDateService {
     public List<FestivalDate> findAllByFestivalId(final Long festivalId) {
         return festivalDateRepository.findAllByFestivalId(festivalId);
     }
+
+    @Transactional(readOnly = true)
+    public void loadDatesWithStagesByFestivalId(long festivalId) {
+        festivalDateRepository.findDatesWithStagesByFestivalId(festivalId);
+    }
 }

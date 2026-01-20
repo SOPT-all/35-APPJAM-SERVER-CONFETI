@@ -16,4 +16,12 @@ public interface FestivalDateRepository extends JpaRepository<FestivalDate, Long
     Optional<FestivalDate> findAllFestivalDateById(@Param("festivalDateId") long festivalDateId);
 
     List<FestivalDate> findAllByFestivalId(Long festivalId);
+
+    @Query("""
+            SELECT DISTINCT fd
+            FROM FestivalDate fd
+            JOIN FETCH fd.stages fs
+            WHERE fd.festival.id = :festivalId
+        """)
+    List<FestivalDate> findDatesWithStagesByFestivalId(@Param("festivalId") long festivalId);
 }

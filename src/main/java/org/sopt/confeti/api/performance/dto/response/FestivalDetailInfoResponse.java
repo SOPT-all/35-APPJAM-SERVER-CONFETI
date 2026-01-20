@@ -7,40 +7,42 @@ import org.sopt.confeti.global.util.DateConvertor;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record FestivalDetailInfoResponse(
-        long festivalId,
-        String posterUrl,
-        String title,
-        String subtitle,
-        String startAt,
-        String endAt,
-        String area,
-        String reserveAt,
-        String time,
-        String ageRating,
-        String price,
-        boolean isFavorite,
-        String address,
-        List<FestivalReservationResponse> reservations
+    long festivalId,
+    String posterUrl,
+    String title,
+    String subtitle,
+    String startAt,
+    String endAt,
+    String area,
+    String reserveAt,
+    String time,
+    String ageRating,
+    String price,
+    boolean isFavorite,
+    String address,
+    List<FestivalReservationResponse> reservations
 ) {
-    public static FestivalDetailInfoResponse of(final FestivalDetailDTO festival, final S3FileHandler s3FileHandler) {
+
+    public static FestivalDetailInfoResponse of(FestivalDetailDTO festival, boolean isFavorite,
+        S3FileHandler s3FileHandler) {
         return new FestivalDetailInfoResponse(
-                festival.festivalId(),
-                s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER),
-                        festival.posterPath()).toString(),
-                festival.title(),
-                festival.subtitle(),
-                DateConvertor.convertToDefaultFormat(festival.startAt()),
-                DateConvertor.convertToDefaultFormat(festival.endAt()),
-                festival.area(),
-                DateConvertor.convertToDefaultFormat(festival.reserveAt()),
-                festival.time(),
-                festival.ageRating(),
-                festival.price(),
-                festival.isFavorite(),
-                festival.address(),
-                festival.reservations().stream()
-                        .map(reservation -> FestivalReservationResponse.of(reservation, s3FileHandler))
-                        .toList()
+            festival.festivalId(),
+            s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER),
+                festival.posterPath()).toString(),
+            festival.title(),
+            festival.subtitle(),
+            DateConvertor.convertToDefaultFormat(festival.startAt()),
+            DateConvertor.convertToDefaultFormat(festival.endAt()),
+            festival.area(),
+            DateConvertor.convertToDefaultFormat(festival.reserveAt()),
+            festival.time(),
+            festival.ageRating(),
+            festival.price(),
+            isFavorite,
+            festival.address(),
+            festival.reservations().stream()
+                .map(reservation -> FestivalReservationResponse.of(reservation, s3FileHandler))
+                .toList()
         );
     }
 }
