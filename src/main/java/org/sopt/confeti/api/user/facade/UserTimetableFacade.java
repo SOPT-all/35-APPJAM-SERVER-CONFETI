@@ -163,6 +163,7 @@ public class UserTimetableFacade {
         );
     }
 
+    @Transactional(readOnly = true)
     public UserTimetableFestivalBasicDTO getTimetableInfo(long festivalDateId) {
         FestivalDate festivalDate = festivalDateService.findFestivalDateId(festivalDateId);
         return getUserTimetableDTO(UserContext.get().id(), festivalDate);
