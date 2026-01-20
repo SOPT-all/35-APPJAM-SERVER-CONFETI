@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
+import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.sopt.confeti.global.common.redis.RedisKey;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -38,12 +39,12 @@ public class ConcertService {
         return concertDetail;
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public boolean existsById(long concertId) {
         return concertRepository.existsById(concertId);
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public Concert findById(final long concertId) {
         return concertRepository.findById(concertId)
             .orElseThrow(

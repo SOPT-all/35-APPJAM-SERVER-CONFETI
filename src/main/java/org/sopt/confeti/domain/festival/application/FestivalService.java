@@ -1,6 +1,5 @@
 package org.sopt.confeti.domain.festival.application;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +13,7 @@ import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.application.FestivalDateService;
 import org.sopt.confeti.domain.festival_stage.application.FestivalStageService;
 import org.sopt.confeti.domain.festival_time.application.FestivalTimeService;
+import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.sopt.confeti.global.common.redis.RedisKey;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -39,7 +39,7 @@ public class FestivalService {
     private final FestivalTimeService festivalTimeService;
     private final RedisHandler redisHandler;
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public Festival findById(Long festivalId) {
         return festivalRepository.findById(festivalId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
@@ -67,7 +67,7 @@ public class FestivalService {
         return festivalDetail;
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public boolean existsById(final long festivalId) {
         return festivalRepository.existsById(festivalId);
     }
@@ -78,7 +78,7 @@ public class FestivalService {
     }
 
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public List<Festival> findFestivalsUsingInitCursor(final long userId, final int size) {
         return festivalRepository.findFestivalsUsingInitCursor(
             userId,
@@ -96,7 +96,7 @@ public class FestivalService {
         );
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public List<Festival> findFestivalsUsingCursor(
         final long userId,
         final String cursorTitle,
@@ -111,28 +111,10 @@ public class FestivalService {
         );
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public Optional<FestivalCursorDTO> findFestivalCursor(final long userId,
         final long festivalId) {
         return festivalRepository.findFestivalCursor(userId, festivalId);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Festival> getRecentFestivals(final int size) {
-        return festivalRepository.findAllByEndAtGreaterThanEqual(
-            LocalDateTime.now(),
-            getPageRequest(size, getRecentFestivalsSort())
-        );
-    }
-
-    private PageRequest getPageRequest(final int size, final Sort sort) {
-        return PageRequest.of(INIT_PAGE, size, sort);
-    }
-
-    private Sort getRecentFestivalsSort() {
-        return Sort.by(
-            Order.asc(START_AT_COLUMN)
-        );
     }
 
     @Transactional
@@ -151,7 +133,7 @@ public class FestivalService {
         );
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public List<Festival> getAll() {
         return festivalRepository.findAll();
     }
