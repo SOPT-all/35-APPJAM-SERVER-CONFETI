@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.request.GetUpcomingPerformancesDTO;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
@@ -185,8 +185,8 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceDTO> getExpectedPerformances(GetExpectedPerformancesDTO expectedPerformancesDTO) {
-        List<Pair<PerformanceType, Long>> performancePairs = convertToPairs(expectedPerformancesDTO);
+    public List<PerformanceDTO> getUpcomingPerformances(GetUpcomingPerformancesDTO upcomingPerformancesDTO) {
+        List<Pair<PerformanceType, Long>> performancePairs = convertToPairs(upcomingPerformancesDTO);
         List<Performance> performances = performanceCriteriaRepository.findPerformancesByTypeAndTypeId(
                 performancePairs);
 
@@ -216,8 +216,8 @@ public class PerformanceService {
                 .toList();
     }
 
-    private List<Pair<PerformanceType, Long>> convertToPairs(GetExpectedPerformancesDTO expectedPerformancesDTO) {
-        return expectedPerformancesDTO.expectedPerformanceDTOs().stream()
+    private List<Pair<PerformanceType, Long>> convertToPairs(GetUpcomingPerformancesDTO upcomingPerformancesDTO) {
+        return upcomingPerformancesDTO.upcomingPerformanceDTOs().stream()
                 .map(performanceDTO -> Pair.of(performanceDTO.type(), performanceDTO.typeId()))
                 .toList();
     }

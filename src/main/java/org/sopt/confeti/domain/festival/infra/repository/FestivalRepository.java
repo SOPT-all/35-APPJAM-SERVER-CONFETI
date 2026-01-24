@@ -18,7 +18,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             JOIN FETCH f.dates fd
             WHERE f.id = :festivalId AND f.endAt >= CURRENT_DATE
         """)
-    Optional<Festival> findExpectedWithDatesById(@Param("festivalId") long festivalId);
+    Optional<Festival> findUpcomingWithDatesById(@Param("festivalId") long festivalId);
 
     @Query("""
             SELECT DISTINCT f
@@ -26,7 +26,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             JOIN FETCH f.reservationUrls
             WHERE f.id = :festivalId
         """)
-    Optional<Festival> findExpectedWithReservationUrlsById(@Param("festivalId") long festivalId);
+    Optional<Festival> findUpcomingWithReservationUrlsById(@Param("festivalId") long festivalId);
 
     List<Festival> findFestivalsByIdIn(final @Param("festivalIds") List<Long> festivalIds);
 

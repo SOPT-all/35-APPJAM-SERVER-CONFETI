@@ -36,8 +36,8 @@ public class PerformanceSearchService {
                 .toList();
     }
 
-    public List<SearchPerformanceResult> getExpectedPerformancesByTitleAndTypePartialMatched(String ptitle,
-                                                                                             PerformanceType ptype) {
+    public List<SearchPerformanceResult> getUpcomingPerformancesByTitleAndTypePartialMatched(String ptitle,
+                                                                                            PerformanceType ptype) {
         List<PerformanceDocument> performances = performanceSearchOperator.searchByTitleAndTypePartialMatch(
                 clearSentence(ptitle), ptype, PerformanceStatus.ALL);
 

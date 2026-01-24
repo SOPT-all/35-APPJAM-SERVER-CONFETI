@@ -15,13 +15,13 @@ import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.request.GetUpcomingPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailWithFavoriteDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.UpcomingPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailWithFavoriteDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
@@ -112,8 +112,8 @@ public class PerformanceFacade {
         this.performanceExecutor = performanceExecutor;
     }
 
-    public ConcertDetailWithFavoriteDTO getExpectedConcertDetail(long concertId) {
-        ConcertDetailDTO concertDetail = concertService.getExpectedConcertDetailByConcertId(
+    public ConcertDetailWithFavoriteDTO getUpcomingConcertDetail(long concertId) {
+        ConcertDetailDTO concertDetail = concertService.getUpcomingConcertDetailByConcertId(
             concertId);
         return ConcertDetailWithFavoriteDTO.of(concertDetail, getConcertFavorite(concertId));
     }
@@ -124,8 +124,8 @@ public class PerformanceFacade {
             .orElse(false);
     }
 
-    public FestivalDetailWithFavoriteDTO getExpectedFestivalDetail(long festivalId) {
-        FestivalDetailDTO festivalDetail = festivalService.getExpectedFestivalDetailByFestivalId(
+    public FestivalDetailWithFavoriteDTO getUpcomingFestivalDetail(long festivalId) {
+        FestivalDetailDTO festivalDetail = festivalService.getUpcomingFestivalDetailByFestivalId(
             festivalId);
         return FestivalDetailWithFavoriteDTO.of(festivalDetail, getIsFavorite(festivalId));
     }
@@ -384,10 +384,10 @@ public class PerformanceFacade {
     }
 
     @ReadOnlyTransactional
-    public ExpectedPerformancesDTO getExpectedPerformances(
-        GetExpectedPerformancesDTO expectedPerformancesDTO) {
-        return ExpectedPerformancesDTO.from(
-            performanceService.getExpectedPerformances(expectedPerformancesDTO));
+    public UpcomingPerformancesDTO getUpcomingPerformances(
+        GetUpcomingPerformancesDTO upcomingPerformancesDTO) {
+        return UpcomingPerformancesDTO.from(
+            performanceService.getUpcomingPerformances(upcomingPerformancesDTO));
     }
 
     public PerformanceIdsDTO getPerformances() {

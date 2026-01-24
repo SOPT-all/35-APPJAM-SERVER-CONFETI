@@ -22,17 +22,17 @@ public class ConcertService {
 
     // TODO: AOP 방식으로 캐싱 전략 수정
     @Transactional(readOnly = true)
-    public ConcertDetailDTO getExpectedConcertDetailByConcertId(long concertId) {
+    public ConcertDetailDTO getUpcomingConcertDetailByConcertId(long concertId) {
         Optional<ConcertDetailDTO> cachedConcert = redisHandler.get(
             RedisKey.PERFORMANCE_CONCERTS.createKeyInfo(concertId));
         if (cachedConcert.isPresent()) {
             return cachedConcert.get();
         }
 
-        Concert concert = concertRepository.findExpectedWithArtistsById(concertId)
+        Concert concert = concertRepository.findUpcomingWithArtistsById(concertId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        concertRepository.findExpectedWithReservationUrlsById(concertId);
+        concertRepository.findUpcomingWithReservationUrlsById(concertId);
 
         ConcertDetailDTO concertDetail = ConcertDetailDTO.from(concert);
         redisHandler.set(RedisKey.PERFORMANCE_CONCERTS.createKeyInfo(concertId), concertDetail);

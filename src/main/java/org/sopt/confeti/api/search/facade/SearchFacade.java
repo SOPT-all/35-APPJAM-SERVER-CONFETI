@@ -117,7 +117,7 @@ public class SearchFacade {
         );
 
         // 검색어 기반
-        List<PerformanceDTO> searchedPerformances = performanceSearchService.getExpectedPerformancesByTitleAndTypePartialMatched(
+        List<PerformanceDTO> searchedPerformances = performanceSearchService.getUpcomingPerformancesByTitleAndTypePartialMatched(
                 analyzeResult.processedTerm(), analyzeResult.performanceType()).stream()
             .map(PerformanceDTO::from)
             .toList();
