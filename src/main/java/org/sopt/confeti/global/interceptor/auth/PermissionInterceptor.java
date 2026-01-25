@@ -37,7 +37,7 @@ public class PermissionInterceptor implements HandlerInterceptor, CustomIntercep
     }
 
     private boolean hasRequiredRole(Role role, Permission permission) {
-        boolean permitted = Set.of(permission.role()).stream()
+        boolean permitted = isAdmin(role) || Set.of(permission.role()).stream()
             .anyMatch(permittedRole -> permittedRole == role);
 
         if (!permitted) {
@@ -45,5 +45,9 @@ public class PermissionInterceptor implements HandlerInterceptor, CustomIntercep
         }
 
         return true;
+    }
+
+    private boolean isAdmin(Role role) {
+        return role == Role.ADMIN;
     }
 }
