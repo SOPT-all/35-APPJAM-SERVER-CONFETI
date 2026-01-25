@@ -8,11 +8,10 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.controller.docs.PerformanceControllerDocs;
-import org.sopt.confeti.api.performance.dto.request.GetExpectedPerformanceRequest;
+import org.sopt.confeti.api.performance.dto.request.GetUpcomingPerformanceRequest;
 import org.sopt.confeti.api.performance.dto.response.ArtistPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.ConcertDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.ConfetiRecordResponse;
-import org.sopt.confeti.api.performance.dto.response.ExpectedPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.FestivalDetailResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceIdsResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
@@ -22,12 +21,12 @@ import org.sopt.confeti.api.performance.dto.response.RecommendMusicsPerformanceR
 import org.sopt.confeti.api.performance.dto.response.RecommendMusicsResponse_deprecated;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.SearchACPerformancesResponse;
+import org.sopt.confeti.api.performance.dto.response.UpcomingPerformancesResponse;
 import org.sopt.confeti.api.performance.facade.PerformanceFacade;
-import org.sopt.confeti.api.performance.facade.dto.request.GetExpectedPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.request.GetUpcomingPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailWithFavoriteDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.ExpectedPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailWithFavoriteDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservationDTO;
@@ -37,6 +36,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformance
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.UpcomingPerformancesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.ApiVersion;
 import org.sopt.confeti.global.annotation.Permission;
@@ -71,7 +71,8 @@ public class PerformanceController implements PerformanceControllerDocs {
     public ResponseEntity<BaseResponse<ConcertDetailResponse>> getConcertInfo(
         @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId
     ) {
-        ConcertDetailWithFavoriteDTO concertDetail = performanceFacade.getExpectedConcertDetail(concertId);
+        ConcertDetailWithFavoriteDTO concertDetail = performanceFacade.getUpcomingConcertDetail(
+            concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             ConcertDetailResponse.of(concertDetail, s3FileHandler));
     }
@@ -80,7 +81,7 @@ public class PerformanceController implements PerformanceControllerDocs {
     public ResponseEntity<BaseResponse<FestivalDetailResponse>> getFestivalInfo(
         @PathVariable("festivalId") @Min(RequestConstraint.ID) Long festivalId
     ) {
-        FestivalDetailWithFavoriteDTO festivalDetail = performanceFacade.getExpectedFestivalDetail(
+        FestivalDetailWithFavoriteDTO festivalDetail = performanceFacade.getUpcomingFestivalDetail(
             festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             FestivalDetailResponse.of(festivalDetail, s3FileHandler));
@@ -187,25 +188,25 @@ public class PerformanceController implements PerformanceControllerDocs {
             ConfetiRecordResponse.from(recordDTO));
     }
 
-    @GetMapping("/expected")
-    public ResponseEntity<BaseResponse<ExpectedPerformancesResponse>> getExpectedPerformances(
+    @GetMapping("/upcoming")
+    public ResponseEntity<BaseResponse<UpcomingPerformancesResponse>> getUpcomingPerformances(
         @RequestParam String items
     ) {
-        List<GetExpectedPerformanceRequest> performanceRequests = decodeToExpectedPerformancesRequest(
+        List<GetUpcomingPerformanceRequest> performanceRequests = decodeToUpcomingPerformancesRequest(
             items);
-        ExpectedPerformancesDTO expectedPerformances = performanceFacade.getExpectedPerformances(
-            GetExpectedPerformancesDTO.from(performanceRequests));
+        UpcomingPerformancesDTO upcomingPerformances = performanceFacade.getUpcomingPerformances(
+            GetUpcomingPerformancesDTO.from(performanceRequests));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            ExpectedPerformancesResponse.of(expectedPerformances, s3FileHandler));
+            UpcomingPerformancesResponse.of(upcomingPerformances, s3FileHandler));
     }
 
-    private List<GetExpectedPerformanceRequest> decodeToExpectedPerformancesRequest(
+    private List<GetUpcomingPerformanceRequest> decodeToUpcomingPerformancesRequest(
         String request) {
         try {
             return Arrays.stream(request.split(","))
                 .map(item -> {
                     String[] performance = item.split(":");
-                    return GetExpectedPerformanceRequest.of(
+                    return GetUpcomingPerformanceRequest.of(
                         PerformanceType.convert(performance[0].trim()),
                         Long.parseLong(performance[1].trim())
                     );

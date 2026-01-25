@@ -47,20 +47,20 @@ public class FestivalService {
 
     // TODO: AOP 방식으로 캐싱 전략 수정
     @Transactional(readOnly = true)
-    public FestivalDetailDTO getExpectedFestivalDetailByFestivalId(long festivalId) {
+    public FestivalDetailDTO getUpcomingFestivalDetailByFestivalId(long festivalId) {
         Optional<FestivalDetailDTO> cachedFestival = redisHandler.get(
             RedisKey.PERFORMANCE_FESTIVALS.createKeyInfo(festivalId));
         if (cachedFestival.isPresent()) {
             return cachedFestival.get();
         }
 
-        Festival festival = festivalRepository.findExpectedWithDatesById(festivalId)
+        Festival festival = festivalRepository.findUpcomingWithDatesById(festivalId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
         festivalDateService.loadDatesWithStagesByFestivalId(festivalId);
         festivalStageService.loadStagesWithTimesByFestivalId(festivalId);
         festivalTimeService.loadTimesWithArtistsByFestivalId(festivalId);
-        festivalRepository.findExpectedWithReservationUrlsById(festivalId);
+        festivalRepository.findUpcomingWithReservationUrlsById(festivalId);
 
         FestivalDetailDTO festivalDetail = FestivalDetailDTO.from(festival);
         redisHandler.set(RedisKey.PERFORMANCE_FESTIVALS.createKeyInfo(festivalId), festivalDetail);

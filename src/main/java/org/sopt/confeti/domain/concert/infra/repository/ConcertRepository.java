@@ -16,7 +16,7 @@ public interface ConcertRepository extends JpaRepository<Concert, Long> {
             LEFT JOIN FETCH ca.artist
             WHERE c.id = :concertId AND c.endAt >= CURRENT_DATE
         """)
-    Optional<Concert> findExpectedWithArtistsById(@Param("concertId") long concertId);
+    Optional<Concert> findUpcomingWithArtistsById(@Param("concertId") long concertId);
 
     @Query(value = """
             SELECT DISTINCT c
@@ -24,7 +24,7 @@ public interface ConcertRepository extends JpaRepository<Concert, Long> {
             JOIN FETCH c.reservationUrls cr
             WHERE c.id = :concertId AND c.endAt >= CURRENT_DATE
         """)
-    Optional<Concert> findExpectedWithReservationUrlsById(@Param("concertId") long concertId);
+    Optional<Concert> findUpcomingWithReservationUrlsById(@Param("concertId") long concertId);
 
     List<Concert> findAllByIdIn(final List<Long> concertIds);
 }

@@ -237,58 +237,6 @@ public ResponseEntity<BaseResponse<Token>> reissue(@RefreshToken String refreshT
 }
 ```
 
-### @UserId
-
-#### 목적
-
-JWT 토큰에서 사용자 ID를 자동으로 추출하여 Controller 메서드 파라미터에 주입함.
-
-#### 사용 위치
-
-- Controller 메서드의 파라미터에만 적용 가능 (`@Target(ElementType.PARAMETER)`)
-- 파라미터 타입은 `Long`이어야 함
-
-#### 동작 방식
-
-1. HTTP 요청의 `Authorization` 헤더에서 JWT 토큰 추출
-2. 토큰에서 사용자 ID(subject) 추출
-3. 파라미터에 Long 타입으로 주입
-4. 토큰이 없거나 유효하지 않으면 예외 발생 (require=true인 경우)
-
-#### 속성
-
-- `require`: 토큰 필수 여부 (기본값: `true`)
-    - `true`: 토큰이 없으면 `BAD_REQUEST` 예외 발생
-    - `false`: 토큰이 없으면 `null` 반환 (인증 선택적 API에 사용)
-
-#### 사용 예시
-
-```java
-// 필수 인증 (토큰 없으면 예외 발생)
-@Permission(role = {Role.GENERAL})
-@GetMapping("/my/setlists/all")
-public ResponseEntity<BaseResponse<GetAllSetlistsResponse>> getAllMySetlists(
-    @UserId Long userId  // require = true (기본값)
-) {
-    // userId는 항상 존재함
-}
-
-// 선택적 인증 (토큰 없으면 null 반환)
-@GetMapping("/artists/search/ac")
-public ResponseEntity<BaseResponse<SearchACArtistsResponse>> searchAutoComplete(
-    @UserId(require = false) Long userId,  // 로그인하지 않은 사용자도 접근 가능
-    @RequestParam String term
-) {
-    // userId는 null일 수 있음
-}
-```
-
-#### 주의사항
-
-- `@UserId`는 `@Permission`과 함께 사용하는 것이 일반적
-- `@Permission` 없이 `@UserId`만 사용하면 권한 검증 없이 ID만 추출됨
-- Swagger 문서에서 자동으로 숨김 처리됨 (`@Schema(hidden = true)`)
-
 ---
 
 # API 응답 코드 컨벤션
@@ -473,8 +421,9 @@ Controller 클래스에서 Docs 인터페이스를 `implements`하여 구현
 - 가능한 짧게 작성 (30줄 이내 권장)
 - 복잡한 로직은 private 메서드로 분리
 
-## **반드시** 지켜야하는 네이밍 규칙
+## **반드시** 지켜야하는 네이밍 규칙 [[IMPORTANT]] [[MANDATORY]]
 
 - "노래"를 의미하는 경우 `song` 으로 표기해야 함.
     - 단, `Apple Music API`와 같은 서비스명의 `music` 키워드는 예외
+- `예정된`의 의미를 지닌 경우 `Upcoming` 키워드가 메서드 명, 변수 명, 클래스 명에 반드시 들어가야 함.
 

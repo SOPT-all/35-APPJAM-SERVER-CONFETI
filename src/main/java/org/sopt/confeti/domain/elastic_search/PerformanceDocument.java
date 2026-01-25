@@ -11,53 +11,54 @@ import org.springframework.data.elasticsearch.annotations.MultiField;
 import org.springframework.data.elasticsearch.annotations.Setting;
 
 @Builder
-@Document(indexName = "expected_performances")
+@Document(indexName = "upcoming_performances")
 @Setting(settingPath = "/elasticsearch/performance-settings.json")
 public record PerformanceDocument(
 
-        @Field(type = FieldType.Long)
-        long id,
+    @Field(type = FieldType.Long)
+    long id,
 
-        @Field(type = FieldType.Keyword)
-        String type,
+    @Field(type = FieldType.Keyword)
+    String type,
 
-        @Field(type = FieldType.Long)
-        long typeId,
+    @Field(type = FieldType.Long)
+    long typeId,
 
-        @MultiField(
-                mainField = @Field(type = FieldType.Text, analyzer = "search_analyzer"),
-                otherFields = {
-                        @InnerField(suffix = "autocomplete", type = FieldType.Text,
-                                analyzer = "autocomplete_analyzer", searchAnalyzer = "search_analyzer"),
-                        @InnerField(suffix = "partial", type = FieldType.Text,      // 추가!
-                                analyzer = "partial_match_analyzer", searchAnalyzer = "search_analyzer"),
-                        @InnerField(suffix = "keyword", type = FieldType.Keyword)
-                }
-        )
-        String title,
+    @MultiField(
+        mainField = @Field(type = FieldType.Text, analyzer = "search_analyzer"),
+        otherFields = {
+            @InnerField(suffix = "autocomplete", type = FieldType.Text,
+                analyzer = "autocomplete_analyzer", searchAnalyzer = "search_analyzer"),
+            @InnerField(suffix = "partial", type = FieldType.Text,      // 추가!
+                analyzer = "partial_match_analyzer", searchAnalyzer = "search_analyzer"),
+            @InnerField(suffix = "keyword", type = FieldType.Keyword)
+        }
+    )
+    String title,
 
-        @Field(type = FieldType.Date)
-        LocalDate startAt,
+    @Field(type = FieldType.Date)
+    LocalDate startAt,
 
-        @Field(type = FieldType.Date)
-        LocalDate endAt,
+    @Field(type = FieldType.Date)
+    LocalDate endAt,
 
-        @Field(type = FieldType.Text)
-        String posterPath,
+    @Field(type = FieldType.Text)
+    String posterPath,
 
-        @Field(type = FieldType.Text)
-        String area
+    @Field(type = FieldType.Text)
+    String area
 ) {
+
     public static PerformanceDocument create(PerformanceDTO performance) {
         return PerformanceDocument.builder()
-                .id(performance.id())
-                .type(performance.type().getName())
-                .typeId(performance.typeId())
-                .title(performance.title())
-                .startAt(performance.startAt())
-                .endAt(performance.endAt())
-                .posterPath(performance.posterPath())
-                .area(performance.area())
-                .build();
+            .id(performance.id())
+            .type(performance.type().getName())
+            .typeId(performance.typeId())
+            .title(performance.title())
+            .startAt(performance.startAt())
+            .endAt(performance.endAt())
+            .posterPath(performance.posterPath())
+            .area(performance.area())
+            .build();
     }
 }
