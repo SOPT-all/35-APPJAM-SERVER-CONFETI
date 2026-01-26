@@ -89,7 +89,7 @@ public class PerformanceController implements PerformanceControllerDocs {
 
     @GetMapping("/reservation")
     public ResponseEntity<BaseResponse<PerformanceReservationResponse>> getPerformReservationInfo() {
-        PerformanceReservationDTO performanceReservationDTO = performanceFacade.getPerformReservationInfo();
+        PerformanceReservationDTO performanceReservationDTO = performanceFacade.getPerformanceReservationInfo();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             PerformanceReservationResponse.from(performanceReservationDTO));
     }
