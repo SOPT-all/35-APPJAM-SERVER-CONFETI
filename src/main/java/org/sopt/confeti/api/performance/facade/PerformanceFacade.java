@@ -21,7 +21,6 @@ import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDe
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailWithFavoriteDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ConfetiRecordDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.UpcomingPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailWithFavoriteDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.PerformanceIdsDTO;
@@ -34,6 +33,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SongRecommendDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.UpcomingPerformancesDTO;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.application.ConcertService;
@@ -137,7 +137,7 @@ public class PerformanceFacade {
     }
 
     @ReadOnlyTransactional
-    public PerformanceReservationDTO getPerformReservationInfo() {
+    public PerformanceReservationDTO getPerformanceReservationInfo() {
         boolean existsFavoritePerformance = UserContext.getOptional()
             .map(userInfo ->
                 concertFavoriteService.existsUpcomingReservationByUserId(userInfo.id())
@@ -148,11 +148,11 @@ public class PerformanceFacade {
         if (existsFavoritePerformance) {
             List<PerformanceTicketDTO> performanceReserve = performanceService.getFavoritePerformancesReservation(
                 UserContext.get().id());
-            return PerformanceReservationDTO.from(performanceReserve);
+            return PerformanceReservationDTO.of(PERSONALIZED, performanceReserve);
         }
 
         List<PerformanceTicketDTO> performanceReserve = performanceService.getPerformancesReservation();
-        return PerformanceReservationDTO.from(performanceReserve);
+        return PerformanceReservationDTO.of(UNPERSONALIZED, performanceReserve);
     }
 
     @ReadOnlyTransactional
