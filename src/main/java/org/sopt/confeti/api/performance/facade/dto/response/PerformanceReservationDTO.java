@@ -4,13 +4,18 @@ import java.util.List;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
 
 public record PerformanceReservationDTO(
-        List<PerformanceReservationDetailDTO> performanceReservation
+    boolean isPersonalized,
+    List<PerformanceReservationDetailDTO> performanceReservation
 ) {
-    public static PerformanceReservationDTO from(List<PerformanceTicketDTO> performanceTickets) {
+
+    public static PerformanceReservationDTO of(
+        boolean isPersonalized,
+        List<PerformanceTicketDTO> performanceTickets) {
         return new PerformanceReservationDTO(
-                performanceTickets.stream()
-                        .map(PerformanceReservationDetailDTO::from)
-                        .toList()
+            isPersonalized,
+            performanceTickets.stream()
+                .map(PerformanceReservationDetailDTO::from)
+                .toList()
         );
     }
 }
