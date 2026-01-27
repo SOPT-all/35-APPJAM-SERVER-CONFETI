@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import org.sopt.confeti.domain.timetable.Timetable;
 import org.sopt.confeti.domain.timetable.TimetableCursor.CursorData;
-import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -116,6 +115,4 @@ public interface TimetableRepository extends JpaRepository<Timetable, Long> {
         @Param("cursor") CursorData cursor,
         @Param("status") PerformanceStatus status,
         @Param("size") int size);
-
-    long user(User user);
 }

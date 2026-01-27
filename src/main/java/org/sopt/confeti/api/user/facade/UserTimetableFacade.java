@@ -10,14 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimeBlockDTO;
-import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimeBlockListDTO;
+import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableDatesDTO;
-import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableDetailFestivalsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableEntireFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableFestivalBasicDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableHistoryDTO;
+import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetablesDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
@@ -25,13 +25,13 @@ import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.application.FestivalDateService;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
+import org.sopt.confeti.domain.time_block.TimeBlock;
+import org.sopt.confeti.domain.time_block.application.TimeBlockService;
 import org.sopt.confeti.domain.timetable.Timetable;
 import org.sopt.confeti.domain.timetable.TimetableCursor.CursorData;
 import org.sopt.confeti.domain.timetable.application.TimetableService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
-import org.sopt.confeti.domain.time_block.TimeBlock;
-import org.sopt.confeti.domain.time_block.application.TimeBlockService;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.CursorPage;
@@ -61,7 +61,7 @@ public class UserTimetableFacade {
 
     @Transactional(readOnly = true)
     public TimetableDetailFestivalsDTO getTimetablesListAndDate() {
-        List<Timetable> timetableList = timetableService.getFetivalList(
+        List<Timetable> timetableList = timetableService.getFestivalList(
             UserContext.get().id());
         return TimetableDetailFestivalsDTO.from(timetableList);
     }

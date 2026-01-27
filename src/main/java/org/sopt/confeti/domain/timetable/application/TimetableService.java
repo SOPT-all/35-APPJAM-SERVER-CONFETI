@@ -14,8 +14,6 @@ import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +24,6 @@ public class TimetableService {
 
     private static final int INIT_PAGE = 0;
     private static final int GET_TIMETABLES_SIZE_WITH_CURSOR = 10 + 1;
-    private static final String START_AT_COLUMN = "startAt";
 
     private final TimetableRepository timetableRepository;
 
@@ -37,7 +34,7 @@ public class TimetableService {
     }
 
     @Transactional(readOnly = true)
-    public List<Timetable> getFetivalList(long userId) {
+    public List<Timetable> getFestivalList(long userId) {
         return timetableRepository.findByUserIdWhereEndAtLENow(userId);
     }
 
@@ -136,9 +133,5 @@ public class TimetableService {
     public Timetable getEntireFestivalInfo(final long userId, final long festivalId) {
         return timetableRepository.findByUserIdAndFestivalId(userId, festivalId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-    }
-
-    private PageRequest getPageRequestWithSort(final int size, final Sort sort) {
-        return PageRequest.of(INIT_PAGE, size, sort);
     }
 }
