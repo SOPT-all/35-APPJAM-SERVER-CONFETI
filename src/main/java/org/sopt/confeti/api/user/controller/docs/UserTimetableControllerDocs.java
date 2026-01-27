@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.sopt.confeti.api.user.dto.request.AddTimetableFestivalRequest;
+import org.sopt.confeti.api.user.dto.request.AddTimetableRequest;
 import org.sopt.confeti.api.user.dto.request.PatchTimetableFestivalRequest;
 import org.sopt.confeti.api.user.dto.response.TimetableDatesResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetableCursorResponse;
+import org.sopt.confeti.api.user.dto.response.TimetableCursorResponse;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.Permission;
 import org.sopt.confeti.global.common.BaseResponse;
@@ -38,7 +38,7 @@ public interface UserTimetableControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<Void>> addTimetableFestival(
-        @RequestBody AddTimetableFestivalRequest addTimetableFestivalRequest
+        @RequestBody AddTimetableRequest addTimetableRequest
     );
 
     @Operation(
@@ -66,7 +66,7 @@ public interface UserTimetableControllerDocs {
     )
     @AuthErrorResponses
     @CommonErrorResponses
-    ResponseEntity<BaseResponse<UserTimetableCursorResponse>> getTimetables(
+    ResponseEntity<BaseResponse<TimetableCursorResponse>> getTimetables(
         @RequestParam(required = false) TimetableSortType sortBy,
         @RequestParam(required = false) String cursor,
         @RequestParam(defaultValue = Default.PERFORMANCE_STATUS) PerformanceStatus status
@@ -97,8 +97,8 @@ public interface UserTimetableControllerDocs {
         }
     )
     @Permission(role = {Role.GENERAL})
-    @GetMapping("/{timetableFestivalId}/dates")
+    @GetMapping("/{timetableId}/dates")
     ResponseEntity<BaseResponse<TimetableDatesResponse>> getTimetableDates(
-        @PathVariable Long timetableFestivalId
+        @PathVariable Long timetableId
     );
 }

@@ -12,7 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value =
         "SELECT DISTINCT u" +
             " FROM User u" +
-            " LEFT JOIN FETCH u.timetableFestivals tf" +
+            " LEFT JOIN FETCH u.timetables t" +
             " WHERE u.id = :userId"
     )
     Optional<User> findUserTimetablesById(final @Param("userId") long userId);

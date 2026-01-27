@@ -4,7 +4,7 @@ package org.sopt.confeti.api.user.facade.dto.response;
 import java.util.List;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
-import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
+import org.sopt.confeti.domain.timetable.Timetable;
 
 public record TimetableDatesDTO(
     long timetableFestivalId,
@@ -14,7 +14,7 @@ public record TimetableDatesDTO(
 ) {
 
     public static TimetableDatesDTO of(
-        TimetableFestival timetableFestival,
+        Timetable timetable,
         Festival festival,
         List<FestivalDate> festivalDates
     ) {
@@ -23,7 +23,7 @@ public record TimetableDatesDTO(
             .toList();
 
         return new TimetableDatesDTO(
-            timetableFestival.getId(), festival.getTitle(), festival.getPosterPath(), dates);
+            timetable.getId(), festival.getTitle(), festival.getPosterPath(), dates);
     }
 
 }
