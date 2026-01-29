@@ -22,7 +22,7 @@ import lombok.Setter;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalTimeDTO;
 import org.sopt.confeti.domain.festival_artist.FestivalArtist;
 import org.sopt.confeti.domain.festival_stage.FestivalStage;
-import org.sopt.confeti.domain.user_timetable.UserTimetable;
+import org.sopt.confeti.domain.time_block.TimeBlock;
 
 @Entity
 @Table(name = "festival_times")
@@ -46,7 +46,7 @@ public class FestivalTime {
     private LocalTime endAt;
 
     @OneToMany(mappedBy = "festivalTime", cascade = CascadeType.REMOVE)
-    private List<UserTimetable> timetables = new ArrayList<>();
+    private List<TimeBlock> timeBlocks = new ArrayList<>();
 
     @OneToMany(mappedBy = "festivalTime", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FestivalArtist> artists = new ArrayList<>();

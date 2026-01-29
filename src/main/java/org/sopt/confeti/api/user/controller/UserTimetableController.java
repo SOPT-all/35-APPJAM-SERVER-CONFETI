@@ -3,31 +3,31 @@ package org.sopt.confeti.api.user.controller;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.docs.UserTimetableControllerDocs;
-import org.sopt.confeti.api.user.dto.request.AddTimetableFestivalRequest;
+import org.sopt.confeti.api.user.dto.request.AddTimetableRequest;
 import org.sopt.confeti.api.user.dto.request.PatchTimetableFestivalRequest;
 import org.sopt.confeti.api.user.dto.request.PatchTimetableRequest;
 import org.sopt.confeti.api.user.dto.response.TimetableDatesResponse;
 import org.sopt.confeti.api.user.dto.response.TimetablesToAddResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetableCursorResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetableDetailFestivalsResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetableEntireFestivalResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetableFestivalResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetableHistoryResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetablesPreviewResponse;
-import org.sopt.confeti.api.user.dto.response.UserTimetablesResponse;
+import org.sopt.confeti.api.user.dto.response.TimetableCursorResponse;
+import org.sopt.confeti.api.user.dto.response.TimetableDetailFestivalsResponse;
+import org.sopt.confeti.api.user.dto.response.TimetableEntireFestivalResponse;
+import org.sopt.confeti.api.user.dto.response.TimetableFestivalResponse;
+import org.sopt.confeti.api.user.dto.response.TimetableHistoryResponse;
+import org.sopt.confeti.api.user.dto.response.TimetablesPreviewResponse;
+import org.sopt.confeti.api.user.dto.response.TimetablesResponse;
 import org.sopt.confeti.api.user.facade.UserTimetableFacade;
-import org.sopt.confeti.api.user.facade.dto.request.AddTimetableFestivalDTO;
-import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
+import org.sopt.confeti.api.user.facade.dto.request.AddTimetableDTO;
+import org.sopt.confeti.api.user.facade.dto.request.PatchTimeBlockDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableDatesDTO;
 import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableDetailFestivalsDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableEntireFestivalDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableFestivalBasicDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetableHistoryDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserTimetablesDTO;
-import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
-import org.sopt.confeti.domain.timetable_festival.TimetableFestivalCursor;
-import org.sopt.confeti.domain.timetable_festival.TimetableFestivalCursor.CursorData;
+import org.sopt.confeti.api.user.facade.dto.response.TimetableDetailFestivalsDTO;
+import org.sopt.confeti.api.user.facade.dto.response.TimetableEntireFestivalDTO;
+import org.sopt.confeti.api.user.facade.dto.response.TimetableFestivalBasicDTO;
+import org.sopt.confeti.api.user.facade.dto.response.TimetableHistoryDTO;
+import org.sopt.confeti.api.user.facade.dto.response.TimetablesDTO;
+import org.sopt.confeti.domain.timetable.Timetable;
+import org.sopt.confeti.domain.timetable.TimetableCursor;
+import org.sopt.confeti.domain.timetable.TimetableCursor.CursorData;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.annotation.ApiVersion;
 import org.sopt.confeti.global.annotation.Permission;
@@ -59,24 +59,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user/timetables")
 public class UserTimetableController implements UserTimetableControllerDocs {
 
-    private final UserTimetableFacade userTimetableFacade;
+    private final UserTimetableFacade timetableFacade;
     private final S3FileHandler s3FileHandler;
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/festivals")
-    public ResponseEntity<BaseResponse<UserTimetableDetailFestivalsResponse>> getTimetablesListAndDate() {
-        UserTimetableDetailFestivalsDTO userTimetableDetailFestivalsDTO = userTimetableFacade.getTimetablesListAndDate();
+    public ResponseEntity<BaseResponse<TimetableDetailFestivalsResponse>> getTimetablesListAndDate() {
+        TimetableDetailFestivalsDTO timetableDetailFestivalsDTO = timetableFacade.getTimetablesListAndDate();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserTimetableDetailFestivalsResponse.of(userTimetableDetailFestivalsDTO,
+            TimetableDetailFestivalsResponse.of(timetableDetailFestivalsDTO,
                 s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/festivals/history")
-    public ResponseEntity<BaseResponse<UserTimetableHistoryResponse>> getHasTimetableHistory() {
-        UserTimetableHistoryDTO timetableHistoryDTO = userTimetableFacade.getHasTimetableHistory();
+    public ResponseEntity<BaseResponse<TimetableHistoryResponse>> getHasTimetableHistory() {
+        TimetableHistoryDTO timetableHistoryDTO = timetableFacade.getHasTimetableHistory();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserTimetableHistoryResponse.from(timetableHistoryDTO));
+            TimetableHistoryResponse.from(timetableHistoryDTO));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -84,7 +84,7 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     public ResponseEntity<BaseResponse<TimetablesToAddResponse>> getTimetablesToAdd(
         @RequestParam(name = "cursor", required = false) Long cursor
     ) {
-        CursorPage<TimetableToAddDTO> timetablesToAdd = userTimetableFacade.getTimetablesToAdd(
+        CursorPage<TimetableToAddDTO> timetablesToAdd = timetableFacade.getTimetablesToAdd(
             cursor);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             TimetablesToAddResponse.of(timetablesToAdd, s3FileHandler));
@@ -93,10 +93,10 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     @Permission(role = {Role.GENERAL})
     @PostMapping("/festivals")
     public ResponseEntity<BaseResponse<Void>> addTimetableFestival(
-        @RequestBody AddTimetableFestivalRequest addTimetableFestivalRequest
+        @RequestBody AddTimetableRequest addTimetableRequest
     ) {
-        userTimetableFacade.addTimetableFestivals(
-            AddTimetableFestivalDTO.from(addTimetableFestivalRequest));
+        timetableFacade.addTimetables(
+            AddTimetableDTO.from(addTimetableRequest));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
@@ -105,19 +105,19 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     public ResponseEntity<BaseResponse<Void>> removeTimetableFestival(
         @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) long festivalId
     ) {
-        userTimetableFacade.removeTimetableFestival(festivalId);
+        timetableFacade.removeTimetable(festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/festivals/{festivalDateId}")
-    public ResponseEntity<BaseResponse<UserTimetableFestivalResponse>> getTimetableFestival(
+    public ResponseEntity<BaseResponse<TimetableFestivalResponse>> getTimetableFestival(
         @PathVariable(name = "festivalDateId") @Min(RequestConstraint.ID) long festivalDateId
     ) {
-        UserTimetableFestivalBasicDTO response = userTimetableFacade.getTimetableInfo(
+        TimetableFestivalBasicDTO response = timetableFacade.getTimetableInfo(
             festivalDateId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserTimetableFestivalResponse.from(response));
+            TimetableFestivalResponse.from(response));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -125,65 +125,65 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     public ResponseEntity<BaseResponse<Void>> updateTimetableFestival(
         @RequestBody PatchTimetableRequest patchTimetableRequest
     ) {
-        userTimetableFacade.patchTimetableFestivals(PatchTimetableDTO.from(patchTimetableRequest));
+        timetableFacade.patchTimeBlocks(PatchTimeBlockDTO.from(patchTimetableRequest));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @GetMapping
     @Deprecated
     @Permission(role = {Role.GENERAL})
-    public ResponseEntity<BaseResponse<UserTimetablesResponse>> getTimetables(
+    public ResponseEntity<BaseResponse<TimetablesResponse>> getTimetables(
         @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy
     ) {
-        UserTimetablesDTO timetables = userTimetableFacade.getTimetables_deprecated(
+        TimetablesDTO timetables = timetableFacade.getTimetables_deprecated(
             UserContext.get().id(), sortBy);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserTimetablesResponse.of(timetables, s3FileHandler));
+            TimetablesResponse.of(timetables, s3FileHandler));
     }
 
     @ApiVersion("2")
     @GetMapping
     @Permission(role = {Role.GENERAL})
-    public ResponseEntity<BaseResponse<UserTimetableCursorResponse>> getTimetables(
+    public ResponseEntity<BaseResponse<TimetableCursorResponse>> getTimetables(
         @RequestParam(required = false) TimetableSortType sortBy,
         @RequestParam(required = false) String cursor,
         @RequestParam(defaultValue = Default.PERFORMANCE_STATUS) PerformanceStatus status
     ) {
-        CursorData cursorData = TimetableFestivalCursor.decode(cursor);
-        CursorPage<TimetableFestival> timetableCursorPage = userTimetableFacade.getTimetableCursorPage(
+        CursorData cursorData = TimetableCursor.decode(cursor);
+        CursorPage<Timetable> timetableCursorPage = timetableFacade.getTimetableCursorPage(
             sortBy, cursorData, status);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserTimetableCursorResponse.of(timetableCursorPage, s3FileHandler));
+            TimetableCursorResponse.of(timetableCursorPage, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/preview")
-    public ResponseEntity<BaseResponse<UserTimetablesPreviewResponse>> getTimetablesPreview() {
-        UserTimetablesDTO timetables = userTimetableFacade.getTimetablesPreview();
+    public ResponseEntity<BaseResponse<TimetablesPreviewResponse>> getTimetablesPreview() {
+        TimetablesDTO timetables = timetableFacade.getTimetablesPreview();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserTimetablesPreviewResponse.of(timetables, s3FileHandler));
+            TimetablesPreviewResponse.of(timetables, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/archive/{festivalId}")
-    public ResponseEntity<BaseResponse<UserTimetableEntireFestivalResponse>> getEntireFestivalInfo(
+    public ResponseEntity<BaseResponse<TimetableEntireFestivalResponse>> getEntireFestivalInfo(
         @PathVariable(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId
     ) {
-        UserTimetableEntireFestivalDTO entireFestivalDTO = userTimetableFacade.getEntireFestivalInfo(
+        TimetableEntireFestivalDTO entireFestivalDTO = timetableFacade.getEntireFestivalInfo(
             festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserTimetableEntireFestivalResponse.of(entireFestivalDTO, s3FileHandler));
+            TimetableEntireFestivalResponse.of(entireFestivalDTO, s3FileHandler));
     }
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/archive/festival/{festivalDateId}")
-    public ResponseEntity<BaseResponse<UserTimetableFestivalResponse>> getEntireFestivalDateInfo(
+    public ResponseEntity<BaseResponse<TimetableFestivalResponse>> getEntireFestivalDateInfo(
         @PathVariable(name = "festivalDateId") @Min(RequestConstraint.ID) Long festivalDateId
     ) {
-        UserTimetableFestivalBasicDTO festivalBasicDTO = userTimetableFacade.getEntireFestivalDateInfo(
+        TimetableFestivalBasicDTO festivalBasicDTO = timetableFacade.getEntireFestivalDateInfo(
             festivalDateId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserTimetableFestivalResponse.from(festivalBasicDTO));
+            TimetableFestivalResponse.from(festivalBasicDTO));
     }
 
     @ApiVersion("2")
@@ -192,17 +192,17 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     public ResponseEntity<BaseResponse<Void>> updateTimetableFestival(
         @RequestBody PatchTimetableFestivalRequest patchTimetableFestivalRequest
     ) {
-        userTimetableFacade.updateTimetableFestivals(patchTimetableFestivalRequest.toDTO());
+        timetableFacade.updateTimetables(patchTimetableFestivalRequest.toDTO());
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Permission(role = {Role.GENERAL})
-    @GetMapping("/{timetableFestivalId}/dates")
+    @GetMapping("/{timetableId}/dates")
     public ResponseEntity<BaseResponse<TimetableDatesResponse>> getTimetableDates(
-        @PathVariable Long timetableFestivalId
+        @PathVariable Long timetableId
     ) {
-        TimetableDatesDTO timetableDates = userTimetableFacade.getTimetableDates(
-            timetableFestivalId);
+        TimetableDatesDTO timetableDates = timetableFacade.getTimetableDates(
+            timetableId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             TimetableDatesResponse.of(timetableDates, s3FileHandler));
     }

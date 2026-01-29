@@ -42,7 +42,7 @@ import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchServi
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
-import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
+import org.sopt.confeti.domain.timetable.application.TimetableService;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
@@ -82,7 +82,7 @@ public class PerformanceFacade {
     private final ArtistFavoriteService artistFavoriteService;
     private final PerformanceSearchService performanceSearchService;
     private final MusicAPIHandler musicAPIHandler;
-    private final TimetableFestivalService timetableFestivalService;
+    private final TimetableService timetableService;
     private final SetlistService setlistService;
     private final Executor performanceExecutor;
 
@@ -95,7 +95,7 @@ public class PerformanceFacade {
         ArtistFavoriteService artistFavoriteService,
         PerformanceSearchService performanceSearchService,
         MusicAPIHandler musicAPIHandler,
-        TimetableFestivalService timetableFestivalService,
+        TimetableService timetableService,
         SetlistService setlistService,
         @Qualifier(ExecutorName.PERFORMANCE_EXECUTOR) Executor performanceExecutor) {
         this.concertService = concertService;
@@ -107,7 +107,7 @@ public class PerformanceFacade {
         this.artistFavoriteService = artistFavoriteService;
         this.performanceSearchService = performanceSearchService;
         this.musicAPIHandler = musicAPIHandler;
-        this.timetableFestivalService = timetableFestivalService;
+        this.timetableService = timetableService;
         this.setlistService = setlistService;
         this.performanceExecutor = performanceExecutor;
     }
@@ -363,7 +363,7 @@ public class PerformanceFacade {
     @ReadOnlyTransactional
     public ConfetiRecordDTO getConfetiRecord() {
         long userId = UserContext.get().id();
-        List<Long> timetableFestivalIds = timetableFestivalService.findFestivalIdsByUserId(userId);
+        List<Long> timetableFestivalIds = timetableService.findFestivalIdsByUserId(userId);
         List<Long> setListFestivalIds = setlistService.findFestivalIdsByUserId(userId);
         List<Long> setListConcertIds = setlistService.findConcertIdsByUserId(userId);
 

@@ -5,9 +5,9 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
-import org.sopt.confeti.domain.timetable_festival.TimetableFestivalCursor.CursorData;
-import org.sopt.confeti.domain.timetable_festival.application.TimetableFestivalService;
+import org.sopt.confeti.domain.timetable.Timetable;
+import org.sopt.confeti.domain.timetable.TimetableCursor.CursorData;
+import org.sopt.confeti.domain.timetable.application.TimetableService;
 import org.sopt.confeti.global.common.CursorPage;
 
 /**
@@ -19,19 +19,19 @@ import org.sopt.confeti.global.common.CursorPage;
 public enum TimetableSortType {
     EARLIEST("earliest") {
         @Override
-        public CursorPage<TimetableFestival> getTimetableCursorPage(
-            TimetableFestivalService timetableFestivalService, long userId, CursorData cursor,
+        public CursorPage<Timetable> getTimetableCursorPage(
+            TimetableService timetableService, long userId, CursorData cursor,
             PerformanceStatus performanceStatus) {
-            return timetableFestivalService.getTimetablesEarliest(userId, cursor,
+            return timetableService.getTimetablesEarliest(userId, cursor,
                 performanceStatus);
         }
     },
     LATEST("latest") {
         @Override
-        public CursorPage<TimetableFestival> getTimetableCursorPage(
-            TimetableFestivalService timetableFestivalService, long userId, CursorData cursor,
+        public CursorPage<Timetable> getTimetableCursorPage(
+            TimetableService timetableService, long userId, CursorData cursor,
             PerformanceStatus performanceStatus) {
-            return timetableFestivalService.getTimetablesLatest(userId, cursor, performanceStatus);
+            return timetableService.getTimetablesLatest(userId, cursor, performanceStatus);
         }
     };
 
@@ -47,7 +47,7 @@ public enum TimetableSortType {
             .findFirst();
     }
 
-    public abstract CursorPage<TimetableFestival> getTimetableCursorPage(
-        TimetableFestivalService timetableFestivalService, long userId, CursorData cursor,
+    public abstract CursorPage<Timetable> getTimetableCursorPage(
+        TimetableService timetableService, long userId, CursorData cursor,
         PerformanceStatus performanceStatus);
 }

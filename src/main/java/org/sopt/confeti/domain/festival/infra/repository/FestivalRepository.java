@@ -36,9 +36,9 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             " LEFT JOIN FestivalFavorite ff" +
             " ON f.id = ff.festival.id AND ff.user.id = :userId" +
             " WHERE f.endAt >= CURRENT_DATE AND f.id NOT IN (" +
-            " SELECT tf.festival.id" +
-            " FROM TimetableFestival tf" +
-            " INNER JOIN tf.user u" +
+            " SELECT t.festival.id" +
+            " FROM Timetable t" +
+            " INNER JOIN t.user u" +
             " WHERE u.id = :userId" +
             " )" +
             " ORDER BY CASE WHEN ff.id IS NULL THEN 0 ELSE 1 END DESC"
@@ -54,9 +54,9 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             " LEFT JOIN FestivalFavorite ff" +
             " ON f.id = ff.festival.id AND ff.user.id = :userId" +
             " WHERE f.endAt >= CURRENT_DATE AND f.id NOT IN (" +
-            " SELECT tf.festival.id" +
-            " FROM TimetableFestival tf" +
-            " INNER JOIN tf.user u" +
+            " SELECT t.festival.id" +
+            " FROM Timetable t" +
+            " INNER JOIN t.user u" +
             " WHERE u.id = :userId" +
             " ) AND " +
             " (" +

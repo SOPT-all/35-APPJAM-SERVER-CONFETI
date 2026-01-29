@@ -74,7 +74,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "WHERE ((p.type = org.sopt.confeti.global.common.constant.PerformanceType.CONCERT " +
             "        AND p.typeId IN (SELECT cf.concert.id FROM ConcertFavorite cf WHERE cf.user.id = :userId)) " +
             "    OR (p.type = org.sopt.confeti.global.common.constant.PerformanceType.FESTIVAL " +
-            "        AND p.typeId IN (SELECT tf.festival.id FROM TimetableFestival tf WHERE tf.user.id = :userId))) " +
+            "        AND p.typeId IN (SELECT t.festival.id FROM Timetable t WHERE t.user.id = :userId))) " +
             "AND p.endAt >= CURRENT_DATE " +
             "ORDER BY p.startAt ASC LIMIT 1 ")
     Optional<Performance> upcomingPerformanceByUserId(final @Param("userId") long userId);
@@ -95,7 +95,7 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
             "WHERE ((p.type = org.sopt.confeti.global.common.constant.PerformanceType.CONCERT " +
             "        AND p.typeId IN (SELECT cf.concert.id FROM ConcertFavorite cf WHERE cf.user.id = :userId)) " +
             "    OR (p.type = org.sopt.confeti.global.common.constant.PerformanceType.FESTIVAL " +
-            "        AND p.typeId IN (SELECT tf.festival.id FROM TimetableFestival tf WHERE tf.user.id = :userId))) " +
+            "        AND p.typeId IN (SELECT t.festival.id FROM Timetable t WHERE t.user.id = :userId))) " +
             "AND p.endAt >= CURRENT_DATE " +
             "ORDER BY RAND() ASC LIMIT 1 ")
     Optional<Performance> getPerformanceByUserFavorites(final @Param("userId") Long userId);

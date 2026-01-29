@@ -22,7 +22,7 @@ import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
 import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
-import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
+import org.sopt.confeti.domain.timetable.Timetable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -93,7 +93,7 @@ public class Festival {
     private List<FestivalFavorite> festivalFavorites = new ArrayList<>();
 
     @OneToMany(mappedBy = "festival", cascade = CascadeType.REMOVE)
-    private List<TimetableFestival> timetableFestivals = new ArrayList<>();
+    private List<Timetable> timetables = new ArrayList<>();
 
     @Builder
     private Festival(String title, String subtitle, LocalDate startAt, LocalDate endAt, String area,
@@ -152,4 +152,3 @@ public class Festival {
         dates.forEach(date -> date.setFestival(this));
     }
 }
-

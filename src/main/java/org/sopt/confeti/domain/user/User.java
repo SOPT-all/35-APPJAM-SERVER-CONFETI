@@ -21,7 +21,7 @@ import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.concert_favorite.ConcertFavorite;
 import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
 import org.sopt.confeti.domain.setlist.Setlist;
-import org.sopt.confeti.domain.timetable_festival.TimetableFestival;
+import org.sopt.confeti.domain.timetable.Timetable;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.global.interceptor.auth.UserInfo;
 
@@ -69,7 +69,7 @@ public class User {
     private List<FestivalFavorite> festivalFavorites = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<TimetableFestival> timetableFestivals = new ArrayList<>();
+    private List<Timetable> timetables = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Setlist> setlists = new ArrayList<>();
