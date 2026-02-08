@@ -18,7 +18,7 @@ public class TopArtistService {
 
     @Transactional(readOnly = true)
     public List<ConfetiArtist> getTopArtists() {
-        return topArtistRepository.findAll().stream()
+        return topArtistRepository.findAllWithArtist().stream()
                 .map(TopArtist::getArtist)
                 .map(Artist::toConfetiArtist)
                 .toList();

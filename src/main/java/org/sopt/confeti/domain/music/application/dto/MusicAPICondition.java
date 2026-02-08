@@ -11,6 +11,10 @@ public record MusicAPICondition(
         return new MusicAPICondition(new HashSet<>(ids));
     }
 
+    public static MusicAPICondition empty() {
+        return new MusicAPICondition(new HashSet<>());
+    }
+
     public Set<String> excludeIds(Set<String> excludeIds) {
         Set<String> copiedIds = new HashSet<>(ids);
         copiedIds.removeIf(excludeIds::contains);

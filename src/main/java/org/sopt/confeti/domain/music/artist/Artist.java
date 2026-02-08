@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.music.artist;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -97,7 +98,12 @@ public class Artist {
         this.relatedArtists.add(RelatedArtist.create(this, relatedArtist));
     }
 
+    @Nullable
     public String getProfileUrl() {
+        if (artworkUrl == null) {
+            return null;
+        }
+
         try {
             return UriComponentsBuilder.fromUriString(artworkUrl)
                 .buildAndExpand(ArtistConstant.PROFILE_IMG_SIZE)

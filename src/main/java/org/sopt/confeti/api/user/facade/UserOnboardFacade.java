@@ -15,6 +15,9 @@ import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardFavoriteArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedArtistsDTO;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
+import org.sopt.confeti.domain.music.application.dto.MusicAPICondition;
+import org.sopt.confeti.domain.music.relatedartist.application.RelatedArtistService;
+import org.sopt.confeti.domain.music.topartist.application.TopArtistMusicAPIService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserOnboardService;
 import org.sopt.confeti.domain.user.application.UserService;
@@ -38,15 +41,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserOnboardFacade {
 
-    private static final int FIXED_RELATED_ARTISTS_FETCH_SIZE = 50;
+    private static final int FIXED_RELATED_ARTISTS_FETCH_SIZE = 20;
     private static final int FIXED_SEARCH_ARTISTS_FETCH_SIZE = 25;
-
-    private static final int DEFAULT_TOP_SONGS_FETCH_SIZE = 100;
 
     private final MusicAPIHandler musicAPIHandler;
     private final UserService userService;
     private final UserOnboardService userOnboardService;
     private final ArtistFavoriteService artistFavoriteService;
+    private final TopArtistMusicAPIService topArtistMusicAPIService;
+    private final RelatedArtistService relatedArtistService;
     private final RedisHandler redisHandler;
 
     public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(String term, int limit) {
@@ -104,10 +107,10 @@ public class UserOnboardFacade {
     ) {
         UserOnboardCacheDTO cachedOnboardArtists = userOnboardService.getCachedOnboardArtists(
             userId);
-        List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
-            FIXED_RELATED_ARTISTS_FETCH_SIZE);
+        List<ConfetiArtist> relatedArtists = relatedArtistService.getRelatedArtists(requestArtistId,
+            Math.min(limit, FIXED_RELATED_ARTISTS_FETCH_SIZE));
         List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
-            relatedArtists, cachedOnboardArtists.favoriteArtistIds(), limit);
+            relatedArtists, cachedOnboardArtists.favoriteArtistIds());
 
         return UserOnboardArtistsDTO.from(filteredRelatedArtists);
     }
@@ -182,10 +185,6 @@ public class UserOnboardFacade {
         userOnboardService.flushCachedOnboardArtists(UserContext.get().id());
     }
 
-    public void cacheTopArtists(List<ConfetiArtist> topArtists) {
-        redisHandler.set(RedisKey.MUSIC_TOP_ARTISTS.createKeyInfo(), topArtists);
-    }
-
     public void patchFavoriteArtist(PatchOnboardFavoriteArtistsDTO requestDto) {
         long userId = UserContext.get().id();
 
@@ -222,24 +221,7 @@ public class UserOnboardFacade {
             return cachedTopArtists;
         }
 
-        return fetchAllTopArtists();
-    }
-
-    private List<ConfetiArtist> fetchAllTopArtists() {
-        List<ConfetiSong> topSongs = musicAPIHandler.getTopSongs(DEFAULT_TOP_SONGS_FETCH_SIZE);
-        Set<String> topSongIds = topSongs.stream()
-            .map(ConfetiSong::getId)
-            .collect(Collectors.toSet());
-
-        List<ConfetiSong> topSongsWithArtists = musicAPIHandler.getSongsBySongIds(topSongIds);
-        Set<String> topArtistIds = topSongsWithArtists.stream()
-            .flatMap(song -> song.getArtists().stream())
-            .map(ConfetiSongArtist::getId)
-            .collect(Collectors.toSet());
-
-        List<ConfetiArtist> topArtists = musicAPIHandler.getArtistsByArtistIds(topArtistIds);
-        cacheTopArtists(topArtists);
-        return topArtists;
+        return topArtistMusicAPIService.getList(MusicAPICondition.empty());
     }
 
     private void validOnboardArtists(UserOnboardCacheDTO userOnboardCacheDTO) {
@@ -251,11 +233,18 @@ public class UserOnboardFacade {
     }
 
     private List<ConfetiArtist> getFilteredArtists(List<ConfetiArtist> targetArtists,
-        Set<String> excludeArtistIds, int limit) {
+        Set<String> excludeArtistIds) {
         return targetArtists.stream()
             .filter(artist -> !excludeArtistIds.contains(artist.getId()))
-            .limit(limit)
             .toList();
     }
 
+    private List<ConfetiArtist> getFilteredArtists(
+        List<ConfetiArtist> targetArtists,
+        Set<String> excludeArtistIds,
+        int limit) {
+        return getFilteredArtists(targetArtists, excludeArtistIds).stream()
+            .limit(limit)
+            .toList();
+    }
 }
