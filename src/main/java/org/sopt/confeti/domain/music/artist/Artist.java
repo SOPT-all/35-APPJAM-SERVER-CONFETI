@@ -87,6 +87,7 @@ public class Artist {
 
     public static Artist fromDomain(ArtistInfo domain) {
         return Artist.builder()
+            .artistId(domain.id())
             .name(domain.name())
             .artworkUrl(domain.artworkUrl())
             .build();

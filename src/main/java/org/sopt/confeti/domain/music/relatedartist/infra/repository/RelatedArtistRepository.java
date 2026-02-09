@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface RelatedArtistRepository extends JpaRepository<RelatedArtist, Long> {
 
-    @Query("SELECT ra FROM RelatedArtist ra JOIN FETCH ra.relatedArtist WHERE ra.artist.id = :artistId")
+    @Query("SELECT ra FROM RelatedArtist ra JOIN FETCH ra.artist JOIN FETCH ra.relatedArtist WHERE ra.artist.id = :artistId")
     List<RelatedArtist> findAllByArtistId(@Param("artistId") String artistId, Pageable pageable);
 
     @Query("SELECT ra.relatedArtist.id FROM RelatedArtist ra WHERE ra.artist.id = :artistId")

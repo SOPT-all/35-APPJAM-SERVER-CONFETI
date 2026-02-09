@@ -62,13 +62,6 @@ public class RelatedArtist {
             .build();
     }
 
-    public static RelatedArtist fromDomain(RelatedArtistInfo domain) {
-        return RelatedArtist.builder()
-            .artist(Artist.fromDomain(domain.artist()))
-            .relatedArtist(Artist.fromDomain(domain.relatedArtist()))
-            .build();
-    }
-
     public RelatedArtistInfo toDomain() {
         return RelatedArtistInfo.builder()
             .id(id)

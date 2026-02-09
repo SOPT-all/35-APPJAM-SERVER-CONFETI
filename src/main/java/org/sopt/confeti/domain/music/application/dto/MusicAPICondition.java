@@ -2,6 +2,8 @@ package org.sopt.confeti.domain.music.application.dto;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.sopt.confeti.global.exception.ParameterInvalidException;
+import org.sopt.confeti.global.message.ErrorMessage;
 
 public record MusicAPICondition(
     Set<String> ids
@@ -20,7 +22,8 @@ public record MusicAPICondition(
     }
 
     public String extractSingleId() {
-        return ids.iterator().next();
+        return ids.stream().findFirst()
+            .orElseThrow(() -> new ParameterInvalidException(ErrorMessage.BAD_REQUEST));
     }
 
     public Set<String> excludeIds(Set<String> excludeIds) {

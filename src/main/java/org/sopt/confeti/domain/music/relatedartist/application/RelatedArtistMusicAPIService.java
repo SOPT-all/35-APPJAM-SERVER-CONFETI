@@ -15,6 +15,7 @@ import org.sopt.confeti.domain.music.relatedartist.application.dto.RelatedArtist
 import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.sopt.confeti.global.common.redis.RedisKey;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.transaction.Tx;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.stereotype.Service;
 
@@ -45,12 +46,15 @@ public class RelatedArtistMusicAPIService extends MusicAPIService<RelatedArtistI
         List<ArtistInfo> relatedArtistInfos = targetList.stream()
             .map(RelatedArtistInfo::relatedArtist)
             .toList();
-        artistService.createFromArtistInfos(relatedArtistInfos);
 
         Set<String> relatedArtistIds = relatedArtistInfos.stream()
             .map(ArtistInfo::id)
             .collect(Collectors.toSet());
-        relatedArtistService.createRelatedArtists(artistId, relatedArtistIds);
+
+        Tx.masterTx(() -> {
+            artistService.createFromArtistInfos(relatedArtistInfos);
+            relatedArtistService.createRelatedArtists(artistId, relatedArtistIds);
+        });
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.sopt.confeti.domain.music.artist.application;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.music.artist.Artist;
 import org.sopt.confeti.domain.music.artist.application.dto.ArtistInfo;
@@ -40,10 +41,24 @@ public class ArtistService {
 
     @Transactional
     public void createFromArtistInfos(List<ArtistInfo> artistInfos) {
-        List<Artist> artists = artistInfos.stream()
+        Set<String> requestedIds = artistInfos.stream()
+            .map(ArtistInfo::id)
+            .collect(Collectors.toSet());
+
+        Set<String> existingIds = artistRepository.findAllById(requestedIds).stream()
+            .map(Artist::getId)
+            .collect(Collectors.toSet());
+
+        List<Artist> newArtists = artistInfos.stream()
+            .filter(info -> !existingIds.contains(info.id()))
             .map(info -> Artist.create(info.id(), info.name(), info.artworkUrl()))
             .toList();
-        artistRepository.saveAll(artists);
+
+        artistRepository.saveAll(newArtists);
+    }
+
+    public Artist getReferenceById(String artistId) {
+        return artistRepository.getReferenceById(artistId);
     }
 
     @Transactional(readOnly = true)
