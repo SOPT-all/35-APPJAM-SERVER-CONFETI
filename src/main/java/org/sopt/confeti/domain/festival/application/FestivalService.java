@@ -38,20 +38,20 @@ public class FestivalService {
     @ReadOnlyTransactional
     public Festival findById(Long festivalId) {
         return festivalRepository.findById(festivalId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
     // TODO: AOP 방식으로 캐싱 전략 수정
     @Transactional(readOnly = true)
     public FestivalDetailDTO getUpcomingFestivalDetailByFestivalId(long festivalId) {
         Optional<FestivalDetailDTO> cachedFestival = redisHandler.get(
-                RedisKey.PERFORMANCE_FESTIVALS.createKeyInfo(festivalId));
+            RedisKey.PERFORMANCE_FESTIVALS.createKeyInfo(festivalId));
         if (cachedFestival.isPresent()) {
             return cachedFestival.get();
         }
 
         Festival festival = festivalRepository.findUpcomingWithDatesById(festivalId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
         festivalDateService.loadDatesWithArtistsByFestivalId(festivalId);
         festivalRepository.findUpcomingWithReservationUrlsById(festivalId);
@@ -74,8 +74,8 @@ public class FestivalService {
     @ReadOnlyTransactional
     public List<Festival> findFestivalsUsingInitCursor(final long userId, final int size) {
         return festivalRepository.findFestivalsUsingInitCursor(
-                userId,
-                getPageRequestWithSort(size, getFestivalSort()));
+            userId,
+            getPageRequestWithSort(size, getFestivalSort()));
     }
 
     private PageRequest getPageRequestWithSort(final int size, final Sort sort) {
@@ -84,25 +84,26 @@ public class FestivalService {
 
     private Sort getFestivalSort() {
         return Sort.by(
-                Order.asc(TITLE_COLUMN));
+            Order.asc(TITLE_COLUMN));
     }
 
     @ReadOnlyTransactional
     public List<Festival> findFestivalsUsingCursor(
-            final long userId,
-            final String cursorTitle,
-            final boolean cursorIsFavorite,
-            final int size) {
+        final long userId,
+        final String cursorTitle,
+        final boolean cursorIsFavorite,
+        final int size
+    ) {
         return festivalRepository.findFestivalsUsingCursor(
-                userId,
-                cursorTitle,
-                cursorIsFavorite,
-                getPageRequestWithSort(size, getFestivalSort()));
+            userId,
+            cursorTitle,
+            cursorIsFavorite,
+            getPageRequestWithSort(size, getFestivalSort()));
     }
 
     @ReadOnlyTransactional
     public Optional<FestivalCursorDTO> findFestivalCursor(final long userId,
-            final long festivalId) {
+        final long festivalId) {
         return festivalRepository.findFestivalCursor(userId, festivalId);
     }
 
@@ -116,9 +117,9 @@ public class FestivalService {
         Festival festival = findById(festivalId);
 
         festival.addDates(
-                dates.stream()
-                        .map(FestivalDate::create)
-                        .toList());
+            dates.stream()
+                .map(FestivalDate::create)
+                .toList());
     }
 
     @ReadOnlyTransactional

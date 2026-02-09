@@ -48,7 +48,7 @@ public class FestivalArtist {
 
     public static FestivalArtist create(CreateFestivalArtistDTO festivalArtistDTO) {
         return FestivalArtist.builder()
-                .artist(Artist.create(festivalArtistDTO.artistId()))
-                .build();
+            .artist(Artist.create(festivalArtistDTO.artistId()))
+            .build();
     }
 }

@@ -5,19 +5,19 @@ import java.util.List;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
 
 public record FestivalDetailTimeDTO(
-        long festivalTimeId,
-        LocalTime startAt,
-        LocalTime endAt,
-        List<FestivalDetailArtistDTO> artists
+    long festivalTimeId,
+    LocalTime startAt,
+    LocalTime endAt,
+    List<FestivalDetailArtistDTO> artists
 ) {
     public static FestivalDetailTimeDTO from(final FestivalTime festivalTime) {
         return new FestivalDetailTimeDTO(
-                festivalTime.getId(),
-                festivalTime.getStartAt(),
-                festivalTime.getEndAt(),
-                festivalTime.getArtists().stream()
-                        .map(FestivalDetailArtistDTO::from)
-                        .toList()
+            festivalTime.getId(),
+            festivalTime.getStartAt(),
+            festivalTime.getEndAt(),
+            festivalTime.getArtists().stream()
+                .map(FestivalDetailArtistDTO::from)
+                .toList()
         );
     }
 }

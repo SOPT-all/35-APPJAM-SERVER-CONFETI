@@ -20,7 +20,7 @@ public class FestivalDateService {
     @Transactional(readOnly = true)
     public FestivalDate findFestivalDateId(final long festivalDateId) {
         FestivalDate festivalDate = festivalDateRepository.findByFestivalDateId(festivalDateId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         musicAPIResolver.load(festivalDate);
 
         return festivalDate;
@@ -29,7 +29,7 @@ public class FestivalDateService {
     @Transactional(readOnly = true)
     public FestivalDate findEntireFestivalDateById(final long festivalDateId) {
         FestivalDate festivalDate = festivalDateRepository.findAllFestivalDateById(festivalDateId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         musicAPIResolver.load(festivalDate);
 
         return festivalDate;
