@@ -5,25 +5,22 @@ import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDateDT
 import org.sopt.confeti.global.common.constant.ArtistConstant;
 
 public record FestivalDetailDateResponse(
-        long festivalDateId,
-        String festivalAt,
-        boolean isOpen,
-        List<FestivalDetailArtistResponse> artists
+                long festivalDateId,
+                String festivalAt,
+                boolean isOpen,
+                List<FestivalDetailArtistResponse> artists
 ) {
-    private static final String FESTIVAL_AT_PREFIX = "DAY ";
+        private static final String FESTIVAL_AT_PREFIX = "DAY ";
 
-    public static FestivalDetailDateResponse of(final FestivalDetailDateDTO festivalDate, final int order) {
-        List<FestivalDetailArtistResponse> artists = festivalDate.stages().stream()
-                .flatMap(date -> date.times().stream())
-                .flatMap(time -> time.artists().stream())
-                .map(FestivalDetailArtistResponse::from)
-                .toList();
+        public static FestivalDetailDateResponse of(final FestivalDetailDateDTO festivalDate, final int order) {
+                List<FestivalDetailArtistResponse> artists = festivalDate.artists().stream()
+                                .map(FestivalDetailArtistResponse::from)
+                                .toList();
 
-        return new FestivalDetailDateResponse(
-                festivalDate.festivalDateId(),
-                FESTIVAL_AT_PREFIX + order,
-                artists.size() > ArtistConstant.BOX_OPEN_CRITERIA,
-                artists
-        );
-    }
+                return new FestivalDetailDateResponse(
+                                festivalDate.festivalDateId(),
+                                FESTIVAL_AT_PREFIX + order,
+                                artists.size() > ArtistConstant.BOX_OPEN_CRITERIA,
+                                artists);
+        }
 }
