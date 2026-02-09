@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
 import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.festival_artist.FestivalArtist;
 import org.sopt.confeti.domain.festival_stage.FestivalStage;
 
 @Entity
@@ -48,9 +49,12 @@ public class FestivalDate {
     @OneToMany(mappedBy = "festivalDate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FestivalStage> stages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "festivalDate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FestivalArtist> artists = new ArrayList<>();
+
     @Builder
     public FestivalDate(LocalDate festivalAt, LocalTime openAt,
-                        List<FestivalStage> stages) {
+            List<FestivalStage> stages) {
         this.festivalAt = festivalAt;
         this.openAt = openAt;
         this.stages = stages;
@@ -67,8 +71,7 @@ public class FestivalDate {
                 .stages(
                         festivalDateDTO.stages().stream()
                                 .map(FestivalStage::create)
-                                .toList()
-                )
+                                .toList())
                 .build();
     }
 }
