@@ -37,6 +37,7 @@ public class FestivalArtist {
     @JoinColumn(name = "artist_id")
     private Artist artist;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "festival_date_id", nullable = false)
     private FestivalDate festivalDate;

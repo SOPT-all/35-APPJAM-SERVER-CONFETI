@@ -54,14 +54,20 @@ public class FestivalDate {
 
     @Builder
     public FestivalDate(LocalDate festivalAt, LocalTime openAt, 
-        List<FestivalStage> stages
+        List<FestivalStage> stages,
+        List<FestivalArtist> artists
     ) {
         this.festivalAt = festivalAt;
         this.openAt = openAt;
         this.stages = stages;
+        this.artists = artists;
 
         this.stages.forEach(stage -> {
             stage.setFestivalDate(this);
+        });
+
+        this.artists.forEach(artist -> {
+            artist.setFestivalDate(this);
         });
     }
 
@@ -73,6 +79,12 @@ public class FestivalDate {
                 festivalDateDTO.stages().stream()
                     .map(FestivalStage::create)
                     .toList())
-                .build();
+            .artists(
+                festivalDateDTO.stages().stream()
+                    .flatMap(stage -> stage.times().stream())
+                    .flatMap(time -> time.artists().stream())
+                    .map(FestivalArtist::create)
+                    .toList())
+            .build();
     }
 }
