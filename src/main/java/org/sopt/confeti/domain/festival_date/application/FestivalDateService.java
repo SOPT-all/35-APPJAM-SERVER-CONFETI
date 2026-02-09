@@ -41,11 +41,6 @@ public class FestivalDateService {
     }
 
     @Transactional(readOnly = true)
-    public void loadDatesWithStagesByFestivalId(long festivalId) {
-        festivalDateRepository.findDatesWithStagesByFestivalId(festivalId);
-    }
-
-    @Transactional(readOnly = true)
     public List<FestivalDate> loadDatesWithArtistsByFestivalId(long festivalId) {
         return festivalDateRepository.findDatesWithArtistsByFestivalId(festivalId);
     }
