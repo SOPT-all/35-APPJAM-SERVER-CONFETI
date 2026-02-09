@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.domain.music.artist.application.dto.ArtistInfo;
 import org.sopt.confeti.domain.music.artistsong.ArtistSong;
 import org.sopt.confeti.domain.music.relatedartist.RelatedArtist;
 import org.sopt.confeti.domain.music.song.Song;
@@ -81,6 +82,23 @@ public class Artist {
             .artistId(artistId)
             .name(name)
             .artworkUrl(artworkUrl)
+            .build();
+    }
+
+    public static Artist fromDomain(ArtistInfo domain) {
+        return Artist.builder()
+            .name(domain.name())
+            .artworkUrl(domain.artworkUrl())
+            .build();
+    }
+
+    public ArtistInfo toDomain() {
+        return ArtistInfo.builder()
+            .id(id)
+            .name(name)
+            .artworkUrl(artworkUrl)
+            .createdAt(createdAt)
+            .updatedAt(updatedAt)
             .build();
     }
 

@@ -16,7 +16,8 @@ import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardFavorite
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedArtistsDTO;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.music.application.dto.MusicAPICondition;
-import org.sopt.confeti.domain.music.relatedartist.application.RelatedArtistService;
+import org.sopt.confeti.domain.music.relatedartist.application.RelatedArtistMusicAPIService;
+import org.sopt.confeti.domain.music.relatedartist.application.dto.RelatedArtistInfo;
 import org.sopt.confeti.domain.music.topartist.application.TopArtistMusicAPIService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserOnboardService;
@@ -49,7 +50,7 @@ public class UserOnboardFacade {
     private final UserOnboardService userOnboardService;
     private final ArtistFavoriteService artistFavoriteService;
     private final TopArtistMusicAPIService topArtistMusicAPIService;
-    private final RelatedArtistService relatedArtistService;
+    private final RelatedArtistMusicAPIService relatedArtistMusicAPIService;
     private final RedisHandler redisHandler;
 
     public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(String term, int limit) {
@@ -85,7 +86,6 @@ public class UserOnboardFacade {
         Optional<String> targetArtistId
     ) {
         long userId = UserContext.get().id();
-
         if (targetArtistId.isPresent()) {
             return getRelatedArtistsV4(userId, targetArtistId.get(), limit);
         }
@@ -107,10 +107,13 @@ public class UserOnboardFacade {
     ) {
         UserOnboardCacheDTO cachedOnboardArtists = userOnboardService.getCachedOnboardArtists(
             userId);
-        List<ConfetiArtist> relatedArtists = relatedArtistService.getRelatedArtists(requestArtistId,
-            Math.min(limit, FIXED_RELATED_ARTISTS_FETCH_SIZE));
+        List<RelatedArtistInfo> relatedArtistInfos = relatedArtistMusicAPIService.getList(
+            MusicAPICondition.from(requestArtistId));
+        List<ConfetiArtist> relatedArtists = relatedArtistInfos.stream()
+            .map(RelatedArtistInfo::toConfetiArtist)
+            .toList();
         List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
-            relatedArtists, cachedOnboardArtists.favoriteArtistIds());
+            relatedArtists, cachedOnboardArtists.favoriteArtistIds(), limit);
 
         return UserOnboardArtistsDTO.from(filteredRelatedArtists);
     }

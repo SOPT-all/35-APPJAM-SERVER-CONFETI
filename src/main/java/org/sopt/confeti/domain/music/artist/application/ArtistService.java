@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.music.artist.Artist;
+import org.sopt.confeti.domain.music.artist.application.dto.ArtistInfo;
 import org.sopt.confeti.domain.music.artist.application.dto.request.CreateArtistDTO;
 import org.sopt.confeti.domain.music.artist.infra.repository.ArtistRepository;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
@@ -34,6 +35,14 @@ public class ArtistService {
             .map(ConfetiArtist::toArtist)
             .toList();
 
+        artistRepository.saveAll(artists);
+    }
+
+    @Transactional
+    public void createFromArtistInfos(List<ArtistInfo> artistInfos) {
+        List<Artist> artists = artistInfos.stream()
+            .map(info -> Artist.create(info.id(), info.name(), info.artworkUrl()))
+            .toList();
         artistRepository.saveAll(artists);
     }
 

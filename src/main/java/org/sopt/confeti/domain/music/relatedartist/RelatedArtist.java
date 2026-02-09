@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.domain.music.artist.Artist;
+import org.sopt.confeti.domain.music.relatedartist.application.dto.RelatedArtistInfo;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -58,6 +59,23 @@ public class RelatedArtist {
         return RelatedArtist.builder()
             .artist(artist)
             .relatedArtist(relatedArtist)
+            .build();
+    }
+
+    public static RelatedArtist fromDomain(RelatedArtistInfo domain) {
+        return RelatedArtist.builder()
+            .artist(Artist.fromDomain(domain.artist()))
+            .relatedArtist(Artist.fromDomain(domain.relatedArtist()))
+            .build();
+    }
+
+    public RelatedArtistInfo toDomain() {
+        return RelatedArtistInfo.builder()
+            .id(id)
+            .artist(artist.toDomain())
+            .relatedArtist(relatedArtist.toDomain())
+            .createdAt(createdAt)
+            .updatedAt(updatedAt)
             .build();
     }
 }

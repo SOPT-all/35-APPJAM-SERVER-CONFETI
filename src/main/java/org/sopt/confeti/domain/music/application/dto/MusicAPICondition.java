@@ -11,8 +11,16 @@ public record MusicAPICondition(
         return new MusicAPICondition(new HashSet<>(ids));
     }
 
+    public static MusicAPICondition from(String singleId) {
+        return new MusicAPICondition(new HashSet<>(Set.of(singleId)));
+    }
+
     public static MusicAPICondition empty() {
         return new MusicAPICondition(new HashSet<>());
+    }
+
+    public String extractSingleId() {
+        return ids.iterator().next();
     }
 
     public Set<String> excludeIds(Set<String> excludeIds) {
