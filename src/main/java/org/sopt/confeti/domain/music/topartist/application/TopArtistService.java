@@ -18,20 +18,20 @@ public class TopArtistService {
 
     @Transactional(readOnly = true)
     public List<ConfetiArtist> getTopArtists() {
-        return topArtistRepository.findAll().stream()
-                .map(TopArtist::getArtist)
-                .map(Artist::toConfetiArtist)
-                .toList();
+        return topArtistRepository.findAllWithArtist().stream()
+            .map(TopArtist::getArtist)
+            .map(Artist::toDomain)
+            .toList();
     }
 
     @Transactional
     public void create(List<ConfetiArtist> confetiArtists) {
         List<Artist> artists = confetiArtists.stream()
-                .map(ConfetiArtist::toArtist)
-                .toList();
+            .map(Artist::fromDomain)
+            .toList();
 
         List<TopArtist> topArtists = IntStream.range(0, artists.size()).mapToObj(idx ->
-                TopArtist.create(artists.get(idx), idx + 1)
+            TopArtist.create(artists.get(idx), idx + 1)
         ).toList();
 
         topArtistRepository.saveAll(topArtists);

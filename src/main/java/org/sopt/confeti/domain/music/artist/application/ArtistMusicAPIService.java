@@ -60,7 +60,7 @@ public class ArtistMusicAPIService extends MusicAPIService<ConfetiArtist> {
     protected PersistResult<ConfetiArtist> getPersisted(MusicAPICondition musicAPICondition) {
         List<ConfetiArtist> persistedSongs = artistService.getArtists(musicAPICondition.ids())
             .stream()
-            .map(Artist::toConfetiArtist)
+            .map(Artist::toDomain)
             .toList();
         Set<String> persistedSongIds = persistedSongs.stream()
             .map(ConfetiArtist::getId)
