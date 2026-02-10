@@ -59,16 +59,11 @@ public class FestivalDate {
     ) {
         this.festivalAt = festivalAt;
         this.openAt = openAt;
-        this.stages = stages;
-        this.artists = artists;
+        this.stages = stages == null ? new ArrayList<>() : stages;
+        this.artists = artists == null ? new ArrayList<>() : artists;
 
-        this.stages.forEach(stage -> {
-            stage.setFestivalDate(this);
-        });
-
-        this.artists.forEach(artist -> {
-            artist.setFestivalDate(this);
-        });
+        this.stages.forEach(stage -> stage.setFestivalDate(this));
+        this.artists.forEach(artist -> artist.setFestivalDate(this));
     }
 
     public static FestivalDate create(CreateFestivalDateDTO festivalDateDTO) {
