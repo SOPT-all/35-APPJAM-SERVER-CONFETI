@@ -53,7 +53,7 @@ public class FestivalService {
         Festival festival = festivalRepository.findUpcomingWithDatesById(festivalId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        festivalDateService.loadDatesWithArtistsByFestivalId(festivalId);
+        festivalDateService.findDatesWithArtistsByFestivalId(festivalId);
         festivalRepository.findUpcomingWithReservationUrlsById(festivalId);
 
         FestivalDetailDTO festivalDetail = FestivalDetailDTO.from(festival);
