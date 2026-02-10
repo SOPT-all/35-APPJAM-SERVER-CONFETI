@@ -5,9 +5,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.music.artist.Artist;
-import org.sopt.confeti.domain.music.artist.application.dto.ArtistInfo;
 import org.sopt.confeti.domain.music.artist.application.dto.request.CreateArtistDTO;
 import org.sopt.confeti.domain.music.artist.infra.repository.ArtistRepository;
+import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +19,7 @@ public class ArtistService {
 
     private final ArtistRepository artistRepository;
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public List<Artist> getArtists(Set<String> artistIds) {
         return artistRepository.findAllById(artistIds);
     }
@@ -31,27 +31,18 @@ public class ArtistService {
     }
 
     @Transactional
-    public void create(List<ConfetiArtist> confetiArtists) {
-        List<Artist> artists = confetiArtists.stream()
-            .map(ConfetiArtist::toArtist)
-            .toList();
-
-        artistRepository.saveAll(artists);
-    }
-
-    @Transactional
-    public void createFromArtistInfos(List<ArtistInfo> artistInfos) {
-        Set<String> requestedIds = artistInfos.stream()
-            .map(ArtistInfo::id)
+    public void create(List<ConfetiArtist> artists) {
+        Set<String> requestedIds = artists.stream()
+            .map(ConfetiArtist::getId)
             .collect(Collectors.toSet());
 
         Set<String> existingIds = artistRepository.findAllById(requestedIds).stream()
             .map(Artist::getId)
             .collect(Collectors.toSet());
 
-        List<Artist> newArtists = artistInfos.stream()
-            .filter(info -> !existingIds.contains(info.id()))
-            .map(info -> Artist.create(info.id(), info.name(), info.artworkUrl()))
+        List<Artist> newArtists = artists.stream()
+            .filter(artist -> !existingIds.contains(artist.getId()))
+            .map(Artist::fromDomain)
             .toList();
 
         artistRepository.saveAll(newArtists);

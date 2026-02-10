@@ -10,7 +10,6 @@ import org.sopt.confeti.domain.music.application.dto.FetchResult;
 import org.sopt.confeti.domain.music.application.dto.MusicAPICondition;
 import org.sopt.confeti.domain.music.application.dto.PersistResult;
 import org.sopt.confeti.domain.music.artist.application.ArtistService;
-import org.sopt.confeti.domain.music.artist.application.dto.ArtistInfo;
 import org.sopt.confeti.domain.music.relatedartist.application.dto.RelatedArtistInfo;
 import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.sopt.confeti.global.common.redis.RedisKey;
@@ -32,7 +31,7 @@ public class RelatedArtistMusicAPIService extends MusicAPIService<RelatedArtistI
 
     @Override
     protected void cache(List<RelatedArtistInfo> targetList) {
-        String artistId = targetList.getFirst().artist().id();
+        String artistId = targetList.getFirst().artist().getId();
         redisHandler.set(RedisKey.MUSIC_RELATED_ARTISTS.createKeyInfo(artistId), targetList);
     }
 
@@ -41,18 +40,18 @@ public class RelatedArtistMusicAPIService extends MusicAPIService<RelatedArtistI
         if (targetList.isEmpty()) {
             return;
         }
-        String artistId = targetList.getFirst().artist().id();
+        String artistId = targetList.getFirst().artist().getId();
 
-        List<ArtistInfo> relatedArtistInfos = targetList.stream()
+        List<ConfetiArtist> relatedArtists = targetList.stream()
             .map(RelatedArtistInfo::relatedArtist)
             .toList();
 
-        Set<String> relatedArtistIds = relatedArtistInfos.stream()
-            .map(ArtistInfo::id)
+        Set<String> relatedArtistIds = relatedArtists.stream()
+            .map(ConfetiArtist::getId)
             .collect(Collectors.toSet());
 
         Tx.masterTx(() -> {
-            artistService.createFromArtistInfos(relatedArtistInfos);
+            artistService.create(relatedArtists);
             relatedArtistService.createRelatedArtists(artistId, relatedArtistIds);
         });
     }

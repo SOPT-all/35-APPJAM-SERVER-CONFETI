@@ -27,7 +27,7 @@ public class RelatedArtistService {
         return relatedArtistRepository.findAllByArtistId(artistId, PageRequest.of(0, limit))
             .stream()
             .map(RelatedArtist::getRelatedArtist)
-            .map(Artist::toConfetiArtist)
+            .map(Artist::toDomain)
             .toList();
     }
 

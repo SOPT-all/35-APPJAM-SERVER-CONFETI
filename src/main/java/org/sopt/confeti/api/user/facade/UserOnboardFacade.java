@@ -110,7 +110,7 @@ public class UserOnboardFacade {
         List<RelatedArtistInfo> relatedArtistInfos = relatedArtistMusicAPIService.getList(
             MusicAPICondition.from(requestArtistId));
         List<ConfetiArtist> relatedArtists = relatedArtistInfos.stream()
-            .map(RelatedArtistInfo::toConfetiArtist)
+            .map(RelatedArtistInfo::relatedArtist)
             .toList();
         List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
             relatedArtists, cachedOnboardArtists.favoriteArtistIds(), limit);
@@ -235,18 +235,12 @@ public class UserOnboardFacade {
         }
     }
 
-    private List<ConfetiArtist> getFilteredArtists(List<ConfetiArtist> targetArtists,
-        Set<String> excludeArtistIds) {
-        return targetArtists.stream()
-            .filter(artist -> !excludeArtistIds.contains(artist.getId()))
-            .toList();
-    }
-
     private List<ConfetiArtist> getFilteredArtists(
         List<ConfetiArtist> targetArtists,
         Set<String> excludeArtistIds,
         int limit) {
-        return getFilteredArtists(targetArtists, excludeArtistIds).stream()
+        return targetArtists.stream()
+            .filter(artist -> !excludeArtistIds.contains(artist.getId()))
             .limit(limit)
             .toList();
     }
