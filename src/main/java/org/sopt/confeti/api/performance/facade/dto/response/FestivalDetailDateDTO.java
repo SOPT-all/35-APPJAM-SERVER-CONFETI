@@ -9,16 +9,15 @@ public record FestivalDetailDateDTO(
         long festivalDateId,
         LocalDate festivalAt,
         LocalTime openAt,
-        List<FestivalDetailStageDTO> stages
+        List<FestivalDetailArtistDTO> artists
 ) {
     public static FestivalDetailDateDTO from(final FestivalDate festivalDate) {
         return new FestivalDetailDateDTO(
                 festivalDate.getId(),
                 festivalDate.getFestivalAt(),
                 festivalDate.getOpenAt(),
-                festivalDate.getStages().stream()
-                        .map(FestivalDetailStageDTO::from)
-                        .toList()
-        );
+                festivalDate.getArtists().stream()
+                        .map(FestivalDetailArtistDTO::from)
+                        .toList());
     }
 }

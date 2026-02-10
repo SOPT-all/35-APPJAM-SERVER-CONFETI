@@ -13,17 +13,15 @@ public record FestivalDetailDateResponse(
     private static final String FESTIVAL_AT_PREFIX = "DAY ";
 
     public static FestivalDetailDateResponse of(final FestivalDetailDateDTO festivalDate, final int order) {
-        List<FestivalDetailArtistResponse> artists = festivalDate.stages().stream()
-                .flatMap(date -> date.times().stream())
-                .flatMap(time -> time.artists().stream())
-                .map(FestivalDetailArtistResponse::from)
-                .toList();
+        List<FestivalDetailArtistResponse> artists = festivalDate.artists().stream()
+            .map(FestivalDetailArtistResponse::from)
+            .toList();
 
         return new FestivalDetailDateResponse(
-                festivalDate.festivalDateId(),
-                FESTIVAL_AT_PREFIX + order,
-                artists.size() > ArtistConstant.BOX_OPEN_CRITERIA,
-                artists
+            festivalDate.festivalDateId(),
+            FESTIVAL_AT_PREFIX + order,
+            artists.size() > ArtistConstant.BOX_OPEN_CRITERIA,
+            artists
         );
     }
 }

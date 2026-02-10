@@ -11,8 +11,6 @@ import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.application.FestivalDateService;
-import org.sopt.confeti.domain.festival_stage.application.FestivalStageService;
-import org.sopt.confeti.domain.festival_time.application.FestivalTimeService;
 import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.sopt.confeti.global.common.redis.RedisKey;
@@ -35,8 +33,6 @@ public class FestivalService {
 
     private final FestivalRepository festivalRepository;
     private final FestivalDateService festivalDateService;
-    private final FestivalStageService festivalStageService;
-    private final FestivalTimeService festivalTimeService;
     private final RedisHandler redisHandler;
 
     @ReadOnlyTransactional
@@ -57,9 +53,7 @@ public class FestivalService {
         Festival festival = festivalRepository.findUpcomingWithDatesById(festivalId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        festivalDateService.loadDatesWithStagesByFestivalId(festivalId);
-        festivalStageService.loadStagesWithTimesByFestivalId(festivalId);
-        festivalTimeService.loadTimesWithArtistsByFestivalId(festivalId);
+        festivalDateService.findDatesWithArtistsByFestivalId(festivalId);
         festivalRepository.findUpcomingWithReservationUrlsById(festivalId);
 
         FestivalDetailDTO festivalDetail = FestivalDetailDTO.from(festival);
@@ -77,13 +71,11 @@ public class FestivalService {
         return festivalRepository.findFestivalsByIdIn(festivalIds);
     }
 
-
     @ReadOnlyTransactional
     public List<Festival> findFestivalsUsingInitCursor(final long userId, final int size) {
         return festivalRepository.findFestivalsUsingInitCursor(
             userId,
-            getPageRequestWithSort(size, getFestivalSort())
-        );
+            getPageRequestWithSort(size, getFestivalSort()));
     }
 
     private PageRequest getPageRequestWithSort(final int size, final Sort sort) {
@@ -92,8 +84,7 @@ public class FestivalService {
 
     private Sort getFestivalSort() {
         return Sort.by(
-            Order.asc(TITLE_COLUMN)
-        );
+            Order.asc(TITLE_COLUMN));
     }
 
     @ReadOnlyTransactional
@@ -107,8 +98,7 @@ public class FestivalService {
             userId,
             cursorTitle,
             cursorIsFavorite,
-            getPageRequestWithSort(size, getFestivalSort())
-        );
+            getPageRequestWithSort(size, getFestivalSort()));
     }
 
     @ReadOnlyTransactional
@@ -129,8 +119,7 @@ public class FestivalService {
         festival.addDates(
             dates.stream()
                 .map(FestivalDate::create)
-                .toList()
-        );
+                .toList());
     }
 
     @ReadOnlyTransactional

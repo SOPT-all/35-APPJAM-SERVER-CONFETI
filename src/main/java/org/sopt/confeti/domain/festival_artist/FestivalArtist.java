@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalArtistDTO;
+import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
 import org.sopt.confeti.domain.music.artist.Artist;
 
@@ -29,12 +30,17 @@ public class FestivalArtist {
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "festival_time_id", nullable = false)
+    @JoinColumn(name = "festival_time_id", nullable = true)
     private FestivalTime festivalTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artist_id")
     private Artist artist;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "festival_date_id", nullable = false)
+    private FestivalDate festivalDate;
 
     @Builder
     public FestivalArtist(Artist artist) {

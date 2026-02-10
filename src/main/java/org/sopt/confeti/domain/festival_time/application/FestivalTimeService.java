@@ -11,8 +11,4 @@ public class FestivalTimeService {
 
     private final FestivalTimeRepository festivalTimeRepository;
 
-    @Transactional(readOnly = true)
-    public void loadTimesWithArtistsByFestivalId(long festivalId) {
-        festivalTimeRepository.findTimesWithArtistsByFestivalId(festivalId);
-    }
 }
