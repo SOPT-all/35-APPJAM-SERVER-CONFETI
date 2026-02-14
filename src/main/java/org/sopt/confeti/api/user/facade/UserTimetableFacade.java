@@ -136,31 +136,27 @@ public class UserTimetableFacade {
     @ReadOnlyTransactional
     public CursorPage<TimetableToAddDTO> getTimetablesToAdd(Long cursor) {
         long userId = UserContext.get().id();
+        List<Festival> festivals = getFestivalsToAddTimetable(userId, cursor);
 
-        if (cursor == null) {
-            List<Festival> festivals = festivalService.findFestivalsUsingInitCursor(
-                UserContext.get().id(),
-                TIMETABLES_TO_ADD_SIZE);
-            return CursorPage.of(
-                festivals.stream()
-                    .map(TimetableToAddDTO::from)
-                    .toList(),
-                TIMETABLES_TO_ADD_SIZE
-            );
-        }
-
-        // 커서 값 조회
-        FestivalCursorDTO festivalCursorDTO = getFestivalCursor(userId, cursor);
-
-        List<Festival> festivals = festivalService.findFestivalsUsingCursor(userId,
-            festivalCursorDTO.cursorTitle(),
-            festivalCursorDTO.cursorIsFavorite(), TIMETABLES_TO_ADD_SIZE);
         return CursorPage.of(
             festivals.stream()
                 .map(TimetableToAddDTO::from)
                 .toList(),
             TIMETABLES_TO_ADD_SIZE
         );
+    }
+
+    private List<Festival> getFestivalsToAddTimetable (long userId, Long cursor) {
+        if (cursor == null) {
+            return festivalService.findSupportedTimetableFestivalsUsingInitCursor(userId, TIMETABLES_TO_ADD_SIZE);
+        }
+        
+        // 커서 값 조회 
+        FestivalCursorDTO festivalCursorDTO = getFestivalCursor(userId, cursor);
+        return festivalService.findSupportedTimetableFestivalsUsingCursor(userId,
+                festivalCursorDTO.cursorTitle(),
+                festivalCursorDTO.cursorIsFavorite(), 
+                TIMETABLES_TO_ADD_SIZE);
     }
 
     @Transactional(readOnly = true)
