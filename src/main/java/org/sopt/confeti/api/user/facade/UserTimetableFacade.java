@@ -1,5 +1,7 @@
 package org.sopt.confeti.api.user.facade;
 
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +24,7 @@ import org.sopt.confeti.api.user.facade.dto.response.TimetablesDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
+import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.application.FestivalDateService;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
@@ -37,6 +40,7 @@ import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.TimetableSortType;
+import org.sopt.confeti.global.exception.BadRequestException;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -87,7 +91,8 @@ public class UserTimetableFacade {
                 .map(AddTimetableArtistDTO::festivalId)
                 .toList()
         );
-
+        
+        validateSupportedTimetable(addFestivals);
         validateDuplicateTimetable(
             user.getTimetables().stream()
                 .map(Timetable::getFestival)
@@ -98,6 +103,15 @@ public class UserTimetableFacade {
 
         timetableService.addTimetables(user, addFestivals);
         userService.updateHasTimetableHistory(userId);
+    }
+
+    protected void validateSupportedTimetable(final Collection<Festival> currentFestivals) {
+        if (
+            currentFestivals.stream()
+            .anyMatch(festival -> festival.getTimetableSupportStatus() == TimetableSupportStatus.NOT_SUPPORTED)
+        ) {
+            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+        }
     }
 
     @Transactional
