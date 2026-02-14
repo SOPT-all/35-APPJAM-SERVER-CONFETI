@@ -4,6 +4,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
+import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
 import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
@@ -75,6 +78,13 @@ public class Festival {
 
     @Column(length = 100, nullable = false)
     private String address;
+
+    @Column(length = 100, nullable = false)
+    private String category;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TimetableSupportStatus timetableSupportStatus;
 
     @CreatedDate
     @Column(updatable = false)
