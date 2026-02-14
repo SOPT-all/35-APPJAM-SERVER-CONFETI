@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.sopt.confeti.api.dummy.dto.festival.CreateFestivalRequest;
 import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
+import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 
 public record CreateFestivalDTO(
         String title,
@@ -20,6 +21,7 @@ public record CreateFestivalDTO(
         String time,
         String price,
         String address,
+        TimetableSupportStatus timetableSupportStatus,
         List<CreateFestivalReservationUrlDTO> reservationUrls,
         List<CreateFestivalDateDTO> dates
 ) {
@@ -38,6 +40,7 @@ public record CreateFestivalDTO(
                 request.getTime(),
                 request.getPrice(),
                 request.getAddress(),
+                request.getTimetableSupportStatus(),
                 request.getReservationUrls().stream()
                         .map(reservationUrl -> CreateFestivalReservationUrlDTO.of(reservationUrl,
                                 filePaths.reservationLogoPaths().get(
