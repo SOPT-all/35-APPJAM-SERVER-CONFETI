@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum TimetableSupportStatus {
-    NONE("타임테이블 생성 불가"), 
+    NOT_SUPPORTED("타임테이블 생성 불가"), 
     SUPPORTED("타임테이블 생성 가능"),
     ;
 
