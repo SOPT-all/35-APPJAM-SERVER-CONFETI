@@ -11,6 +11,7 @@ import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.constant.Role;
 import org.sopt.confeti.domain.user.infra.repository.AllUserRepository;
 import org.sopt.confeti.domain.user.infra.repository.UserRepository;
+import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.exception.UnauthorizedException;
@@ -34,9 +35,9 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findById(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new UnauthorizedException(ErrorMessage.UNAUTHORIZED)
-                );
+            .orElseThrow(
+                () -> new UnauthorizedException(ErrorMessage.UNAUTHORIZED)
+            );
         return user;
     }
 
@@ -48,9 +49,9 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findUserTimetablesById(final long userId) {
         return userRepository.findUserTimetablesById(userId)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
+            .orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+            );
     }
 
     @Transactional
@@ -66,32 +67,32 @@ public class UserService {
     @Transactional
     public void create(CreateUserDTO createUserDTO) {
         allUserRepository.save(
-                AuthUser.create(
-                        createUserDTO.provider(),
-                        createUserDTO.id(),
-                        createUserDTO.name(),
-                        createUserDTO.profileImgUrl()
-                )
+            AuthUser.create(
+                createUserDTO.provider(),
+                createUserDTO.id(),
+                createUserDTO.name(),
+                createUserDTO.profileImgUrl()
+            )
         );
     }
 
     @Transactional(readOnly = true)
     public AuthUser getAuthUser(String socialId, OAuthProvider provider) {
         return userRepository.findBySocialIdAndProvider(socialId, provider)
-                .map(AuthUser::toAuthUser)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
+            .map(AuthUser::toAuthUser)
+            .orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+            );
     }
 
     @Transactional
     public void patchUserInfo(long userId, PatchUserInfoRequest patchUserInfoRequest) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
         if (Objects.nonNull(patchUserInfoRequest.profileFile())) {
             String profilePath = s3FileHandler.uploadFile(patchUserInfoRequest.profileFile(),
-                    FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
+                FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
             user.setProfilePath(profilePath);
         }
 
@@ -104,7 +105,7 @@ public class UserService {
         Path profileImg = fileDownloader.downloadFile(profileImgUrl);
         try {
             return s3FileHandler.uploadFile(profileImg.toFile(),
-                    FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
+                FolderPath.combine(FolderPath.USER, FolderPath.PROFILE));
         } finally {
             fileDownloader.deleteTempFile(profileImg);
         }
@@ -113,29 +114,24 @@ public class UserService {
     @Transactional
     public void updateHasTimetableHistory(long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
+            .orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+            );
 
         user.setHasTimetableHistory(TIMETABLE_ADDED);
     }
 
-    @Transactional(readOnly = true)
-    public boolean getHasTimetableHistory(long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
-
-        return user.isHasTimetableHistory();
+    @ReadOnlyTransactional
+    public boolean hasTimetableHistory(long userId) {
+        return userRepository.hasTimetableHistory(userId);
     }
 
     @Transactional(readOnly = true)
     public Role getRole(long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
+            .orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+            );
 
         return user.getRole();
     }

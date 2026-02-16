@@ -12,11 +12,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface TimetableRepository extends JpaRepository<Timetable, Long> {
 
-    @Query("select t from Timetable t join fetch t.festival f where t.user.id = :userId and f.endAt >= CURRENT_DATE")
-    List<Timetable> findByUserIdWhereEndAtLENow(@Param("userId") Long userId);
-
-    List<Timetable> findByUserId(final long userId);
-
     boolean existsByUserIdAndFestivalId(final long userId, final long festivalId);
 
     void deleteByUserIdAndFestivalId(final long userId, final long festivalId);
@@ -28,10 +23,6 @@ public interface TimetableRepository extends JpaRepository<Timetable, Long> {
     @Query("SELECT t.festival.id FROM Timetable t WHERE t.user.id = :userId")
     List<Long> findFestivalIdsByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT t FROM Timetable t JOIN FETCH t.festival f LEFT JOIN FETCH f.dates d WHERE t.user.id = :userId AND t.festival.id = :festivalId")
-    Optional<Timetable> findByUserIdAndFestivalId(@Param("userId") Long userId,
-        final long festivalId);
-
     @Query(value =
         """
                 select t
@@ -41,6 +32,9 @@ public interface TimetableRepository extends JpaRepository<Timetable, Long> {
             """)
     Optional<Timetable> findByIdWithFestival(
         @Param("timetableId") Long timetableId);
+
+    @Query("SELECT t FROM Timetable t JOIN FETCH t.festival f LEFT JOIN FETCH f.dates d WHERE t.id = :timetableId")
+    Optional<Timetable> findByIdWithFestivalAndDates(@Param("timetableId") Long timetableId);
 
     @Query(value =
         """

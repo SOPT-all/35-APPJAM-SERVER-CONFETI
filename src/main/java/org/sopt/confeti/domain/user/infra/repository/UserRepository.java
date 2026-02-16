@@ -20,4 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findBySocialIdAndProvider(String socialId, OAuthProvider provider);
 
     boolean existsBySocialIdAndProvider(String socialId, OAuthProvider provider);
+
+    @Query("SELECT u.hasTimetableHistory FROM User u WHERE u.id = :userId")
+    boolean hasTimetableHistory(@Param("userId") long userId);
 }
