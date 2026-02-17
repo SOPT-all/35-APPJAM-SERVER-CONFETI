@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.user.facade.dto.request.timetable.AddTimetableArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.request.timetable.AddTimetablesDTO;
 import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimeBlockDTO;
@@ -89,7 +90,8 @@ public class UserTimetableFacade {
     protected void validateSupportedTimetable(final Collection<Festival> currentFestivals) {
         if (
             currentFestivals.stream()
-            .anyMatch(festival -> festival.getTimetableSupportStatus() == TimetableSupportStatus.NOT_SUPPORTED)
+                .anyMatch(festival -> festival.getTimetableSupportStatus()
+                    == TimetableSupportStatus.NOT_SUPPORTED)
         ) {
             log.warn("Not supported timetable for festivalIds: {}", currentFestivals.stream()
                 .filter(f -> f.getTimetableSupportStatus() == TimetableSupportStatus.NOT_SUPPORTED)
@@ -118,7 +120,8 @@ public class UserTimetableFacade {
     @ReadOnlyTransactional
     protected void validateCountTimetable(final long currentCount, final int addCount) {
         if (currentCount + addCount > TIMETABLE_COUNT_MAXIMUM) {
-            log.warn("Timetable count exceeded: currentCount: {}, addCount: {}", currentCount, addCount);
+            log.warn("Timetable count exceeded: currentCount: {}, addCount: {}", currentCount,
+                addCount);
             throw new ConflictException(ErrorMessage.TIMETABLE_FESTIVAL_IS_FULL);
         }
     }
@@ -136,17 +139,18 @@ public class UserTimetableFacade {
         );
     }
 
-    private List<Festival> getFestivalsToAddTimetable (long userId, Long cursor) {
+    private List<Festival> getFestivalsToAddTimetable(long userId, Long cursor) {
         if (cursor == null) {
-            return festivalService.findSupportedTimetableFestivalsUsingInitCursor(userId, TIMETABLES_TO_ADD_SIZE);
+            return festivalService.findSupportedTimetableFestivalsUsingInitCursor(userId,
+                TIMETABLES_TO_ADD_SIZE);
         }
 
         // 커서 값 조회
         FestivalCursorDTO festivalCursorDTO = getFestivalCursor(userId, cursor);
         return festivalService.findSupportedTimetableFestivalsUsingCursor(userId,
-                festivalCursorDTO.cursorTitle(),
-                festivalCursorDTO.cursorIsFavorite(),
-                TIMETABLES_TO_ADD_SIZE);
+            festivalCursorDTO.cursorTitle(),
+            festivalCursorDTO.cursorIsFavorite(),
+            TIMETABLES_TO_ADD_SIZE);
     }
 
     @Transactional(readOnly = true)
