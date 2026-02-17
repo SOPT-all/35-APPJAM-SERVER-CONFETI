@@ -1,7 +1,6 @@
 package org.sopt.confeti.domain.timetable.application;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class TimetableService {
 
 
-    private static final int INIT_PAGE = 0;
     private static final int GET_TIMETABLES_SIZE_WITH_CURSOR = 10 + 1;
 
     private final TimetableRepository timetableRepository;
@@ -34,8 +32,9 @@ public class TimetableService {
     }
 
     @Transactional(readOnly = true)
-    public List<Timetable> getFestivalList(long userId) {
-        return timetableRepository.findByUserIdWhereEndAtLENow(userId);
+    public Timetable getWithFestivalAndDates(Long timetableId) {
+        return timetableRepository.findByIdWithFestivalAndDates(timetableId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
@@ -65,19 +64,6 @@ public class TimetableService {
         );
     }
 
-    @Deprecated
-    @Transactional(readOnly = true)
-    public List<Timetable> getTimetables(final long userId, final String sortBy) {
-        List<Timetable> timetables = timetableRepository.findByUserId(userId);
-
-        if ("createdAt".equalsIgnoreCase(sortBy)) {
-            timetables.sort(Comparator.comparing(Timetable::getCreatedAt).reversed());
-        } else if ("oldestFirst".equalsIgnoreCase(sortBy)) {
-            timetables.sort(Comparator.comparing(Timetable::getCreatedAt));
-        }
-
-        return timetables;
-    }
 
     @Transactional(readOnly = true)
     public CursorPage<Timetable> getTimetablesEarliest(long userId, CursorData cursor,
@@ -129,9 +115,4 @@ public class TimetableService {
         return timetableRepository.findFestivalIdsByUserId(userId);
     }
 
-    @Transactional(readOnly = true)
-    public Timetable getEntireFestivalInfo(final long userId, final long festivalId) {
-        return timetableRepository.findByUserIdAndFestivalId(userId, festivalId)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-    }
 }

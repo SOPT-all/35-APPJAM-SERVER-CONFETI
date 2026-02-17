@@ -4,27 +4,59 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.sopt.confeti.api.user.dto.request.AddTimetableRequest;
-import org.sopt.confeti.api.user.dto.request.PatchTimetableFestivalRequest;
-import org.sopt.confeti.api.user.dto.response.TimetableDatesResponse;
-import org.sopt.confeti.api.user.dto.response.TimetableCursorResponse;
-import org.sopt.confeti.domain.user.constant.Role;
-import org.sopt.confeti.global.annotation.Permission;
+import jakarta.validation.constraints.Min;
+import org.sopt.confeti.api.user.dto.request.timetable.AddTimetablesRequest;
+import org.sopt.confeti.api.user.dto.request.timetable.PatchTimeBlocksRequest;
+import org.sopt.confeti.api.user.dto.request.timetable.PatchTimetablesRequest;
+import org.sopt.confeti.api.user.dto.response.timetable.TimetableCursorResponse;
+import org.sopt.confeti.api.user.dto.response.timetable.TimetableDatesResponse;
+import org.sopt.confeti.api.user.dto.response.timetable.TimetableEntireFestivalResponse;
+import org.sopt.confeti.api.user.dto.response.timetable.TimetableFestivalResponse;
+import org.sopt.confeti.api.user.dto.response.timetable.TimetableHistoryResponse;
+import org.sopt.confeti.api.user.dto.response.timetable.TimetablesPreviewResponse;
+import org.sopt.confeti.api.user.dto.response.timetable.TimetablesToAddResponse;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.Default;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
+import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.common.constant.TimetableSortType;
 import org.sopt.confeti.global.common.swagger.AuthErrorResponses;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "유저 온보딩")
 public interface UserTimetableControllerDocs {
+
+    @Operation(summary = "타임테이블 추가 이력 조회")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<TimetableHistoryResponse>> getHasTimetableHistory();
+
+    @Operation(summary = "추가할 페스티벌 목록 조회")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<TimetablesToAddResponse>> getTimetablesToAdd(
+        @RequestParam(name = "cursor", required = false) Long cursor
+    );
 
     @Operation(summary = "타임테이블 페스티벌 추가")
     @ApiResponses(
@@ -38,7 +70,39 @@ public interface UserTimetableControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<Void>> addTimetableFestival(
-        @RequestBody AddTimetableRequest addTimetableRequest
+        @RequestBody AddTimetablesRequest addTimetablesRequest
+    );
+
+    @Operation(summary = "등록된 시간표 조회")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<TimetableFestivalResponse>> getTimetableFestival(
+        @PathVariable(name = "timetableId") @Min(RequestConstraint.ID) long timetableId,
+        @PathVariable(name = "festivalDateId") @Min(RequestConstraint.ID) long festivalDateId
+    );
+
+    @Operation(summary = "시간표 수정")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<Void>> updateTimetableFestival(
+        @PathVariable(name = "timetableId") @Min(RequestConstraint.ID) long timetableId,
+        @RequestBody PatchTimeBlocksRequest patchTimeBlocksRequest
     );
 
     @Operation(
@@ -72,6 +136,50 @@ public interface UserTimetableControllerDocs {
         @RequestParam(defaultValue = Default.PERFORMANCE_STATUS) PerformanceStatus status
     );
 
+    @Operation(summary = "타임테이블 미리보기 조회")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<TimetablesPreviewResponse>> getTimetablesPreview();
+
+    @Operation(summary = "지난 페스티벌 정보 조회")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<TimetableEntireFestivalResponse>> getEntireFestivalInfo(
+        @PathVariable(name = "timetableId") @Min(RequestConstraint.ID) Long timetableId
+    );
+
+    @Operation(summary = "지난 페스티벌 날짜별 타임테이블 조회")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<TimetableFestivalResponse>> getEntireFestivalDateInfo(
+        @PathVariable(name = "timetableId") @Min(RequestConstraint.ID) Long timetableId,
+        @PathVariable(name = "festivalDateId") @Min(RequestConstraint.ID) Long festivalDateId
+    );
+
     @Operation(summary = "타임테이블 페스티벌 다건 삭제")
     @ApiResponses(
         value = {
@@ -81,13 +189,13 @@ public interface UserTimetableControllerDocs {
             )
         }
     )
-    @PatchMapping("/festivals")
+    @AuthErrorResponses
+    @CommonErrorResponses
     ResponseEntity<BaseResponse<Void>> updateTimetableFestival(
-        @RequestBody PatchTimetableFestivalRequest patchTimetableFestivalRequest
+        @RequestBody PatchTimetablesRequest patchTimetablesRequest
     );
 
-
-    @Operation(summary = "타임테이블의 날짜 목록 조회")
+    @Operation(summary = "타임테이블 날짜 목록 조회")
     @ApiResponses(
         value = {
             @ApiResponse(
@@ -96,8 +204,8 @@ public interface UserTimetableControllerDocs {
             )
         }
     )
-    @Permission(role = {Role.GENERAL})
-    @GetMapping("/{timetableId}/dates")
+    @AuthErrorResponses
+    @CommonErrorResponses
     ResponseEntity<BaseResponse<TimetableDatesResponse>> getTimetableDates(
         @PathVariable Long timetableId
     );
