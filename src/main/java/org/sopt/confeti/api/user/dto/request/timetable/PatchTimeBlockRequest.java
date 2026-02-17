@@ -5,7 +5,4 @@ public record PatchTimeBlockRequest(
     boolean isSelected
 ) {
 
-    public static PatchTimeBlockRequest from(PatchTimeBlockRequest request) {
-        return new PatchTimeBlockRequest(request.timeBlockId(), request.isSelected());
-    }
 }

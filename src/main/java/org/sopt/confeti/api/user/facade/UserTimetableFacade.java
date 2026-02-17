@@ -9,19 +9,17 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.sopt.confeti.api.user.facade.dto.request.AddTimetableArtistDTO;
-import org.sopt.confeti.api.user.facade.dto.request.AddTimetableDTO;
-import org.sopt.confeti.api.user.facade.dto.request.PatchTimeBlockDTO;
-import org.sopt.confeti.api.user.facade.dto.request.PatchTimeBlockListDTO;
-import org.sopt.confeti.api.user.facade.dto.request.PatchTimetableDTO;
-import org.sopt.confeti.api.user.facade.dto.response.TimetableDatesDTO;
-import org.sopt.confeti.api.user.facade.dto.response.TimetableDetailFestivalsDTO;
-import org.sopt.confeti.api.user.facade.dto.response.TimetableEntireFestivalDTO;
-import org.sopt.confeti.api.user.facade.dto.response.TimetableFestivalBasicDTO;
-import org.sopt.confeti.api.user.facade.dto.response.TimetableHistoryDTO;
-import org.sopt.confeti.api.user.facade.dto.response.TimetableToAddDTO;
-import org.sopt.confeti.api.user.facade.dto.response.TimetablesDTO;
+import org.sopt.confeti.api.user.facade.dto.request.timetable.AddTimetableArtistDTO;
+import org.sopt.confeti.api.user.facade.dto.request.timetable.AddTimetablesDTO;
+import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimeBlockDTO;
+import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimeBlocksDTO;
+import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimetablesCommand;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableDatesDTO;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableEntireFestivalDTO;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableFestivalBasicDTO;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableHistoryDTO;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableToAddDTO;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetablesDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
@@ -160,14 +158,6 @@ public class UserTimetableFacade {
     }
 
     @ReadOnlyTransactional
-    protected void validateUserExists(final long userId) {
-        if (!userService.existsById(userId)) {
-            log.warn("User not found: {}", userId);
-            throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
-        }
-    }
-
-    @ReadOnlyTransactional
     public FestivalCursorDTO getFestivalCursor(final long userId, final long cursor) {
         return festivalService.findFestivalCursor(userId, cursor)
             .orElseThrow(() -> {
@@ -268,12 +258,14 @@ public class UserTimetableFacade {
         return TimetableHistoryDTO.from(hasTimetableHistory);
     }
 
+    @ReadOnlyTransactional
     public TimetableEntireFestivalDTO getEntireFestivalInfo(long timetableId) {
         Timetable timetable = timetableService.getWithFestivalAndDates(timetableId);
         timetable.validateOwner(UserContext.get().id());
         return TimetableEntireFestivalDTO.from(timetable);
     }
 
+    @ReadOnlyTransactional
     public TimetableFestivalBasicDTO getEntireFestivalDateInfo(long timetableId,
         long festivalDateId) {
         Timetable timetable = timetableService.getWithFestival(timetableId);
@@ -284,10 +276,10 @@ public class UserTimetableFacade {
 
     @Transactional
     public void updateTimetables(
-        final PatchTimetablesDTO patchTimetablesDTO
+        final PatchTimetablesCommand patchTimetablesCommand
     ) {
         timetableService.removeTimetables(
-            UserContext.get().id(), patchTimetablesDTO.deleteTimetableIds());
+            UserContext.get().id(), patchTimetablesCommand.deleteTimetableIds());
     }
 
     @Transactional(readOnly = true)

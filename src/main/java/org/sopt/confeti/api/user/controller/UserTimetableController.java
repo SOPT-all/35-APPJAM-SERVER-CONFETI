@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.user.controller;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.docs.UserTimetableControllerDocs;
@@ -79,7 +80,7 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     @Permission(role = {Role.GENERAL})
     @PostMapping
     public ResponseEntity<BaseResponse<Void>> addTimetableFestival(
-        @RequestBody AddTimetablesRequest addTimetablesRequest
+        @Valid @RequestBody AddTimetablesRequest addTimetablesRequest
     ) {
         userTimetableFacade.addTimetables(
             AddTimetablesDTO.from(addTimetablesRequest));
@@ -102,7 +103,7 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     @PatchMapping("/{timetableId}/time-blocks")
     public ResponseEntity<BaseResponse<Void>> updateTimetableFestival(
         @PathVariable(name = "timetableId") @Min(RequestConstraint.ID) long timetableId,
-        @RequestBody PatchTimeBlocksRequest patchTimeBlocksRequest
+        @Valid @RequestBody PatchTimeBlocksRequest patchTimeBlocksRequest
     ) {
         userTimetableFacade.patchTimeBlocks(timetableId,
             PatchTimeBlocksDTO.from(patchTimeBlocksRequest));
@@ -159,9 +160,9 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     @Permission(role = {Role.GENERAL})
     @PatchMapping
     public ResponseEntity<BaseResponse<Void>> updateTimetableFestival(
-        @RequestBody PatchTimetablesRequest patchTimetablesRequest
+        @Valid @RequestBody PatchTimetablesRequest patchTimetablesRequest
     ) {
-        userTimetableFacade.updateTimetables(patchTimetablesRequest.toDTO());
+        userTimetableFacade.updateTimetables(patchTimetablesRequest.toCommand());
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
