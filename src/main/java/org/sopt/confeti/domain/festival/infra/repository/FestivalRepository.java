@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
+import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -35,7 +36,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             " FROM Festival f" +
             " LEFT JOIN FestivalFavorite ff" +
             " ON f.id = ff.festival.id AND ff.user.id = :userId" +
-            " WHERE f.endAt >= CURRENT_DATE AND f.id NOT IN (" +
+            " WHERE f.timetableSupportStatus = :supportStatus AND f.endAt >= CURRENT_DATE AND f.id NOT IN (" +
             " SELECT t.festival.id" +
             " FROM Timetable t" +
             " INNER JOIN t.user u" +
@@ -43,9 +44,10 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             " )" +
             " ORDER BY CASE WHEN ff.id IS NULL THEN 0 ELSE 1 END DESC"
     )
-    List<Festival> findFestivalsUsingInitCursor(
+    List<Festival> findFestivalsUsingInitCursorAndSupportStatus(
         final @Param("userId") long userId,
-        final PageRequest page
+        final PageRequest page,
+        final @Param("supportStatus") TimetableSupportStatus supportStatus
     );
 
     @Query(value =
@@ -53,7 +55,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             " FROM Festival f" +
             " LEFT JOIN FestivalFavorite ff" +
             " ON f.id = ff.festival.id AND ff.user.id = :userId" +
-            " WHERE f.endAt >= CURRENT_DATE AND f.id NOT IN (" +
+            " WHERE f.timetableSupportStatus = :supportStatus AND f.endAt >= CURRENT_DATE AND f.id NOT IN (" +
             " SELECT t.festival.id" +
             " FROM Timetable t" +
             " INNER JOIN t.user u" +
@@ -69,11 +71,12 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
             " )" +
             " ORDER BY CASE WHEN ff.id IS NULL THEN 0 ELSE 1 END DESC"
     )
-    List<Festival> findFestivalsUsingCursor(
+    List<Festival> findFestivalsUsingCursorAndSupportStatus(
         final @Param("userId") long userId,
         final @Param("cursorTitle") String cursorTitle,
         final @Param("cursorIsFavorite") boolean cursorIsFavorite,
-        final PageRequest page
+        final PageRequest page,
+        final @Param("supportStatus") TimetableSupportStatus supportStatus
     );
 
     @Query(value =

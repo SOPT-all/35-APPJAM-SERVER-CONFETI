@@ -1,5 +1,7 @@
 package org.sopt.confeti.api.user.facade;
 
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -7,6 +9,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.request.AddTimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.request.PatchTimeBlockDTO;
@@ -22,6 +25,7 @@ import org.sopt.confeti.api.user.facade.dto.response.TimetablesDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
+import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.application.FestivalDateService;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
@@ -37,6 +41,7 @@ import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
 import org.sopt.confeti.global.common.constant.TimetableSortType;
+import org.sopt.confeti.global.exception.BadRequestException;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -45,6 +50,7 @@ import org.sopt.confeti.global.interceptor.auth.UserContext;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Facade
 @RequiredArgsConstructor
 public class UserTimetableFacade {
@@ -87,7 +93,8 @@ public class UserTimetableFacade {
                 .map(AddTimetableArtistDTO::festivalId)
                 .toList()
         );
-
+        
+        validateSupportedTimetable(addFestivals);
         validateDuplicateTimetable(
             user.getTimetables().stream()
                 .map(Timetable::getFestival)
@@ -100,6 +107,19 @@ public class UserTimetableFacade {
         userService.updateHasTimetableHistory(userId);
     }
 
+    protected void validateSupportedTimetable(final Collection<Festival> currentFestivals) {
+        if (
+            currentFestivals.stream()
+            .anyMatch(festival -> festival.getTimetableSupportStatus() == TimetableSupportStatus.NOT_SUPPORTED)
+        ) {
+            log.warn("Not supported timetable for festivalIds: {}", currentFestivals.stream()
+                .filter(f -> f.getTimetableSupportStatus() == TimetableSupportStatus.NOT_SUPPORTED)
+                .map(Festival::getId)
+                .toList());
+            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+        }
+    }
+
     @Transactional
     protected void validateDuplicateTimetable(final List<Festival> currentFestivals,
         final List<Festival> addFestivals) {
@@ -108,6 +128,10 @@ public class UserTimetableFacade {
                 .anyMatch(currentFestival -> addFestivals.stream()
                     .anyMatch(Predicate.isEqual(currentFestival)))
         ) {
+            log.warn("Duplicate timetable for festivalIds: {}", addFestivals.stream()
+                .filter(currentFestivals::contains)
+                .map(Festival::getId)
+                .toList());
             throw new ConflictException(ErrorMessage.CONFLICT);
         }
     }
@@ -115,6 +139,7 @@ public class UserTimetableFacade {
     @ReadOnlyTransactional
     protected void validateCountTimetable(final long currentCount, final int addCount) {
         if (currentCount + addCount > TIMETABLE_COUNT_MAXIMUM) {
+            log.warn("Timetable count exceeded: currentCount: {}, addCount: {}", currentCount, addCount);
             throw new ConflictException(ErrorMessage.TIMETABLE_FESTIVAL_IS_FULL);
         }
     }
@@ -122,6 +147,7 @@ public class UserTimetableFacade {
     @ReadOnlyTransactional
     protected void validateExistFestival(final long festivalId) {
         if (!festivalService.existsById(festivalId)) {
+            log.warn("Festival not found: {}", festivalId);
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
@@ -129,6 +155,7 @@ public class UserTimetableFacade {
     @ReadOnlyTransactional
     protected void validateExistTimetable(final long userId, final long festivalId) {
         if (!timetableService.existsByUserIdAndFestivalId(userId, festivalId)) {
+            log.warn("Timetable not found: userId: {}, festivalId: {}", userId, festivalId);
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
@@ -136,31 +163,27 @@ public class UserTimetableFacade {
     @ReadOnlyTransactional
     public CursorPage<TimetableToAddDTO> getTimetablesToAdd(Long cursor) {
         long userId = UserContext.get().id();
+        List<Festival> festivals = getFestivalsToAddTimetable(userId, cursor);
 
-        if (cursor == null) {
-            List<Festival> festivals = festivalService.findFestivalsUsingInitCursor(
-                UserContext.get().id(),
-                TIMETABLES_TO_ADD_SIZE);
-            return CursorPage.of(
-                festivals.stream()
-                    .map(TimetableToAddDTO::from)
-                    .toList(),
-                TIMETABLES_TO_ADD_SIZE
-            );
-        }
-
-        // 커서 값 조회
-        FestivalCursorDTO festivalCursorDTO = getFestivalCursor(userId, cursor);
-
-        List<Festival> festivals = festivalService.findFestivalsUsingCursor(userId,
-            festivalCursorDTO.cursorTitle(),
-            festivalCursorDTO.cursorIsFavorite(), TIMETABLES_TO_ADD_SIZE);
         return CursorPage.of(
             festivals.stream()
                 .map(TimetableToAddDTO::from)
                 .toList(),
             TIMETABLES_TO_ADD_SIZE
         );
+    }
+
+    private List<Festival> getFestivalsToAddTimetable (long userId, Long cursor) {
+        if (cursor == null) {
+            return festivalService.findSupportedTimetableFestivalsUsingInitCursor(userId, TIMETABLES_TO_ADD_SIZE);
+        }
+        
+        // 커서 값 조회 
+        FestivalCursorDTO festivalCursorDTO = getFestivalCursor(userId, cursor);
+        return festivalService.findSupportedTimetableFestivalsUsingCursor(userId,
+                festivalCursorDTO.cursorTitle(),
+                festivalCursorDTO.cursorIsFavorite(), 
+                TIMETABLES_TO_ADD_SIZE);
     }
 
     @Transactional(readOnly = true)
@@ -172,6 +195,7 @@ public class UserTimetableFacade {
     @ReadOnlyTransactional
     protected void validateUserExists(final long userId) {
         if (!userService.existsById(userId)) {
+            log.warn("User not found: {}", userId);
             throw new UnauthorizedException(ErrorMessage.UNAUTHORIZED);
         }
     }
@@ -179,9 +203,10 @@ public class UserTimetableFacade {
     @ReadOnlyTransactional
     public FestivalCursorDTO getFestivalCursor(final long userId, final long cursor) {
         return festivalService.findFestivalCursor(userId, cursor)
-            .orElseThrow(
-                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-            );
+            .orElseThrow(() -> {
+                log.warn("Festival cursor not found for user: {}, cursor: {}", userId, cursor);
+                return new NotFoundException(ErrorMessage.NOT_FOUND);
+            });
     }
 
     @Transactional
@@ -223,6 +248,7 @@ public class UserTimetableFacade {
 
     protected void validateExistFestivalTimeIds(final List<Long> festivalTimeIds) {
         if (festivalTimeIds == null || festivalTimeIds.isEmpty()) {
+            log.warn("FestivalTimeIds not found");
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
@@ -254,12 +280,14 @@ public class UserTimetableFacade {
 
     protected void validateExistTimeBlockMapper(Map<Long, TimeBlock> timeBlocks) {
         if (timeBlocks.isEmpty()) {
+            log.warn("TimeBlockMapper not found");
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
 
     protected void validateExistTimeBlocks(List<TimeBlock> timeBlocks) {
         if (timeBlocks.isEmpty()) {
+            log.warn("TimeBlocks not found");
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
@@ -273,6 +301,7 @@ public class UserTimetableFacade {
 
         for (PatchTimeBlockListDTO timeBlockListDTO : timeBlockDTO.timeBlocks()) {
             if (!existingIds.contains(timeBlockListDTO.timeBlockId())) {
+                log.warn("TimeBlock ID not found: {}", timeBlockListDTO.timeBlockId());
                 throw new NotFoundException(ErrorMessage.NOT_FOUND);
             }
         }
@@ -281,6 +310,7 @@ public class UserTimetableFacade {
     @ReadOnlyTransactional
     protected void validateSortType(final String sortBy) {
         if (!sortBy.equalsIgnoreCase("createdAt") && !sortBy.equalsIgnoreCase("oldestFirst")) {
+            log.warn("Invalid sort type: {}", sortBy);
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
     }

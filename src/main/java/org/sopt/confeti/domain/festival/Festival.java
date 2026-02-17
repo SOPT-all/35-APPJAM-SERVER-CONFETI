@@ -4,6 +4,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,7 +20,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.checkerframework.checker.units.qual.t;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
+import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
 import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
@@ -76,6 +80,10 @@ public class Festival {
     @Column(length = 100, nullable = false)
     private String address;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TimetableSupportStatus timetableSupportStatus;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -99,6 +107,7 @@ public class Festival {
     private Festival(String title, String subtitle, LocalDate startAt, LocalDate endAt, String area,
                      String posterPath, String logoPath, LocalDateTime reserveAt,
                      String ageRating, String time, String price, String address,
+                     TimetableSupportStatus timetableSupportStatus,
                      List<FestivalDate> dates, List<FestivalReservationUrl> reservationUrls
     ) {
         this.title = title;
@@ -115,6 +124,7 @@ public class Festival {
         this.address = address;
         this.dates = dates;
         this.reservationUrls = reservationUrls;
+        this.timetableSupportStatus = timetableSupportStatus;
 
         this.dates.forEach(date -> date.setFestival(this));
         this.reservationUrls.forEach(url -> url.setFestival(this));
@@ -134,6 +144,7 @@ public class Festival {
                 .time(festivalDTO.time())
                 .price(festivalDTO.price())
                 .address(festivalDTO.address())
+                .timetableSupportStatus(festivalDTO.timetableSupportStatus())
                 .dates(
                         festivalDTO.dates().stream()
                                 .map(FestivalDate::create)

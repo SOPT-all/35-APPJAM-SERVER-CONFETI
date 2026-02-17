@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,6 +36,8 @@ public class CreateFestivalRequest {
     private String price;
     @NotBlank
     private String address;
+    @NotNull
+    private TimetableSupportStatus timetableSupportStatus;
 
     @Valid
     @Size(min = 1)

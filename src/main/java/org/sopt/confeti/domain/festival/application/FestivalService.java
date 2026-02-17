@@ -9,6 +9,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
+import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.application.FestivalDateService;
 import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
@@ -72,10 +73,12 @@ public class FestivalService {
     }
 
     @ReadOnlyTransactional
-    public List<Festival> findFestivalsUsingInitCursor(final long userId, final int size) {
-        return festivalRepository.findFestivalsUsingInitCursor(
+    public List<Festival> findSupportedTimetableFestivalsUsingInitCursor(final long userId, final int size) {
+        return festivalRepository.findFestivalsUsingInitCursorAndSupportStatus(
             userId,
-            getPageRequestWithSort(size, getFestivalSort()));
+            getPageRequestWithSort(size, getFestivalSort()),
+            TimetableSupportStatus.SUPPORTED
+        );
     }
 
     private PageRequest getPageRequestWithSort(final int size, final Sort sort) {
@@ -88,17 +91,19 @@ public class FestivalService {
     }
 
     @ReadOnlyTransactional
-    public List<Festival> findFestivalsUsingCursor(
+    public List<Festival> findSupportedTimetableFestivalsUsingCursor(
         final long userId,
         final String cursorTitle,
         final boolean cursorIsFavorite,
         final int size
     ) {
-        return festivalRepository.findFestivalsUsingCursor(
+        return festivalRepository.findFestivalsUsingCursorAndSupportStatus(
             userId,
             cursorTitle,
             cursorIsFavorite,
-            getPageRequestWithSort(size, getFestivalSort()));
+            getPageRequestWithSort(size, getFestivalSort()),
+            TimetableSupportStatus.SUPPORTED
+        );
     }
 
     @ReadOnlyTransactional
