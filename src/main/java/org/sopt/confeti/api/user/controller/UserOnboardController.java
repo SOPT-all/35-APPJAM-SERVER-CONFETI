@@ -73,7 +73,7 @@ public class UserOnboardController implements UserOnboardControllerDocs {
     @Onboarding
     @GetMapping("/artists")
     public ResponseEntity<BaseResponse<UserOnboardArtistsResponse>> getOnboardArtists(
-        @RequestParam(required = false, defaultValue = "50") @Min(1) @Max(200) int limit,
+        @RequestParam(required = false, defaultValue = "50") int limit,
         @RequestParam(required = false) String targetArtistId
     ) {
         UserOnboardArtistsDTO onboardArtists = userOnboardFacade.getOnboardArtists(limit,

@@ -1,6 +1,5 @@
 package org.sopt.confeti.api.user.controller;
 
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.docs.UserTimetableControllerDocs;
 import org.sopt.confeti.api.user.dto.request.timetable.AddTimetablesRequest;
@@ -32,7 +31,6 @@ import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.common.constant.Default;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
-import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.common.constant.TimetableSortType;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -89,8 +87,8 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/{timetableId}/dates/{festivalDateId}")
     public ResponseEntity<BaseResponse<TimetableFestivalResponse>> getTimetableFestival(
-        @PathVariable(name = "timetableId") @Min(RequestConstraint.ID) long timetableId,
-        @PathVariable(name = "festivalDateId") @Min(RequestConstraint.ID) long festivalDateId
+        @PathVariable(name = "timetableId") long timetableId,
+        @PathVariable(name = "festivalDateId") long festivalDateId
     ) {
         TimetableFestivalBasicDTO response = userTimetableFacade.getTimetableInfo(
             timetableId, festivalDateId);
@@ -101,7 +99,7 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     @Permission(role = {Role.GENERAL})
     @PatchMapping("/{timetableId}/time-blocks")
     public ResponseEntity<BaseResponse<Void>> updateTimetableFestival(
-        @PathVariable(name = "timetableId") @Min(RequestConstraint.ID) long timetableId,
+        @PathVariable(name = "timetableId") long timetableId,
         @RequestBody PatchTimeBlocksRequest patchTimeBlocksRequest
     ) {
         userTimetableFacade.patchTimeBlocks(timetableId,
@@ -135,7 +133,7 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/{timetableId}/archive")
     public ResponseEntity<BaseResponse<TimetableEntireFestivalResponse>> getEntireFestivalInfo(
-        @PathVariable(name = "timetableId") @Min(RequestConstraint.ID) Long timetableId
+        @PathVariable(name = "timetableId") Long timetableId
     ) {
         TimetableEntireFestivalDTO entireFestivalDTO = userTimetableFacade.getEntireFestivalInfo(
             timetableId);
@@ -146,8 +144,8 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     @Permission(role = {Role.GENERAL})
     @GetMapping("/{timetableId}/dates/{festivalDateId}/archive")
     public ResponseEntity<BaseResponse<TimetableFestivalResponse>> getEntireFestivalDateInfo(
-        @PathVariable(name = "timetableId") @Min(RequestConstraint.ID) Long timetableId,
-        @PathVariable(name = "festivalDateId") @Min(RequestConstraint.ID) Long festivalDateId
+        @PathVariable(name = "timetableId") Long timetableId,
+        @PathVariable(name = "festivalDateId") Long festivalDateId
     ) {
         TimetableFestivalBasicDTO festivalBasicDTO = userTimetableFacade.getEntireFestivalDateInfo(
             timetableId, festivalDateId);

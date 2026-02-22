@@ -123,7 +123,7 @@ public class PerformanceController implements PerformanceControllerDocs {
     @ApiVersion("2")
     @GetMapping("/recommend")
     public ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances(
-        @RequestParam(defaultValue = "5") @Min(1) @Max(20) int limit
+        @RequestParam(defaultValue = "5") int limit
     ) {
         RecommendPerformancesDTO recommendPerformances = performanceFacade.getRecommendPerformances(
             limit);
@@ -147,8 +147,8 @@ public class PerformanceController implements PerformanceControllerDocs {
     @ApiVersion("2")
     @GetMapping("/song/recommend")
     public ResponseEntity<BaseResponse<PerformancesRecommendResponse>> getSongRecommend(
-        @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer performanceLimit,
-        @RequestParam(defaultValue = "3") @Min(1) @Max(5) Integer songLimit
+        @RequestParam(defaultValue = "3") Integer performanceLimit,
+        @RequestParam(defaultValue = "3") Integer songLimit
     ) {
         PerformancesRecommendDTO performancesRecommendDTO = performanceFacade.getPerformancesRecommend(
             performanceLimit, songLimit);
