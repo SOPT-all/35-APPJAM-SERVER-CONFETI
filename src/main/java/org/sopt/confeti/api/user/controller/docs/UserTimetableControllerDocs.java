@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.sopt.confeti.api.user.dto.request.timetable.AddTimetablesRequest;
 import org.sopt.confeti.api.user.dto.request.timetable.PatchTimeBlocksRequest;
@@ -70,7 +71,7 @@ public interface UserTimetableControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<Void>> addTimetableFestival(
-        @RequestBody AddTimetablesRequest addTimetablesRequest
+        @Valid @RequestBody AddTimetablesRequest addTimetablesRequest
     );
 
     @Operation(summary = "등록된 시간표 조회")
@@ -102,7 +103,7 @@ public interface UserTimetableControllerDocs {
     @CommonErrorResponses
     ResponseEntity<BaseResponse<Void>> updateTimetableFestival(
         @PathVariable(name = "timetableId") @Min(RequestConstraint.ID) long timetableId,
-        @RequestBody PatchTimeBlocksRequest patchTimeBlocksRequest
+        @Valid @RequestBody PatchTimeBlocksRequest patchTimeBlocksRequest
     );
 
     @Operation(
@@ -192,7 +193,7 @@ public interface UserTimetableControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<Void>> updateTimetableFestival(
-        @RequestBody PatchTimetablesRequest patchTimetablesRequest
+        @Valid @RequestBody PatchTimetablesRequest patchTimetablesRequest
     );
 
     @Operation(summary = "타임테이블 날짜 목록 조회")

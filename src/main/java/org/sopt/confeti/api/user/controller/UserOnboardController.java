@@ -1,6 +1,5 @@
 package org.sopt.confeti.api.user.controller;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.util.Optional;
@@ -123,7 +122,7 @@ public class UserOnboardController implements UserOnboardControllerDocs {
     @Onboarding
     @PatchMapping("/artists/favorite")
     public ResponseEntity<BaseResponse<Void>> patchFavoriteArtists(
-        @Valid @RequestBody PatchOnboardFavoriteArtistsRequest request
+        @RequestBody PatchOnboardFavoriteArtistsRequest request
     ) {
         userOnboardFacade.patchFavoriteArtist(request.toDto());
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
@@ -132,7 +131,7 @@ public class UserOnboardController implements UserOnboardControllerDocs {
     @Onboarding
     @PostMapping("/artists/favorite")
     public ResponseEntity<BaseResponse<UserOnboardFavoriteArtistsResponse>> addFavoriteArtists(
-        @Valid @RequestBody AddOnboardFavoriteArtistRequest request
+        @RequestBody AddOnboardFavoriteArtistRequest request
     ) {
         UserOnboardFavoriteArtistsDTO favoriteArtists = userOnboardFacade.addFavoriteArtists(
             request.toDTO());
