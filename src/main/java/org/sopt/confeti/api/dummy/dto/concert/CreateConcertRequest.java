@@ -10,36 +10,21 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class CreateConcertRequest {
-
-    @NotBlank
-    private String title;
-    @NotBlank
-    private String subtitle;
-    @NotNull
-    private LocalDateTime startAt;
-    @NotNull
-    private LocalDateTime endAt;
-    @NotBlank
-    private String area;
-    @NotNull
-    private LocalDateTime reserveAt;
-    @NotBlank
-    private String ageRating;
-    @NotBlank
-    private String time;
-    @NotBlank
-    private String price;
-    @NotBlank
-    private String address;
-
-    @Valid
-    @Size(min = 1)
-    private List<CreateConcertArtistRequest> artists = new ArrayList<>();
-
-    @Valid
-    @Size(min = 1)
-    private List<CreateConcertReservationUrlRequest> reservationUrls = new ArrayList<>();
+public record CreateConcertRequest(
+    @NotBlank String title,
+    @NotBlank String subtitle,
+    @NotNull LocalDateTime startAt,
+    @NotNull LocalDateTime endAt,
+    @NotBlank String area,
+    @NotNull LocalDateTime reserveAt,
+    @NotBlank String ageRating,
+    @NotBlank String time,
+    @NotBlank String price,
+    @NotBlank String address,
+    @Valid @Size(min = 1) List<CreateConcertArtistRequest> artists,
+    @Valid @Size(min = 1) List<CreateConcertReservationUrlRequest> reservationUrls
+) {
+    public CreateConcertRequest() {
+        this(null, null, null, null, null, null, null, null, null, null, new ArrayList<>(), new ArrayList<>());
+    }
 }

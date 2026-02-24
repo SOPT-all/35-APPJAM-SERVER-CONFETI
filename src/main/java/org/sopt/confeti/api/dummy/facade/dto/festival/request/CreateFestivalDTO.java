@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.sopt.confeti.api.dummy.dto.festival.CreateFestivalRequest;
 import org.sopt.confeti.api.dummy.facade.dto.festival.FestivalFilePathsDTO;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
+import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 
 public record CreateFestivalDTO(
         String title,
@@ -25,28 +26,28 @@ public record CreateFestivalDTO(
         List<CreateFestivalReservationUrlDTO> reservationUrls,
         List<CreateFestivalDateDTO> dates
 ) {
-    public static CreateFestivalDTO of(CreateFestivalRequest request, FestivalFilePathsDTO filePaths) {
-        AtomicInteger atomicInteger = new AtomicInteger();
+    public static CreateFestivalDTO from(CreateFestivalRequest request, FestivalFilePathsDTO filePaths) {
         return new CreateFestivalDTO(
-                request.getTitle(),
-                request.getSubtitle(),
-                request.getStartAt(),
-                request.getEndAt(),
-                request.getArea(),
+                request.title(),
+                request.subtitle(),
+                request.startAt(),
+                request.endAt(),
+                request.area(),
                 filePaths.posterPath(),
                 filePaths.logoPath(),
-                request.getReserveAt(),
-                request.getAgeRating(),
-                request.getTime(),
-                request.getPrice(),
-                request.getAddress(),
-                request.getTimetableSupportStatus(),
-                request.getReservationUrls().stream()
-                        .map(reservationUrl -> CreateFestivalReservationUrlDTO.of(reservationUrl,
-                                filePaths.reservationLogoPaths().get(
-                                        atomicInteger.getAndIncrement())))
+                request.reserveAt(),
+                request.ageRating(),
+                request.time(),
+                request.price(),
+                request.address(),
+                request.timetableSupportStatus(),
+                java.util.stream.IntStream.range(0, request.reservationUrls().size())
+                        .mapToObj(i -> CreateFestivalReservationUrlDTO.from(
+                                request.reservationUrls().get(i),
+                                filePaths.reservationLogoPaths().get(i).logoPath()
+                        ))
                         .toList(),
-                request.getDates().stream()
+                request.dates().stream()
                         .map(CreateFestivalDateDTO::from)
                         .toList()
         );

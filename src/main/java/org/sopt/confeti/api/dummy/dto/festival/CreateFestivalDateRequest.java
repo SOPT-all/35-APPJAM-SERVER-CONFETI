@@ -10,16 +10,12 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class CreateFestivalDateRequest {
-
-    @NotNull
-    private LocalDate festivalAt;
-    @NotNull
-    private LocalTime openAt;
-
-    @Valid
-    @Size(min = 1)
-    private List<CreateFestivalStageRequest> stages = new ArrayList<>();
+public record CreateFestivalDateRequest(
+    @NotNull LocalDate festivalAt,
+    @NotNull LocalTime openAt,
+    @Valid @Size(min = 1) List<CreateFestivalStageRequest> stages
+) {
+    public CreateFestivalDateRequest() {
+        this(null, null, new ArrayList<>());
+    }
 }

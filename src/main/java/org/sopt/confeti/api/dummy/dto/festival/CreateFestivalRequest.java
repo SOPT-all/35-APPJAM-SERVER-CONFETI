@@ -12,38 +12,22 @@ import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class CreateFestivalRequest {
-
-    @NotBlank
-    private String title;
-    @NotBlank
-    private String subtitle;
-    @NotNull
-    private LocalDate startAt;
-    @NotNull
-    private LocalDate endAt;
-    @NotBlank
-    private String area;
-    @NotNull
-    private LocalDateTime reserveAt;
-    @NotBlank
-    private String ageRating;
-    @NotBlank
-    private String time;
-    @NotBlank
-    private String price;
-    @NotBlank
-    private String address;
-    @NotNull
-    private TimetableSupportStatus timetableSupportStatus;
-
-    @Valid
-    @Size(min = 1)
-    private List<CreateFestivalReservationUrlRequest> reservationUrls = new ArrayList<>();
-
-    @Valid
-    @Size(min = 1)
-    private List<CreateFestivalDateRequest> dates = new ArrayList<>();
+public record CreateFestivalRequest(
+    @NotBlank String title,
+    @NotBlank String subtitle,
+    @NotNull LocalDate startAt,
+    @NotNull LocalDate endAt,
+    @NotBlank String area,
+    @NotNull LocalDateTime reserveAt,
+    @NotBlank String ageRating,
+    @NotBlank String time,
+    @NotBlank String price,
+    @NotBlank String address,
+    @NotNull TimetableSupportStatus timetableSupportStatus,
+    @Valid @Size(min = 1) List<CreateFestivalReservationUrlRequest> reservationUrls,
+    @Valid @Size(min = 1) List<CreateFestivalDateRequest> dates
+) {
+    public CreateFestivalRequest() {
+        this(null, null, null, null, null, null, null, null, null, null, null, new ArrayList<>(), new ArrayList<>());
+    }
 }

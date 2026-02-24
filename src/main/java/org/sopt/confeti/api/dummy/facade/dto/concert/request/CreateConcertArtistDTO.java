@@ -6,6 +6,6 @@ public record CreateConcertArtistDTO(
         String artistId
 ) {
     public static CreateConcertArtistDTO from(CreateConcertArtistRequest request) {
-        return new CreateConcertArtistDTO(request.getArtistId());
+        return new CreateConcertArtistDTO(request.artistId());
     }
 }

@@ -4,10 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class CreateConcertArtistRequest {
-
-    @NotBlank
-    private String artistId;
+public record CreateConcertArtistRequest(
+    @NotBlank String artistId
+) {
+    public CreateConcertArtistRequest() {
+        this(null);
+    }
 }

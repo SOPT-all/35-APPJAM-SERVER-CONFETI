@@ -4,12 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class CreateConcertReservationUrlRequest {
-
-    @NotBlank
-    private String reservationUrl;
-    @NotBlank
-    private String name;
+public record CreateConcertReservationUrlRequest(
+    @NotBlank String reservationUrl,
+    @NotBlank String name
+) {
+    public CreateConcertReservationUrlRequest() {
+        this(null, null);
+    }
 }

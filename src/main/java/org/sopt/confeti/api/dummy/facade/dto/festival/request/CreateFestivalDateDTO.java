@@ -12,9 +12,9 @@ public record CreateFestivalDateDTO(
 ) {
     public static CreateFestivalDateDTO from(CreateFestivalDateRequest request) {
         return new CreateFestivalDateDTO(
-                request.getFestivalAt(),
-                request.getOpenAt(),
-                request.getStages().stream()
+                request.festivalAt(),
+                request.openAt(),
+                request.stages().stream()
                         .map(CreateFestivalStageDTO::from)
                         .toList()
         );

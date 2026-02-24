@@ -6,6 +6,6 @@ public record CreateFestivalArtistDTO(
         String artistId
 ) {
     public static CreateFestivalArtistDTO from(CreateFestivalArtistRequest request) {
-        return new CreateFestivalArtistDTO(request.getArtistId());
+        return new CreateFestivalArtistDTO(request.artistId());
     }
 }
