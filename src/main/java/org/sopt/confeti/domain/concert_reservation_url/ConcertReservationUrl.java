@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertReservationUrlDTO;
 import org.sopt.confeti.domain.concert.Concert;
+import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 
 @Entity
 @Table(name = "concert_reservation_urls")
@@ -32,27 +33,26 @@ public class ConcertReservationUrl {
     @JoinColumn(name = "concert_id")
     private Concert concert;
 
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticket_vendor_id")
+    private TicketVendor ticketVendor;
+
     @Column(length = 200, nullable = false)
     private String reservationUrl;
 
-    @Column(length = 50, nullable = false)
-    private String name;
-
-    @Column(length = 250, nullable = false)
-    private String logoPath;
-
     @Builder
-    public ConcertReservationUrl(String reservationUrl, String name, String logoPath) {
+    public ConcertReservationUrl(String reservationUrl, TicketVendor ticketVendor) {
         this.reservationUrl = reservationUrl;
-        this.name = name;
-        this.logoPath = logoPath;
+        this.ticketVendor = ticketVendor;
     }
 
-    public static ConcertReservationUrl create(CreateConcertReservationUrlDTO concertReservationUrlDTO) {
+    public static ConcertReservationUrl create(
+        CreateConcertReservationUrlDTO concertReservationUrlDTO,
+        TicketVendor ticketVendor) {
         return ConcertReservationUrl.builder()
-                .reservationUrl(concertReservationUrlDTO.reservationUrl())
-                .name(concertReservationUrlDTO.name())
-                .logoPath(concertReservationUrlDTO.logoPath())
-                .build();
+            .reservationUrl(concertReservationUrlDTO.reservationUrl())
+            .ticketVendor(ticketVendor)
+            .build();
     }
 }

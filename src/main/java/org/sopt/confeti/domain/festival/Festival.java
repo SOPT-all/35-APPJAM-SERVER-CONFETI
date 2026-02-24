@@ -15,17 +15,18 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.checkerframework.checker.units.qual.t;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
 import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
+import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.timetable.Timetable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -104,12 +105,14 @@ public class Festival {
     private List<Timetable> timetables = new ArrayList<>();
 
     @Builder
-    private Festival(String title, String subtitle, LocalDate startAt, LocalDate endAt, String area,
-                     String posterPath, String logoPath, LocalDateTime reserveAt,
-                     String ageRating, String time, String price, String address,
-                     TimetableSupportStatus timetableSupportStatus,
-                     List<FestivalDate> dates, List<FestivalReservationUrl> reservationUrls
-    ) {
+    private Festival(String title, String subtitle, LocalDate startAt, LocalDate endAt,
+            String area,
+            String posterPath, String logoPath, LocalDateTime reserveAt,
+            String ageRating,
+            String time, String price, String address,
+            TimetableSupportStatus timetableSupportStatus,
+            List<FestivalDate> dates,
+            List<FestivalReservationUrl> reservationUrls) {
         this.title = title;
         this.subtitle = subtitle;
         this.startAt = startAt;
@@ -130,7 +133,8 @@ public class Festival {
         this.reservationUrls.forEach(url -> url.setFestival(this));
     }
 
-    public static Festival create(CreateFestivalDTO festivalDTO) {
+    public static Festival create(CreateFestivalDTO festivalDTO,
+            List<TicketVendor> ticketVendors) {
         return Festival.builder()
                 .title(festivalDTO.title())
                 .subtitle(festivalDTO.subtitle())
@@ -148,13 +152,13 @@ public class Festival {
                 .dates(
                         festivalDTO.dates().stream()
                                 .map(FestivalDate::create)
-                                .toList()
-                )
+                                .toList())
                 .reservationUrls(
-                        festivalDTO.reservationUrls().stream()
-                                .map(FestivalReservationUrl::create)
-                                .toList()
-                )
+                        IntStream.range(0, festivalDTO.reservationUrls().size())
+                                .mapToObj(i -> FestivalReservationUrl.create(
+                                        festivalDTO.reservationUrls().get(i),
+                                        ticketVendors.get(i)))
+                                .toList())
                 .build();
     }
 

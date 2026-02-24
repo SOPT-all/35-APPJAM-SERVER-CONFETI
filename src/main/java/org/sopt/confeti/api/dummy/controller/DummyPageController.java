@@ -80,7 +80,8 @@ public class DummyPageController {
             UploadFestivalFilesDTO.of(poster, logo, reservationLogos)
         );
 
-        dummyFacade.createFestival(CreateFestivalDTO.of(request, filePaths));
+        CreateFestivalDTO festivalDTO = CreateFestivalDTO.from(request, filePaths);
+        dummyFacade.createFestival(festivalDTO);
 
         redirectAttributes.addFlashAttribute("message", "서버에 정상적으로 저장되었습니다.");
 
@@ -136,7 +137,8 @@ public class DummyPageController {
             UploadConcertFilesDTO.of(poster, reservationLogos)
         );
 
-        dummyFacade.createConcert(CreateConcertDTO.of(request, filePaths));
+        CreateConcertDTO concertDTO = CreateConcertDTO.from(request, filePaths);
+        dummyFacade.createConcert(concertDTO);
 
         redirectAttributes.addFlashAttribute("message", "서버에 정상적으로 저장되었습니다.");
 

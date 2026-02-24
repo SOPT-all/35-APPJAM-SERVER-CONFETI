@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +22,7 @@ import lombok.Setter;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.domain.concert_artist.ConcertArtist;
 import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
+import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -84,10 +86,9 @@ public class Concert {
 
     @Builder
     private Concert(String title, String subtitle, LocalDate startAt, LocalDate endAt, String area,
-                    String posterPath, LocalDateTime reserveAt, String ageRating,
-                    String time, String price, String address,
-                    List<ConcertArtist> artists, List<ConcertReservationUrl> reservationUrls
-    ) {
+            String posterPath, LocalDateTime reserveAt, String ageRating,
+            String time, String price, String address,
+            List<ConcertArtist> artists, List<ConcertReservationUrl> reservationUrls) {
         this.title = title;
         this.subtitle = subtitle;
         this.startAt = startAt;
@@ -106,7 +107,7 @@ public class Concert {
         this.reservationUrls.forEach(url -> url.setConcert(this));
     }
 
-    public static Concert create(CreateConcertDTO concertDTO) {
+    public static Concert create(CreateConcertDTO concertDTO, List<TicketVendor> ticketVendors) {
         return Concert.builder()
                 .title(concertDTO.title())
                 .subtitle(concertDTO.subtitle())
@@ -122,13 +123,13 @@ public class Concert {
                 .artists(
                         concertDTO.artists().stream()
                                 .map(ConcertArtist::create)
-                                .toList()
-                )
+                                .toList())
                 .reservationUrls(
-                        concertDTO.reservationUrls().stream()
-                                .map(ConcertReservationUrl::create)
-                                .toList()
-                )
+                        IntStream.range(0, concertDTO.reservationUrls().size())
+                                .mapToObj(i -> ConcertReservationUrl.create(
+                                        concertDTO.reservationUrls().get(i),
+                                        ticketVendors.get(i)))
+                                .toList())
                 .build();
     }
 }
