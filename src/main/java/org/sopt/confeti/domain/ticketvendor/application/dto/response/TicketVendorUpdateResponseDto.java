@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.ticketvendor.application.dto;
+package org.sopt.confeti.domain.ticketvendor.application.dto.response;
 
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 

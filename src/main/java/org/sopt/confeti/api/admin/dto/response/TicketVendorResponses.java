@@ -1,7 +1,7 @@
 package org.sopt.confeti.api.admin.dto.response;
 
 import java.util.List;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorDtos;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
 
 public record TicketVendorResponses(
     List<TicketVendorResponse> ticketVendors

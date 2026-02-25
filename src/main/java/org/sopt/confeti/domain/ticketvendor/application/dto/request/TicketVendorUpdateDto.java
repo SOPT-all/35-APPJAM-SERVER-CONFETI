@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.ticketvendor.application.dto;
+package org.sopt.confeti.domain.ticketvendor.application.dto.request;
 
 public record TicketVendorUpdateDto(
     Long ticketVendorId,

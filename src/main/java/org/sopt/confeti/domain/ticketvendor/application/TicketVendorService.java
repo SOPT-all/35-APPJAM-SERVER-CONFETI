@@ -2,11 +2,11 @@ package org.sopt.confeti.domain.ticketvendor.application;
 
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorCreateDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorCreateResponseDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorUpdateDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorUpdateResponseDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorCreateResponseDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorDtos;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
 
 @Service
 @RequiredArgsConstructor

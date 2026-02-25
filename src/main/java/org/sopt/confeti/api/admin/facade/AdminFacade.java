@@ -5,12 +5,12 @@ import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorCreateDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorCreateResponseDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorUpdateDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorDtos;
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorUpdateResponseDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorCreateResponseDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
 import org.sopt.confeti.global.annotation.Facade;
 import org.springframework.transaction.annotation.Transactional;
 

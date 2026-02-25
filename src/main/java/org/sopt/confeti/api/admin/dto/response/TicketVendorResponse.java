@@ -1,6 +1,6 @@
 package org.sopt.confeti.api.admin.dto.response;
 
-import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDto;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 
 public record TicketVendorResponse(
