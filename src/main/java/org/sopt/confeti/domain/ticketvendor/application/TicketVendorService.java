@@ -58,4 +58,12 @@ public class TicketVendorService {
         ticketVendor.update(dto.name(), dto.logoPath());
         return TicketVendorUpdateResponseDto.of(ticketVendor);
     }
+
+    @Transactional
+    public void delete(Long ticketVendorId) {
+        TicketVendor ticketVendor = ticketVendorRepository.findById(ticketVendorId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+        
+        ticketVendorRepository.delete(ticketVendor);
+    }
 }

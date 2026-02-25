@@ -48,4 +48,19 @@ public interface AdminControllerDocs {
         @PathVariable Long ticketVendorId,
         @Valid @RequestBody UpdateTicketVendorRequest request
     );
+
+    @Operation(summary = "예매처 삭제")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<Void>> deleteTicketVendor(
+        @PathVariable Long ticketVendorId
+    );
 }

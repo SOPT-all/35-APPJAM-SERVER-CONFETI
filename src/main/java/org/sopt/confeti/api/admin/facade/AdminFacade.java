@@ -41,4 +41,9 @@ public class AdminFacade {
             responseDto.logoPath()
         );
     }
+
+    @Transactional
+    public void deleteTicketVendor(Long ticketVendorId) {
+        ticketVendorService.delete(ticketVendorId);
+    }
 }
