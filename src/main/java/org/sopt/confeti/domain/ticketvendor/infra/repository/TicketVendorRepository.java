@@ -1,4 +1,4 @@
-package org.sopt.confeti.domain.ticketvendor.application;
+package org.sopt.confeti.domain.ticketvendor.infra.repository;
 
 import java.util.Optional;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;

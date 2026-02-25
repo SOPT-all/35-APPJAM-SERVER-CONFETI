@@ -7,6 +7,7 @@ import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendo
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
+import org.sopt.confeti.domain.ticketvendor.infra.repository.TicketVendorRepository;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
