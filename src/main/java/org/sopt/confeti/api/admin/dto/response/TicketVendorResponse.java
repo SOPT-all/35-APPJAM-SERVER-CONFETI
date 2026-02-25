@@ -19,4 +19,12 @@ public record TicketVendorResponse(
     public static TicketVendorResponse of(TicketVendorDto dto) {
         return new TicketVendorResponse(dto.id(), dto.name(), dto.logoPath());
     }
+
+    public static TicketVendorResponse from(org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorCreateResponseDto dto) {
+        return new TicketVendorResponse(dto.id(), dto.name(), dto.logoPath());
+    }
+
+    public static TicketVendorResponse from(org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto dto) {
+        return new TicketVendorResponse(dto.id(), dto.name(), dto.logoPath());
+    }
 }

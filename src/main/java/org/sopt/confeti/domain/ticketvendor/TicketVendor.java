@@ -33,6 +33,13 @@ public class TicketVendor {
         this.logoPath = logoPath;
     }
 
+    public static TicketVendor create(String name, String logoPath) {
+        return TicketVendor.builder()
+            .name(name)
+            .logoPath(logoPath)
+            .build();
+    }
+
     public void update(String name, String logoPath) {
         this.name = name;
         this.logoPath = logoPath;

@@ -8,13 +8,10 @@ import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorCreateResponseDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
 import org.sopt.confeti.global.annotation.Facade;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Facade
 @RequiredArgsConstructor
@@ -24,26 +21,18 @@ public class AdminFacade {
 
     @Transactional
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
-        TicketVendorCreateDto dto = TicketVendorCreateDto.of(request.name(), request.logoPath());
+        TicketVendorCreateDto dto = TicketVendorCreateDto.from(request);
         TicketVendorCreateResponseDto responseDto = ticketVendorService.create(dto);
         
-        return new TicketVendorResponse(
-            responseDto.id(), 
-            responseDto.name(), 
-            responseDto.logoPath()
-        );
+        return TicketVendorResponse.from(responseDto);
     }
 
     @Transactional
     public TicketVendorResponse updateTicketVendor(Long ticketVendorId, UpdateTicketVendorRequest request) {
-        TicketVendorUpdateDto dto = TicketVendorUpdateDto.of(ticketVendorId, request.name(), request.logoPath());
+        TicketVendorUpdateDto dto = TicketVendorUpdateDto.of(ticketVendorId, request);
         TicketVendorUpdateResponseDto responseDto = ticketVendorService.update(dto);
         
-        return new TicketVendorResponse(
-            responseDto.id(), 
-            responseDto.name(), 
-            responseDto.logoPath()
-        );
+        return TicketVendorResponse.from(responseDto);
     }
 
     @Transactional

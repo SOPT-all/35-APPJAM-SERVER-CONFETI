@@ -14,7 +14,6 @@ import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
 
 @Service
@@ -27,10 +26,7 @@ public class TicketVendorService {
     public TicketVendor getOrCreate(String name, String logoPath) {
         return ticketVendorRepository.findByName(name)
             .orElseGet(() -> ticketVendorRepository.save(
-                TicketVendor.builder()
-                    .name(name)
-                    .logoPath(logoPath)
-                    .build()
+                TicketVendor.create(name, logoPath)
             ));
     }
 
@@ -39,12 +35,7 @@ public class TicketVendorService {
         if (ticketVendorRepository.findByName(dto.name()).isPresent()) {
             throw new ConflictException(ErrorMessage.CONFLICT);
         }
-        TicketVendor savedVendor = ticketVendorRepository.save(
-            TicketVendor.builder()
-                .name(dto.name())
-                .logoPath(dto.logoPath())
-                .build()
-        );
+        TicketVendor savedVendor = ticketVendorRepository.save(dto.toEntity());
         return TicketVendorCreateResponseDto.of(savedVendor);
     }
 

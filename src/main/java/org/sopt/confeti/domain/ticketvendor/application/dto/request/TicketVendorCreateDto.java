@@ -7,4 +7,12 @@ public record TicketVendorCreateDto(
     public static TicketVendorCreateDto of(String name, String logoPath) {
         return new TicketVendorCreateDto(name, logoPath);
     }
+
+    public static TicketVendorCreateDto from(org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest request) {
+        return new TicketVendorCreateDto(request.name(), request.logoPath());
+    }
+
+    public org.sopt.confeti.domain.ticketvendor.TicketVendor toEntity() {
+        return org.sopt.confeti.domain.ticketvendor.TicketVendor.create(this.name, this.logoPath);
+    }
 }
