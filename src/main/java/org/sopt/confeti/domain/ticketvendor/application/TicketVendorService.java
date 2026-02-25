@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorCreateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorCreateResponseDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorUpdateDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorUpdateResponseDto;
 import org.sopt.confeti.global.exception.ConflictException;
+import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,5 +41,21 @@ public class TicketVendorService {
                 .build()
         );
         return TicketVendorCreateResponseDto.of(savedVendor);
+    }
+
+    @Transactional
+    public TicketVendorUpdateResponseDto update(TicketVendorUpdateDto dto) {
+        TicketVendor ticketVendor = ticketVendorRepository.findById(dto.ticketVendorId())
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+
+        ticketVendorRepository.findByName(dto.name())
+            .ifPresent(existingVendor -> {
+                if (!existingVendor.getId().equals(dto.ticketVendorId())) {
+                    throw new ConflictException(ErrorMessage.CONFLICT);
+                }
+            });
+
+        ticketVendor.update(dto.name(), dto.logoPath());
+        return TicketVendorUpdateResponseDto.of(ticketVendor);
     }
 }

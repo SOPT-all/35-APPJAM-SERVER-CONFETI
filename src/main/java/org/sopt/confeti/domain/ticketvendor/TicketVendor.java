@@ -32,4 +32,9 @@ public class TicketVendor {
         this.name = name;
         this.logoPath = logoPath;
     }
+
+    public void update(String name, String logoPath) {
+        this.name = name;
+        this.logoPath = logoPath;
+    }
 }

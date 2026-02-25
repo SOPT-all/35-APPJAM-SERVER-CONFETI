@@ -6,11 +6,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.swagger.AuthErrorResponses;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "어드민 API", description = "어드민 전용 API")
@@ -29,5 +31,21 @@ public interface AdminControllerDocs {
     @CommonErrorResponses
     ResponseEntity<BaseResponse<TicketVendorResponse>> createTicketVendor(
         @Valid @RequestBody CreateTicketVendorRequest request
+    );
+
+    @Operation(summary = "예매처 수정")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<TicketVendorResponse>> updateTicketVendor(
+        @PathVariable Long ticketVendorId,
+        @Valid @RequestBody UpdateTicketVendorRequest request
     );
 }
