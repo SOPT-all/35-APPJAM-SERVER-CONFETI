@@ -12,7 +12,9 @@ import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,5 +59,14 @@ public class AdminController implements AdminControllerDocs {
     ) {
         adminFacade.deleteTicketVendor(ticketVendorId);
         return ApiResponseUtil.success(SuccessMessage.DELETED);
+    }
+
+    @Override
+    @GetMapping("/ticket-vendors")
+    public ResponseEntity<BaseResponse<TicketVendorResponses>> getTicketVendors() {
+        return ApiResponseUtil.success(
+            SuccessMessage.SUCCESS,
+            TicketVendorResponses.from(adminFacade.getTicketVendors())
+        );
     }
 }

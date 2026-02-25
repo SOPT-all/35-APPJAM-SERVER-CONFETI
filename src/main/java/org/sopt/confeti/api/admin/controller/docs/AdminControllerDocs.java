@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
+import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.swagger.AuthErrorResponses;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
@@ -63,4 +64,17 @@ public interface AdminControllerDocs {
     ResponseEntity<BaseResponse<Void>> deleteTicketVendor(
         @PathVariable Long ticketVendorId
     );
+
+    @Operation(summary = "예매처 전체 조회")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<TicketVendorResponses>> getTicketVendors();
 }

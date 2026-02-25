@@ -8,9 +8,13 @@ import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorCreateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorCreateResponseDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorUpdateDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorDtos;
 import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorUpdateResponseDto;
 import org.sopt.confeti.global.annotation.Facade;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Facade
 @RequiredArgsConstructor
@@ -45,5 +49,10 @@ public class AdminFacade {
     @Transactional
     public void deleteTicketVendor(Long ticketVendorId) {
         ticketVendorService.delete(ticketVendorId);
+    }
+
+    @Transactional(readOnly = true)
+    public TicketVendorDtos getTicketVendors() {
+        return ticketVendorService.findAll();
     }
 }

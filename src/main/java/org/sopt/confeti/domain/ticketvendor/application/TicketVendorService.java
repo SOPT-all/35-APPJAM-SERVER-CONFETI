@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorCreateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorCreateResponseDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorUpdateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorUpdateResponseDto;
 import org.sopt.confeti.global.exception.ConflictException;
@@ -11,6 +12,9 @@ import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import org.sopt.confeti.domain.ticketvendor.application.dto.TicketVendorDtos;
 
 @Service
 @RequiredArgsConstructor
@@ -65,5 +69,14 @@ public class TicketVendorService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         
         ticketVendorRepository.delete(ticketVendor);
+    }
+
+    @Transactional(readOnly = true)
+    public TicketVendorDtos findAll() {
+        return TicketVendorDtos.from(
+            ticketVendorRepository.findAll().stream()
+                .map(TicketVendorDto::of)
+                .toList()
+        );
     }
 }
