@@ -15,6 +15,7 @@ import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController implements AdminControllerDocs {
 
     private final AdminFacade adminFacade;
+    private final S3FileHandler s3FileHandler;
 
     @Override
     @PostMapping("/ticket-vendors")
@@ -81,6 +83,6 @@ public class AdminController implements AdminControllerDocs {
     ) {
         AdminConcertDetailInfo concertDetail = adminFacade.getAdminConcertDetail(concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            AdminConcertDetailResponse.from(concertDetail));
+            AdminConcertDetailResponse.of(concertDetail, s3FileHandler));
     }
 }

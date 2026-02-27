@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
+import org.sopt.confeti.global.common.constant.FolderPath;
+import org.sopt.confeti.global.util.S3FileHandler;
 
 public record AdminConcertDetailResponse(
     long concertId,
@@ -12,7 +14,7 @@ public record AdminConcertDetailResponse(
     LocalDate startAt,
     LocalDate endAt,
     String area,
-    String posterPath,
+    String posterUrl,
     LocalDateTime reserveAt,
     String ageRating,
     String time,
@@ -54,7 +56,7 @@ public record AdminConcertDetailResponse(
         }
     }
 
-    public static AdminConcertDetailResponse from(AdminConcertDetailInfo info) {
+    public static AdminConcertDetailResponse of(AdminConcertDetailInfo info, S3FileHandler s3FileHandler) {
         return new AdminConcertDetailResponse(
             info.concertId(),
             info.title(),
@@ -62,7 +64,7 @@ public record AdminConcertDetailResponse(
             info.startAt(),
             info.endAt(),
             info.area(),
-            info.posterPath(),
+            s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER), info.posterPath()).toString(),
             info.reserveAt(),
             info.ageRating(),
             info.time(),
