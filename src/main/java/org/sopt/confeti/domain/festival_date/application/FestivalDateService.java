@@ -6,6 +6,7 @@ import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.infra.repository.FestivalDateRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
+import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.resolver.music_api.MusicAPIResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,5 +44,10 @@ public class FestivalDateService {
     @Transactional(readOnly = true)
     public List<FestivalDate> findDatesWithArtistsByFestivalId(long festivalId) {
         return festivalDateRepository.findDatesWithArtistsByFestivalId(festivalId);
+    }
+
+    @ReadOnlyTransactional
+    public List<FestivalDate> findDatesWithStagesByFestivalId(long festivalId) {
+        return festivalDateRepository.findDatesWithStagesByFestivalId(festivalId);
     }
 }

@@ -5,7 +5,9 @@ import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.domain.concert.application.ConcertService;
+import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorCreateResponseDto;
@@ -22,6 +24,7 @@ public class AdminFacade {
 
     private final TicketVendorService ticketVendorService;
     private final ConcertService concertService;
+    private final FestivalService festivalService;
 
     @Transactional
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
@@ -51,5 +54,9 @@ public class AdminFacade {
 
     public AdminConcertDetailInfo getAdminConcertDetail(long concertId) {
         return Tx.readOnlyTx(() -> concertService.getAdminConcertDetailInfo(concertId));
+    }
+
+    public AdminFestivalDetailInfo getAdminFestivalDetail(long festivalId) {
+        return Tx.readOnlyTx(() -> festivalService.getAdminFestivalDetailInfo(festivalId));
     }
 }

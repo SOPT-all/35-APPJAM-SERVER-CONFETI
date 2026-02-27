@@ -16,4 +16,13 @@ public interface FestivalTimeRepository extends JpaRepository<FestivalTime, Long
             WHERE ft.festivalStage.festivalDate.festival.id = :festivalId
         """)
     List<FestivalTime> findTimesWithArtistsByFestivalId(@Param("festivalId") long festivalId);
+
+    @Query("""
+            SELECT DISTINCT ft
+            FROM FestivalTime ft
+            JOIN FETCH ft.artists fa
+            LEFT JOIN FETCH fa.artist
+            WHERE ft.festivalStage.id IN :stageIds
+        """)
+    List<FestivalTime> findTimesWithArtistsByFestivalStageIdIn(@Param("stageIds") List<Long> stageIds);
 }

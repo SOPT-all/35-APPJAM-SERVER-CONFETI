@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.domain.festival.Festival;
@@ -12,6 +13,9 @@ import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.application.FestivalDateService;
+import org.sopt.confeti.domain.festival_stage.FestivalStage;
+import org.sopt.confeti.domain.festival_stage.application.FestivalStageService;
+import org.sopt.confeti.domain.festival_time.application.FestivalTimeService;
 import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.sopt.confeti.global.common.redis.RedisKey;
@@ -34,6 +38,8 @@ public class FestivalService {
 
     private final FestivalRepository festivalRepository;
     private final FestivalDateService festivalDateService;
+    private final FestivalStageService festivalStageService;
+    private final FestivalTimeService festivalTimeService;
     private final RedisHandler redisHandler;
 
     @ReadOnlyTransactional
@@ -125,6 +131,31 @@ public class FestivalService {
             dates.stream()
                 .map(FestivalDate::create)
                 .toList());
+    }
+
+    @Transactional(readOnly = true)
+    public AdminFestivalDetailInfo getAdminFestivalDetailInfo(long festivalId) {
+        Festival festival = festivalRepository.findWithDatesById(festivalId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+
+        festivalDateService.findDatesWithArtistsByFestivalId(festivalId);
+
+        festivalDateService.findDatesWithStagesByFestivalId(festivalId);
+
+        List<Long> dateIds = festival.getDates().stream()
+            .map(FestivalDate::getId)
+            .toList();
+        festivalStageService.findStagesWithTimesByDateIds(dateIds);
+
+        List<Long> stageIds = festival.getDates().stream()
+            .flatMap(date -> date.getStages().stream())
+            .map(FestivalStage::getId)
+            .toList();
+        if (!stageIds.isEmpty()) {
+            festivalTimeService.findTimesWithArtistsByStageIds(stageIds);
+        }
+
+        return AdminFestivalDetailInfo.from(festival);
     }
 
     @ReadOnlyTransactional
