@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalReservationUrlDTO;
 import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 
 @Entity
 @Table(name = "festival_reservation_urls")
@@ -32,27 +33,25 @@ public class FestivalReservationUrl {
     @JoinColumn(name = "festival_id")
     private Festival festival;
 
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticket_vendor_id")
+    private TicketVendor ticketVendor;
+
     @Column(length = 200, nullable = false)
     private String reservationUrl;
 
-    @Column(length = 50, nullable = false)
-    private String name;
-
-    @Column(length = 250, nullable = false)
-    private String logoPath;
-
     @Builder
-    public FestivalReservationUrl(String reservationUrl, String name, String logoPath) {
+    public FestivalReservationUrl(String reservationUrl, TicketVendor ticketVendor) {
         this.reservationUrl = reservationUrl;
-        this.name = name;
-        this.logoPath = logoPath;
+        this.ticketVendor = ticketVendor;
     }
 
-    public static FestivalReservationUrl create(CreateFestivalReservationUrlDTO festivalReservationUrlDTO) {
+    public static FestivalReservationUrl create(
+        CreateFestivalReservationUrlDTO festivalReservationUrlDTO, TicketVendor ticketVendor) {
         return FestivalReservationUrl.builder()
-                .reservationUrl(festivalReservationUrlDTO.reservationUrl())
-                .name(festivalReservationUrlDTO.name())
-                .logoPath(festivalReservationUrlDTO.logoPath())
-                .build();
+            .reservationUrl(festivalReservationUrlDTO.reservationUrl())
+            .ticketVendor(ticketVendor)
+            .build();
     }
 }

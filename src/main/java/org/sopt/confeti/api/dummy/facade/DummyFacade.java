@@ -2,6 +2,8 @@ package org.sopt.confeti.api.dummy.facade;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.dummy.dto.concert.CreateConcertRequest;
+import org.sopt.confeti.api.dummy.dto.festival.CreateFestivalRequest;
 import org.sopt.confeti.api.dummy.dto.festival.FixDummyFestivalDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.ConcertFilePathsDTO;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
@@ -15,6 +17,8 @@ import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
+import org.sopt.confeti.domain.ticketvendor.TicketVendor;
+import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
@@ -36,6 +40,7 @@ public class DummyFacade {
     private final FestivalService festivalService;
     private final ConcertService concertService;
     private final PerformanceService performanceService;
+    private final TicketVendorService ticketVendorService;
 
     public FestivalFilePathsDTO uploadFestivalFiles(UploadFestivalFilesDTO files) {
         String posterPath = s3FileHandler.uploadFile(files.poster(),
@@ -52,7 +57,11 @@ public class DummyFacade {
 
     @Transactional
     public void createFestival(CreateFestivalDTO festivalDTO) {
-        long festivalId = festivalService.create(Festival.create(festivalDTO));
+        List<TicketVendor> ticketVendors = festivalDTO.reservationUrls().stream()
+            .map(url -> ticketVendorService.getOrCreate(url.name(), url.logoPath()))
+            .toList();
+
+        long festivalId = festivalService.create(Festival.create(festivalDTO, ticketVendors));
         performanceService.create(Performance.create(festivalId, festivalDTO));
     }
 
@@ -69,7 +78,11 @@ public class DummyFacade {
 
     @Transactional
     public void createConcert(CreateConcertDTO concertDTO) {
-        long concertId = concertService.create(Concert.create(concertDTO));
+        List<TicketVendor> ticketVendors = concertDTO.reservationUrls().stream()
+            .map(url -> ticketVendorService.getOrCreate(url.name(), url.logoPath()))
+            .toList();
+
+        long concertId = concertService.create(Concert.create(concertDTO, ticketVendors));
         performanceService.create(Performance.create(concertId, concertDTO));
     }
 

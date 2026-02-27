@@ -22,6 +22,7 @@ public interface ConcertRepository extends JpaRepository<Concert, Long> {
             SELECT DISTINCT c
             FROM Concert c
             JOIN FETCH c.reservationUrls cr
+            JOIN FETCH cr.ticketVendor
             WHERE c.id = :concertId AND c.endAt >= CURRENT_DATE
         """)
     Optional<Concert> findUpcomingWithReservationUrlsById(@Param("concertId") long concertId);

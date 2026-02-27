@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.sopt.confeti.api.dummy.dto.concert.CreateConcertRequest;
 import org.sopt.confeti.api.dummy.facade.dto.concert.ConcertFilePathsDTO;
+import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 
 public record CreateConcertDTO(
         String title,
@@ -22,27 +23,27 @@ public record CreateConcertDTO(
         List<CreateConcertArtistDTO> artists,
         List<CreateConcertReservationUrlDTO> reservationUrls
 ) {
-    public static CreateConcertDTO of(CreateConcertRequest request, ConcertFilePathsDTO filePaths) {
-        AtomicInteger atomicInteger = new AtomicInteger();
+    public static CreateConcertDTO from(CreateConcertRequest request, ConcertFilePathsDTO filePaths) {
         return new CreateConcertDTO(
-                request.getTitle(),
-                request.getSubtitle(),
-                request.getStartAt().toLocalDate(),
-                request.getEndAt().toLocalDate(),
-                request.getArea(),
+                request.title(),
+                request.subtitle(),
+                request.startAt().toLocalDate(),
+                request.endAt().toLocalDate(),
+                request.area(),
                 filePaths.posterPath(),
-                request.getReserveAt(),
-                request.getAgeRating(),
-                request.getTime(),
-                request.getPrice(),
-                request.getAddress(),
-                request.getArtists().stream()
+                request.reserveAt(),
+                request.ageRating(),
+                request.time(),
+                request.price(),
+                request.address(),
+                request.artists().stream()
                         .map(CreateConcertArtistDTO::from)
                         .toList(),
-                request.getReservationUrls().stream()
-                        .map(reservationUrl -> CreateConcertReservationUrlDTO.of(reservationUrl,
-                                filePaths.reservationLogoPaths().get(
-                                        atomicInteger.getAndIncrement())))
+                java.util.stream.IntStream.range(0, request.reservationUrls().size())
+                        .mapToObj(i -> CreateConcertReservationUrlDTO.from(
+                                request.reservationUrls().get(i),
+                                filePaths.reservationLogoPaths().get(i).logoPath()
+                        ))
                         .toList()
         );
     }

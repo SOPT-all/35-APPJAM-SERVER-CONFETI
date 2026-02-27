@@ -9,16 +9,12 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class CreateFestivalStageRequest {
-
-    @NotBlank
-    private String name;
-    @Min(0)
-    @Max(10)
-    private int order;
-
-    @Valid
-    private List<CreateFestivalTimeRequest> times = new ArrayList<>();
+public record CreateFestivalStageRequest(
+    @NotBlank String name,
+    @Min(0) @Max(10) int order,
+    @Valid List<CreateFestivalTimeRequest> times
+) {
+    public CreateFestivalStageRequest() {
+        this(null, 0, new ArrayList<>());
+    }
 }

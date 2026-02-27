@@ -9,10 +9,11 @@ public record FestivalReservationDTO(
 ) {
 
     public static FestivalReservationDTO from(FestivalReservationUrl reservation) {
+        var vendor = reservation.getTicketVendor();
         return new FestivalReservationDTO(
                 reservation.getReservationUrl(),
-                reservation.getName(),
-                reservation.getLogoPath()
+                vendor != null ? vendor.getName() : null,
+                vendor != null ? vendor.getLogoPath() : null
         );
     }
 }
