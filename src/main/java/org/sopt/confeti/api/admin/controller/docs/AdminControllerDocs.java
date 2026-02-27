@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.sopt.confeti.global.common.BaseResponse;
@@ -77,4 +78,23 @@ public interface AdminControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<TicketVendorResponses>> getTicketVendors();
+
+    @Operation(
+        summary = "수정할 콘서트 단건 조회",
+        description = "어드민 권한으로 수정할 콘서트의 전체 상세 정보를 조회합니다. "
+            + "예정된 공연 여부와 관계없이 모든 콘서트를 조회할 수 있습니다."
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<AdminConcertDetailResponse>> getAdminConcertDetail(
+        @PathVariable("concertId") long concertId
+    );
 }

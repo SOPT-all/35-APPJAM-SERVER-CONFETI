@@ -1,20 +1,24 @@
 package org.sopt.confeti.api.admin.controller;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.controller.docs.AdminControllerDocs;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
+import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.sopt.confeti.api.admin.facade.AdminFacade;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.global.annotation.Admin;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -68,5 +72,15 @@ public class AdminController implements AdminControllerDocs {
             SuccessMessage.SUCCESS,
             TicketVendorResponses.from(adminFacade.getTicketVendors())
         );
+    }
+
+    @Override
+    @GetMapping("/performances/concerts/{concertId}")
+    public ResponseEntity<BaseResponse<AdminConcertDetailResponse>> getAdminConcertDetail(
+        @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId
+    ) {
+        AdminConcertDetailInfo concertDetail = adminFacade.getAdminConcertDetail(concertId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            AdminConcertDetailResponse.from(concertDetail));
     }
 }
