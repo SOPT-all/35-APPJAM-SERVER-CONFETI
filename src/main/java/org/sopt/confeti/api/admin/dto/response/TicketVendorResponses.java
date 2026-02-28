@@ -6,10 +6,10 @@ import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendo
 public record TicketVendorResponses(
     List<TicketVendorResponse> ticketVendors
 ) {
-    public static TicketVendorResponses from(final TicketVendorDtos dtos) {
+    public static TicketVendorResponses from(final TicketVendorDtos dtos, org.sopt.confeti.global.util.S3FileHandler s3FileHandler) {
         return new TicketVendorResponses(
             dtos.ticketVendors().stream()
-                .map(TicketVendorResponse::of)
+                .map(dto -> TicketVendorResponse.of(dto, s3FileHandler))
                 .toList()
         );
     }
