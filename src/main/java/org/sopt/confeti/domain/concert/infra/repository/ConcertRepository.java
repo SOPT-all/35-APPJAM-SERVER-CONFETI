@@ -21,7 +21,7 @@ public interface ConcertRepository extends JpaRepository<Concert, Long> {
     @Query(value = """
             SELECT DISTINCT c
             FROM Concert c
-            JOIN FETCH c.reservationUrls cr
+            LEFT JOIN FETCH c.reservationUrls cr
             JOIN FETCH cr.ticketVendor
             WHERE c.id = :concertId AND c.endAt >= CURRENT_DATE
         """)
