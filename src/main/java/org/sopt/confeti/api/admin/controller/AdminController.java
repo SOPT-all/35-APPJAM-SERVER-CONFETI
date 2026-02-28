@@ -6,10 +6,12 @@ import org.sopt.confeti.api.admin.controller.docs.AdminControllerDocs;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
+import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.sopt.confeti.api.admin.facade.AdminFacade;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.global.annotation.Admin;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
@@ -84,5 +86,15 @@ public class AdminController implements AdminControllerDocs {
         AdminConcertDetailInfo concertDetail = adminFacade.getAdminConcertDetail(concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             AdminConcertDetailResponse.of(concertDetail, s3FileHandler));
+    }
+
+    @Override
+    @GetMapping("/performances/festivals/{festivalId}")
+    public ResponseEntity<BaseResponse<AdminFestivalDetailResponse>> getAdminFestivalDetail(
+        @PathVariable("festivalId") @Min(RequestConstraint.ID) long festivalId
+    ) {
+        AdminFestivalDetailInfo festivalDetail = adminFacade.getAdminFestivalDetail(festivalId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            AdminFestivalDetailResponse.of(festivalDetail, s3FileHandler));
     }
 }
