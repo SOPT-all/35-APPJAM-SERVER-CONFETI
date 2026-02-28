@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo.DateInfo;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -37,7 +38,7 @@ public record AdminFestivalDetailResponse(
         List<StageResponse> stages
     ) {
 
-        public static DateResponse of(AdminFestivalDetailInfo.DateInfo info, S3FileHandler s3FileHandler) {
+        public static DateResponse from(AdminFestivalDetailInfo.DateInfo info) {
             return new DateResponse(
                 info.festivalDateId(),
                 info.festivalAt(),
@@ -124,7 +125,7 @@ public record AdminFestivalDetailResponse(
             info.createdAt(),
             info.updatedAt(),
             info.dates().stream()
-                .map(date -> DateResponse.of(date, s3FileHandler))
+                .map(DateResponse::from)
                 .toList()
         );
     }
