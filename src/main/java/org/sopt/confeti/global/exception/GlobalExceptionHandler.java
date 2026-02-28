@@ -2,6 +2,7 @@ package org.sopt.confeti.global.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -10,9 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -34,6 +37,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<Void>> handleMethodArgumentTypeMismatchException(
         MethodArgumentTypeMismatchException e, HttpServletRequest request) {
         request.setAttribute("exception", e);
+        return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<BaseResponse<Void>> handleHandlerMethodValidationException(
+        HandlerMethodValidationException e
+    ) {
+        log.warn("GlobalExceptionHandler.handleHandlerMethodValidationException: 메서드 파라미터 검증에 실패했습니다. Message : {}", e.getMessage());
         return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
     }
 

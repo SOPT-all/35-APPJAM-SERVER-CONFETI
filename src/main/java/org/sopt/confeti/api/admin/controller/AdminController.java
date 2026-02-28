@@ -1,10 +1,14 @@
 package org.sopt.confeti.api.admin.controller;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.controller.docs.AdminControllerDocs;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
@@ -12,6 +16,7 @@ import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.sopt.confeti.api.admin.facade.AdminFacade;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
+import org.sopt.confeti.global.annotation.Admin;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
@@ -21,13 +26,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-//@Admin
+@Admin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
@@ -42,7 +48,7 @@ public class AdminController implements AdminControllerDocs {
         @ModelAttribute CreateTicketVendorRequest request
     ) {
         return ApiResponseUtil.success(
-            SuccessMessage.CREATED, 
+            SuccessMessage.CREATED,
             adminFacade.createTicketVendor(request)
         );
     }
@@ -54,7 +60,7 @@ public class AdminController implements AdminControllerDocs {
         @ModelAttribute UpdateTicketVendorRequest request
     ) {
         return ApiResponseUtil.success(
-            SuccessMessage.UPDATED, 
+            SuccessMessage.UPDATED,
             adminFacade.updateTicketVendor(ticketVendorId, request)
         );
     }
@@ -95,5 +101,17 @@ public class AdminController implements AdminControllerDocs {
         AdminFestivalDetailInfo festivalDetail = adminFacade.getAdminFestivalDetail(festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             AdminFestivalDetailResponse.of(festivalDetail, s3FileHandler));
+    }
+
+    @Override
+    @GetMapping("/artists/search")
+    public ResponseEntity<BaseResponse<AdminArtistSearchResponses>> searchArtists(
+        @RequestParam @NotBlank @Size(max = 50) String term,
+        @RequestParam(defaultValue = "5") @Min(1) @Max(25) int limit
+    ) {
+        return ApiResponseUtil.success(
+            SuccessMessage.SUCCESS,
+            adminFacade.searchArtists(term, limit)
+        );
     }
 }
