@@ -117,6 +117,6 @@ public interface AdminControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<AdminFestivalDetailResponse>> getAdminFestivalDetail(
-        @PathVariable("festivalId") long festivalId
+        @PathVariable("festivalId") @Min(RequestConstraint.ID) long festivalId
     );
 }
