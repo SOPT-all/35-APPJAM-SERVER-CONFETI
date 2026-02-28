@@ -13,6 +13,7 @@ import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
+import org.sopt.confeti.api.admin.dto.response.AdminConcertListResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
@@ -86,6 +87,23 @@ public interface AdminControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<TicketVendorResponses>> getTicketVendors();
+
+    @Operation(
+        summary = "등록된 콘서트 목록 조회",
+        description = "어드민 권한으로 등록된 모든 콘서트 목록을 조회합니다. "
+            + "진행 예정/진행 중인 콘서트와 종료된 콘서트를 구분하여 반환합니다."
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<AdminConcertListResponse>> getAdminConcerts();
 
     @Operation(
         summary = "수정할 콘서트 단건 조회",

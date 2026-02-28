@@ -10,13 +10,14 @@ import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
+import org.sopt.confeti.api.admin.dto.response.AdminConcertListResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.sopt.confeti.api.admin.facade.AdminFacade;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
-import org.sopt.confeti.global.annotation.Admin;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
@@ -33,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Admin
+//@Admin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
@@ -48,7 +49,7 @@ public class AdminController implements AdminControllerDocs {
         @RequestBody CreateTicketVendorRequest request
     ) {
         return ApiResponseUtil.success(
-            SuccessMessage.CREATED, 
+            SuccessMessage.CREATED,
             adminFacade.createTicketVendor(request)
         );
     }
@@ -60,7 +61,7 @@ public class AdminController implements AdminControllerDocs {
         @RequestBody UpdateTicketVendorRequest request
     ) {
         return ApiResponseUtil.success(
-            SuccessMessage.UPDATED, 
+            SuccessMessage.UPDATED,
             adminFacade.updateTicketVendor(ticketVendorId, request)
         );
     }
@@ -81,6 +82,14 @@ public class AdminController implements AdminControllerDocs {
             SuccessMessage.SUCCESS,
             TicketVendorResponses.from(adminFacade.getTicketVendors())
         );
+    }
+
+    @Override
+    @GetMapping("/performances/concerts")
+    public ResponseEntity<BaseResponse<AdminConcertListResponse>> getAdminConcerts() {
+        AdminConcertListInfo concertList = adminFacade.getAdminConcerts();
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            AdminConcertListResponse.of(concertList, s3FileHandler));
     }
 
     @Override
