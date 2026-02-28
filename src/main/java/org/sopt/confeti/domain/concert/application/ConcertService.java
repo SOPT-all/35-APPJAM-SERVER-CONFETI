@@ -2,6 +2,7 @@ package org.sopt.confeti.domain.concert.application;
 
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
@@ -37,6 +38,14 @@ public class ConcertService {
         ConcertDetailDTO concertDetail = ConcertDetailDTO.from(concert);
         redisHandler.set(RedisKey.PERFORMANCE_CONCERTS.createKeyInfo(concertId), concertDetail);
         return concertDetail;
+    }
+
+    @Transactional(readOnly = true)
+    public AdminConcertDetailInfo getAdminConcertDetailInfo(long concertId) {
+        Concert concert = concertRepository.findWithArtistsById(concertId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+        concertRepository.findWithReservationUrlsById(concertId);
+        return AdminConcertDetailInfo.from(concert);
     }
 
     @ReadOnlyTransactional

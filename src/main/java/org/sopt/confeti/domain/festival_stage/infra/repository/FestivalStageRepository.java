@@ -15,4 +15,12 @@ public interface FestivalStageRepository extends JpaRepository<FestivalStage, Lo
             WHERE fs.festivalDate.festival.id = :festivalId
         """)
     List<FestivalStage> findStagesWithTimesByFestivalId(@Param("festivalId") long festivalId);
+
+    @Query("""
+            SELECT DISTINCT fs
+            FROM FestivalStage fs
+            JOIN FETCH fs.times ft
+            WHERE fs.festivalDate.id IN :dateIds
+        """)
+    List<FestivalStage> findStagesWithTimesByFestivalDateIdIn(@Param("dateIds") List<Long> dateIds);
 }

@@ -5,11 +5,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
+import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.sopt.confeti.global.common.BaseResponse;
+import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.common.swagger.AuthErrorResponses;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
 import org.springframework.http.ResponseEntity;
@@ -77,4 +81,42 @@ public interface AdminControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<TicketVendorResponses>> getTicketVendors();
+
+    @Operation(
+        summary = "수정할 콘서트 단건 조회",
+        description = "어드민 권한으로 수정할 콘서트의 전체 상세 정보를 조회합니다. "
+            + "예정된 공연 여부와 관계없이 모든 콘서트를 조회할 수 있습니다."
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<AdminConcertDetailResponse>> getAdminConcertDetail(
+        @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId
+    );
+
+    @Operation(
+        summary = "수정할 페스티벌 단건 조회",
+        description = "어드민 권한으로 수정할 페스티벌의 전체 상세 정보를 조회합니다. "
+            + "예정된 공연 여부와 관계없이 모든 페스티벌을 조회할 수 있습니다."
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<AdminFestivalDetailResponse>> getAdminFestivalDetail(
+        @PathVariable("festivalId") @Min(RequestConstraint.ID) long festivalId
+    );
 }

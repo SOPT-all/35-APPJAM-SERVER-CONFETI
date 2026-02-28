@@ -1,5 +1,6 @@
 package org.sopt.confeti.global.transaction;
 
+import jakarta.annotation.PostConstruct;
 import java.util.function.Supplier;
 import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class TxRunner {
+
+    @PostConstruct
+    protected void initialize() {
+        Tx.initialize(this);
+    }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void runTx(Runnable runnable) {
