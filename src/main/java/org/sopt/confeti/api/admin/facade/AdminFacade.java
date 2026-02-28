@@ -1,7 +1,10 @@
 package org.sopt.confeti.api.admin.facade;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
@@ -66,13 +69,18 @@ public class AdminFacade {
         List<ConcertPreviewInfo> concerts = Tx.readOnlyTx(concertService::getAllConcerts);
         LocalDate today = LocalDate.now();
 
-        List<ConcertInfo> upcomingConcerts = concerts.stream()
-            .filter(concert -> !concert.endAt().isBefore(today))
+        Map<Boolean, List<ConcertPreviewInfo>> partitioned = concerts.stream()
+            .collect(Collectors.partitioningBy(
+                concert -> !concert.endAt().isBefore(today)
+            ));
+
+        List<ConcertInfo> upcomingConcerts = partitioned.get(true).stream()
+            .sorted(Comparator.comparing(ConcertPreviewInfo::startAt).reversed())
             .map(ConcertInfo::from)
             .toList();
 
-        List<ConcertInfo> finishedConcerts = concerts.stream()
-            .filter(concert -> concert.endAt().isBefore(today))
+        List<ConcertInfo> finishedConcerts = partitioned.get(false).stream()
+            .sorted(Comparator.comparing(ConcertPreviewInfo::startAt).reversed())
             .map(ConcertInfo::from)
             .toList();
 

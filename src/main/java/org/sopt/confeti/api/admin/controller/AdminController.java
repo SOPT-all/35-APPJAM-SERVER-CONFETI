@@ -18,6 +18,7 @@ import org.sopt.confeti.api.admin.facade.AdminFacade;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
+import org.sopt.confeti.global.annotation.Admin;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
@@ -34,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-//@Admin
+@Admin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
