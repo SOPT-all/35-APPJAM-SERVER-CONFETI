@@ -1,10 +1,13 @@
 package org.sopt.confeti.api.admin.controller;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.controller.docs.AdminControllerDocs;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
@@ -26,9 +29,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-//@Admin
+@Admin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
@@ -96,5 +100,17 @@ public class AdminController implements AdminControllerDocs {
         AdminFestivalDetailInfo festivalDetail = adminFacade.getAdminFestivalDetail(festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             AdminFestivalDetailResponse.of(festivalDetail, s3FileHandler));
+    }
+
+    @Override
+    @GetMapping("/artists/search")
+    public ResponseEntity<BaseResponse<AdminArtistSearchResponses>> searchArtists(
+        @RequestParam String term,
+        @RequestParam(defaultValue = "5") @Min(1) @Max(25) int limit
+    ) {
+        return ApiResponseUtil.success(
+            SuccessMessage.SUCCESS,
+            adminFacade.searchArtists(term, limit)
+        );
     }
 }

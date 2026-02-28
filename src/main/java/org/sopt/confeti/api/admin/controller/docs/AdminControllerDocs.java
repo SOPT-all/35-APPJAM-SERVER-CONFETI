@@ -5,9 +5,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
@@ -19,6 +21,7 @@ import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "어드민 API", description = "어드민 전용 API")
 public interface AdminControllerDocs {
@@ -118,5 +121,21 @@ public interface AdminControllerDocs {
     @CommonErrorResponses
     ResponseEntity<BaseResponse<AdminFestivalDetailResponse>> getAdminFestivalDetail(
         @PathVariable("festivalId") @Min(RequestConstraint.ID) long festivalId
+    );
+
+    @Operation(summary = "아티스트 검색")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<AdminArtistSearchResponses>> searchArtists(
+        @RequestParam String term,
+        @RequestParam(defaultValue = "5") @Min(1) @Max(25) int limit
     );
 }

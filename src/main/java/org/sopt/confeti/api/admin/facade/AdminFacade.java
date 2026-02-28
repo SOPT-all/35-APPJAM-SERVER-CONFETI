@@ -3,6 +3,7 @@ package org.sopt.confeti.api.admin.facade;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
@@ -14,17 +15,22 @@ import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendo
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
+import org.sopt.confeti.external.client.AppleMusicFeignClient;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.transaction.Tx;
+import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
 @RequiredArgsConstructor
 public class AdminFacade {
 
+    private static final String ARTISTS_TYPE = "artists";
+
     private final TicketVendorService ticketVendorService;
     private final ConcertService concertService;
     private final FestivalService festivalService;
+    private final AppleMusicFeignClient appleMusicFeignClient;
 
     @Transactional
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
@@ -58,5 +64,16 @@ public class AdminFacade {
 
     public AdminFestivalDetailInfo getAdminFestivalDetail(long festivalId) {
         return Tx.readOnlyTx(() -> festivalService.getAdminFestivalDetailInfo(festivalId));
+    }
+
+    public AdminArtistSearchResponses searchArtists(String term, int limit) {
+        AppleMusicSearchResponse response = appleMusicFeignClient.searchByKeyword(
+            term,
+            ARTISTS_TYPE,
+            String.valueOf(limit),
+            null,
+            null
+        );
+        return AdminArtistSearchResponses.from(response);
     }
 }
