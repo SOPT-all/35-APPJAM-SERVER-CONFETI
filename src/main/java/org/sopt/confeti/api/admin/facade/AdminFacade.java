@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.admin.facade;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
@@ -15,22 +16,20 @@ import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendo
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
-import org.sopt.confeti.external.client.AppleMusicFeignClient;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.transaction.Tx;
-import org.sopt.confeti.global.util.music.dto.search.AppleMusicSearchResponse;
+import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
 @RequiredArgsConstructor
 public class AdminFacade {
 
-    private static final String ARTISTS_TYPE = "artists";
-
     private final TicketVendorService ticketVendorService;
     private final ConcertService concertService;
     private final FestivalService festivalService;
-    private final AppleMusicFeignClient appleMusicFeignClient;
+    private final MusicAPIHandler musicAPIHandler;
 
     @Transactional
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
@@ -67,13 +66,7 @@ public class AdminFacade {
     }
 
     public AdminArtistSearchResponses searchArtists(String term, int limit) {
-        AppleMusicSearchResponse response = appleMusicFeignClient.searchByKeyword(
-            term,
-            ARTISTS_TYPE,
-            String.valueOf(limit),
-            null,
-            null
-        );
-        return AdminArtistSearchResponses.from(response);
+        List<ConfetiArtist> artists = musicAPIHandler.findArtistsByKeyword(term, limit);
+        return AdminArtistSearchResponses.from(artists);
     }
 }
