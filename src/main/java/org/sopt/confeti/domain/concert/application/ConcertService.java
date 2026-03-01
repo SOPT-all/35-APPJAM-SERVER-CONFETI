@@ -1,8 +1,10 @@
 package org.sopt.confeti.domain.concert.application;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
+import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
@@ -46,6 +48,13 @@ public class ConcertService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         concertRepository.findWithReservationUrlsById(concertId);
         return AdminConcertDetailInfo.from(concert);
+    }
+
+    @ReadOnlyTransactional
+    public List<ConcertPreviewInfo> getAllConcerts() {
+        return concertRepository.findAll().stream()
+            .map(ConcertPreviewInfo::from)
+            .toList();
     }
 
     @ReadOnlyTransactional
