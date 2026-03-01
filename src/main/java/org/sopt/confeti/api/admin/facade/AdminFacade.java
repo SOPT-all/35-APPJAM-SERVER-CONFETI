@@ -1,13 +1,22 @@
 package org.sopt.confeti.api.admin.facade;
 
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo.ConcertInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
+import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
@@ -82,12 +91,54 @@ public class AdminFacade {
         return Tx.readOnlyTx(() -> ticketVendorService.findAll());
     }
 
+    public AdminConcertListInfo getAdminConcerts() {
+        List<ConcertPreviewInfo> concerts = Tx.readOnlyTx(concertService::getAllConcerts);
+        LocalDate today = LocalDate.now();
+
+        Map<Boolean, List<ConcertPreviewInfo>> partitioned = concerts.stream()
+            .collect(Collectors.partitioningBy(
+                concert -> !concert.endAt().isBefore(today)
+            ));
+
+        List<ConcertInfo> upcomingConcerts = partitioned.get(true).stream()
+            .sorted(Comparator.comparing(ConcertPreviewInfo::startAt).reversed())
+            .map(ConcertInfo::from)
+            .toList();
+
+        List<ConcertInfo> finishedConcerts = partitioned.get(false).stream()
+            .sorted(Comparator.comparing(ConcertPreviewInfo::startAt).reversed())
+            .map(ConcertInfo::from)
+            .toList();
+
+        return new AdminConcertListInfo(upcomingConcerts, finishedConcerts);
+    }
+
     public AdminConcertDetailInfo getAdminConcertDetail(long concertId) {
         return Tx.readOnlyTx(() -> concertService.getAdminConcertDetailInfo(concertId));
     }
 
     public AdminFestivalDetailInfo getAdminFestivalDetail(long festivalId) {
         return Tx.readOnlyTx(() -> festivalService.getAdminFestivalDetailInfo(festivalId));
+    }
+
+    public AdminFestivalListInfo getAdminFestivals() {
+        List<AdminFestivalPreviewInfo> festivals = Tx.readOnlyTx(
+            festivalService::getAdminFestivals);
+        LocalDate today = LocalDate.now();
+
+        Map<Boolean, List<AdminFestivalPreviewInfo>> partitioned = festivals.stream()
+            .collect(Collectors.partitioningBy(
+                festival -> !festival.endAt().isBefore(today)
+            ));
+
+        List<AdminFestivalPreviewInfo> upcomingFestivals = partitioned.get(true).stream()
+            .sorted(Comparator.comparing(AdminFestivalPreviewInfo::startAt).reversed())
+            .toList();
+        List<AdminFestivalPreviewInfo> finishedFestivals = partitioned.get(false).stream()
+            .sorted(Comparator.comparing(AdminFestivalPreviewInfo::startAt).reversed())
+            .toList();
+
+        return AdminFestivalListInfo.of(upcomingFestivals, finishedFestivals);
     }
 
     public AdminArtistSearchResponses searchArtists(String term, int limit) {
