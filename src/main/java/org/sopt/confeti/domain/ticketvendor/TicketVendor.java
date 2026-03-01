@@ -69,7 +69,11 @@ public class TicketVendor {
     }
 
     public void update(String name, String logoPath) {
-        this.name = name;
-        this.logoPath = logoPath;
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (logoPath != null && !logoPath.isBlank()) {
+            this.logoPath = logoPath;
+        }
     }
 }

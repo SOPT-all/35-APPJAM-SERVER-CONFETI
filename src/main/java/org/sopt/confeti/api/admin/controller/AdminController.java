@@ -29,10 +29,10 @@ import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,7 +49,7 @@ public class AdminController implements AdminControllerDocs {
     @Override
     @PostMapping("/ticket-vendors")
     public ResponseEntity<BaseResponse<TicketVendorResponse>> createTicketVendor(
-        @RequestBody CreateTicketVendorRequest request
+        @ModelAttribute CreateTicketVendorRequest request
     ) {
         return ApiResponseUtil.success(
             SuccessMessage.CREATED,
@@ -58,10 +58,10 @@ public class AdminController implements AdminControllerDocs {
     }
 
     @Override
-    @PutMapping("/ticket-vendors/{ticketVendorId}")
+    @PatchMapping("/ticket-vendors/{ticketVendorId}")
     public ResponseEntity<BaseResponse<TicketVendorResponse>> updateTicketVendor(
         @PathVariable Long ticketVendorId,
-        @RequestBody UpdateTicketVendorRequest request
+        @ModelAttribute UpdateTicketVendorRequest request
     ) {
         return ApiResponseUtil.success(
             SuccessMessage.UPDATED,
@@ -83,7 +83,7 @@ public class AdminController implements AdminControllerDocs {
     public ResponseEntity<BaseResponse<TicketVendorResponses>> getTicketVendors() {
         return ApiResponseUtil.success(
             SuccessMessage.SUCCESS,
-            TicketVendorResponses.from(adminFacade.getTicketVendors())
+            TicketVendorResponses.from(adminFacade.getTicketVendors(), s3FileHandler)
         );
     }
 

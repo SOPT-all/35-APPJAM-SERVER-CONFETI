@@ -8,6 +8,7 @@ import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendo
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
 import org.sopt.confeti.domain.ticketvendor.infra.repository.TicketVendorRepository;
+import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.exception.ConflictException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -21,6 +22,11 @@ import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendo
 public class TicketVendorService {
 
     private final TicketVendorRepository ticketVendorRepository;
+
+    @Transactional(readOnly = true)
+    public TicketVendor getById(Long id) {
+        return ticketVendorRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+    }
 
     @Transactional
     public TicketVendor getOrCreate(String name, String logoPath) {
@@ -44,12 +50,14 @@ public class TicketVendorService {
         TicketVendor ticketVendor = ticketVendorRepository.findById(dto.ticketVendorId())
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        ticketVendorRepository.findByName(dto.name())
-            .ifPresent(existingVendor -> {
-                if (!existingVendor.getId().equals(dto.ticketVendorId())) {
-                    throw new ConflictException(ErrorMessage.CONFLICT);
-                }
-            });
+        if (dto.name() != null) {
+            ticketVendorRepository.findByName(dto.name())
+                .ifPresent(existingVendor -> {
+                    if (!existingVendor.getId().equals(dto.ticketVendorId())) {
+                        throw new ConflictException(ErrorMessage.CONFLICT);
+                    }
+                });
+        }
 
         ticketVendor.update(dto.name(), dto.logoPath());
         return TicketVendorUpdateResponseDto.of(ticketVendor);
@@ -63,7 +71,7 @@ public class TicketVendorService {
         ticketVendorRepository.delete(ticketVendor);
     }
 
-    @Transactional(readOnly = true)
+    @ReadOnlyTransactional
     public TicketVendorDtos findAll() {
         return TicketVendorDtos.from(
             ticketVendorRepository.findAll().stream()

@@ -8,8 +8,8 @@ public record TicketVendorCreateDto(
         return new TicketVendorCreateDto(name, logoPath);
     }
 
-    public static TicketVendorCreateDto from(org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest request) {
-        return new TicketVendorCreateDto(request.name(), request.logoPath());
+    public static TicketVendorCreateDto from(org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest request, String logoPath) {
+        return new TicketVendorCreateDto(request.name(), logoPath);
     }
 
     public org.sopt.confeti.domain.ticketvendor.TicketVendor toEntity() {

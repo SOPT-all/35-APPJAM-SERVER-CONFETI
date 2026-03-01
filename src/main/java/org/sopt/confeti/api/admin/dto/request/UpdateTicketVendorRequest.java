@@ -1,9 +1,9 @@
 package org.sopt.confeti.api.admin.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
+import org.springframework.web.multipart.MultipartFile;
 
 public record UpdateTicketVendorRequest(
-    @NotBlank String name,
-    @NotBlank String logoPath
+    String name,
+    MultipartFile logoImage
 ) {
 }

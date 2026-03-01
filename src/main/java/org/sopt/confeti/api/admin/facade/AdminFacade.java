@@ -19,6 +19,7 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.festival.application.FestivalService;
+import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
@@ -26,10 +27,12 @@ import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendo
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
 import org.sopt.confeti.global.annotation.Facade;
+import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.transaction.Tx;
+import org.sopt.confeti.global.util.S3FileHandler;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Facade
 @RequiredArgsConstructor
@@ -39,32 +42,53 @@ public class AdminFacade {
     private final ConcertService concertService;
     private final FestivalService festivalService;
     private final MusicAPIHandler musicAPIHandler;
+    private final S3FileHandler s3FileHandler;
 
-    @Transactional
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
-        TicketVendorCreateDto dto = TicketVendorCreateDto.from(request);
-        TicketVendorCreateResponseDto responseDto = ticketVendorService.create(dto);
+        String logoPath = s3FileHandler.uploadFile(request.logoImage(),
+            FolderPath.combine(FolderPath.TICKET_VENDOR, FolderPath.LOGO));
+        TicketVendorCreateDto dto = TicketVendorCreateDto.from(request, logoPath);
 
-        return TicketVendorResponse.from(responseDto);
+        TicketVendorCreateResponseDto responseDto = Tx.masterTx(
+            () -> ticketVendorService.create(dto));
+
+        return TicketVendorResponse.from(responseDto, s3FileHandler);
     }
 
-    @Transactional
     public TicketVendorResponse updateTicketVendor(Long ticketVendorId,
         UpdateTicketVendorRequest request) {
-        TicketVendorUpdateDto dto = TicketVendorUpdateDto.of(ticketVendorId, request);
-        TicketVendorUpdateResponseDto responseDto = ticketVendorService.update(dto);
+        TicketVendor existing = Tx.readOnlyTx(() -> ticketVendorService.getById(ticketVendorId));
+        String logoPath = existing.getLogoPath();
 
-        return TicketVendorResponse.from(responseDto);
+        MultipartFile logoImage = request != null ? request.logoImage() : null;
+
+        if (logoImage != null && !logoImage.isEmpty()) {
+            s3FileHandler.deleteFile(FolderPath.combine(FolderPath.TICKET_VENDOR, FolderPath.LOGO),
+                logoPath);
+            logoPath = s3FileHandler.uploadFile(logoImage,
+                FolderPath.combine(FolderPath.TICKET_VENDOR, FolderPath.LOGO));
+        }
+
+        final String finalLogoPath = logoPath;
+        TicketVendorUpdateResponseDto responseDto = Tx.masterTx(() -> {
+            TicketVendorUpdateDto dto = TicketVendorUpdateDto.of(ticketVendorId, request,
+                finalLogoPath);
+            return ticketVendorService.update(dto);
+        });
+
+        return TicketVendorResponse.from(responseDto, s3FileHandler);
     }
 
-    @Transactional
     public void deleteTicketVendor(Long ticketVendorId) {
-        ticketVendorService.delete(ticketVendorId);
+        org.sopt.confeti.domain.ticketvendor.TicketVendor existing = Tx.readOnlyTx(
+            () -> ticketVendorService.getById(ticketVendorId));
+        s3FileHandler.deleteFile(FolderPath.combine(FolderPath.TICKET_VENDOR, FolderPath.LOGO),
+            existing.getLogoPath());
+        Tx.masterTx(() -> ticketVendorService.delete(ticketVendorId));
     }
 
-    @Transactional(readOnly = true)
     public TicketVendorDtos getTicketVendors() {
-        return ticketVendorService.findAll();
+        return Tx.readOnlyTx(() -> ticketVendorService.findAll());
     }
 
     public AdminConcertListInfo getAdminConcerts() {
