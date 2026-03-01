@@ -15,6 +15,8 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo.ConcertInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
@@ -93,6 +95,26 @@ public class AdminFacade {
 
     public AdminFestivalDetailInfo getAdminFestivalDetail(long festivalId) {
         return Tx.readOnlyTx(() -> festivalService.getAdminFestivalDetailInfo(festivalId));
+    }
+
+    public AdminFestivalListInfo getAdminFestivals() {
+        List<AdminFestivalPreviewInfo> festivals = Tx.readOnlyTx(
+            festivalService::getAdminFestivals);
+        LocalDate today = LocalDate.now();
+
+        Map<Boolean, List<AdminFestivalPreviewInfo>> partitioned = festivals.stream()
+            .collect(Collectors.partitioningBy(
+                festival -> !festival.endAt().isBefore(today)
+            ));
+
+        List<AdminFestivalPreviewInfo> upcomingFestivals = partitioned.get(true).stream()
+            .sorted(Comparator.comparing(AdminFestivalPreviewInfo::startAt).reversed())
+            .toList();
+        List<AdminFestivalPreviewInfo> finishedFestivals = partitioned.get(false).stream()
+            .sorted(Comparator.comparing(AdminFestivalPreviewInfo::startAt).reversed())
+            .toList();
+
+        return AdminFestivalListInfo.of(upcomingFestivals, finishedFestivals);
     }
 
     public AdminArtistSearchResponses searchArtists(String term, int limit) {
