@@ -181,18 +181,25 @@ public class AdminFacade {
     }
 
     public PerformanceDraftDto createPerformanceDraft(PerformanceDraftCreateDto dto) {
-        String posterPath = s3FileHandler.uploadFile(dto.posterImage(), FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER));
-        String logoPath = dto.getOptionalLogoImage()
-            .map(image -> s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO)))
-            .orElse(null);
+        String posterPath = null;
+        String logoPath = null;
 
         try {
+            posterPath = s3FileHandler.uploadFile(dto.posterImage(), FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER));
+            logoPath = dto.getOptionalLogoImage()
+                .map(image -> s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO)))
+                .orElse(null);
+
             return performanceDraftService.createDraft(dto, posterPath, logoPath);
         } catch (Exception e) {
             log.warn("AdminFacade.createPerformanceDraft : 공연 초안 생성에 실패해 업로드했던 이미지 파일을 롤백합니다. posterPath : {}, logoPath : {}", posterPath, logoPath);
-            s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), posterPath);
-            Optional.ofNullable(logoPath)
-                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), path));
+            
+            if (posterPath != null) {
+                s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), posterPath);
+            }
+            if (logoPath != null) {
+                s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), logoPath);
+            }
             throw e;
         }
     }
