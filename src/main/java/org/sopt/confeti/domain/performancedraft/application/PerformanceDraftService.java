@@ -5,13 +5,13 @@ import org.sopt.confeti.domain.performancedraft.PerformanceDraft;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
+import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDtos;
 import org.sopt.confeti.domain.performancedraft.infra.PerformanceDraftRepository;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,10 +34,12 @@ public class PerformanceDraftService {
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceDraftDto> findAllDrafts() {
-        return draftRepository.findAll().stream()
-                .map(PerformanceDraftDto::from)
-                .toList();
+    public PerformanceDraftDtos findAllDrafts() {
+        return PerformanceDraftDtos.from(
+                draftRepository.findAll().stream()
+                        .map(PerformanceDraftDto::from)
+                        .toList()
+        );
     }
 
     @Transactional

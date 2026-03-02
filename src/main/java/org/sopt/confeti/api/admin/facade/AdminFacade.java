@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
-import org.sopt.confeti.api.admin.dto.response.PerformanceDraftResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
@@ -25,6 +24,7 @@ import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftServ
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
+import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDtos;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
@@ -159,6 +159,10 @@ public class AdminFacade {
             .map(image -> s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO)))
             .orElse(null);
         return performanceDraftService.createDraft(dto, posterPath, logoPath);
+    }
+
+    public PerformanceDraftDtos getPerformanceDrafts() {
+        return Tx.readOnlyTx(performanceDraftService::findAllDrafts);
     }
 
     public PerformanceDraftDto updatePerformanceDraft(PerformanceDraftUpdateDto dto) {

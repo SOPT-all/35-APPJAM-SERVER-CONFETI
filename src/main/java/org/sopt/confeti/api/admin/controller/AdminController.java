@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.admin.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -15,6 +16,7 @@ import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertListResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalListResponse;
+import org.sopt.confeti.api.admin.dto.response.PerformanceDraftListResponses;
 import org.sopt.confeti.api.admin.dto.response.PerformanceDraftResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
@@ -49,6 +51,7 @@ public class AdminController implements AdminControllerDocs {
 
     private final AdminFacade adminFacade;
     private final S3FileHandler s3FileHandler;
+    private final ObjectMapper objectMapper;
 
     @Override
     @PostMapping("/ticket-vendors")
@@ -88,6 +91,15 @@ public class AdminController implements AdminControllerDocs {
         return ApiResponseUtil.success(
             SuccessMessage.SUCCESS,
             TicketVendorResponses.from(adminFacade.getTicketVendors(), s3FileHandler)
+        );
+    }
+
+    @Override
+    @GetMapping("/performances/drafts")
+    public ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts() {
+        return ApiResponseUtil.success(
+            SuccessMessage.SUCCESS,
+            PerformanceDraftListResponses.from(adminFacade.getPerformanceDrafts(), objectMapper)
         );
     }
 

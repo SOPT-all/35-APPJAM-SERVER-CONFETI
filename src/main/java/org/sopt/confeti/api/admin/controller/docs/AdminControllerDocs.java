@@ -19,6 +19,7 @@ import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertListResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalListResponse;
+import org.sopt.confeti.api.admin.dto.response.PerformanceDraftListResponses;
 import org.sopt.confeti.api.admin.dto.response.PerformanceDraftResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
@@ -102,6 +103,19 @@ public interface AdminControllerDocs {
     @CommonErrorResponses
     ResponseEntity<BaseResponse<TicketVendorResponses>> getTicketVendors();
 
+
+    @Operation(summary = "대기 공연 목록 조회")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts();
 
     @Operation(summary = "대기 공연 등록")
     @ApiResponses(
