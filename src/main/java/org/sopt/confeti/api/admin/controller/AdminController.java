@@ -139,7 +139,7 @@ public class AdminController implements AdminControllerDocs {
         request.validate();
 
         return ApiResponseUtil.success(
-            SuccessMessage.SUCCESS,
+            request.concertId() == null ? SuccessMessage.CREATED : SuccessMessage.SUCCESS,
             adminFacade.upsertConcert(poster, request)
         );
     }
