@@ -4,18 +4,18 @@ import java.util.Optional;
 
 import org.sopt.confeti.domain.performancedraft.DraftStatus;
 import org.sopt.confeti.domain.performancedraft.PerformanceDraft;
-import org.sopt.confeti.domain.performancedraft.PerformanceType;
+import org.sopt.confeti.domain.performancedraft.PerformanceDraftType;
 import org.sopt.confeti.global.common.upload.UploadableFile;
 
 public record PerformanceDraftCreateDto(
-        PerformanceType performanceType,
+        PerformanceDraftType performanceType,
         String performanceData,
         DraftStatus status,
         UploadableFile posterImage,
         UploadableFile logoImage
 ) {
     public static PerformanceDraftCreateDto of(
-        PerformanceType performanceType, String performanceData, DraftStatus status, 
+        PerformanceDraftType performanceType, String performanceData, DraftStatus status, 
         UploadableFile posterImage, UploadableFile logoImage
     ) {
         return new PerformanceDraftCreateDto(performanceType, performanceData, status, posterImage, logoImage);

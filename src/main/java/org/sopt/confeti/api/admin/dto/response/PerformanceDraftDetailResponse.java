@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Optional;
 import org.sopt.confeti.api.admin.facade.dto.response.PerformanceDraftDetailInfo;
 import org.sopt.confeti.domain.performancedraft.DraftStatus;
-import org.sopt.confeti.domain.performancedraft.PerformanceType;
+import org.sopt.confeti.domain.performancedraft.PerformanceDraftType;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.S3FileHandler;
 
 public record PerformanceDraftDetailResponse(
         Long id,
-        PerformanceType performanceType,
+        PerformanceDraftType performanceType,
         DraftStatus status,
         @JsonRawValue
         String performanceData,

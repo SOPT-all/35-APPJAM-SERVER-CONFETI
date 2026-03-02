@@ -1,6 +1,6 @@
 package org.sopt.confeti.domain.performancedraft;
 
-public enum PerformanceType {
+public enum PerformanceDraftType {
     FESTIVAL,
     CONCERT
 }

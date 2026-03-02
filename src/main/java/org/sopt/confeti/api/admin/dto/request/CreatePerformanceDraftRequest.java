@@ -6,14 +6,14 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
 
 import org.sopt.confeti.domain.performancedraft.DraftStatus;
-import org.sopt.confeti.domain.performancedraft.PerformanceType;
+import org.sopt.confeti.domain.performancedraft.PerformanceDraftType;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
 import org.sopt.confeti.global.common.upload.MultipartFileAdapter;
 import org.springframework.web.multipart.MultipartFile;
 
 public record CreatePerformanceDraftRequest(
     @NotNull
-    PerformanceType performanceType,
+    PerformanceDraftType performanceType,
     @NotBlank
     String performanceData,
     @NotNull

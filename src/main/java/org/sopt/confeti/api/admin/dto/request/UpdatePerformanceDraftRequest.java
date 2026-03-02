@@ -2,13 +2,13 @@ package org.sopt.confeti.api.admin.dto.request;
 
 import java.util.Optional;
 import org.sopt.confeti.domain.performancedraft.DraftStatus;
-import org.sopt.confeti.domain.performancedraft.PerformanceType;
+import org.sopt.confeti.domain.performancedraft.PerformanceDraftType;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
 import org.sopt.confeti.global.common.upload.MultipartFileAdapter;
 import org.springframework.web.multipart.MultipartFile;
 
 public record UpdatePerformanceDraftRequest(
-    PerformanceType performanceType,
+    PerformanceDraftType performanceType,
     DraftStatus status,
     String performanceData,
     MultipartFile posterImage,

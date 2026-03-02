@@ -2,7 +2,7 @@ package org.sopt.confeti.api.admin.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import org.sopt.confeti.domain.performancedraft.DraftStatus;
-import org.sopt.confeti.domain.performancedraft.PerformanceType;
+import org.sopt.confeti.domain.performancedraft.PerformanceDraftType;
 import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public record PerformanceDraftResponse(
         Long id,
-        PerformanceType performanceType,
+        PerformanceDraftType performanceType,
         DraftStatus status,
         @JsonRawValue
         String performanceData,

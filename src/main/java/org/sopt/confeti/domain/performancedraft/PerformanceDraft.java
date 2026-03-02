@@ -33,7 +33,7 @@ public class PerformanceDraft {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private PerformanceType performanceType;
+    private PerformanceDraftType performanceType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -58,7 +58,7 @@ public class PerformanceDraft {
 
     @Builder
     private PerformanceDraft(
-        PerformanceType performanceType, 
+        PerformanceDraftType performanceType, 
         DraftStatus status, 
         String performanceData, 
         String posterPath, 
@@ -72,7 +72,7 @@ public class PerformanceDraft {
     }
 
     public static PerformanceDraft create(
-        PerformanceType performanceType, 
+        PerformanceDraftType performanceType, 
         String performanceData, 
         DraftStatus status,
         String posterPath,
@@ -88,7 +88,7 @@ public class PerformanceDraft {
     }
 
     public void update(
-        PerformanceType performanceType, 
+        PerformanceDraftType performanceType, 
         DraftStatus status, 
         String performanceData,
         String posterPath,

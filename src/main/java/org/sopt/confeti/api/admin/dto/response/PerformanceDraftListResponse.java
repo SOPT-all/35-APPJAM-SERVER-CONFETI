@@ -4,12 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.sopt.confeti.domain.performancedraft.DraftStatus;
-import org.sopt.confeti.domain.performancedraft.PerformanceType;
+import org.sopt.confeti.domain.performancedraft.PerformanceDraftType;
 import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
 
 public record PerformanceDraftListResponse(
         Long id,
-        PerformanceType performanceType,
+        PerformanceDraftType performanceType,
         DraftStatus status,
         String title,
         String area,
