@@ -24,13 +24,13 @@ import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.common.swagger.AuthErrorResponses;
 import org.sopt.confeti.global.common.swagger.CommonErrorResponses;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -191,7 +191,7 @@ public interface AdminControllerDocs {
     @CommonErrorResponses
     ResponseEntity<BaseResponse<PutAdminConcertResponse>> upsertConcert(
         @RequestPart MultipartFile poster,
-        @Valid @RequestPart("request") PutAdminConcertRequest request
+        @Valid @RequestPart(value = "concert") PutAdminConcertRequest request
     );
 
     @Operation(summary = "아티스트 검색")

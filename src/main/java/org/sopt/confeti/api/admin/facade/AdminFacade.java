@@ -27,9 +27,9 @@ import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
 import org.sopt.confeti.domain.concert_artist.ConcertArtist;
 import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
 import org.sopt.confeti.domain.festival.application.FestivalService;
-import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.music.artist.Artist;
 import org.sopt.confeti.domain.music.artist.application.ArtistService;
+import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
@@ -173,10 +173,18 @@ public class AdminFacade {
         ensureArtistsExist(new HashSet<>(request.artistIds()));
 
         long concertId;
-        if (request.concertId() == null) {
-            concertId = createConcert(request, posterPath);
-        } else {
-            concertId = updateConcert(request, posterPath, folderPath);
+        try {
+            if (request.concertId() == null) {
+                concertId = createConcert(request, posterPath);
+            } else {
+                concertId = updateConcert(request, posterPath, folderPath);
+            }
+        } catch (Exception e) {
+            log.warn(
+                "AdminFacade.upsertConcert : 콘서트 생성에 실패해 업로드했던 이미지 파일을 롤백합니다. Folder Path : {}, File Name : {}",
+                folderPath, posterPath);
+            s3FileHandler.deleteFile(folderPath, posterPath);
+            throw e;
         }
 
         return PutAdminConcertResponse.from(concertId);
@@ -282,6 +290,11 @@ public class AdminFacade {
         List<Long> ticketVendorIds = request.reservationUrls().stream()
             .map(PutAdminConcertRequest.ReservationUrlRequest::ticketVendorId)
             .toList();
+
+        if (ticketVendorIds.isEmpty()) {
+            return Map.of();
+        }
+
         return ticketVendorService.findAllByIds(ticketVendorIds).stream()
             .collect(Collectors.toMap(TicketVendor::getId, v -> v));
     }
