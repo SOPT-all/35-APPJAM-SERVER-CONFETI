@@ -19,6 +19,7 @@ import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertListResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalListResponse;
+import org.sopt.confeti.api.admin.dto.response.PerformanceDraftDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.PerformanceDraftListResponses;
 import org.sopt.confeti.api.admin.dto.response.PerformanceDraftResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
@@ -130,6 +131,21 @@ public interface AdminControllerDocs {
     @CommonErrorResponses
     public ResponseEntity<BaseResponse<PerformanceDraftResponse>> createPerformanceDraft(
         @ModelAttribute @Valid CreatePerformanceDraftRequest request
+    );
+
+    @Operation(summary = "대기 공연 상세 조회")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<PerformanceDraftDetailResponse>> getPerformanceDraftDetail(
+        @PathVariable Long draftId
     );
 
     @Operation(summary = "대기 공연 수정",

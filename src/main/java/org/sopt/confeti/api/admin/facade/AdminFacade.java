@@ -1,9 +1,15 @@
 package org.sopt.confeti.api.admin.facade;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
@@ -14,12 +20,16 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo.ConcertInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
-import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.PerformanceDraftDetailInfo;
 import org.sopt.confeti.domain.concert.application.ConcertService;
+import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
 import org.sopt.confeti.domain.festival.application.FestivalService;
+import org.sopt.confeti.domain.music.artist.Artist;
+import org.sopt.confeti.domain.music.artist.application.ArtistService;
 import org.sopt.confeti.domain.performancedraft.PerformanceDraft;
+import org.sopt.confeti.domain.performancedraft.PerformanceType;
 import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftService;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
@@ -50,6 +60,8 @@ public class AdminFacade {
     private final MusicAPIHandler musicAPIHandler;
     private final S3FileHandler s3FileHandler;
     private final PerformanceDraftService performanceDraftService;
+    private final ArtistService artistService;
+    private final ObjectMapper objectMapper;
 
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
         String logoPath = s3FileHandler.uploadFile(request.logoImage(),
@@ -164,6 +176,43 @@ public class AdminFacade {
     public PerformanceDraftDtos getPerformanceDrafts() {
         return Tx.readOnlyTx(performanceDraftService::findAllDrafts);
     }
+
+    public PerformanceDraftDetailInfo getPerformanceDraftDetail(Long draftId) {
+        PerformanceDraft draft = Tx.readOnlyTx(() -> performanceDraftService.getById(draftId));
+        PerformanceDraftDto dto = PerformanceDraftDto.from(draft);
+
+        Set<String> artistIds = extractArtistIds(dto);
+        List<ConfetiArtist> artists = Tx.readOnlyTx(() -> artistService.getArtists(artistIds))
+                .stream()
+                .map(Artist::toDomain)
+                .toList();
+
+        return new PerformanceDraftDetailInfo(dto, artists);
+    }
+
+    private Set<String> extractArtistIds(PerformanceDraftDto dto) {
+        Set<String> artistIds = new HashSet<>();
+        try {
+            JsonNode root = objectMapper.readTree(dto.performanceData());
+            if (dto.performanceType() == PerformanceType.CONCERT) {
+                Optional.ofNullable(root.get("artists")).ifPresent(arr ->
+                    arr.forEach(item -> Optional.ofNullable(item.get("artistId"))
+                        .ifPresent(node -> artistIds.add(node.asText())))
+                );
+            } else {
+                Optional.ofNullable(root.get("dates")).ifPresent(dates ->
+                    dates.forEach(date -> Optional.ofNullable(date.get("dailyArtists")).ifPresent(daily ->
+                        daily.forEach(item -> Optional.ofNullable(item.get("artistId"))
+                            .ifPresent(node -> artistIds.add(node.asText())))
+                    ))
+                );
+            }
+        } catch (JsonProcessingException e) {
+            // 파싱 실패 시 빈 Set 반환
+        }
+        return artistIds;
+    }
+
 
     public PerformanceDraftDto updatePerformanceDraft(PerformanceDraftUpdateDto dto) {
         PerformanceDraft existing = Tx.readOnlyTx(() -> performanceDraftService.getById(dto.id()));

@@ -16,6 +16,7 @@ import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertListResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalListResponse;
+import org.sopt.confeti.api.admin.dto.response.PerformanceDraftDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.PerformanceDraftListResponses;
 import org.sopt.confeti.api.admin.dto.response.PerformanceDraftResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
@@ -113,6 +114,17 @@ public class AdminController implements AdminControllerDocs {
             SuccessMessage.CREATED,
             PerformanceDraftResponse.from(performanceDraftDto, s3FileHandler)
         );  
+    }
+
+    @Override
+    @GetMapping("/performances/drafts/{draftId}")
+    public ResponseEntity<BaseResponse<PerformanceDraftDetailResponse>> getPerformanceDraftDetail(
+        @PathVariable Long draftId
+    ) {
+        return ApiResponseUtil.success(
+            SuccessMessage.SUCCESS,
+            PerformanceDraftDetailResponse.from(adminFacade.getPerformanceDraftDetail(draftId), s3FileHandler)
+        );
     }
 
     @Override
