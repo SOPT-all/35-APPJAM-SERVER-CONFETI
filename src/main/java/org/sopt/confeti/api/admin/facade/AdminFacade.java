@@ -243,17 +243,19 @@ public class AdminFacade {
 
         String posterPath = dto.getOptionalPosterImage()
             .map(image -> {
+                String newPath = s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER));
                 s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), existing.getPosterPath());
-                return s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER));
+                return newPath;
             })
             .orElseGet(existing::getPosterPath);
 
         String logoPath = dto.getOptionalLogoImage()
             .map(image -> {
+                String newPath = s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO));
                 if (existing.getLogoPath() != null) {
                     s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), existing.getLogoPath());
                 }
-                return s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO));
+                return newPath;
             })
             .orElseGet(existing::getLogoPath);
 
