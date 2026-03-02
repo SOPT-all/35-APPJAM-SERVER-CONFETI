@@ -19,6 +19,7 @@ import org.sopt.confeti.api.admin.dto.response.PutAdminConcertResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.sopt.confeti.api.admin.facade.AdminFacade;
+import org.sopt.confeti.api.admin.facade.dto.request.AdminConcertCommand;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
@@ -138,9 +139,10 @@ public class AdminController implements AdminControllerDocs {
     ) {
         request.validate();
 
+        AdminConcertCommand command = AdminConcertCommand.from(request);
         return ApiResponseUtil.success(
-            request.concertId() == null ? SuccessMessage.CREATED : SuccessMessage.SUCCESS,
-            adminFacade.upsertConcert(poster, request)
+            command.concertId() == null ? SuccessMessage.CREATED : SuccessMessage.SUCCESS,
+            adminFacade.upsertConcert(poster, command)
         );
     }
 

@@ -10,11 +10,12 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
-import org.sopt.confeti.api.admin.dto.request.PutAdminConcertRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.PutAdminConcertResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
+import org.sopt.confeti.api.admin.facade.dto.request.AdminConcertCommand;
+import org.sopt.confeti.api.admin.facade.dto.request.AdminConcertCommand.ReservationUrl;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo.ConcertInfo;
@@ -166,18 +167,18 @@ public class AdminFacade {
     }
 
     public PutAdminConcertResponse upsertConcert(MultipartFile poster,
-        PutAdminConcertRequest request) {
+        AdminConcertCommand command) {
         String folderPath = FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER);
         String posterPath = s3FileHandler.uploadFile(poster, folderPath);
 
-        ensureArtistsExist(new HashSet<>(request.artistIds()));
+        ensureArtistsExist(new HashSet<>(command.artistIds()));
 
         long concertId;
         try {
-            if (request.concertId() == null) {
-                concertId = createConcert(request, posterPath);
+            if (command.concertId() == null) {
+                concertId = createConcert(command, posterPath);
             } else {
-                concertId = updateConcert(request, posterPath, folderPath);
+                concertId = updateConcert(command, posterPath, folderPath);
             }
         } catch (Exception e) {
             log.warn(
@@ -218,49 +219,42 @@ public class AdminFacade {
         }
     }
 
-    private long createConcert(PutAdminConcertRequest request, String posterPath) {
+    private long createConcert(AdminConcertCommand command, String posterPath) {
         return Tx.masterTx(() -> {
-            Map<Long, TicketVendor> vendorMap = getTicketVendorMap(request);
+            Map<Long, TicketVendor> vendorMap = getTicketVendorMap(command);
 
-            List<ConcertArtist> concertArtists = buildConcertArtists(request);
-            List<ConcertReservationUrl> reservationUrls = buildReservationUrls(request, vendorMap);
-            List<PerformanceArtist> performanceArtists = buildPerformanceArtists(request);
+            List<ConcertArtist> concertArtists = buildConcertArtists(command);
+            List<ConcertReservationUrl> reservationUrls = buildReservationUrls(command, vendorMap);
+            List<PerformanceArtist> performanceArtists = buildPerformanceArtists(command);
 
             Concert concert = Concert.create(
-                request.title(), request.subtitle(), request.startAt(), request.endAt(),
-                request.area(), posterPath, request.reserveAt(), request.ageRating(),
-                request.time(), request.price(), request.address(),
+                command.title(), command.subtitle(), command.startAt(), command.endAt(),
+                command.area(), posterPath, command.reserveAt(), command.ageRating(),
+                command.time(), command.price(), command.address(),
                 concertArtists, reservationUrls
             );
             long concertId = concertService.create(concert);
 
-            Performance performance = Performance.builder()
-                .typeId(concertId)
-                .type(PerformanceType.CONCERT)
-                .area(request.area())
-                .title(request.title())
-                .subtitle(request.subtitle())
-                .startAt(request.startAt())
-                .endAt(request.endAt())
-                .posterPath(posterPath)
-                .artists(performanceArtists)
-                .build();
+            Performance performance = Performance.createConcert(
+                concertId, command.title(), command.subtitle(), command.area(),
+                command.startAt(), command.endAt(), posterPath,
+                performanceArtists
+            );
             performanceService.create(performance);
 
             return concertId;
         });
     }
 
-    private long updateConcert(PutAdminConcertRequest request, String posterPath,
-        String folderPath) {
+    private long updateConcert(AdminConcertCommand command, String posterPath, String folderPath) {
         return Tx.masterTx(() -> {
-            Map<Long, TicketVendor> vendorMap = getTicketVendorMap(request);
+            Map<Long, TicketVendor> vendorMap = getTicketVendorMap(command);
 
-            List<ConcertArtist> concertArtists = buildConcertArtists(request);
-            List<ConcertReservationUrl> reservationUrls = buildReservationUrls(request, vendorMap);
-            List<PerformanceArtist> performanceArtists = buildPerformanceArtists(request);
+            List<ConcertArtist> concertArtists = buildConcertArtists(command);
+            List<ConcertReservationUrl> reservationUrls = buildReservationUrls(command, vendorMap);
+            List<PerformanceArtist> performanceArtists = buildPerformanceArtists(command);
 
-            Concert concert = concertService.findWithRelationsById(request.concertId());
+            Concert concert = concertService.findWithRelationsById(command.concertId());
             String oldPosterPath = concert.getPosterPath();
 
             if (oldPosterPath != null) {
@@ -268,27 +262,27 @@ public class AdminFacade {
             }
 
             concert.update(
-                request.title(), request.subtitle(), request.startAt(), request.endAt(),
-                request.area(), posterPath, request.reserveAt(), request.ageRating(),
-                request.time(), request.price(), request.address(),
+                command.title(), command.subtitle(), command.startAt(), command.endAt(),
+                command.area(), posterPath, command.reserveAt(), command.ageRating(),
+                command.time(), command.price(), command.address(),
                 concertArtists, reservationUrls
             );
 
             Performance performance = performanceService.getPerformanceByTypeAndTypeId(
-                PerformanceType.CONCERT, request.concertId());
+                PerformanceType.CONCERT, command.concertId());
             performance.update(
-                request.title(), request.subtitle(), request.area(),
-                request.startAt(), request.endAt(), posterPath,
+                command.title(), command.subtitle(), command.area(),
+                command.startAt(), command.endAt(), posterPath,
                 performanceArtists
             );
 
-            return request.concertId();
+            return command.concertId();
         });
     }
 
-    private Map<Long, TicketVendor> getTicketVendorMap(PutAdminConcertRequest request) {
-        List<Long> ticketVendorIds = request.reservationUrls().stream()
-            .map(PutAdminConcertRequest.ReservationUrlRequest::ticketVendorId)
+    private Map<Long, TicketVendor> getTicketVendorMap(AdminConcertCommand command) {
+        List<Long> ticketVendorIds = command.reservationUrls().stream()
+            .map(ReservationUrl::ticketVendorId)
             .toList();
 
         if (ticketVendorIds.isEmpty()) {
@@ -299,24 +293,24 @@ public class AdminFacade {
             .collect(Collectors.toMap(TicketVendor::getId, v -> v));
     }
 
-    private List<ConcertArtist> buildConcertArtists(PutAdminConcertRequest request) {
-        return request.artistIds().stream()
+    private List<ConcertArtist> buildConcertArtists(AdminConcertCommand command) {
+        return command.artistIds().stream()
             .map(artistId -> ConcertArtist.builder()
                 .artist(Artist.create(artistId))
                 .build())
             .toList();
     }
 
-    private List<ConcertReservationUrl> buildReservationUrls(PutAdminConcertRequest request,
+    private List<ConcertReservationUrl> buildReservationUrls(AdminConcertCommand command,
         Map<Long, TicketVendor> vendorMap) {
-        return request.reservationUrls().stream()
+        return command.reservationUrls().stream()
             .map(url -> ConcertReservationUrl.create(
                 url.reservationUrl(), vendorMap.get(url.ticketVendorId())))
             .toList();
     }
 
-    private List<PerformanceArtist> buildPerformanceArtists(PutAdminConcertRequest request) {
-        return request.artistIds().stream()
+    private List<PerformanceArtist> buildPerformanceArtists(AdminConcertCommand command) {
+        return command.artistIds().stream()
             .map(PerformanceArtist::create)
             .toList();
     }
