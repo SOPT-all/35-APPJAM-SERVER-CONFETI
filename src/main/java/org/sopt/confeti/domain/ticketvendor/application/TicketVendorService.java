@@ -3,11 +3,13 @@ package org.sopt.confeti.domain.ticketvendor.application;
 import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorCreateResponseDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
 import org.sopt.confeti.domain.ticketvendor.infra.repository.TicketVendorRepository;
 import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
@@ -17,8 +19,7 @@ import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TicketVendorService {
@@ -27,7 +28,8 @@ public class TicketVendorService {
 
     @Transactional(readOnly = true)
     public TicketVendor getById(Long id) {
-        return ticketVendorRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+        return ticketVendorRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
     @Transactional
@@ -69,7 +71,7 @@ public class TicketVendorService {
     public void delete(Long ticketVendorId) {
         TicketVendor ticketVendor = ticketVendorRepository.findById(ticketVendorId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-        
+
         ticketVendorRepository.delete(ticketVendor);
     }
 
@@ -77,6 +79,9 @@ public class TicketVendorService {
     public List<TicketVendor> findAllByIds(List<Long> ids) {
         List<TicketVendor> vendors = ticketVendorRepository.findAllById(ids);
         if (vendors.size() != new HashSet<>(ids).size()) {
+            log.warn(
+                "TicketVendorService.findAllByIds : 등록되지 않은 예매처입니다. ids : {}, fetched ids : {}",
+                ids, vendors.stream().map(TicketVendor::getId).toList());
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
         return vendors;
