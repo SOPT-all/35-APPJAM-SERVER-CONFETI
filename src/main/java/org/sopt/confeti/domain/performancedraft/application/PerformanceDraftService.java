@@ -34,7 +34,7 @@ public class PerformanceDraftService {
     }
 
     @Transactional(readOnly = true)
-    public PerformanceDraftDtos findAllDrafts() {
+    public PerformanceDraftDtos getAllDrafts() {
         return PerformanceDraftDtos.from(
                 draftRepository.findAll().stream()
                         .map(PerformanceDraftDto::from)

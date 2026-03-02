@@ -189,7 +189,7 @@ public class AdminFacade {
     }
 
     public PerformanceDraftDtos getPerformanceDrafts() {
-        return Tx.readOnlyTx(performanceDraftService::findAllDrafts);
+        return Tx.readOnlyTx(performanceDraftService::getAllDrafts);
     }
 
     public void deletePerformanceDraft(Long draftId) {
