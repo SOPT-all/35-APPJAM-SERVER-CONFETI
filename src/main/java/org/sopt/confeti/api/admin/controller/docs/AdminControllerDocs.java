@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size;
 
 import org.sopt.confeti.api.admin.dto.request.CreatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.request.UpdatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
@@ -115,6 +116,25 @@ public interface AdminControllerDocs {
     @CommonErrorResponses
     public ResponseEntity<BaseResponse<PerformanceDraftResponse>> createPerformanceDraft(
         @ModelAttribute @Valid CreatePerformanceDraftRequest request
+    );
+
+    @Operation(summary = "대기 공연 수정",
+        description = "수정을 원하는 필드만 전달하면 해당 부분만 수정됩니다. 이미지는 선택적으로 교체할 수 있습니다."
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    @PatchMapping(value = "/performances/drafts/{draftId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<BaseResponse<PerformanceDraftResponse>> updatePerformanceDraft(
+        @PathVariable Long draftId,
+        @ModelAttribute UpdatePerformanceDraftRequest request
     );
 
     @Operation(

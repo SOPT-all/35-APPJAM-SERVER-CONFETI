@@ -23,6 +23,7 @@ import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.performancedraft.PerformanceDraft;
 import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftService;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
+import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
@@ -158,6 +159,30 @@ public class AdminFacade {
             .map(image -> s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO)))
             .orElse(null);
         return performanceDraftService.createDraft(dto, posterPath, logoPath);
+    }
+
+    public PerformanceDraftDto updatePerformanceDraft(PerformanceDraftUpdateDto dto) {
+        PerformanceDraft existing = Tx.readOnlyTx(() -> performanceDraftService.getById(dto.id()));
+
+        String posterPath = dto.getOptionalPosterImage()
+            .map(image -> {
+                s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), existing.getPosterPath());
+                return s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER));
+            })
+            .orElseGet(existing::getPosterPath);
+
+        String logoPath = dto.getOptionalLogoImage()
+            .map(image -> {
+                if (existing.getLogoPath() != null) {
+                    s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), existing.getLogoPath());
+                }
+                return s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO));
+            })
+            .orElseGet(existing::getLogoPath);
+
+        final String finalPosterPath = posterPath;
+        final String finalLogoPath = logoPath;
+        return Tx.masterTx(() -> performanceDraftService.updateDraft(dto, finalPosterPath, finalLogoPath));
     }
 
 }

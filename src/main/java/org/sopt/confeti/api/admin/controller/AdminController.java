@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.controller.docs.AdminControllerDocs;
 import org.sopt.confeti.api.admin.dto.request.CreatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.request.UpdatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
@@ -100,6 +101,19 @@ public class AdminController implements AdminControllerDocs {
             SuccessMessage.CREATED,
             PerformanceDraftResponse.from(performanceDraftDto, s3FileHandler)
         );  
+    }
+
+    @Override
+    @PatchMapping("/performances/drafts/{draftId}")
+    public ResponseEntity<BaseResponse<PerformanceDraftResponse>> updatePerformanceDraft(
+        @PathVariable Long draftId,
+        @ModelAttribute UpdatePerformanceDraftRequest request
+    ) {
+        PerformanceDraftDto performanceDraftDto = adminFacade.updatePerformanceDraft(request.toUpdateDto(draftId));
+        return ApiResponseUtil.success(
+            SuccessMessage.UPDATED,
+            PerformanceDraftResponse.from(performanceDraftDto, s3FileHandler)
+        );
     }
 
     @Override
