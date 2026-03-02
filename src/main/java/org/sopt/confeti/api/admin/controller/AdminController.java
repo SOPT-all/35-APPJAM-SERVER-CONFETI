@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.admin.controller;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -7,12 +8,14 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.controller.docs.AdminControllerDocs;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.request.PutAdminConcertRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertListResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalListResponse;
+import org.sopt.confeti.api.admin.dto.response.PutAdminConcertResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.sopt.confeti.api.admin.facade.AdminFacade;
@@ -26,6 +29,7 @@ import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
 import org.sopt.confeti.global.util.S3FileHandler;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +39,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Admin
 @RestController
@@ -121,6 +127,20 @@ public class AdminController implements AdminControllerDocs {
         AdminFestivalListInfo festivalListInfo = adminFacade.getAdminFestivals();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             AdminFestivalListResponse.of(festivalListInfo, s3FileHandler));
+    }
+
+    @Override
+    @PutMapping(value = "/performances/concerts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse<PutAdminConcertResponse>> upsertConcert(
+        @RequestPart MultipartFile poster,
+        @Valid @RequestPart(value = "concert") PutAdminConcertRequest request
+    ) {
+        request.validate();
+
+        return ApiResponseUtil.success(
+            SuccessMessage.SUCCESS,
+            adminFacade.upsertConcert(poster, request)
+        );
     }
 
     @Override

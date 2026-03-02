@@ -1,5 +1,7 @@
 package org.sopt.confeti.domain.ticketvendor.application;
 
+import java.util.HashSet;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
@@ -69,6 +71,15 @@ public class TicketVendorService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         
         ticketVendorRepository.delete(ticketVendor);
+    }
+
+    @ReadOnlyTransactional
+    public List<TicketVendor> findAllByIds(List<Long> ids) {
+        List<TicketVendor> vendors = ticketVendorRepository.findAllById(ids);
+        if (vendors.size() != new HashSet<>(ids).size()) {
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+        return vendors;
     }
 
     @ReadOnlyTransactional

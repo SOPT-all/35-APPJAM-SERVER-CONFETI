@@ -2,38 +2,55 @@ package org.sopt.confeti.api.admin.facade;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.request.PutAdminConcertRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
+import org.sopt.confeti.api.admin.dto.response.PutAdminConcertResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo.ConcertInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
-import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
+import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
+import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
+import org.sopt.confeti.domain.concert_artist.ConcertArtist;
+import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
+import org.sopt.confeti.domain.music.artist.Artist;
+import org.sopt.confeti.domain.music.artist.application.ArtistService;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorCreateResponseDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
+import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.PerformanceArtist;
+import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.FolderPath;
+import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.exception.BadRequestException;
+import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.transaction.Tx;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Facade
 @RequiredArgsConstructor
 public class AdminFacade {
@@ -43,6 +60,8 @@ public class AdminFacade {
     private final FestivalService festivalService;
     private final MusicAPIHandler musicAPIHandler;
     private final S3FileHandler s3FileHandler;
+    private final ArtistService artistService;
+    private final PerformanceService performanceService;
 
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
         String logoPath = s3FileHandler.uploadFile(request.logoImage(),
@@ -144,5 +163,148 @@ public class AdminFacade {
     public AdminArtistSearchResponses searchArtists(String term, int limit) {
         List<ConfetiArtist> artists = musicAPIHandler.findArtistsByKeyword(term, limit);
         return AdminArtistSearchResponses.from(artists);
+    }
+
+    public PutAdminConcertResponse upsertConcert(MultipartFile poster,
+        PutAdminConcertRequest request) {
+        String folderPath = FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER);
+        String posterPath = s3FileHandler.uploadFile(poster, folderPath);
+
+        ensureArtistsExist(new HashSet<>(request.artistIds()));
+
+        long concertId;
+        if (request.concertId() == null) {
+            concertId = createConcert(request, posterPath);
+        } else {
+            concertId = updateConcert(request, posterPath, folderPath);
+        }
+
+        return PutAdminConcertResponse.from(concertId);
+    }
+
+    private void ensureArtistsExist(Set<String> artistIds) {
+        List<Artist> existingArtists = Tx.readOnlyTx(() -> artistService.getArtists(artistIds));
+        Set<String> existingIds = existingArtists.stream()
+            .map(Artist::getId)
+            .collect(Collectors.toSet());
+
+        Set<String> missingIds = artistIds.stream()
+            .filter(id -> !existingIds.contains(id))
+            .collect(Collectors.toSet());
+
+        if (!missingIds.isEmpty()) {
+            List<ConfetiArtist> fetchedArtists = musicAPIHandler.getArtistsByArtistIds(missingIds);
+
+            Set<String> fetchedIds = fetchedArtists.stream()
+                .map(ConfetiArtist::getId)
+                .collect(Collectors.toSet());
+
+            if (!fetchedIds.containsAll(missingIds)) {
+                log.warn(
+                    "ArtistFacade.ensureArtistsExist : 아티스트 아이디 중 올바르지 않은 아이디가 존재합니다. 애플 뮤직 조회에 실패했습니다. missingIds : {}, fetchedIds : {}",
+                    missingIds, fetchedIds);
+                throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+            }
+
+            Tx.masterTx(() -> artistService.create(fetchedArtists));
+        }
+    }
+
+    private long createConcert(PutAdminConcertRequest request, String posterPath) {
+        return Tx.masterTx(() -> {
+            Map<Long, TicketVendor> vendorMap = getTicketVendorMap(request);
+
+            List<ConcertArtist> concertArtists = buildConcertArtists(request);
+            List<ConcertReservationUrl> reservationUrls = buildReservationUrls(request, vendorMap);
+            List<PerformanceArtist> performanceArtists = buildPerformanceArtists(request);
+
+            Concert concert = Concert.create(
+                request.title(), request.subtitle(), request.startAt(), request.endAt(),
+                request.area(), posterPath, request.reserveAt(), request.ageRating(),
+                request.time(), request.price(), request.address(),
+                concertArtists, reservationUrls
+            );
+            long concertId = concertService.create(concert);
+
+            Performance performance = Performance.builder()
+                .typeId(concertId)
+                .type(PerformanceType.CONCERT)
+                .area(request.area())
+                .title(request.title())
+                .subtitle(request.subtitle())
+                .startAt(request.startAt())
+                .endAt(request.endAt())
+                .posterPath(posterPath)
+                .artists(performanceArtists)
+                .build();
+            performanceService.create(performance);
+
+            return concertId;
+        });
+    }
+
+    private long updateConcert(PutAdminConcertRequest request, String posterPath,
+        String folderPath) {
+        return Tx.masterTx(() -> {
+            Map<Long, TicketVendor> vendorMap = getTicketVendorMap(request);
+
+            List<ConcertArtist> concertArtists = buildConcertArtists(request);
+            List<ConcertReservationUrl> reservationUrls = buildReservationUrls(request, vendorMap);
+            List<PerformanceArtist> performanceArtists = buildPerformanceArtists(request);
+
+            Concert concert = concertService.findWithRelationsById(request.concertId());
+            String oldPosterPath = concert.getPosterPath();
+
+            if (oldPosterPath != null) {
+                s3FileHandler.deleteFile(folderPath, oldPosterPath);
+            }
+
+            concert.update(
+                request.title(), request.subtitle(), request.startAt(), request.endAt(),
+                request.area(), posterPath, request.reserveAt(), request.ageRating(),
+                request.time(), request.price(), request.address(),
+                concertArtists, reservationUrls
+            );
+
+            Performance performance = performanceService.getPerformanceByTypeAndTypeId(
+                PerformanceType.CONCERT, request.concertId());
+            performance.update(
+                request.title(), request.subtitle(), request.area(),
+                request.startAt(), request.endAt(), posterPath,
+                performanceArtists
+            );
+
+            return request.concertId();
+        });
+    }
+
+    private Map<Long, TicketVendor> getTicketVendorMap(PutAdminConcertRequest request) {
+        List<Long> ticketVendorIds = request.reservationUrls().stream()
+            .map(PutAdminConcertRequest.ReservationUrlRequest::ticketVendorId)
+            .toList();
+        return ticketVendorService.findAllByIds(ticketVendorIds).stream()
+            .collect(Collectors.toMap(TicketVendor::getId, v -> v));
+    }
+
+    private List<ConcertArtist> buildConcertArtists(PutAdminConcertRequest request) {
+        return request.artistIds().stream()
+            .map(artistId -> ConcertArtist.builder()
+                .artist(Artist.create(artistId))
+                .build())
+            .toList();
+    }
+
+    private List<ConcertReservationUrl> buildReservationUrls(PutAdminConcertRequest request,
+        Map<Long, TicketVendor> vendorMap) {
+        return request.reservationUrls().stream()
+            .map(url -> ConcertReservationUrl.create(
+                url.reservationUrl(), vendorMap.get(url.ticketVendorId())))
+            .toList();
+    }
+
+    private List<PerformanceArtist> buildPerformanceArtists(PutAdminConcertRequest request) {
+        return request.artistIds().stream()
+            .map(PerformanceArtist::create)
+            .toList();
     }
 }

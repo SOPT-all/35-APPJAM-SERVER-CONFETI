@@ -47,4 +47,8 @@ public class PerformanceArtist {
     public static PerformanceArtist create(CreateConcertArtistDTO concertArtistDTO) {
         return new PerformanceArtist(concertArtistDTO.artistId());
     }
+
+    public static PerformanceArtist create(String artistId) {
+        return new PerformanceArtist(artistId);
+    }
 }

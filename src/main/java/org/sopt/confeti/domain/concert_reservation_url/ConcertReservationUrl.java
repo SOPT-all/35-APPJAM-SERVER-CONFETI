@@ -47,6 +47,13 @@ public class ConcertReservationUrl {
         this.ticketVendor = ticketVendor;
     }
 
+    public static ConcertReservationUrl create(String reservationUrl, TicketVendor ticketVendor) {
+        return ConcertReservationUrl.builder()
+            .reservationUrl(reservationUrl)
+            .ticketVendor(ticketVendor)
+            .build();
+    }
+
     public static ConcertReservationUrl create(
         CreateConcertReservationUrlDTO concertReservationUrlDTO,
         TicketVendor ticketVendor) {
