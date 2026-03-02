@@ -177,6 +177,15 @@ public class AdminFacade {
         return Tx.readOnlyTx(performanceDraftService::findAllDrafts);
     }
 
+    public void deletePerformanceDraft(Long draftId) {
+        PerformanceDraft draft = Tx.readOnlyTx(() -> performanceDraftService.getById(draftId));
+        Optional.ofNullable(draft.getPosterPath())
+                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), path));
+        Optional.ofNullable(draft.getLogoPath())
+                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), path));
+        Tx.masterTx(() -> performanceDraftService.deleteDraft(draftId));
+    }
+
     public PerformanceDraftDetailInfo getPerformanceDraftDetail(Long draftId) {
         PerformanceDraft draft = Tx.readOnlyTx(() -> performanceDraftService.getById(draftId));
         PerformanceDraftDto dto = PerformanceDraftDto.from(draft);

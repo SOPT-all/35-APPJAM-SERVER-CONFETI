@@ -141,6 +141,15 @@ public class AdminController implements AdminControllerDocs {
     }
 
     @Override
+    @DeleteMapping("/performances/drafts/{draftId}")
+    public ResponseEntity<BaseResponse<Void>> deletePerformanceDraft(
+        @PathVariable Long draftId
+    ) {
+        adminFacade.deletePerformanceDraft(draftId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @Override
     @GetMapping("/performances/concerts")
     public ResponseEntity<BaseResponse<AdminConcertListResponse>> getAdminConcerts() {
         AdminConcertListInfo concertList = adminFacade.getAdminConcerts();

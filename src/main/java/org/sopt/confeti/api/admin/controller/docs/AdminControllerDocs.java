@@ -167,6 +167,21 @@ public interface AdminControllerDocs {
         @ModelAttribute UpdatePerformanceDraftRequest request
     );
 
+    @Operation(summary = "대기 공연 삭제")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<Void>> deletePerformanceDraft(
+        @PathVariable Long draftId
+    );
+
     @Operation(
         summary = "등록된 콘서트 목록 조회",
         description = "어드민 권한으로 등록된 모든 콘서트 목록을 조회합니다. "

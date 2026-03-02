@@ -43,7 +43,7 @@ public class PerformanceDraft {
     @Column(columnDefinition = "json", nullable = false)
     private String performanceData;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String posterPath;
 
     @Column(nullable = true)
