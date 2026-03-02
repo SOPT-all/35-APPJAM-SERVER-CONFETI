@@ -185,7 +185,16 @@ public class AdminFacade {
         String logoPath = dto.getOptionalLogoImage()
             .map(image -> s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO)))
             .orElse(null);
-        return performanceDraftService.createDraft(dto, posterPath, logoPath);
+
+        try {
+            return performanceDraftService.createDraft(dto, posterPath, logoPath);
+        } catch (Exception e) {
+            log.warn("AdminFacade.createPerformanceDraft : 공연 초안 생성에 실패해 업로드했던 이미지 파일을 롤백합니다. posterPath : {}, logoPath : {}", posterPath, logoPath);
+            s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), posterPath);
+            Optional.ofNullable(logoPath)
+                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), path));
+            throw e;
+        }
     }
 
     public PerformanceDraftDtos getPerformanceDrafts() {
@@ -241,27 +250,42 @@ public class AdminFacade {
     public PerformanceDraftDto updatePerformanceDraft(PerformanceDraftUpdateDto dto) {
         PerformanceDraft existing = Tx.readOnlyTx(() -> performanceDraftService.getById(dto.id()));
 
-        String posterPath = dto.getOptionalPosterImage()
-            .map(image -> {
-                String newPath = s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER));
-                s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), existing.getPosterPath());
-                return newPath;
-            })
-            .orElseGet(existing::getPosterPath);
+        String newPosterPath = dto.getOptionalPosterImage()
+            .map(image -> s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER)))
+            .orElse(null);
 
-        String logoPath = dto.getOptionalLogoImage()
-            .map(image -> {
-                String newPath = s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO));
-                if (existing.getLogoPath() != null) {
-                    s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), existing.getLogoPath());
-                }
-                return newPath;
-            })
-            .orElseGet(existing::getLogoPath);
+        String newLogoPath = null;
+        try {
+            newLogoPath = dto.getOptionalLogoImage()
+                .map(image -> s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO)))
+                .orElse(null);
+        } catch (Exception e) {
+            log.warn("AdminFacade.updatePerformanceDraft : logo 업로드에 실패해 업로드했던 poster 파일을 롤백합니다. newPosterPath : {}", newPosterPath);
+            Optional.ofNullable(newPosterPath)
+                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), path));
+            throw e;
+        }
 
-        final String finalPosterPath = posterPath;
-        final String finalLogoPath = logoPath;
-        return Tx.masterTx(() -> performanceDraftService.updateDraft(dto, finalPosterPath, finalLogoPath));
+        final String finalPosterPath = newPosterPath != null ? newPosterPath : existing.getPosterPath();
+        final String finalLogoPath = newLogoPath != null ? newLogoPath : existing.getLogoPath();
+        final String capturedNewPosterPath = newPosterPath;
+        final String capturedNewLogoPath = newLogoPath;
+
+        try {
+            PerformanceDraftDto result = Tx.masterTx(() -> performanceDraftService.updateDraft(dto, finalPosterPath, finalLogoPath));
+            Optional.ofNullable(capturedNewPosterPath)
+                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), existing.getPosterPath()));
+            Optional.ofNullable(capturedNewLogoPath)
+                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), existing.getLogoPath()));
+            return result;
+        } catch (Exception e) {
+            log.warn("AdminFacade.updatePerformanceDraft : 공연 초안 수정에 실패해 업로드했던 이미지 파일을 롤백합니다. newPosterPath : {}, newLogoPath : {}", capturedNewPosterPath, capturedNewLogoPath);
+            Optional.ofNullable(capturedNewPosterPath)
+                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), path));
+            Optional.ofNullable(capturedNewLogoPath)
+                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), path));
+            throw e;
+        }
     }
 
     public PutAdminConcertResponse upsertConcert(MultipartFile poster,
