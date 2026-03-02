@@ -60,6 +60,8 @@ public class S3FileHandler {
                 file.getInputStream(), metadata
             );
         } catch (IOException e) {
+            log.warn("S3FileHandler.uploadFile : 파일 업로드 실패. File : {}, Folder Path : {}", file,
+                folderPath);
             throw new ConfetiException(ErrorMessage.BAD_REQUEST);
         }
 

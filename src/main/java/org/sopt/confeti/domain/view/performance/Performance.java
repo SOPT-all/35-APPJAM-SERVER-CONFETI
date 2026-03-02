@@ -110,6 +110,18 @@ public class Performance {
                 .build();
     }
 
+    public static Performance createConcert(long concertId, String title, String subtitle,
+            String area, LocalDate startAt, LocalDate endAt, String posterPath,
+            List<PerformanceArtist> artists) {
+        return Performance.builder()
+                .typeId(concertId)
+                .type(PerformanceType.CONCERT)
+                .title(title).subtitle(subtitle).area(area)
+                .startAt(startAt).endAt(endAt)
+                .posterPath(posterPath).artists(artists)
+                .build();
+    }
+
     public static Performance create(final long concertId, final CreateConcertDTO concertDTO) {
         return Performance.builder()
                 .typeId(concertId)
@@ -126,6 +138,21 @@ public class Performance {
                                 .toList()
                 )
                 .build();
+    }
+
+    public void update(String title, String subtitle, String area,
+            LocalDate startAt, LocalDate endAt, String posterPath,
+            List<PerformanceArtist> newArtists) {
+        this.title = title;
+        this.subtitle = subtitle;
+        this.area = area;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.posterPath = posterPath;
+
+        this.artists.clear();
+        this.artists.addAll(newArtists);
+        newArtists.forEach(artist -> artist.setPerformance(this));
     }
 
     public void addArtists(List<PerformanceArtist> artists) {

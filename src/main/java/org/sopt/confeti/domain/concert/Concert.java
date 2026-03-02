@@ -107,6 +107,52 @@ public class Concert {
         this.reservationUrls.forEach(url -> url.setConcert(this));
     }
 
+    public void update(String title, String subtitle, LocalDate startAt, LocalDate endAt,
+            String area, String posterPath, LocalDateTime reserveAt, String ageRating,
+            String time, String price, String address,
+            List<ConcertArtist> newArtists, List<ConcertReservationUrl> newReservationUrls) {
+        this.title = title;
+        this.subtitle = subtitle;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.area = area;
+        this.posterPath = posterPath;
+        this.reserveAt = reserveAt;
+        this.ageRating = ageRating;
+        this.time = time;
+        this.price = price;
+        this.address = address;
+
+        this.artists.clear();
+        this.artists.addAll(newArtists);
+        newArtists.forEach(a -> a.setConcert(this));
+
+        this.reservationUrls.clear();
+        this.reservationUrls.addAll(newReservationUrls);
+        newReservationUrls.forEach(url -> url.setConcert(this));
+    }
+
+    public static Concert create(String title, String subtitle, LocalDate startAt, LocalDate endAt,
+            String area, String posterPath, LocalDateTime reserveAt, String ageRating,
+            String time, String price, String address,
+            List<ConcertArtist> artists, List<ConcertReservationUrl> reservationUrls) {
+        return Concert.builder()
+                .title(title)
+                .subtitle(subtitle)
+                .startAt(startAt)
+                .endAt(endAt)
+                .area(area)
+                .posterPath(posterPath)
+                .reserveAt(reserveAt)
+                .ageRating(ageRating)
+                .time(time)
+                .price(price)
+                .address(address)
+                .artists(artists)
+                .reservationUrls(reservationUrls)
+                .build();
+    }
+
     public static Concert create(CreateConcertDTO concertDTO, List<TicketVendor> ticketVendors) {
         return Concert.builder()
                 .title(concertDTO.title())

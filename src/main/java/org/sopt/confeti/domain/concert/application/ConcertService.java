@@ -74,4 +74,12 @@ public class ConcertService {
     public long create(Concert concert) {
         return concertRepository.save(concert).getId();
     }
+
+    @Transactional
+    public Concert findWithRelationsById(long concertId) {
+        Concert concert = concertRepository.findWithArtistsById(concertId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+        concertRepository.findWithReservationUrlsById(concertId);
+        return concert;
+    }
 }
