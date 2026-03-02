@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
+import org.sopt.confeti.api.admin.dto.response.PerformanceDraftResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
@@ -19,6 +20,10 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.festival.application.FestivalService;
+import org.sopt.confeti.domain.performancedraft.PerformanceDraft;
+import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftService;
+import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
+import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
@@ -43,6 +48,7 @@ public class AdminFacade {
     private final FestivalService festivalService;
     private final MusicAPIHandler musicAPIHandler;
     private final S3FileHandler s3FileHandler;
+    private final PerformanceDraftService performanceDraftService;
 
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
         String logoPath = s3FileHandler.uploadFile(request.logoImage(),
@@ -145,4 +151,13 @@ public class AdminFacade {
         List<ConfetiArtist> artists = musicAPIHandler.findArtistsByKeyword(term, limit);
         return AdminArtistSearchResponses.from(artists);
     }
+
+    public PerformanceDraftDto createPerformanceDraft(PerformanceDraftCreateDto dto) {
+        String posterPath = s3FileHandler.uploadFile(dto.posterImage(), FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER));
+        String logoPath = dto.getOptionalLogoImage()
+            .map(image -> s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO)))
+            .orElse(null);
+        return performanceDraftService.createDraft(dto, posterPath, logoPath);
+    }
+
 }

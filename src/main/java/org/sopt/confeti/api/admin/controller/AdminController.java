@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.controller.docs.AdminControllerDocs;
+import org.sopt.confeti.api.admin.dto.request.CreatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
@@ -13,6 +14,7 @@ import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertListResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalListResponse;
+import org.sopt.confeti.api.admin.dto.response.PerformanceDraftResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.sopt.confeti.api.admin.facade.AdminFacade;
@@ -20,6 +22,7 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
+import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
 import org.sopt.confeti.global.annotation.Admin;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
@@ -85,6 +88,18 @@ public class AdminController implements AdminControllerDocs {
             SuccessMessage.SUCCESS,
             TicketVendorResponses.from(adminFacade.getTicketVendors(), s3FileHandler)
         );
+    }
+
+    @Override
+    @PostMapping("/performances/drafts")
+    public ResponseEntity<BaseResponse<PerformanceDraftResponse>> createPerformanceDraft(
+        @ModelAttribute CreatePerformanceDraftRequest request
+    ) {
+        PerformanceDraftDto performanceDraftDto = adminFacade.createPerformanceDraft(request.toCreateManualDto());
+        return ApiResponseUtil.success(
+            SuccessMessage.CREATED,
+            PerformanceDraftResponse.from(performanceDraftDto, s3FileHandler)
+        );  
     }
 
     @Override
