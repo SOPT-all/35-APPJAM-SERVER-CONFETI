@@ -48,6 +48,7 @@ public class PerformanceDraftService {
         draftRepository.delete(draft);
     }
 
+    @Transactional(readOnly = true)
     public PerformanceDraft getById(Long id) {
         return draftRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
