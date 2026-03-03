@@ -37,7 +37,7 @@ public record PerformanceDraftDetailResponse(
     public static PerformanceDraftDetailResponse from(PerformanceDraftDetailInfo info, S3FileHandler s3FileHandler) {
         return new PerformanceDraftDetailResponse(
                 info.draft().id(),
-                info.draft().performanceType(),
+                info.draft().performanceDraftType(),
                 info.draft().status(),
                 info.draft().performanceData(),
                 Optional.ofNullable(info.draft().posterUrl())

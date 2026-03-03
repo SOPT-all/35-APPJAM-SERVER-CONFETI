@@ -33,7 +33,7 @@ public class PerformanceDraft {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private PerformanceDraftType performanceType;
+    private PerformanceDraftType performanceDraftType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -64,7 +64,7 @@ public class PerformanceDraft {
         String posterPath, 
         String logoPath
     ) {
-        this.performanceType = performanceType;
+        this.performanceDraftType = performanceType;
         this.status = status;
         this.performanceData = performanceData;
         this.posterPath = posterPath;
@@ -72,14 +72,14 @@ public class PerformanceDraft {
     }
 
     public static PerformanceDraft create(
-        PerformanceDraftType performanceType, 
+        PerformanceDraftType performanceDraftType, 
         String performanceData, 
         DraftStatus status,
         String posterPath,
         String logoPath
     ) {
         return PerformanceDraft.builder()
-                .performanceType(performanceType)
+                .performanceType(performanceDraftType)
                 .status(status)
                 .performanceData(performanceData)
                 .posterPath(posterPath)
@@ -88,14 +88,14 @@ public class PerformanceDraft {
     }
 
     public void update(
-        PerformanceDraftType performanceType, 
+        PerformanceDraftType performanceDraftType, 
         DraftStatus status, 
         String performanceData,
         String posterPath,
         String logoPath
     ) {
-        if (performanceType != null) {
-            this.performanceType = performanceType;
+        if (performanceDraftType != null) {
+            this.performanceDraftType = performanceDraftType;
         }
         if (status != null) {
             this.status = status;

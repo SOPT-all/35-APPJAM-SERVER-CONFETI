@@ -24,7 +24,7 @@ public record PerformanceDraftResponse(
     public static PerformanceDraftResponse from(PerformanceDraftDto dto, S3FileHandler s3FileHandler) {
         return new PerformanceDraftResponse(
                 dto.id(),
-                dto.performanceType(),
+                dto.performanceDraftType(),
                 dto.status(),
                 dto.performanceData(),
                 Optional.ofNullable(dto.posterUrl())

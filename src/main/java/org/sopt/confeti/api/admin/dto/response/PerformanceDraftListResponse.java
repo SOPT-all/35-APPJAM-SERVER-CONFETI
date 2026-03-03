@@ -31,7 +31,7 @@ public record PerformanceDraftListResponse(
 
         return new PerformanceDraftListResponse(
                 dto.id(),
-                dto.performanceType(),
+                dto.performanceDraftType(),
                 dto.status(),
                 title,
                 area,

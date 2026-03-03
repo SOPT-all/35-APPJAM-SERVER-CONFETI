@@ -32,6 +32,7 @@ import org.sopt.confeti.domain.music.artist.Artist;
 import org.sopt.confeti.domain.music.artist.application.ArtistService;
 import org.sopt.confeti.domain.performancedraft.PerformanceDraft;
 import org.sopt.confeti.domain.performancedraft.PerformanceDraftType;
+import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftParser;
 import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftService;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
@@ -77,7 +78,7 @@ public class AdminFacade {
     private final ArtistService artistService;
     private final PerformanceService performanceService;
     private final ApplicationEventPublisher eventPublisher;
-    private final ObjectMapper objectMapper;
+    private final PerformanceDraftParser performanceDraftParser;
 
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
         String logoPath = s3FileHandler.uploadFile(request.logoImage(),
@@ -222,7 +223,7 @@ public class AdminFacade {
         PerformanceDraft draft = Tx.readOnlyTx(() -> performanceDraftService.getById(draftId));
         PerformanceDraftDto dto = PerformanceDraftDto.from(draft);
 
-        Set<String> artistIds = dto.getArtistIds(objectMapper);
+        Set<String> artistIds = performanceDraftParser.parseArtistIds(dto.performanceDraftType(), dto.performanceData());
         List<ConfetiArtist> artists = Tx.readOnlyTx(() -> artistService.getArtists(artistIds))
                 .stream()
                 .map(Artist::toDomain)

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 public record PerformanceDraftDto(
         Long id,
-        PerformanceDraftType performanceType,
+        PerformanceDraftType performanceDraftType,
         DraftStatus status,
         String performanceData,
         String posterUrl,
@@ -24,7 +24,7 @@ public record PerformanceDraftDto(
     public static PerformanceDraftDto from(PerformanceDraft draft) {
         return new PerformanceDraftDto(
                 draft.getId(),
-                draft.getPerformanceType(),
+                draft.getPerformanceDraftType(),
                 draft.getStatus(),
                 draft.getPerformanceData(),
                 draft.getPosterPath(),
@@ -34,26 +34,4 @@ public record PerformanceDraftDto(
         );
     }
 
-    public Set<String> getArtistIds(ObjectMapper objectMapper) {
-        Set<String> artistIds = new HashSet<>();
-        try {
-            JsonNode root = objectMapper.readTree(performanceData);
-            if (performanceType == PerformanceDraftType.CONCERT) {
-                Optional.ofNullable(root.get("artists")).ifPresent(arr ->
-                    arr.forEach(item -> Optional.ofNullable(item.get("artistId"))
-                        .ifPresent(node -> artistIds.add(node.asText())))
-                );
-            } else {
-                Optional.ofNullable(root.get("dates")).ifPresent(dates ->
-                    dates.forEach(date -> Optional.ofNullable(date.get("dailyArtists")).ifPresent(daily ->
-                        daily.forEach(item -> Optional.ofNullable(item.get("artistId"))
-                            .ifPresent(node -> artistIds.add(node.asText())))
-                    ))
-                );
-            }
-        } catch (Exception e) {
-            // 파싱 실패 시 빈 Set 반환
-        }
-        return artistIds;
-    }
 }
