@@ -1,8 +1,6 @@
 package org.sopt.confeti.api.admin.facade;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -63,6 +61,8 @@ import org.sopt.confeti.global.util.S3FileHandler;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Slf4j
 @Facade
 @RequiredArgsConstructor
@@ -75,8 +75,8 @@ public class AdminFacade {
     private final S3FileHandler s3FileHandler;
     private final PerformanceDraftService performanceDraftService;
     private final ArtistService artistService;
-    private final ObjectMapper objectMapper;
     private final PerformanceService performanceService;
+    private final ObjectMapper objectMapper;
 
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
         String logoPath = s3FileHandler.uploadFile(request.logoImage(),
@@ -221,7 +221,7 @@ public class AdminFacade {
         PerformanceDraft draft = Tx.readOnlyTx(() -> performanceDraftService.getById(draftId));
         PerformanceDraftDto dto = PerformanceDraftDto.from(draft);
 
-        Set<String> artistIds = extractArtistIds(dto);
+        Set<String> artistIds = dto.getArtistIds(objectMapper);
         List<ConfetiArtist> artists = Tx.readOnlyTx(() -> artistService.getArtists(artistIds))
                 .stream()
                 .map(Artist::toDomain)
@@ -230,28 +230,7 @@ public class AdminFacade {
         return new PerformanceDraftDetailInfo(dto, artists);
     }
 
-    private Set<String> extractArtistIds(PerformanceDraftDto dto) {
-        Set<String> artistIds = new HashSet<>();
-        try {
-            JsonNode root = objectMapper.readTree(dto.performanceData());
-            if (dto.performanceType() == PerformanceDraftType.CONCERT) {
-                Optional.ofNullable(root.get("artists")).ifPresent(arr ->
-                    arr.forEach(item -> Optional.ofNullable(item.get("artistId"))
-                        .ifPresent(node -> artistIds.add(node.asText())))
-                );
-            } else {
-                Optional.ofNullable(root.get("dates")).ifPresent(dates ->
-                    dates.forEach(date -> Optional.ofNullable(date.get("dailyArtists")).ifPresent(daily ->
-                        daily.forEach(item -> Optional.ofNullable(item.get("artistId"))
-                            .ifPresent(node -> artistIds.add(node.asText())))
-                    ))
-                );
-            }
-        } catch (JsonProcessingException e) {
-            // 파싱 실패 시 빈 Set 반환
-        }
-        return artistIds;
-    }
+
 
 
     public PerformanceDraftDto updatePerformanceDraft(PerformanceDraftUpdateDto dto) {
