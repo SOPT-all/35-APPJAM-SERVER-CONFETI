@@ -14,6 +14,7 @@ import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteServi
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
+import org.sopt.confeti.domain.music.song.application.SongMusicAPIService;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
@@ -23,6 +24,7 @@ import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.interceptor.auth.UserContext;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
+import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSong;
 import org.sopt.confeti.global.util.analyzer.SearchTermAnalyzer;
 import org.sopt.confeti.global.util.analyzer.dto.PerformanceSearchTermAnalyzeResult;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
@@ -33,6 +35,7 @@ public class SearchFacade {
 
     private static final String TYPE_ALL = "ALL";
     private static final int ARTIST_SEARCH_COUNT = 1;
+    private static final int RELATED_POPULAR_SONG_LIMIT = 3;
 
     private final SearchTermService searchTermService;
     private final MusicAPIHandler musicAPIHandler;
@@ -41,6 +44,7 @@ public class SearchFacade {
     private final FestivalFavoriteService festivalFavoriteService;
     private final ConcertFavoriteService concertFavoriteService;
     private final PerformanceSearchService performanceSearchService;
+    private final SongMusicAPIService songMusicAPIService;
 
     @ReadOnlyTransactional
     public SearchResultDTO getHomeSearchResultWithAid(String aid) {
@@ -54,6 +58,8 @@ public class SearchFacade {
 
         List<PerformanceDTO> performances = performanceService.getPerformancesByArtistIdAndType(aid,
             PerformanceType.PERFORMANCE);
+        List<ConfetiSong> songs = songMusicAPIService.getPopularSongsByArtist(artist.getId(),
+            RELATED_POPULAR_SONG_LIMIT);
 
         Map<Long, Boolean> performanceFavorites = performances.stream()
             .collect(Collectors.toMap(
@@ -67,7 +73,8 @@ public class SearchFacade {
             getPerformanceFavorites(performanceFavorites, favoritePerformances);
         }
 
-        return SearchResultDTO.of(artist, artistFavorite, performances, performanceFavorites);
+        return SearchResultDTO.of(artist, artistFavorite, performances, performanceFavorites,
+            songs);
     }
 
     @ReadOnlyTransactional
@@ -137,9 +144,15 @@ public class SearchFacade {
             getPerformanceFavorites(performanceFavorites, favoritePerformances);
         }
 
+        List<ConfetiSong> songs = artist.map(confetiArtist ->
+                songMusicAPIService.getPopularSongsByArtist(confetiArtist.getId(),
+                    RELATED_POPULAR_SONG_LIMIT))
+            .orElse(List.of());
+
         return SearchResultDTO.of(artist.orElse(null), artistFavorite,
             performances.stream().toList(),
-            performanceFavorites);
+            performanceFavorites,
+            songs);
     }
 
     public PopularTermsDTO getPopularSearchTerms(int limit) {

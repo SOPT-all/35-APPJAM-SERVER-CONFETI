@@ -78,4 +78,32 @@ public class SongMusicAPIService extends MusicAPIService<ConfetiSong> {
 
         return new FetchResult<>(fetchedSongs);
     }
+
+    public List<ConfetiSong> getPopularSongsByArtist(String artistId, int limit) {
+        List<ConfetiSong> songs = musicAPIHandler.getArtistTopSongs(artistId, limit);
+        if (songs.isEmpty()) {
+            return List.of();
+        }
+
+        Set<String> songIds = songs.stream()
+            .map(ConfetiSong::getId)
+            .collect(Collectors.toSet());
+        CacheResult<ConfetiSong> cacheResult = getCached(MusicAPICondition.from(songIds));
+        Set<String> cachedSongIds = cacheResult.cachedIds();
+        if (cachedSongIds.size() == songIds.size()) {
+            return songs;
+        }
+
+        List<ConfetiSong> missingSongs = songs.stream()
+            .filter(song -> !cachedSongIds.contains(song.getId()))
+            .toList();
+        if (missingSongs.isEmpty()) {
+            return songs;
+        }
+
+        persist(missingSongs);
+        cache(missingSongs);
+
+        return songs;
+    }
 }
