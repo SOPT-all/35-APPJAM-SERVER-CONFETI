@@ -1,6 +1,6 @@
 package org.sopt.confeti.api.admin.facade;
 
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -59,9 +59,9 @@ import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.transaction.Tx;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
+import org.sopt.confeti.global.event.S3FileDeleteEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Facade
@@ -76,6 +76,7 @@ public class AdminFacade {
     private final PerformanceDraftService performanceDraftService;
     private final ArtistService artistService;
     private final PerformanceService performanceService;
+    private final ApplicationEventPublisher eventPublisher;
     private final ObjectMapper objectMapper;
 
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
@@ -230,9 +231,6 @@ public class AdminFacade {
         return new PerformanceDraftDetailInfo(dto, artists);
     }
 
-
-
-
     public PerformanceDraftDto updatePerformanceDraft(PerformanceDraftUpdateDto dto) {
         PerformanceDraft existing = Tx.readOnlyTx(() -> performanceDraftService.getById(dto.id()));
 
@@ -247,31 +245,41 @@ public class AdminFacade {
                 .orElse(null);
         } catch (Exception e) {
             log.warn("AdminFacade.updatePerformanceDraft : logo 업로드에 실패해 업로드했던 poster 파일을 롤백합니다. newPosterPath : {}", newPosterPath);
-            Optional.ofNullable(newPosterPath)
-                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), path));
+            if (newPosterPath != null) {
+                s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), newPosterPath);
+            }
             throw e;
         }
 
         final String finalPosterPath = newPosterPath != null ? newPosterPath : existing.getPosterPath();
         final String finalLogoPath = newLogoPath != null ? newLogoPath : existing.getLogoPath();
-        final String capturedNewPosterPath = newPosterPath;
-        final String capturedNewLogoPath = newLogoPath;
 
+        PerformanceDraftDto result;
         try {
-            PerformanceDraftDto result = Tx.masterTx(() -> performanceDraftService.updateDraft(dto, finalPosterPath, finalLogoPath));
-            Optional.ofNullable(capturedNewPosterPath)
-                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), existing.getPosterPath()));
-            Optional.ofNullable(capturedNewLogoPath)
-                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), existing.getLogoPath()));
-            return result;
+            result = Tx.masterTx(() -> performanceDraftService.updateDraft(dto, finalPosterPath, finalLogoPath));
         } catch (Exception e) {
-            log.warn("AdminFacade.updatePerformanceDraft : 공연 초안 수정에 실패해 업로드했던 이미지 파일을 롤백합니다. newPosterPath : {}, newLogoPath : {}", capturedNewPosterPath, capturedNewLogoPath);
-            Optional.ofNullable(capturedNewPosterPath)
-                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), path));
-            Optional.ofNullable(capturedNewLogoPath)
-                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), path));
+            log.warn("AdminFacade.updatePerformanceDraft : 공연 초안 수정(DB)에 실패해 업로드했던 새 이미지 파일을 롤백합니다.");
+            if (newPosterPath != null) {
+                s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), newPosterPath);
+            }
+            if (newLogoPath != null) {
+                s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), newLogoPath);
+            }
             throw e;
         }
+
+        Optional.ofNullable(newPosterPath)
+            .filter(path -> existing.getPosterPath() != null)
+            .ifPresent(path -> eventPublisher.publishEvent(
+                new S3FileDeleteEvent(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), existing.getPosterPath())
+            ));
+        Optional.ofNullable(newLogoPath)
+            .filter(path -> existing.getLogoPath() != null)
+            .ifPresent(path -> eventPublisher.publishEvent(
+                new S3FileDeleteEvent(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), existing.getLogoPath())
+            ));
+
+        return result;
     }
 
     public PutAdminConcertResponse upsertConcert(MultipartFile poster,
