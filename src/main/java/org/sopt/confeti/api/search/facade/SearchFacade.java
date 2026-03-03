@@ -16,6 +16,7 @@ import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.music.song.application.SongMusicAPIService;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceArtistDTO;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
@@ -34,7 +35,6 @@ import org.sopt.confeti.global.util.music.MusicAPIHandler;
 public class SearchFacade {
 
     private static final String TYPE_ALL = "ALL";
-    private static final int ARTIST_SEARCH_COUNT = 1;
     private static final int RELATED_POPULAR_SONG_LIMIT = 3;
 
     private final SearchTermService searchTermService;
@@ -95,7 +95,9 @@ public class SearchFacade {
             }
         }
 
-        return SearchResultDTO.of(performance, performanceFavorite);
+        List<ConfetiSong> songs = getPopularSongsByPerformanceArtists(performance);
+
+        return SearchResultDTO.of(performance, performanceFavorite, songs);
     }
 
     @ReadOnlyTransactional
@@ -171,5 +173,20 @@ public class SearchFacade {
         favoritePerformances.forEach(performance -> {
             performanceFavorites.replace(performance.id(), true);
         });
+    }
+
+    private List<ConfetiSong> getPopularSongsByPerformanceArtists(PerformanceDTO performance) {
+        List<PerformanceArtistDTO> artists = performance.artists();
+        if (artists == null || artists.isEmpty()) {
+            return List.of();
+        }
+
+        return artists.stream()
+            .map(PerformanceArtistDTO::artistId)
+            .map(artistId -> songMusicAPIService.getPopularSongsByArtist(artistId,
+                RELATED_POPULAR_SONG_LIMIT))
+            .filter(songs -> !songs.isEmpty())
+            .findFirst()
+            .orElse(List.of());
     }
 }

@@ -32,9 +32,16 @@ public record SearchResultDTO(
     }
 
     public static SearchResultDTO of(PerformanceDTO performance, boolean performanceFavorite) {
+        return of(performance, performanceFavorite, List.of());
+    }
+
+    public static SearchResultDTO of(PerformanceDTO performance, boolean performanceFavorite,
+        List<ConfetiSong> songs) {
         return new SearchResultDTO(
                 null,
-                List.of(),
+                songs.stream()
+                        .map(SearchResultSongDTO::from)
+                        .toList(),
                 List.of(SearchResultPerformanceDTO.of(performance, performanceFavorite))
         );
     }
