@@ -16,8 +16,8 @@ public record PerformanceDraftResponse(
         DraftStatus status,
         @JsonRawValue
         String performanceData,
-        String posterPath,
-        String logoPath,
+        String posterUrl,
+        String logoUrl,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
@@ -27,10 +27,10 @@ public record PerformanceDraftResponse(
                 dto.performanceType(),
                 dto.status(),
                 dto.performanceData(),
-                Optional.ofNullable(dto.posterPath())
+                Optional.ofNullable(dto.posterUrl())
                     .map(path -> s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), path).toString())
                     .orElse(null),
-                Optional.ofNullable(dto.logoPath())
+                Optional.ofNullable(dto.logoUrl())
                     .map(path -> s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), path).toString())
                     .orElse(null),
                 dto.createdAt(),

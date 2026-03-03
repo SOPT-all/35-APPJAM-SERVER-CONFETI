@@ -40,10 +40,10 @@ public record PerformanceDraftDetailResponse(
                 info.draft().performanceType(),
                 info.draft().status(),
                 info.draft().performanceData(),
-                Optional.ofNullable(info.draft().posterPath())
+                Optional.ofNullable(info.draft().posterUrl())
                         .map(path -> s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), path).toString())
                         .orElse(null),
-                Optional.ofNullable(info.draft().logoPath())
+                Optional.ofNullable(info.draft().logoUrl())
                         .map(path -> s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), path).toString())
                         .orElse(null),
                 info.artists().stream()

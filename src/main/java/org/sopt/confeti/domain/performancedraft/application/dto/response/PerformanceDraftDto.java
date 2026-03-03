@@ -16,8 +16,8 @@ public record PerformanceDraftDto(
         PerformanceDraftType performanceType,
         DraftStatus status,
         String performanceData,
-        String posterPath,
-        String logoPath,
+        String posterUrl,
+        String logoUrl,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
