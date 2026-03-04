@@ -1,6 +1,9 @@
 package org.sopt.confeti.api.search.facade;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +39,7 @@ public class SearchFacade {
 
     private static final String TYPE_ALL = "ALL";
     private static final int RELATED_POPULAR_SONG_LIMIT = 3;
+    private static final int RELATED_POPULAR_SONG_ARTIST_LIMIT = 3;
 
     private final SearchTermService searchTermService;
     private final MusicAPIHandler musicAPIHandler;
@@ -181,12 +185,33 @@ public class SearchFacade {
             return List.of();
         }
 
-        return artists.stream()
+        List<String> artistIds = artists.stream()
             .map(PerformanceArtistDTO::artistId)
+            .distinct()
+            .limit(RELATED_POPULAR_SONG_ARTIST_LIMIT)
+            .toList();
+
+        List<ConfetiSong> mergedSongs = artistIds.stream()
             .map(artistId -> songMusicAPIService.getPopularSongsByArtist(artistId,
                 RELATED_POPULAR_SONG_LIMIT))
-            .filter(songs -> !songs.isEmpty())
-            .findFirst()
-            .orElse(List.of());
+            .flatMap(List::stream)
+            .collect(Collectors.collectingAndThen(
+                Collectors.toMap(
+                    ConfetiSong::getId,
+                    song -> song,
+                    (left, right) -> left,
+                    LinkedHashMap::new
+                ),
+                map -> new ArrayList<>(map.values())
+            ));
+
+        if (mergedSongs.isEmpty()) {
+            return List.of();
+        }
+
+        Collections.shuffle(mergedSongs);
+        return mergedSongs.stream()
+            .limit(RELATED_POPULAR_SONG_LIMIT)
+            .toList();
     }
 }
