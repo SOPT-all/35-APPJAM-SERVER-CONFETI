@@ -7,6 +7,7 @@ import org.sopt.confeti.global.util.S3FileHandler;
 
 public record SearchResultResponse(
         SearchResultArtistResponse artist,
+        List<SearchResultSongResponse> songs,
         int performanceCount,
         List<SearchResultPerformanceResponse> performances
 ) {
@@ -18,6 +19,9 @@ public record SearchResultResponse(
 
         return new SearchResultResponse(
                 artist,
+                searchResult.songs().stream()
+                        .map(SearchResultSongResponse::from)
+                        .toList(),
                 searchResult.performances().size(),
                 searchResult.performances().stream()
                         .map(performance -> SearchResultPerformanceResponse.of(performance, s3FileHandler))

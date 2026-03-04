@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.domain.music.application.MusicAPIService;
 import org.sopt.confeti.domain.music.application.dto.CacheResult;
 import org.sopt.confeti.domain.music.application.dto.FetchResult;
@@ -19,6 +20,7 @@ import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class SongMusicAPIService extends MusicAPIService<ConfetiSong> {
 
@@ -77,5 +79,55 @@ public class SongMusicAPIService extends MusicAPIService<ConfetiSong> {
         persist(fetchedSongs);
 
         return new FetchResult<>(fetchedSongs);
+    }
+
+    public List<ConfetiSong> getPopularSongsByArtist(String artistId, int limit) {
+        List<ConfetiSong> songs = safeGetArtistTopSongs(artistId, limit);
+        if (songs.isEmpty()) {
+            return List.of();
+        }
+
+        safePersistAndCacheMissingSongs(artistId, songs);
+        return songs;
+    }
+
+    private List<ConfetiSong> safeGetArtistTopSongs(String artistId, int limit) {
+        try {
+            List<ConfetiSong> songs = musicAPIHandler.getArtistTopSongs(artistId, limit);
+            if (songs == null || songs.isEmpty()) {
+                return List.of();
+            }
+            return songs;
+        } catch (Exception ex) {
+            log.warn("SongMusicAPIService.getPopularSongsByArtist failed. artistId: {}, message: {}",
+                artistId, ex.getMessage());
+            return List.of();
+        }
+    }
+
+    private void safePersistAndCacheMissingSongs(String artistId, List<ConfetiSong> songs) {
+        try {
+            Set<String> songIds = songs.stream()
+                .map(ConfetiSong::getId)
+                .collect(Collectors.toSet());
+            CacheResult<ConfetiSong> cacheResult = getCached(MusicAPICondition.from(songIds));
+            Set<String> cachedSongIds = cacheResult.cachedIds();
+            if (cachedSongIds.size() == songIds.size()) {
+                return;
+            }
+
+            List<ConfetiSong> missingSongs = songs.stream()
+                .filter(song -> !cachedSongIds.contains(song.getId()))
+                .toList();
+            if (missingSongs.isEmpty()) {
+                return;
+            }
+
+            persist(missingSongs);
+            cache(missingSongs);
+        } catch (Exception ex) {
+            log.warn("SongMusicAPIService.getPopularSongsByArtist cache/persist failed. artistId: {}, message: {}",
+                artistId, ex.getMessage());
+        }
     }
 }
