@@ -1,10 +1,12 @@
 package org.sopt.confeti.api.admin.facade;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +24,23 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo.Conce
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
-import org.sopt.confeti.domain.concert.Concert;
+import org.sopt.confeti.api.admin.facade.dto.response.PerformanceDraftDetailInfo;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
-import org.sopt.confeti.domain.concert_artist.ConcertArtist;
-import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.music.artist.Artist;
 import org.sopt.confeti.domain.music.artist.application.ArtistService;
+import org.sopt.confeti.domain.performancedraft.PerformanceDraft;
+import org.sopt.confeti.domain.performancedraft.PerformanceDraftType;
+import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftParser;
+import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftService;
+import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
+import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
+import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
+import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDtos;
+import org.sopt.confeti.domain.concert.Concert;
+import org.sopt.confeti.domain.concert_artist.ConcertArtist;
+import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
@@ -49,6 +60,8 @@ import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.transaction.Tx;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
+import org.sopt.confeti.global.event.S3FileDeleteEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -61,8 +74,11 @@ public class AdminFacade {
     private final FestivalService festivalService;
     private final MusicAPIHandler musicAPIHandler;
     private final S3FileHandler s3FileHandler;
+    private final PerformanceDraftService performanceDraftService;
     private final ArtistService artistService;
     private final PerformanceService performanceService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final PerformanceDraftParser performanceDraftParser;
 
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
         String logoPath = s3FileHandler.uploadFile(request.logoImage(),
@@ -164,6 +180,107 @@ public class AdminFacade {
     public AdminArtistSearchResponses searchArtists(String term, int limit) {
         List<ConfetiArtist> artists = musicAPIHandler.findArtistsByKeyword(term, limit);
         return AdminArtistSearchResponses.from(artists);
+    }
+
+    public PerformanceDraftDto createPerformanceDraft(PerformanceDraftCreateDto dto) {
+        String posterPath = null;
+        String logoPath = null;
+
+        try {
+            posterPath = s3FileHandler.uploadFile(dto.posterImage(), FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER));
+            logoPath = dto.getOptionalLogoImage()
+                .map(image -> s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO)))
+                .orElse(null);
+
+            return performanceDraftService.createDraft(dto, posterPath, logoPath);
+        } catch (Exception e) {
+            log.warn("AdminFacade.createPerformanceDraft : 공연 초안 생성에 실패해 업로드했던 이미지 파일을 롤백합니다. posterPath : {}, logoPath : {}", posterPath, logoPath);
+            
+            if (posterPath != null) {
+                s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), posterPath);
+            }
+            if (logoPath != null) {
+                s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), logoPath);
+            }
+            throw e;
+        }
+    }
+
+    public PerformanceDraftDtos getPerformanceDrafts() {
+        return Tx.readOnlyTx(performanceDraftService::getAllDrafts);
+    }
+
+    public void deletePerformanceDraft(Long draftId) {
+        PerformanceDraft draft = Tx.readOnlyTx(() -> performanceDraftService.getById(draftId));
+        Optional.ofNullable(draft.getPosterPath())
+                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), path));
+        Optional.ofNullable(draft.getLogoPath())
+                .ifPresent(path -> s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), path));
+        Tx.masterTx(() -> performanceDraftService.deleteDraft(draftId));
+    }
+
+    public PerformanceDraftDetailInfo getPerformanceDraftDetail(Long draftId) {
+        PerformanceDraft draft = Tx.readOnlyTx(() -> performanceDraftService.getById(draftId));
+        PerformanceDraftDto dto = PerformanceDraftDto.from(draft);
+
+        Set<String> artistIds = performanceDraftParser.parseArtistIds(dto.performanceDraftType(), dto.performanceData());
+        List<ConfetiArtist> artists = Tx.readOnlyTx(() -> artistService.getArtists(artistIds))
+                .stream()
+                .map(Artist::toDomain)
+                .toList();
+
+        return new PerformanceDraftDetailInfo(dto, artists);
+    }
+
+    public PerformanceDraftDto updatePerformanceDraft(PerformanceDraftUpdateDto dto) {
+        PerformanceDraft existing = Tx.readOnlyTx(() -> performanceDraftService.getById(dto.id()));
+
+        String newPosterPath = dto.getOptionalPosterImage()
+            .map(image -> s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER)))
+            .orElse(null);
+
+        String newLogoPath = null;
+        try {
+            newLogoPath = dto.getOptionalLogoImage()
+                .map(image -> s3FileHandler.uploadFile(image, FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO)))
+                .orElse(null);
+        } catch (Exception e) {
+            log.warn("AdminFacade.updatePerformanceDraft : logo 업로드에 실패해 업로드했던 poster 파일을 롤백합니다. newPosterPath : {}", newPosterPath);
+            if (newPosterPath != null) {
+                s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), newPosterPath);
+            }
+            throw e;
+        }
+
+        final String finalPosterPath = newPosterPath != null ? newPosterPath : existing.getPosterPath();
+        final String finalLogoPath = newLogoPath != null ? newLogoPath : existing.getLogoPath();
+
+        PerformanceDraftDto result;
+        try {
+            result = Tx.masterTx(() -> performanceDraftService.updateDraft(dto, finalPosterPath, finalLogoPath));
+        } catch (Exception e) {
+            log.warn("AdminFacade.updatePerformanceDraft : 공연 초안 수정(DB)에 실패해 업로드했던 새 이미지 파일을 롤백합니다.");
+            if (newPosterPath != null) {
+                s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), newPosterPath);
+            }
+            if (newLogoPath != null) {
+                s3FileHandler.deleteFile(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), newLogoPath);
+            }
+            throw e;
+        }
+
+        Optional.ofNullable(newPosterPath)
+            .filter(path -> existing.getPosterPath() != null)
+            .ifPresent(path -> eventPublisher.publishEvent(
+                new S3FileDeleteEvent(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), existing.getPosterPath())
+            ));
+        Optional.ofNullable(newLogoPath)
+            .filter(path -> existing.getLogoPath() != null)
+            .ifPresent(path -> eventPublisher.publishEvent(
+                new S3FileDeleteEvent(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), existing.getLogoPath())
+            ));
+
+        return result;
     }
 
     public PutAdminConcertResponse upsertConcert(MultipartFile poster,

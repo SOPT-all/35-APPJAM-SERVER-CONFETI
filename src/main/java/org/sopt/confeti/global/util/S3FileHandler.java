@@ -18,6 +18,7 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.global.annotation.Handler;
+import org.sopt.confeti.global.common.upload.UploadableFile;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
@@ -84,6 +85,28 @@ public class S3FileHandler {
         return fileName;
     }
 
+    /**
+     * 파일 업로드
+     */
+    public String uploadFile(UploadableFile file, String folderPath) {
+        final String fileName = fileNameGenerator.generate(
+            Objects.requireNonNull(file.getOriginalFilename()));
+        checkFileNotExist(folderPath, fileName);
+
+        final ObjectMetadata metadata = getMetadata(file);
+
+        try {
+            upload(
+                folderPath + fileName,
+                file.getInputStream(), metadata
+            );
+        } catch (IOException e) {
+            throw new ConfetiException(ErrorMessage.BAD_REQUEST);
+        }
+
+        return fileName;
+    }
+
     private ObjectMetadata getMetadata(MultipartFile file) {
         return new ObjectMetadata.Builder()
             .contentLength(file.getSize())
@@ -103,6 +126,13 @@ public class S3FileHandler {
         return new ObjectMetadata.Builder()
             .contentLength(file.length())
             .contentType(contentType)
+            .build();
+    }
+
+    private ObjectMetadata getMetadata(UploadableFile file) {
+        return new ObjectMetadata.Builder()
+            .contentLength(file.getSize())
+            .contentType(file.getContentType())
             .build();
     }
 

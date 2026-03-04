@@ -5,7 +5,7 @@ import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 
 public enum FolderPath {
-    FESTIVAL("festival"), CONCERT("concert"), USER("user"), TICKET_VENDOR("ticket-vendor"),
+    FESTIVAL("festival"), CONCERT("concert"), USER("user"), TICKET_VENDOR("ticket-vendor"), PERFORMANCE_DRAFT("performance-draft"),
     LOGO("logo"), POSTER_BG("poster-bg"), POSTER("poster"),
     RESERVATION("reservation"), PROFILE("profile"), DEFAULT("default");
 

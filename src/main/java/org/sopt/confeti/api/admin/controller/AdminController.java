@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.admin.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -7,7 +8,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.controller.docs.AdminControllerDocs;
+import org.sopt.confeti.api.admin.dto.request.CreatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.request.UpdatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.PutAdminConcertRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
@@ -15,6 +18,9 @@ import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertListResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalListResponse;
+import org.sopt.confeti.api.admin.dto.response.PerformanceDraftDetailResponse;
+import org.sopt.confeti.api.admin.dto.response.PerformanceDraftListResponses;
+import org.sopt.confeti.api.admin.dto.response.PerformanceDraftResponse;
 import org.sopt.confeti.api.admin.dto.response.PutAdminConcertResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
@@ -24,6 +30,7 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
+import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
 import org.sopt.confeti.global.annotation.Admin;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
@@ -53,6 +60,7 @@ public class AdminController implements AdminControllerDocs {
 
     private final AdminFacade adminFacade;
     private final S3FileHandler s3FileHandler;
+    private final ObjectMapper objectMapper;
 
     @Override
     @PostMapping("/ticket-vendors")
@@ -93,6 +101,60 @@ public class AdminController implements AdminControllerDocs {
             SuccessMessage.SUCCESS,
             TicketVendorResponses.from(adminFacade.getTicketVendors(), s3FileHandler)
         );
+    }
+
+    @Override
+    @GetMapping("/performances/drafts")
+    public ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts() {
+        return ApiResponseUtil.success(
+            SuccessMessage.SUCCESS,
+            PerformanceDraftListResponses.from(adminFacade.getPerformanceDrafts(), objectMapper)
+        );
+    }
+
+    @Override
+    @PostMapping("/performances/drafts")
+    public ResponseEntity<BaseResponse<PerformanceDraftResponse>> createPerformanceDraft(
+        @ModelAttribute CreatePerformanceDraftRequest request
+    ) {
+        PerformanceDraftDto performanceDraftDto = adminFacade.createPerformanceDraft(request.toCreateManualDto());
+        return ApiResponseUtil.success(
+            SuccessMessage.CREATED,
+            PerformanceDraftResponse.from(performanceDraftDto, s3FileHandler)
+        );  
+    }
+
+    @Override
+    @GetMapping("/performances/drafts/{draftId}")
+    public ResponseEntity<BaseResponse<PerformanceDraftDetailResponse>> getPerformanceDraftDetail(
+        @PathVariable Long draftId
+    ) {
+        return ApiResponseUtil.success(
+            SuccessMessage.SUCCESS,
+            PerformanceDraftDetailResponse.from(adminFacade.getPerformanceDraftDetail(draftId), s3FileHandler)
+        );
+    }
+
+    @Override
+    @PatchMapping("/performances/drafts/{draftId}")
+    public ResponseEntity<BaseResponse<PerformanceDraftResponse>> updatePerformanceDraft(
+        @PathVariable Long draftId,
+        @ModelAttribute UpdatePerformanceDraftRequest request
+    ) {
+        PerformanceDraftDto performanceDraftDto = adminFacade.updatePerformanceDraft(request.toUpdateDto(draftId));
+        return ApiResponseUtil.success(
+            SuccessMessage.UPDATED,
+            PerformanceDraftResponse.from(performanceDraftDto, s3FileHandler)
+        );
+    }
+
+    @Override
+    @DeleteMapping("/performances/drafts/{draftId}")
+    public ResponseEntity<BaseResponse<Void>> deletePerformanceDraft(
+        @PathVariable Long draftId
+    ) {
+        adminFacade.deletePerformanceDraft(draftId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @Override

@@ -9,7 +9,10 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
+import org.sopt.confeti.api.admin.dto.request.CreatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
+import org.sopt.confeti.api.admin.dto.request.UpdatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.PutAdminConcertRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
@@ -17,9 +20,13 @@ import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertListResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.AdminFestivalListResponse;
+import org.sopt.confeti.api.admin.dto.response.PerformanceDraftDetailResponse;
+import org.sopt.confeti.api.admin.dto.response.PerformanceDraftListResponses;
+import org.sopt.confeti.api.admin.dto.response.PerformanceDraftResponse;
 import org.sopt.confeti.api.admin.dto.response.PutAdminConcertResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
+import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.common.swagger.AuthErrorResponses;
@@ -99,6 +106,200 @@ public interface AdminControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<TicketVendorResponses>> getTicketVendors();
+
+
+    @Operation(summary = "대기 공연 목록 조회", description = 
+    """
+    크롤링한 데이터의 경우 status가 "검토 필요" 반환되고,  
+    수동 등록한 데이터의 경우 status가 "보류"로 반환됩니다. (현재 수동 등록의 경우 콘서트, 페스티벌 수정/저장 API를 사용하므로 해당 케이스는 존재하지 않습니다.)
+            """)
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts();
+
+    @Deprecated
+    @Operation(summary = "대기 공연 등록",
+        description = "현재 해당 API를 사용하지 않습니다. 공연 수동 등록 시 페스티벌, 콘서트 각각의 수정/저장 API를 사용해야합니다. ")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "201",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    public ResponseEntity<BaseResponse<PerformanceDraftResponse>> createPerformanceDraft(
+        @ModelAttribute @Valid CreatePerformanceDraftRequest request
+    );
+
+    @Operation(summary = "대기 공연 상세 조회",
+        description = """
+        performanceData 는 아래와 같습니다. 
+        festival인 경우
+{
+  "title": "2026 서울재즈페스티벌",
+  "subtitle": "Seoul Jazz Festival",
+  "startAt": "2026-05-22T00:00:00",
+  "endAt": "2026-05-24T23:59:59",
+  "area": "SEOUL",
+  "reserveAt": "2026-03-20T12:00:00",
+  "ageRating": "전체 관람가",
+  "time": "12:00 ~ 22:00",
+  "price": "200000",
+  "address": "올림픽 공원",
+  "timetableSupportStatus": "SUPPORTED",
+  "reservationUrls": [
+    {
+      "name": "멜론 티켓",
+      "url": "https://ticket.melon.com/performance/12345"
+    },
+    {
+      "name": "인터파크 티켓",
+      "url": "https://tickets.interpark.com/goods/12345"
+    }
+  ],
+  "dates": [
+    {
+      "festivalAt": "2026-05-22",
+      "openAt": "11:00:00",
+      "dailyArtists": [
+        {
+          "artistId": "1163087245"
+        },
+        {
+          "artistId": "1188975595"
+        }
+      ],
+      "stages": [
+        {
+          "name": "May Forest Stage",
+          "order": 1,
+          "times": [
+            {
+              "startAt": "13:00:00",
+              "endAt": "14:00:00",
+              "artistId": "1163087245"
+            },
+            {
+              "startAt": "14:30:00",
+              "endAt": "15:30:00",
+              "artistId": "1188975595"
+            }
+          ]
+        },
+        {
+          "name": "Sparkling Dome",
+          "order": 2,
+          "times": []
+        }
+      ]
+    },
+    {
+      "festivalAt": "2026-05-23",
+      "openAt": "11:00:00",
+      "dailyArtists": [
+        {
+          "artistId": "1203816887"
+        },
+        {
+          "artistId": "1214153999"
+        }
+      ],
+      "stages": [] 
+    }
+  ]
+}
+
+콘서트인 경우
+
+{
+  "title": "2026 카더가든 콘서트",
+  "subtitle": "The Golden Hour",
+  "startAt": "2026-04-01T18:00:00",
+  "endAt": "2026-04-01T20:30:00",
+  "area": "서울",
+  "reserveAt": "2026-03-15T20:00:00",
+  "ageRating": "만 7세 이상",
+  "time": "150분",
+  "price": "150000",
+  "address": "올림픽 주경기장",
+  "artists": [
+    {
+      "artistId": "1020577647"
+    }
+  ],
+  "reservationUrls": [
+    {
+      "name": "인터파크 티켓",
+      "reservationUrl": "https://ticket.interpark.com"
+    }
+  ]
+}
+
+
+"""
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<PerformanceDraftDetailResponse>> getPerformanceDraftDetail(
+        @PathVariable Long draftId
+    );
+
+    @Deprecated
+    @Operation(summary = "대기 공연 수정",
+        description = """
+        현재 해당 API를 사용하지 않습니다. 대기 공연 수정은 현재 요구사항에서 지원되지 않습니다.
+        수정을 원하는 필드만 전달하면 해당 부분만 수정됩니다. 이미지는 선택적으로 교체할 수 있습니다.
+        """
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    @PatchMapping(value = "/performances/drafts/{draftId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<BaseResponse<PerformanceDraftResponse>> updatePerformanceDraft(
+        @PathVariable Long draftId,
+        @ModelAttribute UpdatePerformanceDraftRequest request
+    );
+
+    @Operation(summary = "대기 공연 삭제")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<Void>> deletePerformanceDraft(
+        @PathVariable Long draftId
+    );
 
     @Operation(
         summary = "등록된 콘서트 목록 조회",
