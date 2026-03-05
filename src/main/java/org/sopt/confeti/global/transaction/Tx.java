@@ -10,7 +10,7 @@ public final class Tx {
 
     private static TxRunner txRunner;
 
-    public static void initialize(TxRunner txRunner) {
+    static void initialize(TxRunner txRunner) {
         if (Tx.txRunner != null) {
             log.error("Tx.initialize : Tx가 이미 초기화 되었습니다.");
             throw new ParameterInvalidException(ErrorMessage.INTERNAL_SERVER_ERROR);
