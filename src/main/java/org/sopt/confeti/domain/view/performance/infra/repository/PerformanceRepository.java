@@ -44,6 +44,17 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
 
     Optional<Performance> findPerformanceByTypeAndTypeId(PerformanceType type, long typeId);
 
+    @Query("""
+        SELECT DISTINCT p
+        FROM Performance p
+        LEFT JOIN FETCH p.artists
+        WHERE p.type = :type AND p.typeId = :typeId
+    """)
+    Optional<Performance> findWithArtistsByTypeAndTypeId(
+        @Param("type") PerformanceType type,
+        @Param("typeId") long typeId
+    );
+
     List<Performance> findPerformancesByTypeAndTypeIdIn(PerformanceType type, List<Long> typeIds);
 
     @Query(

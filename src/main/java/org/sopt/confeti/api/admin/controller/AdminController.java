@@ -10,8 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.controller.docs.AdminControllerDocs;
 import org.sopt.confeti.api.admin.dto.request.CreatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
-import org.sopt.confeti.api.admin.dto.request.UpdatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.PutAdminConcertRequest;
+import org.sopt.confeti.api.admin.dto.request.PutAdminFestivalRequest;
+import org.sopt.confeti.api.admin.dto.request.UpdatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
@@ -22,10 +23,12 @@ import org.sopt.confeti.api.admin.dto.response.PerformanceDraftDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.PerformanceDraftListResponses;
 import org.sopt.confeti.api.admin.dto.response.PerformanceDraftResponse;
 import org.sopt.confeti.api.admin.dto.response.PutAdminConcertResponse;
+import org.sopt.confeti.api.admin.dto.response.PutAdminFestivalResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.sopt.confeti.api.admin.facade.AdminFacade;
 import org.sopt.confeti.api.admin.facade.dto.request.AdminConcertCommand;
+import org.sopt.confeti.api.admin.facade.dto.request.AdminFestivalCommand;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
@@ -117,11 +120,12 @@ public class AdminController implements AdminControllerDocs {
     public ResponseEntity<BaseResponse<PerformanceDraftResponse>> createPerformanceDraft(
         @ModelAttribute CreatePerformanceDraftRequest request
     ) {
-        PerformanceDraftDto performanceDraftDto = adminFacade.createPerformanceDraft(request.toCreateManualDto());
+        PerformanceDraftDto performanceDraftDto = adminFacade.createPerformanceDraft(
+            request.toCreateManualDto());
         return ApiResponseUtil.success(
             SuccessMessage.CREATED,
             PerformanceDraftResponse.from(performanceDraftDto, s3FileHandler)
-        );  
+        );
     }
 
     @Override
@@ -131,7 +135,8 @@ public class AdminController implements AdminControllerDocs {
     ) {
         return ApiResponseUtil.success(
             SuccessMessage.SUCCESS,
-            PerformanceDraftDetailResponse.from(adminFacade.getPerformanceDraftDetail(draftId), s3FileHandler)
+            PerformanceDraftDetailResponse.from(adminFacade.getPerformanceDraftDetail(draftId),
+                s3FileHandler)
         );
     }
 
@@ -141,7 +146,8 @@ public class AdminController implements AdminControllerDocs {
         @PathVariable Long draftId,
         @ModelAttribute UpdatePerformanceDraftRequest request
     ) {
-        PerformanceDraftDto performanceDraftDto = adminFacade.updatePerformanceDraft(request.toUpdateDto(draftId));
+        PerformanceDraftDto performanceDraftDto = adminFacade.updatePerformanceDraft(
+            request.toUpdateDto(draftId));
         return ApiResponseUtil.success(
             SuccessMessage.UPDATED,
             PerformanceDraftResponse.from(performanceDraftDto, s3FileHandler)
@@ -205,6 +211,22 @@ public class AdminController implements AdminControllerDocs {
         return ApiResponseUtil.success(
             command.concertId() == null ? SuccessMessage.CREATED : SuccessMessage.SUCCESS,
             adminFacade.upsertConcert(poster, command)
+        );
+    }
+
+    @Override
+    @PutMapping(value = "/performances/festivals", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BaseResponse<PutAdminFestivalResponse>> upsertFestival(
+        @RequestPart(required = false) MultipartFile poster,
+        @RequestPart(required = false) MultipartFile logo,
+        @Valid @RequestPart(value = "festival") PutAdminFestivalRequest request
+    ) {
+        request.validate();
+
+        AdminFestivalCommand command = request.toCommand();
+        return ApiResponseUtil.success(
+            command.festivalId() == null ? SuccessMessage.CREATED : SuccessMessage.SUCCESS,
+            adminFacade.upsertFestival(poster, logo, command)
         );
     }
 

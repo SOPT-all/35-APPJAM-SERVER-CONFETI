@@ -57,6 +57,16 @@ public class FestivalStage {
         });
     }
 
+    public void update(String name, int order) {
+        this.name = name;
+        this.order = order;
+    }
+
+    public void addTime(FestivalTime time) {
+        this.times.add(time);
+        time.setFestivalStage(this);
+    }
+
     public static FestivalStage create(CreateFestivalStageDTO festivalStageDTO) {
         return FestivalStage.builder()
                 .name(festivalStageDTO.name())
@@ -66,6 +76,14 @@ public class FestivalStage {
                                 .map(FestivalTime::create)
                                 .toList()
                 )
+                .build();
+    }
+
+    public static FestivalStage create(String name, int order, List<FestivalTime> times) {
+        return FestivalStage.builder()
+                .name(name)
+                .order(order)
+                .times(times)
                 .build();
     }
 }

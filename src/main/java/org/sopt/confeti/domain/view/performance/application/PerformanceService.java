@@ -210,6 +210,12 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
+    public Performance getWithArtistsByTypeAndTypeId(PerformanceType type, long typeId) {
+        return performanceRepository.findWithArtistsByTypeAndTypeId(type, typeId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
     public List<PerformanceDTO> getPerformancesByTypeAndTypeIds(PerformanceType type, List<Long> typeIds) {
         return performanceRepository.findPerformancesByTypeAndTypeIdIn(type, typeIds).stream()
                 .map(PerformanceDTO::from)
