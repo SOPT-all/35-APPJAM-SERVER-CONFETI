@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -135,6 +136,7 @@ public record PutAdminFestivalRequest(
     }
 
     private void validateArtistTimetableMapping() {
+        Set<String> targetArtistIds = new HashSet<>(artistIds);
         Set<String> timetableArtistIds = dates.stream()
             .filter(date -> date.stages() != null)
             .flatMap(date -> date.stages().stream())
@@ -142,9 +144,15 @@ public record PutAdminFestivalRequest(
             .flatMap(time -> time.artistIds().stream())
             .collect(Collectors.toSet());
 
-        if (!timetableArtistIds.containsAll(artistIds)) {
+        if (!timetableArtistIds.containsAll(targetArtistIds)) {
             log.warn(
                 "PutAdminFestivalRequest.validateArtistTimetableMapping : 모든 아티스트가 타임테이블에 배정되어야 합니다.");
+            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+        }
+
+        if (!targetArtistIds.containsAll(timetableArtistIds)) {
+            log.warn(
+                "PutAdminFestivalRequest.validateArtistTimetableMapping : 타임테이블의 모든 아티스트가 선택되어야 합니다.");
             throw new BadRequestException(ErrorMessage.BAD_REQUEST);
         }
     }

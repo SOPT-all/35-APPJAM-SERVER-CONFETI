@@ -1,7 +1,6 @@
 package org.sopt.confeti.api.admin.facade;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -64,6 +63,7 @@ import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.event.S3FileDeleteEvent;
 import org.sopt.confeti.global.exception.BadRequestException;
+import org.sopt.confeti.global.exception.ParameterInvalidException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.transaction.Tx;
@@ -487,12 +487,20 @@ public class AdminFacade {
         MultipartFile poster, MultipartFile logo, AdminFestivalCommand command,
         String posterFolderPath, String logoFolderPath
     ) {
+        if (poster == null || logo == null) {
+            log.warn("AdminFacade.createFestivalWithFileUpload : 포스터와 로고 파일은 필수 입니다.");
+            throw new ParameterInvalidException(ErrorMessage.BAD_REQUEST);
+        }
+
         String posterPath = s3FileHandler.uploadFile(poster, posterFolderPath);
 
         String logoPath;
         try {
             logoPath = s3FileHandler.uploadFile(logo, logoFolderPath);
         } catch (Exception e) {
+            log.warn(
+                "AdminFacade.createFestivalWithFileUpload : 로고 파일 업로드 도중 에러가 발생해 롤백합니다. Festival Create Command : {}",
+                command);
             s3FileHandler.deleteFile(posterFolderPath, posterPath);
             throw e;
         }
@@ -646,6 +654,13 @@ public class AdminFacade {
         for (AdminFestivalCommand.DateCommand dateCmd : dateCommands) {
             if (dateCmd.festivalDateId() != null) { // 수정
                 FestivalDate existingDate = existingDatesMap.get(dateCmd.festivalDateId());
+
+                if (existingDate == null) {
+                    log.warn("AdminFacade.updateFestivalDates : 존재하지 않는 날짜입니다. 입력된 아이디 : {}",
+                        dateCmd.festivalDateId());
+                    throw new ParameterInvalidException(ErrorMessage.BAD_REQUEST);
+                }
+
                 existingDate.update(dateCmd.festivalAt(), dateCmd.openAt());
                 updateFestivalStages(existingDate, dateCmd, artistNameMap);
 
@@ -679,6 +694,13 @@ public class AdminFacade {
         for (AdminFestivalCommand.StageCommand stageCmd : stageCommands) {
             if (stageCmd.festivalStageId() != null) { // 수정
                 FestivalStage existingStage = existingStagesMap.get(stageCmd.festivalStageId());
+
+                if (existingStage == null) {
+                    log.warn("AdminFacade.updateFestivalStages : 존재하지 않는 스테이지입니다. 입력된 아이디 : {}",
+                        stageCmd.festivalStageId());
+                    throw new ParameterInvalidException(ErrorMessage.BAD_REQUEST);
+                }
+
                 existingStage.update(stageCmd.name(), stageCmd.order());
                 updateFestivalTimes(existingStage, stageCmd, artistNameMap);
             } else { // 생성
@@ -710,6 +732,13 @@ public class AdminFacade {
 
             if (timeCmd.festivalTimeId() != null) { // 수정
                 FestivalTime existingTime = existingTimesMap.get(timeCmd.festivalTimeId());
+
+                if (existingTime == null) {
+                    log.warn("AdminFacade.updateFestivalTimes : 존재하지 않는 시간 블록입니다. 입력된 아이디 : {}",
+                        timeCmd.festivalTimeId());
+                    throw new ParameterInvalidException(ErrorMessage.BAD_REQUEST);
+                }
+
                 existingTime.update(timeName, timeCmd.startAt(), timeCmd.endAt(), newArtists);
             } else { // 생성
                 FestivalTime newTime = FestivalTime.create(
@@ -772,7 +801,7 @@ public class AdminFacade {
     private List<FestivalDate> buildFestivalDates(AdminFestivalCommand command,
         Map<String, String> artistNameMap) {
         if (command.dates().isEmpty()) {
-            return new ArrayList<>();
+            return List.of();
         }
 
         return command.dates().stream()
@@ -788,7 +817,7 @@ public class AdminFacade {
     private List<FestivalStage> buildFestivalStages(
         AdminFestivalCommand.DateCommand dateCmd, Map<String, String> artistNameMap) {
         if (dateCmd.stages().isEmpty()) {
-            return new ArrayList<>();
+            return List.of();
         }
 
         return dateCmd.stages().stream()
@@ -831,7 +860,7 @@ public class AdminFacade {
     private List<PerformanceArtist> buildFestivalPerformanceArtists(
         AdminFestivalCommand command) {
         if (command.artistIds() == null || command.artistIds().isEmpty()) {
-            return new ArrayList<>();
+            return List.of();
         }
 
         return command.artistIds().stream()

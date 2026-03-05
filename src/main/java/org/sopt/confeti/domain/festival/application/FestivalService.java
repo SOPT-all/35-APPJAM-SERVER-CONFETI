@@ -160,7 +160,7 @@ public class FestivalService {
         return AdminFestivalDetailInfo.from(festival);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Festival getWithRelationsById(long festivalId) {
         Festival festival = festivalRepository.findWithDatesById(festivalId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
