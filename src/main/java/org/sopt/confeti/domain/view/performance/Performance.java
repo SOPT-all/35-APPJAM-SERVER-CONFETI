@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.sopt.confeti.api.admin.facade.dto.request.AdminFestivalCommand;
 import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
@@ -137,6 +138,21 @@ public class Performance {
                                 .map(PerformanceArtist::create)
                                 .toList()
                 )
+                .build();
+    }
+
+    public static Performance create(long festivalId, AdminFestivalCommand command,
+            String posterPath, List<PerformanceArtist> artists) {
+        return Performance.builder()
+                .typeId(festivalId)
+                .type(PerformanceType.FESTIVAL)
+                .area(command.area())
+                .title(command.title())
+                .subtitle(command.subtitle())
+                .startAt(command.startAt())
+                .endAt(command.endAt())
+                .posterPath(posterPath)
+                .artists(artists)
                 .build();
     }
 

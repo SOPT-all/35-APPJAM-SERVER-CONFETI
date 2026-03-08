@@ -54,4 +54,11 @@ public class FestivalReservationUrl {
             .ticketVendor(ticketVendor)
             .build();
     }
+
+    public static FestivalReservationUrl create(String reservationUrl, TicketVendor ticketVendor) {
+        return FestivalReservationUrl.builder()
+            .reservationUrl(reservationUrl)
+            .ticketVendor(ticketVendor)
+            .build();
+    }
 }

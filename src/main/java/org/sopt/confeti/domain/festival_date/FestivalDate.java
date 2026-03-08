@@ -66,6 +66,22 @@ public class FestivalDate {
         this.artists.forEach(artist -> artist.setFestivalDate(this));
     }
 
+    public void update(LocalDate festivalAt, LocalTime openAt) {
+        this.festivalAt = festivalAt;
+        this.openAt = openAt;
+    }
+
+    public void replaceArtists(List<FestivalArtist> newArtists) {
+        this.artists.clear();
+        this.artists.addAll(newArtists);
+        newArtists.forEach(artist -> artist.setFestivalDate(this));
+    }
+
+    public void addStage(FestivalStage stage) {
+        this.stages.add(stage);
+        stage.setFestivalDate(this);
+    }
+
     public static FestivalDate create(CreateFestivalDateDTO festivalDateDTO) {
         return FestivalDate.builder()
             .festivalAt(festivalDateDTO.festivalAt())
@@ -80,6 +96,16 @@ public class FestivalDate {
                     .flatMap(time -> time.artists().stream())
                     .map(FestivalArtist::create)
                     .toList())
+            .build();
+    }
+
+    public static FestivalDate create(LocalDate festivalAt, LocalTime openAt,
+            List<FestivalStage> stages, List<FestivalArtist> artists) {
+        return FestivalDate.builder()
+            .festivalAt(festivalAt)
+            .openAt(openAt)
+            .stages(stages)
+            .artists(artists)
             .build();
     }
 }

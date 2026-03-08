@@ -162,8 +162,66 @@ public class Festival {
                 .build();
     }
 
+    public static Festival create(
+            String title, String subtitle, LocalDate startAt, LocalDate endAt,
+            String area, String posterPath, String logoPath, LocalDateTime reserveAt,
+            String ageRating, String time, String price, String address,
+            TimetableSupportStatus timetableSupportStatus,
+            List<FestivalDate> dates, List<FestivalReservationUrl> reservationUrls
+    ) {
+        return Festival.builder()
+                .title(title)
+                .subtitle(subtitle)
+                .startAt(startAt)
+                .endAt(endAt)
+                .area(area)
+                .posterPath(posterPath)
+                .logoPath(logoPath)
+                .reserveAt(reserveAt)
+                .ageRating(ageRating)
+                .time(time)
+                .price(price)
+                .address(address)
+                .timetableSupportStatus(timetableSupportStatus)
+                .dates(dates)
+                .reservationUrls(reservationUrls)
+                .build();
+    }
+
+    public void updateBasicFields(
+            String title, String subtitle, LocalDate startAt, LocalDate endAt,
+            String area, String posterPath, String logoPath, LocalDateTime reserveAt,
+            String ageRating, String time, String price, String address,
+            TimetableSupportStatus timetableSupportStatus
+    ) {
+        this.title = title;
+        this.subtitle = subtitle;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.area = area;
+        this.posterPath = posterPath;
+        this.logoPath = logoPath;
+        this.reserveAt = reserveAt;
+        this.ageRating = ageRating;
+        this.time = time;
+        this.price = price;
+        this.address = address;
+        this.timetableSupportStatus = timetableSupportStatus;
+    }
+
     public void addDates(List<FestivalDate> dates) {
         this.dates.addAll(dates);
         dates.forEach(date -> date.setFestival(this));
+    }
+
+    public void replaceReservationUrls(List<FestivalReservationUrl> newReservationUrls) {
+        this.reservationUrls.clear();
+        this.reservationUrls.addAll(newReservationUrls);
+        newReservationUrls.forEach(url -> url.setFestival(this));
+    }
+
+    public void addDate(FestivalDate date) {
+        this.dates.add(date);
+        date.setFestival(this);
     }
 }

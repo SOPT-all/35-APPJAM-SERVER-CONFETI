@@ -52,4 +52,10 @@ public class FestivalArtist {
             .artist(Artist.create(festivalArtistDTO.artistId()))
             .build();
     }
+
+    public static FestivalArtist create(String artistId) {
+        return FestivalArtist.builder()
+            .artist(Artist.create(artistId))
+            .build();
+    }
 }

@@ -10,8 +10,8 @@ import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDate
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
-import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
+import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_date.application.FestivalDateService;
 import org.sopt.confeti.domain.festival_stage.FestivalStage;
@@ -80,7 +80,8 @@ public class FestivalService {
     }
 
     @ReadOnlyTransactional
-    public List<Festival> findSupportedTimetableFestivalsUsingInitCursor(final long userId, final int size) {
+    public List<Festival> findSupportedTimetableFestivalsUsingInitCursor(final long userId,
+        final int size) {
         return festivalRepository.findFestivalsUsingInitCursorAndSupportStatus(
             userId,
             getPageRequestWithSort(size, getFestivalSort()),
@@ -157,6 +158,32 @@ public class FestivalService {
         }
 
         return AdminFestivalDetailInfo.from(festival);
+    }
+
+    @Transactional(readOnly = true)
+    public Festival getWithRelationsById(long festivalId) {
+        Festival festival = festivalRepository.findWithDatesById(festivalId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+
+        festivalDateService.findDatesWithArtistsByFestivalId(festivalId);
+        festivalDateService.findDatesWithStagesByFestivalId(festivalId);
+
+        List<Long> dateIds = festival.getDates().stream()
+            .map(FestivalDate::getId)
+            .toList();
+        festivalStageService.findStagesWithTimesByDateIds(dateIds);
+
+        List<Long> stageIds = festival.getDates().stream()
+            .flatMap(date -> date.getStages().stream())
+            .map(FestivalStage::getId)
+            .toList();
+        if (!stageIds.isEmpty()) {
+            festivalTimeService.findTimesWithArtistsByStageIds(stageIds);
+        }
+
+        festivalRepository.findUpcomingWithReservationUrlsById(festivalId);
+
+        return festival;
     }
 
     @ReadOnlyTransactional

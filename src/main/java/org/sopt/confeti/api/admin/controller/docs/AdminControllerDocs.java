@@ -14,6 +14,7 @@ import org.sopt.confeti.api.admin.dto.request.CreatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.CreateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdatePerformanceDraftRequest;
 import org.sopt.confeti.api.admin.dto.request.PutAdminConcertRequest;
+import org.sopt.confeti.api.admin.dto.request.PutAdminFestivalRequest;
 import org.sopt.confeti.api.admin.dto.request.UpdateTicketVendorRequest;
 import org.sopt.confeti.api.admin.dto.response.AdminArtistSearchResponses;
 import org.sopt.confeti.api.admin.dto.response.AdminConcertDetailResponse;
@@ -24,6 +25,7 @@ import org.sopt.confeti.api.admin.dto.response.PerformanceDraftDetailResponse;
 import org.sopt.confeti.api.admin.dto.response.PerformanceDraftListResponses;
 import org.sopt.confeti.api.admin.dto.response.PerformanceDraftResponse;
 import org.sopt.confeti.api.admin.dto.response.PutAdminConcertResponse;
+import org.sopt.confeti.api.admin.dto.response.PutAdminFestivalResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponse;
 import org.sopt.confeti.api.admin.dto.response.TicketVendorResponses;
 import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
@@ -393,6 +395,29 @@ public interface AdminControllerDocs {
     ResponseEntity<BaseResponse<PutAdminConcertResponse>> upsertConcert(
         @RequestPart MultipartFile poster,
         @Valid @RequestPart(value = "concert") PutAdminConcertRequest request
+    );
+
+    @Operation(
+        summary = "페스티벌 등록/수정",
+        description = "페스티벌을 등록하거나 수정합니다. "
+            + "festivalId가 null이면 신규 등록, 값이 있으면 기존 페스티벌을 수정합니다. "
+            + "포스터 이미지는 'poster' 파트, 로고 이미지는 'logo' 파트로, "
+            + "나머지 데이터는 'festival' 파트(application/json)로 전송합니다."
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<PutAdminFestivalResponse>> upsertFestival(
+        @RequestPart(required = false) MultipartFile poster,
+        @RequestPart(required = false) MultipartFile logo,
+        @Valid @RequestPart(value = "festival") PutAdminFestivalRequest request
     );
 
     @Operation(summary = "아티스트 검색")

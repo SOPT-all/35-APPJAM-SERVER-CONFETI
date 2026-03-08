@@ -39,6 +39,9 @@ public class FestivalTime {
     @JoinColumn(name = "festival_stage_id", nullable = false)
     private FestivalStage festivalStage;
 
+    @Column(length = 100, nullable = false)
+    private String name;
+
     @Column(nullable = false)
     private LocalTime startAt;
 
@@ -52,7 +55,8 @@ public class FestivalTime {
     private List<FestivalArtist> artists = new ArrayList<>();
 
     @Builder
-    public FestivalTime(LocalTime startAt, LocalTime endAt, List<FestivalArtist> artists) {
+    public FestivalTime(String name, LocalTime startAt, LocalTime endAt, List<FestivalArtist> artists) {
+        this.name = name;
         this.startAt = startAt;
         this.endAt = endAt;
         this.artists = artists;
@@ -64,6 +68,7 @@ public class FestivalTime {
 
     public static FestivalTime create(CreateFestivalTimeDTO festivalTimeDTO) {
         return FestivalTime.builder()
+                .name("")
                 .startAt(festivalTimeDTO.startAt())
                 .endAt(festivalTimeDTO.endAt())
                 .artists(
@@ -72,5 +77,25 @@ public class FestivalTime {
                                 .toList()
                 )
                 .build();
+    }
+
+    public static FestivalTime create(String name, LocalTime startAt, LocalTime endAt,
+            List<FestivalArtist> artists) {
+        return FestivalTime.builder()
+                .name(name)
+                .startAt(startAt)
+                .endAt(endAt)
+                .artists(artists)
+                .build();
+    }
+
+    public void update(String name, LocalTime startAt, LocalTime endAt, List<FestivalArtist> newArtists) {
+        this.name = name;
+        this.startAt = startAt;
+        this.endAt = endAt;
+
+        this.artists.clear();
+        this.artists.addAll(newArtists);
+        newArtists.forEach(artist -> artist.setFestivalTime(this));
     }
 }
