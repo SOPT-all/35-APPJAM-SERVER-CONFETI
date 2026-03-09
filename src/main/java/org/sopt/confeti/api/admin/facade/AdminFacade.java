@@ -165,9 +165,9 @@ public class AdminFacade {
         return Tx.readOnlyTx(() -> festivalService.getAdminFestivalDetailInfo(festivalId));
     }
 
-    public AdminFestivalListInfo getAdminFestivals() {
+    public AdminFestivalListInfo getAdminFestivals(String keyword) {
         List<AdminFestivalPreviewInfo> festivals = Tx.readOnlyTx(
-            festivalService::getAdminFestivals);
+            () -> festivalService.getAdminFestivals(keyword));
         LocalDate today = LocalDate.now();
 
         Map<Boolean, List<AdminFestivalPreviewInfo>> partitioned = festivals.stream()

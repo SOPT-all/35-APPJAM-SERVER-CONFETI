@@ -377,7 +377,9 @@ public interface AdminControllerDocs {
     )
     @AuthErrorResponses
     @CommonErrorResponses
-    ResponseEntity<BaseResponse<AdminFestivalListResponse>> getAdminFestivals();
+    ResponseEntity<BaseResponse<AdminFestivalListResponse>> getAdminFestivals(
+        @RequestParam(required = false) @Size(max = 50) String search
+    );
 
     @Operation(
         summary = "콘서트 등록/수정",

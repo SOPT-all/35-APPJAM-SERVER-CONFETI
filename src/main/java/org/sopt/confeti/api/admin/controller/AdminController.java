@@ -195,8 +195,10 @@ public class AdminController implements AdminControllerDocs {
 
     @Override
     @GetMapping("/performances/festivals")
-    public ResponseEntity<BaseResponse<AdminFestivalListResponse>> getAdminFestivals() {
-        AdminFestivalListInfo festivalListInfo = adminFacade.getAdminFestivals();
+    public ResponseEntity<BaseResponse<AdminFestivalListResponse>> getAdminFestivals(
+        @RequestParam(required = false) String search
+    ) {
+        AdminFestivalListInfo festivalListInfo = adminFacade.getAdminFestivals(search);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             AdminFestivalListResponse.of(festivalListInfo, s3FileHandler));
     }
