@@ -1,5 +1,5 @@
 name: 901 CI
-run-name: confeti-ci-${{ github.ref_name }}-${{ github.run_number }} by @${{ github.actor }}
+run-name: confeti-api-ci-${{ github.ref_name }}-${{ github.run_number }} by @${{ github.actor }}
 
 # Event Trigger 환경
 on:
@@ -27,7 +27,7 @@ jobs:
           distribution: 'temurin'
 
       # 빌드 속도 향상을 위한 Gradle 캐싱
-      - name: Gradle Caching
+      - name: gradle caching
         uses: actions/cache@v4
         with:
           path: |
@@ -38,10 +38,10 @@ jobs:
             gradle-${{ runner.os }}-
 
       # 빌드를 위한 권한 부여
-      - name: Grant execute permission for gradlew
+      - name: grant execute permission for gradlew
         run: chmod +x gradlew  # Gradle wrapper에 실행 권한 부여
 
       # Gradle을 사용하여 빌드 실행
-      - name: Build with Gradle Wrapper
+      - name: build with gradle wrapper
         run: |
           ./gradlew clean build -x test

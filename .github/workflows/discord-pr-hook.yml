@@ -1,4 +1,5 @@
 name: 903 PR Discord Notification
+run-name: discord-pr-hook-${{ github.ref_name }}-${{ github.run_number }} by @${{ github.actor }}
 
 on:
   pull_request:
@@ -15,7 +16,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Discord Notification
+      - name: discord notification
         env:
           ACTION: ${{ github.event.action }}
           MERGED: ${{ github.event.pull_request.merged }}

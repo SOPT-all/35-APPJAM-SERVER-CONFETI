@@ -1,6 +1,6 @@
 # Workflow 이름
 name: 101 DEV confeti-api 배포
-run-name: confeti-cd-prod-${{ github.ref_name }}-${{ github.run_number }} by @${{ github.actor }}
+run-name: confeti-api-develop-deploy-${{ github.ref_name }}-${{ github.run_number }} by @${{ github.actor }}
 
 # Event Trigger 환경
 on:

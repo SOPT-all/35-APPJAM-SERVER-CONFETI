@@ -22,12 +22,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Run Claude PR Action
+      - name: run claude pr action
         uses: anthropics/claude-code-action@v1
         with:
           use_bedrock: 'false'
