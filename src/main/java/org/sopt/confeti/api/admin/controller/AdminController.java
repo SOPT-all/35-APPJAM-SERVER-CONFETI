@@ -1,6 +1,5 @@
 package org.sopt.confeti.api.admin.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -63,7 +62,6 @@ public class AdminController implements AdminControllerDocs {
 
     private final AdminFacade adminFacade;
     private final S3FileHandler s3FileHandler;
-    private final ObjectMapper objectMapper;
 
     @Override
     @PostMapping("/ticket-vendors")
@@ -111,7 +109,7 @@ public class AdminController implements AdminControllerDocs {
     public ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts() {
         return ApiResponseUtil.success(
             SuccessMessage.SUCCESS,
-            PerformanceDraftListResponses.from(adminFacade.getPerformanceDrafts(), objectMapper)
+            PerformanceDraftListResponses.from(adminFacade.getPerformanceDrafts(), s3FileHandler)
         );
     }
 

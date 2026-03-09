@@ -26,6 +26,7 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo.Conce
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminPerformanceDraftPreviewInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.PerformanceDraftDetailInfo;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
@@ -47,7 +48,6 @@ import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftServ
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
-import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDtos;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
@@ -224,8 +224,8 @@ public class AdminFacade {
         }
     }
 
-    public PerformanceDraftDtos getPerformanceDrafts() {
-        return Tx.readOnlyTx(performanceDraftService::getAllDrafts);
+    public List<AdminPerformanceDraftPreviewInfo> getPerformanceDrafts() {
+        return Tx.readOnlyTx(performanceDraftService::getAdminPerformanceDraftPreviews);
     }
 
     public void deletePerformanceDraft(Long draftId) {
