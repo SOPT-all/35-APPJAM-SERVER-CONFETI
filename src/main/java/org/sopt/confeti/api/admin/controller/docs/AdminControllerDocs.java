@@ -112,6 +112,7 @@ public interface AdminControllerDocs {
 
     @Operation(summary = "대기 공연 목록 조회", description = 
     """
+    QuertString - search: 생략 가능. title, area를 기준으로 검색
     크롤링한 데이터의 경우 status가 "검토 필요" 반환되고,  
     수동 등록한 데이터의 경우 status가 "보류"로 반환됩니다. (현재 수동 등록의 경우 콘서트, 페스티벌 수정/저장 API를 사용하므로 해당 케이스는 존재하지 않습니다.)
             """)
@@ -309,6 +310,7 @@ public interface AdminControllerDocs {
         summary = "등록된 콘서트 목록 조회",
         description = "어드민 권한으로 등록된 모든 콘서트 목록을 조회합니다. "
             + "진행 예정/진행 중인 콘서트와 종료된 콘서트를 구분하여 반환합니다."
+            + "QuertString - search: 생략 가능. title, area를 기준으로 검색합니다."
     )
     @ApiResponses(
         value = {
@@ -366,6 +368,7 @@ public interface AdminControllerDocs {
         summary = "등록된 페스티벌 목록 조회",
         description = "어드민 권한으로 등록된 모든 페스티벌 목록을 조회합니다. "
             + "진행 예정/진행 중인 페스티벌과 종료된 페스티벌을 구분하여 반환합니다."
+            + "QuertString - search: 생략 가능. title, area를 기준으로 검색합니다."
     )
     @ApiResponses(
         value = {
