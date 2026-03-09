@@ -127,7 +127,7 @@ public interface AdminControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts(
-        @RequestParam(required = false) @Size(max = 50) String search
+        @RequestParam(required = false) @Size(max = 100) String search
     );
 
     @Deprecated
@@ -323,7 +323,7 @@ public interface AdminControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<AdminConcertListResponse>> getAdminConcerts(
-        @RequestParam(required = false) @Size(max = 50) String search
+        @RequestParam(required = false) @Size(max = 100) String search
     );
 
     @Operation(
@@ -381,7 +381,7 @@ public interface AdminControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<AdminFestivalListResponse>> getAdminFestivals(
-        @RequestParam(required = false) @Size(max = 50) String search
+        @RequestParam(required = false) @Size(max = 100) String search
     );
 
     @Operation(
