@@ -135,8 +135,8 @@ public class AdminFacade {
         return Tx.readOnlyTx(ticketVendorService::findAll);
     }
 
-    public AdminConcertListInfo getAdminConcerts() {
-        List<ConcertPreviewInfo> concerts = Tx.readOnlyTx(concertService::getAllConcerts);
+    public AdminConcertListInfo getAdminConcerts(String keyword) {
+        List<ConcertPreviewInfo> concerts = Tx.readOnlyTx(() -> concertService.getAllConcerts(keyword));
         LocalDate today = LocalDate.now();
 
         Map<Boolean, List<ConcertPreviewInfo>> partitioned = concerts.stream()

@@ -320,7 +320,9 @@ public interface AdminControllerDocs {
     )
     @AuthErrorResponses
     @CommonErrorResponses
-    ResponseEntity<BaseResponse<AdminConcertListResponse>> getAdminConcerts();
+    ResponseEntity<BaseResponse<AdminConcertListResponse>> getAdminConcerts(
+        @RequestParam(required = false) @Size(max = 50) String search
+    );
 
     @Operation(
         summary = "수정할 콘서트 단건 조회",
