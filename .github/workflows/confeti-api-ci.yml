@@ -1,5 +1,4 @@
-# Workflow 이름
-name: CI workflow
+name: 901 CI
 run-name: confeti-ci-${{ github.ref_name }}-${{ github.run_number }} by @${{ github.actor }}
 
 # Event Trigger 환경
@@ -17,13 +16,11 @@ jobs:
 
     # Action을 사용하여 Step을 구성
     steps:
-      - name: 체크아웃
-        uses: actions/checkout@v6  # GitHub repository 코드 체크아웃
-        with:
-          fetch-depth: 0
+      - name: checkout
+        uses: actions/checkout@v6
 
       # JDK 21 설치
-      - name: Set up JDK 21
+      - name: set up jdk 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'

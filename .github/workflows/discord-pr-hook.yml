@@ -1,4 +1,4 @@
-name: 'PR Discord Notification'
+name: 903 PR Discord Notification
 
 on:
   pull_request:
@@ -8,6 +8,7 @@ on:
     types:
       - opened
       - closed
+      - reopened
 
 jobs:
   notification:
@@ -25,19 +26,21 @@ jobs:
           DESCRIPTION_MESSAGE="PR 생성"
 
           if [[ "$ACTION" == "opened" ]]; then
-            DESCRIPTION_MESSAGE="{[ OPENED ] 리뷰 달아주세여"
+            DESCRIPTION_MESSAGE="[ OPENED ] 리뷰 부탁합니다람쥐 🐿️"
           elif [[ "$ACTION" == "closed" && "$MERGED" == "true" ]]; then
-            DESCRIPTION_MESSAGE="[ MERGED ] 💯💯💯"
+            DESCRIPTION_MESSAGE="[ MERGED ] 🔥 기여 +1 ✨"
+          elif [[ "$ACTION" == "reopened" ]]; then
+            DESCRIPTION_MESSAGE="[ REOPENED ] 🚪 다시 열렸습니다?"
           else
-            DESCRIPTION_MESSAGE="[ CLOSED ] 마음을 불태워라"
+            DESCRIPTION_MESSAGE="[ CLOSED ] 🥱 꺼드럭"
           fi
           
           curl -X POST -H "Content-Type: application/json" \
           -d '{
               "embeds": [
                 {
-                  "title": "[confeti-server] 서버 Level Up + 1 🔥",
-                  "description": "**🔥 '"$DESCRIPTION_MESSAGE"' 🔥**\n👤 '"$USERNAME"'\n🔊 '"$TITLE"'\n🔗 '"$URL"'",
+                  "title": "[confeti-api] 서버 Level Up + 1 🤴🏼",
+                  "description": "**🍥 '"$DESCRIPTION_MESSAGE"' 🍥**\n👤 '"$USERNAME"'\n🔊 '"$TITLE"'\n🔗 '"$URL"'",
                   "color": 6847432
                 }
               ]
