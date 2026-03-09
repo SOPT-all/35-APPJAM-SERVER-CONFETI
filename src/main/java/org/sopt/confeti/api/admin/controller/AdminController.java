@@ -106,10 +106,12 @@ public class AdminController implements AdminControllerDocs {
 
     @Override
     @GetMapping("/performances/drafts")
-    public ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts() {
+    public ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts(
+        @RequestParam(required = false) String search
+    ) {
         return ApiResponseUtil.success(
             SuccessMessage.SUCCESS,
-            PerformanceDraftListResponses.from(adminFacade.getPerformanceDrafts(), s3FileHandler)
+            PerformanceDraftListResponses.from(adminFacade.getPerformanceDrafts(search), s3FileHandler)
         );
     }
 

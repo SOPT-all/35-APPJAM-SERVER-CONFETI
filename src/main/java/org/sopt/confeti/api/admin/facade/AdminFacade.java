@@ -224,9 +224,9 @@ public class AdminFacade {
         }
     }
 
-    public AdminPerformanceDraftListInfo getPerformanceDrafts() {
+    public AdminPerformanceDraftListInfo getPerformanceDrafts(String keyword) {
         return AdminPerformanceDraftListInfo.from(
-            Tx.readOnlyTx(performanceDraftService::getAdminPerformanceDraftPreviews)
+            Tx.readOnlyTx(() -> performanceDraftService.getAdminPerformanceDraftPreviews(keyword))
         );
     }
 

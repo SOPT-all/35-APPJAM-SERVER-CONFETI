@@ -125,7 +125,9 @@ public interface AdminControllerDocs {
     )
     @AuthErrorResponses
     @CommonErrorResponses
-    ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts();
+    ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts(
+        @RequestParam(required = false) @Size(max = 50) String search
+    );
 
     @Deprecated
     @Operation(summary = "대기 공연 등록",

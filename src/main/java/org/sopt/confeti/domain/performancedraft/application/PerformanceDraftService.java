@@ -14,6 +14,7 @@ import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 
 @Service
@@ -47,10 +48,17 @@ public class PerformanceDraftService {
     }
 
     @ReadOnlyTransactional
-    public List<AdminPerformanceDraftPreviewInfo> getAdminPerformanceDraftPreviews() {
-        return draftRepository.findAll().stream()
+    public List<AdminPerformanceDraftPreviewInfo> getAdminPerformanceDraftPreviews(String keyword) {
+        return findDraftsByKeyword(keyword).stream()
             .map(draft -> AdminPerformanceDraftPreviewInfo.from(draft, draftParser))
             .toList();
+    }
+
+    private List<PerformanceDraft> findDraftsByKeyword(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return draftRepository.findAll();
+        }
+        return draftRepository.searchByKeyword(keyword);
     }
 
     @Transactional
