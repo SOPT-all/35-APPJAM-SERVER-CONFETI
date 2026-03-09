@@ -26,7 +26,7 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo.Conce
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
-import org.sopt.confeti.api.admin.facade.dto.response.AdminPerformanceDraftPreviewInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminPerformanceDraftListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.PerformanceDraftDetailInfo;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
@@ -224,8 +224,10 @@ public class AdminFacade {
         }
     }
 
-    public List<AdminPerformanceDraftPreviewInfo> getPerformanceDrafts() {
-        return Tx.readOnlyTx(performanceDraftService::getAdminPerformanceDraftPreviews);
+    public AdminPerformanceDraftListInfo getPerformanceDrafts() {
+        return AdminPerformanceDraftListInfo.from(
+            Tx.readOnlyTx(performanceDraftService::getAdminPerformanceDraftPreviews)
+        );
     }
 
     public void deletePerformanceDraft(Long draftId) {
