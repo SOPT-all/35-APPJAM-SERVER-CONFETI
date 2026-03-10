@@ -101,4 +101,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
                     final PageRequest pageRequest);
 
     List<Festival> findByIdIn(final List<Long> festivalIds);
+
+    List<Festival> findAllByTitleContainingOrAreaContainingOrSubtitleContaining(
+        String title, String area, String subtitle);
 }

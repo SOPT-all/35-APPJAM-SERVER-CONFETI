@@ -27,6 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -192,9 +193,17 @@ public class FestivalService {
     }
 
     @ReadOnlyTransactional
-    public List<AdminFestivalPreviewInfo> getAdminFestivals() {
-        return festivalRepository.findAll().stream()
+    public List<AdminFestivalPreviewInfo> getAdminFestivalPreviews(String keyword) {
+        return findFestivalsByKeyword(keyword).stream()
             .map(AdminFestivalPreviewInfo::from)
             .toList();
+    }
+
+    private List<Festival> findFestivalsByKeyword(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return festivalRepository.findAll();
+        }
+        return festivalRepository.findAllByTitleContainingOrAreaContainingOrSubtitleContaining(
+            keyword, keyword, keyword);
     }
 }

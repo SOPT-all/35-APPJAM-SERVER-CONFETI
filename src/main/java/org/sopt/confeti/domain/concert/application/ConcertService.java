@@ -15,6 +15,7 @@ import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -51,10 +52,18 @@ public class ConcertService {
     }
 
     @ReadOnlyTransactional
-    public List<ConcertPreviewInfo> getAllConcerts() {
-        return concertRepository.findAll().stream()
+    public List<ConcertPreviewInfo> getAdminConcertPreviews(String keyword) {
+        return findConcertsByKeyword(keyword).stream()
             .map(ConcertPreviewInfo::from)
             .toList();
+    }
+
+    private List<Concert> findConcertsByKeyword(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return concertRepository.findAll();
+        }
+        return concertRepository.findAllByTitleContainingOrAreaContainingOrSubtitleContaining(
+            keyword, keyword, keyword);
     }
 
     @ReadOnlyTransactional

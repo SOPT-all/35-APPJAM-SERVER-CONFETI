@@ -1,6 +1,5 @@
 package org.sopt.confeti.api.admin.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -63,7 +62,6 @@ public class AdminController implements AdminControllerDocs {
 
     private final AdminFacade adminFacade;
     private final S3FileHandler s3FileHandler;
-    private final ObjectMapper objectMapper;
 
     @Override
     @PostMapping("/ticket-vendors")
@@ -108,10 +106,12 @@ public class AdminController implements AdminControllerDocs {
 
     @Override
     @GetMapping("/performances/drafts")
-    public ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts() {
+    public ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts(
+        @RequestParam(required = false) @Size(max = 100) String search
+    ) {
         return ApiResponseUtil.success(
             SuccessMessage.SUCCESS,
-            PerformanceDraftListResponses.from(adminFacade.getPerformanceDrafts(), objectMapper)
+            PerformanceDraftListResponses.from(adminFacade.getPerformanceDrafts(search), s3FileHandler)
         );
     }
 
@@ -165,8 +165,10 @@ public class AdminController implements AdminControllerDocs {
 
     @Override
     @GetMapping("/performances/concerts")
-    public ResponseEntity<BaseResponse<AdminConcertListResponse>> getAdminConcerts() {
-        AdminConcertListInfo concertList = adminFacade.getAdminConcerts();
+    public ResponseEntity<BaseResponse<AdminConcertListResponse>> getAdminConcerts(
+        @RequestParam(required = false) @Size(max = 100) String search
+    ) {
+        AdminConcertListInfo concertList = adminFacade.getAdminConcerts(search);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             AdminConcertListResponse.of(concertList, s3FileHandler));
     }
@@ -193,8 +195,10 @@ public class AdminController implements AdminControllerDocs {
 
     @Override
     @GetMapping("/performances/festivals")
-    public ResponseEntity<BaseResponse<AdminFestivalListResponse>> getAdminFestivals() {
-        AdminFestivalListInfo festivalListInfo = adminFacade.getAdminFestivals();
+    public ResponseEntity<BaseResponse<AdminFestivalListResponse>> getAdminFestivals(
+        @RequestParam(required = false) @Size(max = 100) String search
+    ) {
+        AdminFestivalListInfo festivalListInfo = adminFacade.getAdminFestivals(search);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             AdminFestivalListResponse.of(festivalListInfo, s3FileHandler));
     }

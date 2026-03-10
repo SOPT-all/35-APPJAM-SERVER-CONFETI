@@ -112,6 +112,7 @@ public interface AdminControllerDocs {
 
     @Operation(summary = "대기 공연 목록 조회", description = 
     """
+    QuertString - search: 생략 가능. title, area를 기준으로 검색
     크롤링한 데이터의 경우 status가 "검토 필요" 반환되고,  
     수동 등록한 데이터의 경우 status가 "보류"로 반환됩니다. (현재 수동 등록의 경우 콘서트, 페스티벌 수정/저장 API를 사용하므로 해당 케이스는 존재하지 않습니다.)
             """)
@@ -125,7 +126,9 @@ public interface AdminControllerDocs {
     )
     @AuthErrorResponses
     @CommonErrorResponses
-    ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts();
+    ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts(
+        @RequestParam(required = false) @Size(max = 100) String search
+    );
 
     @Deprecated
     @Operation(summary = "대기 공연 등록",
@@ -307,6 +310,7 @@ public interface AdminControllerDocs {
         summary = "등록된 콘서트 목록 조회",
         description = "어드민 권한으로 등록된 모든 콘서트 목록을 조회합니다. "
             + "진행 예정/진행 중인 콘서트와 종료된 콘서트를 구분하여 반환합니다."
+            + "QuertString - search: 생략 가능. title, subTitle, area를 기준으로 검색합니다."
     )
     @ApiResponses(
         value = {
@@ -318,7 +322,9 @@ public interface AdminControllerDocs {
     )
     @AuthErrorResponses
     @CommonErrorResponses
-    ResponseEntity<BaseResponse<AdminConcertListResponse>> getAdminConcerts();
+    ResponseEntity<BaseResponse<AdminConcertListResponse>> getAdminConcerts(
+        @RequestParam(required = false) @Size(max = 100) String search
+    );
 
     @Operation(
         summary = "수정할 콘서트 단건 조회",
@@ -362,6 +368,7 @@ public interface AdminControllerDocs {
         summary = "등록된 페스티벌 목록 조회",
         description = "어드민 권한으로 등록된 모든 페스티벌 목록을 조회합니다. "
             + "진행 예정/진행 중인 페스티벌과 종료된 페스티벌을 구분하여 반환합니다."
+            + "QuertString - search: 생략 가능. title, subTitle, area를 기준으로 검색합니다."
     )
     @ApiResponses(
         value = {
@@ -373,7 +380,9 @@ public interface AdminControllerDocs {
     )
     @AuthErrorResponses
     @CommonErrorResponses
-    ResponseEntity<BaseResponse<AdminFestivalListResponse>> getAdminFestivals();
+    ResponseEntity<BaseResponse<AdminFestivalListResponse>> getAdminFestivals(
+        @RequestParam(required = false) @Size(max = 100) String search
+    );
 
     @Operation(
         summary = "콘서트 등록/수정",

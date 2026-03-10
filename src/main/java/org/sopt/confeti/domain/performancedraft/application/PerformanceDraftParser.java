@@ -40,5 +40,24 @@ public class PerformanceDraftParser {
         return artistIds;
     }
 
+    public String parseTitle(String performanceData) {
+        return parseField(performanceData, "title");
+    }
 
+    public String parseArea(String performanceData) {
+        return parseField(performanceData, "area");
+    }
+
+    public String parseStartAt(String performanceData) {
+        return parseField(performanceData, "startAt");
+    }
+
+    private String parseField(String performanceData, String fieldName) {
+        try {
+            JsonNode root = objectMapper.readTree(performanceData);
+            return root.hasNonNull(fieldName) ? root.get(fieldName).asText() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

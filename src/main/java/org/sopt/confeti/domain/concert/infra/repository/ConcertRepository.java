@@ -46,4 +46,7 @@ public interface ConcertRepository extends JpaRepository<Concert, Long> {
     Optional<Concert> findWithReservationUrlsById(@Param("concertId") long concertId);
 
     List<Concert> findAllByIdIn(final List<Long> concertIds);
+
+    List<Concert> findAllByTitleContainingOrAreaContainingOrSubtitleContaining(
+        String title, String area, String subtitle);
 }

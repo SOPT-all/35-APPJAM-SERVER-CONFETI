@@ -26,6 +26,7 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo.Conce
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminPerformanceDraftListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.PerformanceDraftDetailInfo;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
@@ -47,7 +48,6 @@ import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftServ
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
-import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDtos;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
@@ -135,8 +135,8 @@ public class AdminFacade {
         return Tx.readOnlyTx(ticketVendorService::findAll);
     }
 
-    public AdminConcertListInfo getAdminConcerts() {
-        List<ConcertPreviewInfo> concerts = Tx.readOnlyTx(concertService::getAllConcerts);
+    public AdminConcertListInfo getAdminConcerts(String keyword) {
+        List<ConcertPreviewInfo> concerts = Tx.readOnlyTx(() -> concertService.getAdminConcertPreviews(keyword));
         LocalDate today = LocalDate.now();
 
         Map<Boolean, List<ConcertPreviewInfo>> partitioned = concerts.stream()
@@ -165,9 +165,9 @@ public class AdminFacade {
         return Tx.readOnlyTx(() -> festivalService.getAdminFestivalDetailInfo(festivalId));
     }
 
-    public AdminFestivalListInfo getAdminFestivals() {
+    public AdminFestivalListInfo getAdminFestivals(String keyword) {
         List<AdminFestivalPreviewInfo> festivals = Tx.readOnlyTx(
-            festivalService::getAdminFestivals);
+            () -> festivalService.getAdminFestivalPreviews(keyword));
         LocalDate today = LocalDate.now();
 
         Map<Boolean, List<AdminFestivalPreviewInfo>> partitioned = festivals.stream()
@@ -224,8 +224,10 @@ public class AdminFacade {
         }
     }
 
-    public PerformanceDraftDtos getPerformanceDrafts() {
-        return Tx.readOnlyTx(performanceDraftService::getAllDrafts);
+    public AdminPerformanceDraftListInfo getPerformanceDrafts(String keyword) {
+        return AdminPerformanceDraftListInfo.from(
+            Tx.readOnlyTx(() -> performanceDraftService.getAdminPerformanceDraftPreviews(keyword))
+        );
     }
 
     public void deletePerformanceDraft(Long draftId) {
