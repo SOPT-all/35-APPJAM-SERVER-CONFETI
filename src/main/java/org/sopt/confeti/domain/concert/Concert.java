@@ -13,16 +13,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
 import org.sopt.confeti.domain.concert_artist.ConcertArtist;
 import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
-import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -33,6 +30,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Concert {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -86,9 +84,9 @@ public class Concert {
 
     @Builder
     private Concert(String title, String subtitle, LocalDate startAt, LocalDate endAt, String area,
-            String posterPath, LocalDateTime reserveAt, String ageRating,
-            String time, String price, String address,
-            List<ConcertArtist> artists, List<ConcertReservationUrl> reservationUrls) {
+        String posterPath, LocalDateTime reserveAt, String ageRating,
+        String time, String price, String address,
+        List<ConcertArtist> artists, List<ConcertReservationUrl> reservationUrls) {
         this.title = title;
         this.subtitle = subtitle;
         this.startAt = startAt;
@@ -107,10 +105,31 @@ public class Concert {
         this.reservationUrls.forEach(url -> url.setConcert(this));
     }
 
+    public static Concert create(String title, String subtitle, LocalDate startAt, LocalDate endAt,
+        String area, String posterPath, LocalDateTime reserveAt, String ageRating,
+        String time, String price, String address,
+        List<ConcertArtist> artists, List<ConcertReservationUrl> reservationUrls) {
+        return Concert.builder()
+            .title(title)
+            .subtitle(subtitle)
+            .startAt(startAt)
+            .endAt(endAt)
+            .area(area)
+            .posterPath(posterPath)
+            .reserveAt(reserveAt)
+            .ageRating(ageRating)
+            .time(time)
+            .price(price)
+            .address(address)
+            .artists(artists)
+            .reservationUrls(reservationUrls)
+            .build();
+    }
+
     public void update(String title, String subtitle, LocalDate startAt, LocalDate endAt,
-            String area, String posterPath, LocalDateTime reserveAt, String ageRating,
-            String time, String price, String address,
-            List<ConcertArtist> newArtists, List<ConcertReservationUrl> newReservationUrls) {
+        String area, String posterPath, LocalDateTime reserveAt, String ageRating,
+        String time, String price, String address,
+        List<ConcertArtist> newArtists, List<ConcertReservationUrl> newReservationUrls) {
         this.title = title;
         this.subtitle = subtitle;
         this.startAt = startAt;
@@ -130,52 +149,5 @@ public class Concert {
         this.reservationUrls.clear();
         this.reservationUrls.addAll(newReservationUrls);
         newReservationUrls.forEach(url -> url.setConcert(this));
-    }
-
-    public static Concert create(String title, String subtitle, LocalDate startAt, LocalDate endAt,
-            String area, String posterPath, LocalDateTime reserveAt, String ageRating,
-            String time, String price, String address,
-            List<ConcertArtist> artists, List<ConcertReservationUrl> reservationUrls) {
-        return Concert.builder()
-                .title(title)
-                .subtitle(subtitle)
-                .startAt(startAt)
-                .endAt(endAt)
-                .area(area)
-                .posterPath(posterPath)
-                .reserveAt(reserveAt)
-                .ageRating(ageRating)
-                .time(time)
-                .price(price)
-                .address(address)
-                .artists(artists)
-                .reservationUrls(reservationUrls)
-                .build();
-    }
-
-    public static Concert create(CreateConcertDTO concertDTO, List<TicketVendor> ticketVendors) {
-        return Concert.builder()
-                .title(concertDTO.title())
-                .subtitle(concertDTO.subtitle())
-                .startAt(concertDTO.startAt())
-                .endAt(concertDTO.endAt())
-                .area(concertDTO.area())
-                .posterPath(concertDTO.posterPath())
-                .reserveAt(concertDTO.reserveAt())
-                .ageRating(concertDTO.ageRating())
-                .time(concertDTO.time())
-                .price(concertDTO.price())
-                .address(concertDTO.address())
-                .artists(
-                        concertDTO.artists().stream()
-                                .map(ConcertArtist::create)
-                                .toList())
-                .reservationUrls(
-                        IntStream.range(0, concertDTO.reservationUrls().size())
-                                .mapToObj(i -> ConcertReservationUrl.create(
-                                        concertDTO.reservationUrls().get(i),
-                                        ticketVendors.get(i)))
-                                .toList())
-                .build();
     }
 }

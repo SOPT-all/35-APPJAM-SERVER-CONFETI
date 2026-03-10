@@ -18,7 +18,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalStageDTO;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
 
@@ -57,6 +56,14 @@ public class FestivalStage {
         });
     }
 
+    public static FestivalStage create(String name, int order, List<FestivalTime> times) {
+        return FestivalStage.builder()
+            .name(name)
+            .order(order)
+            .times(times)
+            .build();
+    }
+
     public void update(String name, int order) {
         this.name = name;
         this.order = order;
@@ -65,25 +72,5 @@ public class FestivalStage {
     public void addTime(FestivalTime time) {
         this.times.add(time);
         time.setFestivalStage(this);
-    }
-
-    public static FestivalStage create(CreateFestivalStageDTO festivalStageDTO) {
-        return FestivalStage.builder()
-                .name(festivalStageDTO.name())
-                .order(festivalStageDTO.order())
-                .times(
-                        festivalStageDTO.times().stream()
-                                .map(FestivalTime::create)
-                                .toList()
-                )
-                .build();
-    }
-
-    public static FestivalStage create(String name, int order, List<FestivalTime> times) {
-        return FestivalStage.builder()
-                .name(name)
-                .order(order)
-                .times(times)
-                .build();
     }
 }

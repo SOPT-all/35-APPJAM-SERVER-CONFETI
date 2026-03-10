@@ -14,8 +14,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertArtistDTO;
-import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalArtistDTO;
 
 @Entity
 @Table(name = "performance_artists")
@@ -38,14 +36,6 @@ public class PerformanceArtist {
     @Builder
     private PerformanceArtist(String artistId) {
         this.artistId = artistId;
-    }
-
-    public static PerformanceArtist create(CreateFestivalArtistDTO festivalArtistDTO) {
-        return new PerformanceArtist(festivalArtistDTO.artistId());
-    }
-
-    public static PerformanceArtist create(CreateConcertArtistDTO concertArtistDTO) {
-        return new PerformanceArtist(concertArtistDTO.artistId());
     }
 
     public static PerformanceArtist create(String artistId) {
