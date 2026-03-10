@@ -107,7 +107,7 @@ public class AdminController implements AdminControllerDocs {
     @Override
     @GetMapping("/performances/drafts")
     public ResponseEntity<BaseResponse<PerformanceDraftListResponses>> getPerformanceDrafts(
-        @RequestParam(required = false) String search
+        @RequestParam(required = false) @Size(max = 100) String search
     ) {
         return ApiResponseUtil.success(
             SuccessMessage.SUCCESS,
@@ -166,7 +166,7 @@ public class AdminController implements AdminControllerDocs {
     @Override
     @GetMapping("/performances/concerts")
     public ResponseEntity<BaseResponse<AdminConcertListResponse>> getAdminConcerts(
-        @RequestParam(required = false) String search
+        @RequestParam(required = false) @Size(max = 100) String search
     ) {
         AdminConcertListInfo concertList = adminFacade.getAdminConcerts(search);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
@@ -196,7 +196,7 @@ public class AdminController implements AdminControllerDocs {
     @Override
     @GetMapping("/performances/festivals")
     public ResponseEntity<BaseResponse<AdminFestivalListResponse>> getAdminFestivals(
-        @RequestParam(required = false) String search
+        @RequestParam(required = false) @Size(max = 100) String search
     ) {
         AdminFestivalListInfo festivalListInfo = adminFacade.getAdminFestivals(search);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
