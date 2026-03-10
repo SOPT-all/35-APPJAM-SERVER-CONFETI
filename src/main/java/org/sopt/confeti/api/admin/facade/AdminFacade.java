@@ -136,7 +136,7 @@ public class AdminFacade {
     }
 
     public AdminConcertListInfo getAdminConcerts(String keyword) {
-        List<ConcertPreviewInfo> concerts = Tx.readOnlyTx(() -> concertService.getAllConcerts(keyword));
+        List<ConcertPreviewInfo> concerts = Tx.readOnlyTx(() -> concertService.getAdminConcertPreviews(keyword));
         LocalDate today = LocalDate.now();
 
         Map<Boolean, List<ConcertPreviewInfo>> partitioned = concerts.stream()
@@ -167,7 +167,7 @@ public class AdminFacade {
 
     public AdminFestivalListInfo getAdminFestivals(String keyword) {
         List<AdminFestivalPreviewInfo> festivals = Tx.readOnlyTx(
-            () -> festivalService.getAdminFestivals(keyword));
+            () -> festivalService.getAdminFestivalPreviews(keyword));
         LocalDate today = LocalDate.now();
 
         Map<Boolean, List<AdminFestivalPreviewInfo>> partitioned = festivals.stream()

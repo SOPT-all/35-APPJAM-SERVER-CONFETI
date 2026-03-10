@@ -310,7 +310,7 @@ public interface AdminControllerDocs {
         summary = "등록된 콘서트 목록 조회",
         description = "어드민 권한으로 등록된 모든 콘서트 목록을 조회합니다. "
             + "진행 예정/진행 중인 콘서트와 종료된 콘서트를 구분하여 반환합니다."
-            + "QuertString - search: 생략 가능. title, area를 기준으로 검색합니다."
+            + "QuertString - search: 생략 가능. title, subTitle, area를 기준으로 검색합니다."
     )
     @ApiResponses(
         value = {
@@ -368,7 +368,7 @@ public interface AdminControllerDocs {
         summary = "등록된 페스티벌 목록 조회",
         description = "어드민 권한으로 등록된 모든 페스티벌 목록을 조회합니다. "
             + "진행 예정/진행 중인 페스티벌과 종료된 페스티벌을 구분하여 반환합니다."
-            + "QuertString - search: 생략 가능. title, area를 기준으로 검색합니다."
+            + "QuertString - search: 생략 가능. title, subTitle, area를 기준으로 검색합니다."
     )
     @ApiResponses(
         value = {

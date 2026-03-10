@@ -193,7 +193,7 @@ public class FestivalService {
     }
 
     @ReadOnlyTransactional
-    public List<AdminFestivalPreviewInfo> getAdminFestivals(String keyword) {
+    public List<AdminFestivalPreviewInfo> getAdminFestivalPreviews(String keyword) {
         return findFestivalsByKeyword(keyword).stream()
             .map(AdminFestivalPreviewInfo::from)
             .toList();
@@ -203,6 +203,7 @@ public class FestivalService {
         if (!StringUtils.hasText(keyword)) {
             return festivalRepository.findAll();
         }
-        return festivalRepository.findAllByTitleContainingOrAreaContaining(keyword, keyword);
+        return festivalRepository.findAllByTitleContainingOrAreaContainingOrSubtitleContaining(
+            keyword, keyword, keyword);
     }
 }

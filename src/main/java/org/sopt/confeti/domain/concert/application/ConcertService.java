@@ -52,7 +52,7 @@ public class ConcertService {
     }
 
     @ReadOnlyTransactional
-    public List<ConcertPreviewInfo> getAllConcerts(String keyword) {
+    public List<ConcertPreviewInfo> getAdminConcertPreviews(String keyword) {
         return findConcertsByKeyword(keyword).stream()
             .map(ConcertPreviewInfo::from)
             .toList();
@@ -62,7 +62,8 @@ public class ConcertService {
         if (!StringUtils.hasText(keyword)) {
             return concertRepository.findAll();
         }
-        return concertRepository.findAllByTitleContainingOrAreaContaining(keyword, keyword);
+        return concertRepository.findAllByTitleContainingOrAreaContainingOrSubtitleContaining(
+            keyword, keyword, keyword);
     }
 
     @ReadOnlyTransactional
