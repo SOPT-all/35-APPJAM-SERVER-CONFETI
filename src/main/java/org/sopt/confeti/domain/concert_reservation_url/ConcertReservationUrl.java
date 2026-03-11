@@ -14,7 +14,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertReservationUrlDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 
@@ -50,15 +49,6 @@ public class ConcertReservationUrl {
     public static ConcertReservationUrl create(String reservationUrl, TicketVendor ticketVendor) {
         return ConcertReservationUrl.builder()
             .reservationUrl(reservationUrl)
-            .ticketVendor(ticketVendor)
-            .build();
-    }
-
-    public static ConcertReservationUrl create(
-        CreateConcertReservationUrlDTO concertReservationUrlDTO,
-        TicketVendor ticketVendor) {
-        return ConcertReservationUrl.builder()
-            .reservationUrl(concertReservationUrlDTO.reservationUrl())
             .ticketVendor(ticketVendor)
             .build();
     }

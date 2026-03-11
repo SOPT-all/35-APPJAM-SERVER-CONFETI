@@ -20,8 +20,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.sopt.confeti.api.admin.facade.dto.request.AdminFestivalCommand;
-import org.sopt.confeti.api.dummy.facade.dto.concert.request.CreateConcertDTO;
-import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDTO;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -75,8 +73,8 @@ public class Performance {
 
     @Builder
     private Performance(long typeId, PerformanceType type, String area, String title,
-                        String subtitle, LocalDate startAt, LocalDate endAt,
-                        String posterPath, List<PerformanceArtist> artists) {
+        String subtitle, LocalDate startAt, LocalDate endAt,
+        String posterPath, List<PerformanceArtist> artists) {
         this.typeId = typeId;
         this.type = type;
         this.area = area;
@@ -90,75 +88,36 @@ public class Performance {
         this.artists.forEach(artist -> artist.setPerformance(this));
     }
 
-    public static Performance create(final long festivalId, final CreateFestivalDTO festivalDTO) {
-        return Performance.builder()
-                .typeId(festivalId)
-                .type(PerformanceType.FESTIVAL)
-                .area(festivalDTO.area())
-                .title(festivalDTO.title())
-                .subtitle(festivalDTO.subtitle())
-                .startAt(festivalDTO.startAt())
-                .endAt(festivalDTO.endAt())
-                .posterPath(festivalDTO.posterPath())
-                .artists(
-                        festivalDTO.dates().stream()
-                                .flatMap(date -> date.stages().stream())
-                                .flatMap(stage -> stage.times().stream())
-                                .flatMap(time -> time.artists().stream())
-                                .map(PerformanceArtist::create)
-                                .toList()
-                )
-                .build();
-    }
-
     public static Performance createConcert(long concertId, String title, String subtitle,
-            String area, LocalDate startAt, LocalDate endAt, String posterPath,
-            List<PerformanceArtist> artists) {
+        String area, LocalDate startAt, LocalDate endAt, String posterPath,
+        List<PerformanceArtist> artists) {
         return Performance.builder()
-                .typeId(concertId)
-                .type(PerformanceType.CONCERT)
-                .title(title).subtitle(subtitle).area(area)
-                .startAt(startAt).endAt(endAt)
-                .posterPath(posterPath).artists(artists)
-                .build();
-    }
-
-    public static Performance create(final long concertId, final CreateConcertDTO concertDTO) {
-        return Performance.builder()
-                .typeId(concertId)
-                .type(PerformanceType.CONCERT)
-                .area(concertDTO.area())
-                .title(concertDTO.title())
-                .subtitle(concertDTO.subtitle())
-                .startAt(concertDTO.startAt())
-                .endAt(concertDTO.endAt())
-                .posterPath(concertDTO.posterPath())
-                .artists(
-                        concertDTO.artists().stream()
-                                .map(PerformanceArtist::create)
-                                .toList()
-                )
-                .build();
+            .typeId(concertId)
+            .type(PerformanceType.CONCERT)
+            .title(title).subtitle(subtitle).area(area)
+            .startAt(startAt).endAt(endAt)
+            .posterPath(posterPath).artists(artists)
+            .build();
     }
 
     public static Performance create(long festivalId, AdminFestivalCommand command,
-            String posterPath, List<PerformanceArtist> artists) {
+        String posterPath, List<PerformanceArtist> artists) {
         return Performance.builder()
-                .typeId(festivalId)
-                .type(PerformanceType.FESTIVAL)
-                .area(command.area())
-                .title(command.title())
-                .subtitle(command.subtitle())
-                .startAt(command.startAt())
-                .endAt(command.endAt())
-                .posterPath(posterPath)
-                .artists(artists)
-                .build();
+            .typeId(festivalId)
+            .type(PerformanceType.FESTIVAL)
+            .area(command.area())
+            .title(command.title())
+            .subtitle(command.subtitle())
+            .startAt(command.startAt())
+            .endAt(command.endAt())
+            .posterPath(posterPath)
+            .artists(artists)
+            .build();
     }
 
     public void update(String title, String subtitle, String area,
-            LocalDate startAt, LocalDate endAt, String posterPath,
-            List<PerformanceArtist> newArtists) {
+        LocalDate startAt, LocalDate endAt, String posterPath,
+        List<PerformanceArtist> newArtists) {
         this.title = title;
         this.subtitle = subtitle;
         this.area = area;

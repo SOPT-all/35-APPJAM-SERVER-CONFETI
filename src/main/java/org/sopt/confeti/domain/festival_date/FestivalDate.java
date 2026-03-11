@@ -20,7 +20,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival_artist.FestivalArtist;
 import org.sopt.confeti.domain.festival_stage.FestivalStage;
@@ -53,7 +52,7 @@ public class FestivalDate {
     private List<FestivalArtist> artists = new ArrayList<>();
 
     @Builder
-    public FestivalDate(LocalDate festivalAt, LocalTime openAt, 
+    public FestivalDate(LocalDate festivalAt, LocalTime openAt,
         List<FestivalStage> stages,
         List<FestivalArtist> artists
     ) {
@@ -64,6 +63,16 @@ public class FestivalDate {
 
         this.stages.forEach(stage -> stage.setFestivalDate(this));
         this.artists.forEach(artist -> artist.setFestivalDate(this));
+    }
+
+    public static FestivalDate create(LocalDate festivalAt, LocalTime openAt,
+        List<FestivalStage> stages, List<FestivalArtist> artists) {
+        return FestivalDate.builder()
+            .festivalAt(festivalAt)
+            .openAt(openAt)
+            .stages(stages)
+            .artists(artists)
+            .build();
     }
 
     public void update(LocalDate festivalAt, LocalTime openAt) {
@@ -80,32 +89,5 @@ public class FestivalDate {
     public void addStage(FestivalStage stage) {
         this.stages.add(stage);
         stage.setFestivalDate(this);
-    }
-
-    public static FestivalDate create(CreateFestivalDateDTO festivalDateDTO) {
-        return FestivalDate.builder()
-            .festivalAt(festivalDateDTO.festivalAt())
-            .openAt(festivalDateDTO.openAt())
-            .stages(
-                festivalDateDTO.stages().stream()
-                    .map(FestivalStage::create)
-                    .toList())
-            .artists(
-                festivalDateDTO.stages().stream()
-                    .flatMap(stage -> stage.times().stream())
-                    .flatMap(time -> time.artists().stream())
-                    .map(FestivalArtist::create)
-                    .toList())
-            .build();
-    }
-
-    public static FestivalDate create(LocalDate festivalAt, LocalTime openAt,
-            List<FestivalStage> stages, List<FestivalArtist> artists) {
-        return FestivalDate.builder()
-            .festivalAt(festivalAt)
-            .openAt(openAt)
-            .stages(stages)
-            .artists(artists)
-            .build();
     }
 }

@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
-import org.sopt.confeti.api.dummy.facade.dto.festival.request.CreateFestivalDateDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
@@ -124,16 +123,6 @@ public class FestivalService {
     @Transactional
     public long create(Festival festival) {
         return festivalRepository.save(festival).getId();
-    }
-
-    @Transactional
-    public void addDates(long festivalId, List<CreateFestivalDateDTO> dates) {
-        Festival festival = findById(festivalId);
-
-        festival.addDates(
-            dates.stream()
-                .map(FestivalDate::create)
-                .toList());
     }
 
     @Transactional(readOnly = true)
