@@ -1,11 +1,14 @@
 package org.sopt.confeti.domain.music.relatedartist.application;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.domain.music.artist.application.ArtistService;
 import org.sopt.confeti.domain.music.relatedartist.CreateRelatedArtistsEvent;
+import org.sopt.confeti.global.common.ExecutorName;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.transaction.Tx;
 import org.springframework.context.event.EventListener;
@@ -20,16 +23,15 @@ public class RelatedArtistEventListener {
     private final ArtistService artistService;
     private final RelatedArtistService relatedArtistService;
 
-    @Async
+    @Async(ExecutorName.MUSIC_API_EVENT_EXECUTOR)
     @EventListener
     public void handleCreateRelatedArtistsEvent(CreateRelatedArtistsEvent event) {
         try {
             Tx.masterTx(() -> {
-                if (!artistService.isExistByArtistId(event.artist().getId())) {
-                    artistService.create(event.artist().toCommand());
-                }
-
-                artistService.create(event.relatedArtists());
+                List<ConfetiArtist> allArtists = new ArrayList<>();
+                allArtists.add(event.artist());
+                allArtists.addAll(event.relatedArtists());
+                artistService.create(allArtists);
 
                 Set<String> relatedArtistIds = event.relatedArtists().stream()
                     .map(ConfetiArtist::getId)

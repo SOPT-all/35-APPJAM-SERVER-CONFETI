@@ -7,4 +7,5 @@ import lombok.NoArgsConstructor;
 public final class ExecutorName {
 
     public static final String PERFORMANCE_EXECUTOR = "performanceExecutor";
+    public static final String MUSIC_API_EVENT_EXECUTOR = "musicApiEventExecutor";
 }
