@@ -37,6 +37,17 @@ class OnboardingInterceptorTest {
     }
 
     @Test
+    void preHandle_onboardingApi_rejectsGeneral() throws Exception {
+        UserContext.set(userInfo(Role.GENERAL));
+
+        assertThatThrownBy(() -> onboardingInterceptor.preHandle(
+            request,
+            response,
+            handlerMethod("onboardingApi")
+        )).isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
     void preHandle_nonOnboardingApi_rejectsOnboardingUser() throws Exception {
         UserContext.set(userInfo(Role.ONBOARDING));
 

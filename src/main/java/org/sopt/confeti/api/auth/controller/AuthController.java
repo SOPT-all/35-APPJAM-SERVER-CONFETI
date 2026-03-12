@@ -39,7 +39,6 @@ public class AuthController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, result);
     }
 
-    @Onboarding
     @Permission(role = {Role.GENERAL})
     @PostMapping("/reissue")
     public ResponseEntity<BaseResponse<Token>> reissue(
@@ -49,7 +48,6 @@ public class AuthController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, token);
     }
 
-    @Onboarding
     @Permission(role = {Role.GENERAL})
     @PostMapping("/logout")
     public ResponseEntity<BaseResponse<Void>> logout() {
@@ -57,9 +55,6 @@ public class AuthController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
-    /**
-     * 개발을 위해 임시로 Role.GENERAL 접근 허용
-     */
     @Onboarding
     @PostMapping("/onboard")
     @Deprecated

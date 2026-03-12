@@ -39,7 +39,7 @@ public class OnboardingInterceptor implements HandlerInterceptor, CustomIntercep
             return true;
         }
 
-        // @Onboarding 어노테이션이 있는 API는 온보딩 유저 전용이다. (편의성을 위해 일반 유저와 관리자도 허용)
+        // @Onboarding 어노테이션이 있는 API는 온보딩 유저 전용이다. 관리자는 예외적으로 허용한다.
         if (isNotAllowedOnOnboardingApi()) {
             log.error("OnboardingInterceptor.preHandle : 온보딩 API에 허용되지 않은 유저가 접근 시도. 유저 정보 : {}",
                 UserContext.get());
@@ -53,7 +53,6 @@ public class OnboardingInterceptor implements HandlerInterceptor, CustomIntercep
         Role userRole = UserContext.get().role();
 
         return userRole != Role.ONBOARDING
-            && userRole != Role.GENERAL
             && userRole != Role.ADMIN;
     }
 
