@@ -1,5 +1,6 @@
 package org.sopt.confeti.domain.user;
 
+import lombok.Builder;
 import lombok.Getter;
 import org.sopt.confeti.domain.user.constant.Role;
 
@@ -21,6 +22,7 @@ public class AuthUser {
         this.role = Role.ONBOARDING;
     }
 
+    @Builder
     private AuthUser(Long id, OAuthProvider provider, String socialId, String socialNickname, String socialProfile,
                      Role role) {
         this.id = id;

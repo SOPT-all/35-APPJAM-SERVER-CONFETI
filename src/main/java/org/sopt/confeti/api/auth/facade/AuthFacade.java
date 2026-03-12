@@ -14,6 +14,7 @@ import org.sopt.confeti.auth.Token;
 import org.sopt.confeti.auth.WebhookService;
 import org.sopt.confeti.auth.WithdrawService;
 import org.sopt.confeti.auth.command.LoginCommand;
+import org.sopt.confeti.auth.dto.CreateUserDTO;
 import org.sopt.confeti.auth.dto.LoginResult;
 import org.sopt.confeti.auth.dto.OAuthSocialInfoResult;
 import org.sopt.confeti.domain.admin_social_id.application.AdminSocialIdService;
@@ -50,14 +51,13 @@ public class AuthFacade {
         OAuthSocialInfoResult socialInfo = loginService.getSocialInfo(loginCommand);
 
         if (userService.notExist(socialInfo.id(), loginCommand.provider())) {
-            userService.create(loginService.getCreateUserDTO(loginCommand.provider(), socialInfo));
+            CreateUserDTO createUserDTO = loginService.getCreateUserDTO(loginCommand.provider(), socialInfo);
+            if (adminSocialIdService.isAdminSocialId(socialInfo.id())) {
+                createUserDTO = createUserDTO.withRole(Role.ADMIN);
+            }
+            userService.create(createUserDTO);
             log.debug("Social ID : {}, User Name : {}", socialInfo.id(), socialInfo.name());
             webhookService.sendDiscordNotification();
-
-            if (adminSocialIdService.isAdminSocialId(socialInfo.id())) {
-                User newUser = userService.getBySocialIdAndProvider(socialInfo.id(), loginCommand.provider());
-                newUser.setRole(Role.ADMIN);
-            }
         }
 
         AuthUser authUser = userService.getAuthUser(socialInfo.id(), loginCommand.provider());
