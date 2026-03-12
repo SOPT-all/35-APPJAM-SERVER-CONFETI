@@ -15,6 +15,8 @@ import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.sopt.confeti.api.performance.facade.context.PerformanceReservationContext;
+import org.sopt.confeti.api.performance.facade.context.RecentPerformanceContext;
 import org.sopt.confeti.api.performance.facade.dto.request.GetUpcomingPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
@@ -34,7 +36,6 @@ import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsPerfor
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SongRecommendDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.UpcomingPerformancesDTO;
-import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
@@ -61,7 +62,6 @@ import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSong;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Facade
@@ -70,9 +70,6 @@ public class PerformanceFacade {
     private static final int RECENT_PERFORMANCES_SIZE = 7;
     private static final int RECOMMEND_SONG_SIZE = 3;
     private static final int RECOMMEND_SONG_FETCH_SIZE = 20;
-    private static final boolean PERSONALIZED = true;
-    private static final boolean UNPERSONALIZED = false;
-
     private final ConcertService concertService;
     private final FestivalService festivalService;
     private final UserService userService;
@@ -138,54 +135,55 @@ public class PerformanceFacade {
 
     @ReadOnlyTransactional
     public PerformanceReservationDTO getPerformanceReservationInfo() {
-        boolean existsFavoritePerformance = UserContext.getOptional()
-            .map(userInfo ->
-                concertFavoriteService.existsUpcomingReservationByUserId(userInfo.id())
-                    || festivalFavoriteService.existsUpcomingReservationByUserId(userInfo.id())
-            )
-            .orElse(false);
+        PerformanceReservationContext context = new PerformanceReservationContext();
 
-        if (existsFavoritePerformance) {
-            List<PerformanceTicketDTO> performanceReserve = performanceService.getFavoritePerformancesReservation(
-                UserContext.get().id());
-            return PerformanceReservationDTO.of(PERSONALIZED, performanceReserve);
+        UserContext.getOptional().ifPresent(userInfo -> {
+            List<PerformanceTicketDTO> favorites =
+                performanceService.getFavoritePerformancesReservation(userInfo.id(),
+                    PerformanceReservationContext.MAX_SIZE);
+            context.addFavoritePerformances(favorites);
+        });
+
+        if (!context.isFull()) {
+            List<PerformanceTicketDTO> general =
+                performanceService.getPerformancesReservationExcluding(
+                    context.getExcludedConcertIds(),
+                    context.getExcludedFestivalIds(),
+                    context.remainingSlots()
+                );
+            context.addGeneralPerformances(general);
         }
 
-        List<PerformanceTicketDTO> performanceReserve = performanceService.getPerformancesReservation();
-        return PerformanceReservationDTO.of(UNPERSONALIZED, performanceReserve);
+        return context.build();
     }
 
     @ReadOnlyTransactional
     public RecentPerformancesDTO getRecentPerformances() {
-        return UserContext.getOptional()
-            .map(userInfo -> getRecentPerformancesWithFavorites(userInfo.id()))
-            .filter(recentPerformancesDTO -> !recentPerformancesDTO.performances().isEmpty())
-            .orElseGet(this::getRecentPerformancesWithoutFavorites);
-    }
+        RecentPerformanceContext context = new RecentPerformanceContext();
 
-    @Transactional(readOnly = true)
-    public RecentPerformancesDTO getRecentPerformancesWithFavorites(final long userId) {
-        List<ArtistFavorite> artistFavorites = artistFavoriteService.getArtistIdsByUserId(userId);
+        UserContext.getOptional().ifPresent(userInfo -> {
+            List<String> favoriteArtistIds =
+                artistFavoriteService.getArtistIdsByUserId(userInfo.id());
+            if (!favoriteArtistIds.isEmpty()) {
+                List<Performance> favoritePerformances =
+                    performanceService.getPerformancesByArtistIds(
+                        favoriteArtistIds,
+                        RecentPerformanceContext.MAX_SIZE
+                    );
+                context.addFavoritePerformances(favoritePerformances);
+            }
+        });
 
-        return RecentPerformancesDTO.of(
-            PERSONALIZED,
-            performanceService.getPerformancesByArtistIds(
-                artistFavorites.stream()
-                    .map(artistFavorite -> artistFavorite.getArtist().getId())
-                    .toList(),
-                RECENT_PERFORMANCES_SIZE
-            )
-        );
-    }
+        if (!context.isFull()) {
+            List<Performance> general =
+                performanceService.getRecentPerformancesExcluding(
+                    context.getExcludedPerformanceIds(),
+                    context.remainingSlots()
+                );
+            context.addGeneralPerformances(general);
+        }
 
-    @ReadOnlyTransactional
-    public RecentPerformancesDTO getRecentPerformancesWithoutFavorites() {
-        List<Performance> performances = performanceService.getRecentPerformances(
-            RECENT_PERFORMANCES_SIZE);
-        return RecentPerformancesDTO.of(
-            UNPERSONALIZED,
-            performances
-        );
+        return context.build();
     }
 
     @ReadOnlyTransactional

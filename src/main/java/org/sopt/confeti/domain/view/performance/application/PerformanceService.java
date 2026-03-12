@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -47,18 +48,15 @@ public class PerformanceService {
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getFavoritePerformancesAll(final long userId, final String type) {
         return performanceRepository.findPerformancesByUserFavorites(userId, type).stream()
-                .map(PerformanceDTO::from)
-                .toList();
+            .map(PerformanceDTO::from)
+            .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceTicketDTO> getFavoritePerformancesReservation(final Long userId) {
-        return performanceDTORepository.findFavoritePerformancesReservation(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public List<PerformanceTicketDTO> getPerformancesReservation() {
-        return performanceDTORepository.findPerformancesReservation();
+    public List<PerformanceTicketDTO> getFavoritePerformancesReservation(final Long userId,
+        final int reservationPerformanceCount) {
+        return performanceDTORepository.findFavoritePerformancesReservation(userId,
+            reservationPerformanceCount);
     }
 
     @Transactional
@@ -67,10 +65,11 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getPerformancesByArtistIds(final List<String> artistIds, final int size) {
+    public List<Performance> getPerformancesByArtistIds(final List<String> artistIds,
+        final int size) {
         return performanceRepository.findPerformancesByArtistIds(
-                artistIds,
-                getPageRequest(size, getRecentPerformancesSort())
+            artistIds,
+            getPageRequest(size, getRecentPerformancesSort())
         );
     }
 
@@ -80,39 +79,51 @@ public class PerformanceService {
 
     private Sort getRecentPerformancesSort() {
         return Sort.by(
-                Order.desc(CREATED_AT_COLUMN)
+            Order.desc(CREATED_AT_COLUMN)
         );
     }
 
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getPerformancesByArtistId(final String artistId) {
         return performanceRepository.findPerformancesByArtistId(artistId).stream()
-                .map(PerformanceDTO::from)
-                .toList();
+            .map(PerformanceDTO::from)
+            .toList();
     }
 
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getAllPerformancesByArtistId(final String artistId) {
         return performanceRepository.findPerformancesByArtists_ArtistId(artistId).stream()
-                .map(PerformanceDTO::from)
-                .toList();
+            .map(PerformanceDTO::from)
+            .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getRecentPerformances(final int recentPerformancesSize) {
-        return performanceRepository.findRecentPerformancesByEndAtGreaterThanEqual(
-                LocalDate.now(),
-                getPageRequest(recentPerformancesSize, getRecentPerformancesSort())
-        ).stream().toList();
+    public List<PerformanceTicketDTO> getPerformancesReservationExcluding(
+        final List<Long> excludedConcertIds,
+        final List<Long> excludedFestivalIds,
+        final int limit) {
+        return performanceDTORepository.findPerformancesReservationExcluding(
+            excludedConcertIds, excludedFestivalIds, limit);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Performance> getRecentPerformancesExcluding(final Set<Long> excludedIds,
+        final int size) {
+        return performanceRepository.findRecentPerformancesExcluding(
+            excludedIds,
+            LocalDate.now(),
+            getPageRequest(size, getRecentPerformancesSort())
+        );
     }
 
     @Transactional
     public void addPerformanceArtists(PerformanceType performanceType, long festivalId,
-                                      List<PerformanceArtist> performanceArtists) {
-        Performance performance = performanceRepository.findPerformanceByTypeAndTypeId(performanceType, festivalId)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
+        List<PerformanceArtist> performanceArtists) {
+        Performance performance = performanceRepository.findPerformanceByTypeAndTypeId(
+                performanceType, festivalId)
+            .orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+            );
 
         performance.addArtists(performanceArtists);
     }
@@ -120,14 +131,14 @@ public class PerformanceService {
     @Transactional
     public Performance getUpcomingPerformanceByUserId(final Long userId) {
         return performanceRepository.upcomingPerformanceByUserId(userId)
-                .orElse(null);
+            .orElse(null);
     }
 
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getAllPerformances() {
         return performanceRepository.findAll().stream()
-                .map(PerformanceDTO::from)
-                .toList();
+            .map(PerformanceDTO::from)
+            .toList();
     }
 
     @Deprecated
@@ -144,26 +155,27 @@ public class PerformanceService {
     @Transactional(readOnly = true)
     public PerformanceDTO getPerformance(long performanceId) {
         Performance performance = performanceRepository.findPerformanceByIdAndEndAtGreaterThanEqual(
-                        performanceId,
-                        LocalDate.now())
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
+                performanceId,
+                LocalDate.now())
+            .orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+            );
 
         return PerformanceDTO.from(performance);
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceDTO> getPerformancesByArtistIdAndType(String artistId, PerformanceType type) {
+    public List<PerformanceDTO> getPerformancesByArtistIdAndType(String artistId,
+        PerformanceType type) {
         if (type == PerformanceType.PERFORMANCE) {
             return performanceRepository.findPerformancesByArtistId(artistId).stream()
-                    .map(PerformanceDTO::from)
-                    .toList();
+                .map(PerformanceDTO::from)
+                .toList();
         }
 
         return performanceRepository.findPerformancesByTypeAndArtistId(type, artistId).stream()
-                .map(PerformanceDTO::from)
-                .toList();
+            .map(PerformanceDTO::from)
+            .toList();
     }
 
     @Transactional(readOnly = true)
@@ -179,53 +191,57 @@ public class PerformanceService {
     @Transactional(readOnly = true)
     public Performance getPerformanceById(long performanceId) {
         return performanceRepository.findById(performanceId)
-                .orElseThrow(
-                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-                );
+            .orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+            );
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceDTO> getUpcomingPerformances(GetUpcomingPerformancesDTO upcomingPerformancesDTO) {
-        List<Pair<PerformanceType, Long>> performancePairs = convertToPairs(upcomingPerformancesDTO);
+    public List<PerformanceDTO> getUpcomingPerformances(
+        GetUpcomingPerformancesDTO upcomingPerformancesDTO) {
+        List<Pair<PerformanceType, Long>> performancePairs = convertToPairs(
+            upcomingPerformancesDTO);
         List<Performance> performances = performanceCriteriaRepository.findPerformancesByTypeAndTypeId(
-                performancePairs);
+            performancePairs);
 
         Map<Pair<PerformanceType, Long>, Performance> performanceMapper = performances.stream()
-                .collect(Collectors.toMap(
-                        performance -> Pair.of(performance.getType(), performance.getTypeId()),
-                        Function.identity()
-                ));
+            .collect(Collectors.toMap(
+                performance -> Pair.of(performance.getType(), performance.getTypeId()),
+                Function.identity()
+            ));
 
         return performancePairs.stream()
-                .map(performanceMapper::get)
-                .filter(Objects::nonNull)
-                .map(PerformanceDTO::from)
-                .toList();
+            .map(performanceMapper::get)
+            .filter(Objects::nonNull)
+            .map(PerformanceDTO::from)
+            .toList();
     }
 
     @Transactional(readOnly = true)
     public Performance getPerformanceByTypeAndTypeId(PerformanceType type, long typeId) {
         return performanceRepository.findPerformanceByTypeAndTypeId(type, typeId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
     public Performance getWithArtistsByTypeAndTypeId(PerformanceType type, long typeId) {
         return performanceRepository.findWithArtistsByTypeAndTypeId(type, typeId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceDTO> getPerformancesByTypeAndTypeIds(PerformanceType type, List<Long> typeIds) {
+    public List<PerformanceDTO> getPerformancesByTypeAndTypeIds(PerformanceType type,
+        List<Long> typeIds) {
         return performanceRepository.findPerformancesByTypeAndTypeIdIn(type, typeIds).stream()
-                .map(PerformanceDTO::from)
-                .toList();
+            .map(PerformanceDTO::from)
+            .toList();
     }
 
-    private List<Pair<PerformanceType, Long>> convertToPairs(GetUpcomingPerformancesDTO upcomingPerformancesDTO) {
+    private List<Pair<PerformanceType, Long>> convertToPairs(
+        GetUpcomingPerformancesDTO upcomingPerformancesDTO) {
         return upcomingPerformancesDTO.upcomingPerformanceDTOs().stream()
-                .map(performanceDTO -> Pair.of(performanceDTO.type(), performanceDTO.typeId()))
-                .toList();
+            .map(performanceDTO -> Pair.of(performanceDTO.type(), performanceDTO.typeId()))
+            .toList();
     }
 
     @Transactional(readOnly = true)
@@ -236,14 +252,15 @@ public class PerformanceService {
     @Transactional(readOnly = true)
     public List<PerformanceDTO> getRandomUpcomingPerformances(int fetchSize) {
         return performanceRepository.findUpcomingPerformancesByRand(fetchSize).stream()
-                .map(PerformanceDTO::from)
-                .toList();
+            .map(PerformanceDTO::from)
+            .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceArtistDTO> getRandomPerformanceArtists(long performanceId, int fetchSize) {
+    public List<PerformanceArtistDTO> getRandomPerformanceArtists(long performanceId,
+        int fetchSize) {
         return performanceRepository.findPerformanceArtistsByRand(performanceId, fetchSize).stream()
-                .map(PerformanceArtistDTO::from)
-                .toList();
+            .map(PerformanceArtistDTO::from)
+            .toList();
     }
 }

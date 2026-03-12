@@ -9,15 +9,28 @@ public record PerformanceReservationDetailDTO(
         long typeId,
         PerformanceType type,
         String title,
-        LocalDateTime reserveAt
+        LocalDateTime reserveAt,
+        boolean isFavorite
 ) {
-    public static PerformanceReservationDetailDTO from(PerformanceTicketDTO performanceTicketDTO) {
+    public static PerformanceReservationDetailDTO of(PerformanceTicketDTO performanceTicketDTO, boolean isFavorite) {
         return new PerformanceReservationDetailDTO(
                 performanceTicketDTO.index(),
                 performanceTicketDTO.typeId(),
                 performanceTicketDTO.type(),
                 performanceTicketDTO.title(),
-                performanceTicketDTO.reserveAt()
+                performanceTicketDTO.reserveAt(),
+                isFavorite
+        );
+    }
+
+    public PerformanceReservationDetailDTO withIndex(int newIndex) {
+        return new PerformanceReservationDetailDTO(
+                newIndex,
+                typeId,
+                type,
+                title,
+                reserveAt,
+                isFavorite
         );
     }
 }

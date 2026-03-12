@@ -13,7 +13,8 @@ public record RecentPerformanceResponse(
         String title,
         String area,
         String startAt,
-        String posterUrl
+        String posterUrl,
+        boolean isFavorite
 ) {
     public static RecentPerformanceResponse of(final RecentPerformanceDTO recentPerformanceDTO,
                                                final S3FileHandler s3FileHandler) {
@@ -27,7 +28,8 @@ public record RecentPerformanceResponse(
                 recentPerformanceDTO.area(),
                 DateConvertor.convertToDefaultFormat(recentPerformanceDTO.startAt()),
                 s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER),
-                        recentPerformanceDTO.posterPath()).toString()
+                        recentPerformanceDTO.posterPath()).toString(),
+                recentPerformanceDTO.isFavorite()
         );
     }
 }

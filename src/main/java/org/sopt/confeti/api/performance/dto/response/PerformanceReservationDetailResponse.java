@@ -9,16 +9,17 @@ public record PerformanceReservationDetailResponse(
         long typeId,
         PerformanceType type,
         String title,
-        String reserveAt
+        String reserveAt,
+        boolean isFavorite
 ) {
     public static PerformanceReservationDetailResponse from(PerformanceReservationDetailDTO performanceReservation) {
-
         return new PerformanceReservationDetailResponse(
                 performanceReservation.index(),
                 performanceReservation.typeId(),
                 performanceReservation.type(),
                 performanceReservation.title(),
-                DateConvertor.convertToDefaultFormat(performanceReservation.reserveAt())
+                DateConvertor.convertToDefaultFormat(performanceReservation.reserveAt()),
+                performanceReservation.isFavorite()
         );
     }
 }

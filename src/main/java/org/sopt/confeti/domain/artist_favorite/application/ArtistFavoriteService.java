@@ -8,19 +8,23 @@ import lombok.AllArgsConstructor;
 import org.sopt.confeti.domain.artist_favorite.ArtistFavorite;
 import org.sopt.confeti.domain.artist_favorite.infra.repository.ArtistFavoriteRepository;
 import org.sopt.confeti.domain.user.User;
+import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.resolver.music_api.MusicAPIResolver;
+import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
 public class ArtistFavoriteService {
-    ArtistFavoriteRepository artistFavoriteRepository;
+
     private final MusicAPIResolver musicAPIResolver;
+    ArtistFavoriteRepository artistFavoriteRepository;
 
     @Transactional(readOnly = true)
     public List<ArtistFavorite> getFavoriteArtistsPreview(Long userId) {
-        List<ArtistFavorite> artistList = artistFavoriteRepository.findTop4ByUserIdOrderByRand(userId);
+        List<ArtistFavorite> artistList = artistFavoriteRepository.findTop4ByUserIdOrderByRand(
+            userId);
         musicAPIResolver.load(artistList);
 
         return artistList;
@@ -34,15 +38,15 @@ public class ArtistFavoriteService {
     @Transactional
     public void addFavorite(final User user, final String artistId) {
         artistFavoriteRepository.save(
-                ArtistFavorite.create(user, artistId)
+            ArtistFavorite.create(user, artistId)
         );
     }
 
     @Transactional
     public void addFavorites(final User user, final Set<String> artistIds) {
         Set<ArtistFavorite> artistFavorites = artistIds.stream()
-                .map(artistId -> ArtistFavorite.create(user, artistId))
-                .collect(Collectors.toSet());
+            .map(artistId -> ArtistFavorite.create(user, artistId))
+            .collect(Collectors.toSet());
 
         artistFavoriteRepository.saveAll(artistFavorites);
     }
@@ -57,14 +61,18 @@ public class ArtistFavoriteService {
         return artistFavoriteRepository.existsByUserId(userId);
     }
 
-    @Transactional(readOnly = true)
-    public List<ArtistFavorite> getArtistIdsByUserId(final long userId) {
-        return artistFavoriteRepository.findArtistFavoritesByUserId(userId);
+    @ReadOnlyTransactional
+    public List<String> getArtistIdsByUserId(final long userId) {
+        return artistFavoriteRepository.findArtistFavoritesByUserId(userId).stream()
+            .map(ArtistFavorite::getArtist)
+            .map(ConfetiArtist::getId)
+            .toList();
     }
 
     @Transactional(readOnly = true)
     public List<ArtistFavorite> getFavoriteArtists(Long userId, String sortBy) {
-        List<ArtistFavorite> artistList = artistFavoriteRepository.findArtistFavoritesByUserId(userId);
+        List<ArtistFavorite> artistList = artistFavoriteRepository.findArtistFavoritesByUserId(
+            userId);
         musicAPIResolver.load(artistList);
 
         if ("createdAt".equalsIgnoreCase(sortBy)) {

@@ -3,6 +3,7 @@ package org.sopt.confeti.domain.view.performance.infra.repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.global.common.constant.PerformanceType;
@@ -112,6 +113,13 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     Optional<Performance> getPerformanceByUserFavorites(final @Param("userId") Long userId);
 
     List<Performance> findRecentPerformancesByEndAtGreaterThanEqual(LocalDate now, PageRequest pageRequest);
+
+    @Query("SELECT p FROM Performance p WHERE p.endAt >= :date AND p.id NOT IN :excludedIds")
+    List<Performance> findRecentPerformancesExcluding(
+            @Param("excludedIds") Set<Long> excludedIds,
+            @Param("date") LocalDate date,
+            PageRequest pageRequest
+    );
 
     List<Performance> findByEndAtGreaterThanEqual(LocalDate now);
 
