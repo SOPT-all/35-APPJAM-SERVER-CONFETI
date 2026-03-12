@@ -46,8 +46,8 @@ public class RecentPerformanceContext {
         }
     }
 
-    public Set<Long> getExcludedPerformanceIds() {
-        return addedPerformanceIds.isEmpty() ? Set.of(-1L) : addedPerformanceIds;
+    public List<Long> getExcludedPerformanceIds() {
+        return addedPerformanceIds.isEmpty() ? List.of(-1L) : List.copyOf(addedPerformanceIds);
     }
 
     public RecentPerformancesDTO build() {

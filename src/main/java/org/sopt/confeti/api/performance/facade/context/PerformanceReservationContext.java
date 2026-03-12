@@ -66,15 +66,14 @@ public class PerformanceReservationContext {
     }
 
     public PerformanceReservationDTO build() {
-        List<PerformanceReservationDetailDTO> performancesWithIndex = new ArrayList<>();
-        for (int i = 0; i < performances.size(); i++) {
-            performancesWithIndex.add(performances.get(i).withIndex(i + 1));
-        }
+        List<PerformanceReservationDetailDTO> sorted = performances.stream()
+            .sorted(Comparator.comparing(PerformanceReservationDetailDTO::reserveAt))
+            .toList();
 
-        return new PerformanceReservationDTO(
-            performancesWithIndex.stream()
-                .sorted(Comparator.comparing(PerformanceReservationDetailDTO::reserveAt))
-                .toList()
-        );
+        List<PerformanceReservationDetailDTO> result = new ArrayList<>();
+        for (int i = 0; i < sorted.size(); i++) {
+            result.add(sorted.get(i).withIndex(i + 1));
+        }
+        return new PerformanceReservationDTO(result);
     }
 }

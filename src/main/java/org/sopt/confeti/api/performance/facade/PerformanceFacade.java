@@ -67,7 +67,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 @Facade
 public class PerformanceFacade {
 
-    private static final int RECENT_PERFORMANCES_SIZE = 7;
     private static final int RECOMMEND_SONG_SIZE = 3;
     private static final int RECOMMEND_SONG_FETCH_SIZE = 20;
     private final ConcertService concertService;
