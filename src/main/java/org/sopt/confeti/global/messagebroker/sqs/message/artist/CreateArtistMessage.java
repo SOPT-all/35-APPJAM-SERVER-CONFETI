@@ -1,6 +1,6 @@
 package org.sopt.confeti.global.messagebroker.sqs.message.artist;
 
-import org.sopt.confeti.domain.music.artist.application.dto.request.CreateArtistDTO;
+import org.sopt.confeti.domain.music.artist.application.dto.request.CreateArtistCommand;
 import org.sopt.confeti.global.messagebroker.message.CreateMessage;
 
 public record CreateArtistMessage(
@@ -9,8 +9,8 @@ public record CreateArtistMessage(
     String artworkUrl
 ) implements CreateMessage {
 
-    public CreateArtistDTO toCreateDTO() {
-        return CreateArtistDTO.builder()
+    public CreateArtistCommand toCreateDTO() {
+        return CreateArtistCommand.builder()
             .artistId(artistId)
             .name(name)
             .artworkUrl(artworkUrl)

@@ -4,7 +4,7 @@ import lombok.Builder;
 import org.sopt.confeti.domain.music.artist.Artist;
 
 @Builder
-public record CreateArtistDTO(
+public record CreateArtistCommand(
     String artistId,
     String name,
     String artworkUrl

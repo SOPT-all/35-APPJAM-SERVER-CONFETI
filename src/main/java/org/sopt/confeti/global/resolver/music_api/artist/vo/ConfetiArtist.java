@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.sopt.confeti.domain.music.artist.application.dto.request.CreateArtistCommand;
 import org.sopt.confeti.global.annotation.RedisSerializable;
 import org.sopt.confeti.global.common.constant.ArtistConstant;
 import org.sopt.confeti.global.util.music.dto.artist.AppleMusicArtistArtworkResponse;
@@ -70,6 +71,14 @@ public class ConfetiArtist {
     public static ConfetiArtist of(final String artistId, final String name,
         final String profileUrl) {
         return new ConfetiArtist(artistId, name, profileUrl);
+    }
+
+    public CreateArtistCommand toCommand() {
+        return CreateArtistCommand.builder()
+            .artistId(id)
+            .name(name)
+            .artworkUrl(profileUrl)
+            .build();
     }
 
     @Override

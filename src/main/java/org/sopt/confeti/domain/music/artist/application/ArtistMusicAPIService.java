@@ -10,12 +10,14 @@ import org.sopt.confeti.domain.music.application.dto.FetchResult;
 import org.sopt.confeti.domain.music.application.dto.MusicAPICondition;
 import org.sopt.confeti.domain.music.application.dto.PersistResult;
 import org.sopt.confeti.domain.music.artist.Artist;
+import org.sopt.confeti.domain.music.artist.CreateArtistsEvent;
 import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.sopt.confeti.global.common.redis.RedisHandler.RedisData;
 import org.sopt.confeti.global.common.redis.RedisKey;
 import org.sopt.confeti.global.common.redis.RedisKey.KeyInfo;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +27,7 @@ public class ArtistMusicAPIService extends MusicAPIService<ConfetiArtist> {
     private final RedisHandler redisHandler;
     private final ArtistService artistService;
     private final MusicAPIHandler musicAPIHandler;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     protected void cache(List<ConfetiArtist> targetList) {
@@ -40,7 +43,7 @@ public class ArtistMusicAPIService extends MusicAPIService<ConfetiArtist> {
 
     @Override
     protected void persist(List<ConfetiArtist> targetList) {
-        artistService.create(targetList);
+        eventPublisher.publishEvent(new CreateArtistsEvent(targetList));
     }
 
     @Override
