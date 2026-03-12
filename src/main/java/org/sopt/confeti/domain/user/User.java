@@ -50,7 +50,6 @@ public class User {
     @Column(length = 250)
     private String profilePath;
 
-    @Setter
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
     private Role role;
@@ -109,5 +108,11 @@ public class User {
             .role(role)
             .hasTimetableHistory(hasTimetableHistory)
             .build();
+    }
+
+    public void setRole(Role role) {
+        if (this.role != Role.ADMIN) {
+            this.role = role;
+        }
     }
 }

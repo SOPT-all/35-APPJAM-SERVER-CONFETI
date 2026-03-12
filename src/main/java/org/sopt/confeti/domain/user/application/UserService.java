@@ -86,6 +86,14 @@ public class UserService {
     }
 
     @Transactional
+    public User getBySocialIdAndProvider(String socialId, OAuthProvider provider) {
+        return userRepository.findBySocialIdAndProvider(socialId, provider)
+            .orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+            );
+    }
+
+    @Transactional
     public void patchUserInfo(long userId, PatchUserInfoRequest patchUserInfoRequest) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
