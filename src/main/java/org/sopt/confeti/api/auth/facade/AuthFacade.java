@@ -52,7 +52,7 @@ public class AuthFacade {
 
         if (userService.notExist(socialInfo.id(), loginCommand.provider())) {
             CreateUserDTO createUserDTO = loginService.getCreateUserDTO(loginCommand.provider(), socialInfo);
-            if (adminSocialIdService.isAdminSocialId(socialInfo.id())) {
+            if (adminSocialIdService.isAdminSocialId(socialInfo.id(), loginCommand.provider())) {
                 createUserDTO = createUserDTO.withRole(Role.ADMIN);
             }
             userService.create(createUserDTO);
