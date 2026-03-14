@@ -66,14 +66,7 @@ public class UserService {
 
     @Transactional
     public void create(CreateUserDTO createUserDTO) {
-        allUserRepository.save(
-            AuthUser.create(
-                createUserDTO.provider(),
-                createUserDTO.id(),
-                createUserDTO.name(),
-                createUserDTO.profileImgUrl()
-            )
-        );
+        allUserRepository.save(createUserDTO.toAuthUser());
     }
 
     @Transactional(readOnly = true)

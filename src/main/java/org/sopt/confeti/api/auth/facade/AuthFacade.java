@@ -14,8 +14,10 @@ import org.sopt.confeti.auth.Token;
 import org.sopt.confeti.auth.WebhookService;
 import org.sopt.confeti.auth.WithdrawService;
 import org.sopt.confeti.auth.command.LoginCommand;
+import org.sopt.confeti.auth.dto.CreateUserDTO;
 import org.sopt.confeti.auth.dto.LoginResult;
 import org.sopt.confeti.auth.dto.OAuthSocialInfoResult;
+import org.sopt.confeti.domain.admin_social_id.application.AdminSocialIdService;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.user.AuthUser;
 import org.sopt.confeti.domain.user.OAuthProvider;
@@ -37,6 +39,7 @@ public class AuthFacade {
     private final ReissueService reissueService;
     private final LogoutService logoutService;
     private final UserService userService;
+    private final AdminSocialIdService adminSocialIdService;
     private final ArtistFavoriteService artistFavoriteService;
     private final OnboardService onboardService;
     private final WithdrawService withdrawService;
@@ -48,7 +51,11 @@ public class AuthFacade {
         OAuthSocialInfoResult socialInfo = loginService.getSocialInfo(loginCommand);
 
         if (userService.notExist(socialInfo.id(), loginCommand.provider())) {
-            userService.create(loginService.getCreateUserDTO(loginCommand.provider(), socialInfo));
+            CreateUserDTO createUserDTO = loginService.getCreateUserDTO(loginCommand.provider(), socialInfo);
+            if (adminSocialIdService.isAdminSocialId(socialInfo.id(), loginCommand.provider())) {
+                createUserDTO = createUserDTO.withRole(Role.ADMIN);
+            }
+            userService.create(createUserDTO);
             log.debug("Social ID : {}, User Name : {}", socialInfo.id(), socialInfo.name());
             webhookService.sendDiscordNotification();
         }
@@ -80,7 +87,9 @@ public class AuthFacade {
 
         onboardService.validateFavoriteArtistCount(favoriteArtistIds);
         artistFavoriteService.addFavorites(user, favoriteArtistIds);
-        user.setRole(Role.GENERAL);
+        if (user.getRole() != Role.ADMIN) {
+            user.setRole(Role.GENERAL);
+        }
     }
 
     public void flushCachedTopArtists(long userId) {
