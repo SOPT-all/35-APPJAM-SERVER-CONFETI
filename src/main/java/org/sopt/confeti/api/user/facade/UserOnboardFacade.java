@@ -3,7 +3,6 @@ package org.sopt.confeti.api.user.facade;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.user.facade.dto.request.onboard.AddOnboardFavoriteArtistDTO;
@@ -15,6 +14,7 @@ import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardFavorite
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardRelatedArtistsDTO;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
 import org.sopt.confeti.domain.music.application.dto.MusicAPICondition;
+import org.sopt.confeti.domain.music.artist.application.ArtistMusicAPIService;
 import org.sopt.confeti.domain.music.relatedartist.application.RelatedArtistMusicAPIService;
 import org.sopt.confeti.domain.music.relatedartist.application.dto.RelatedArtistInfo;
 import org.sopt.confeti.domain.music.topartist.application.TopArtistMusicAPIService;
@@ -47,6 +47,7 @@ public class UserOnboardFacade {
     private final TopArtistMusicAPIService topArtistMusicAPIService;
     private final RelatedArtistMusicAPIService relatedArtistMusicAPIService;
     private final RedisHandler redisHandler;
+    private final ArtistMusicAPIService artistMusicAPIService;
 
     public UserOnboardRelatedArtistsDTO getArtistsRelatedTerm(String term, int limit) {
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(
@@ -156,8 +157,8 @@ public class UserOnboardFacade {
     ) {
         long userId = UserContext.get().id();
 
-        List<ConfetiArtist> newFavoriteArtists = musicAPIHandler.getArtistsByArtistIds(
-            requestDTO.artistIds());
+        List<ConfetiArtist> newFavoriteArtists = artistMusicAPIService.getList(
+            MusicAPICondition.from(requestDTO.artistIds()));
         UserOnboardCacheDTO cachedArtists = userOnboardService.getCachedOnboardArtists(userId);
         UserOnboardCacheDTO newUserOnboardCacheDTO
             = cachedArtists.withAddFavoriteArtists(newFavoriteArtists);

@@ -1,7 +1,6 @@
 package org.sopt.confeti.api.user.facade;
 
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.facade.dto.response.UpcomingPerformanceDTO;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoriteArtistsDTO;
@@ -16,6 +15,8 @@ import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteServi
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
+import org.sopt.confeti.domain.music.application.dto.MusicAPICondition;
+import org.sopt.confeti.domain.music.artist.application.ArtistMusicAPIService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.domain.view.performance.Performance;
@@ -31,7 +32,6 @@ import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.interceptor.auth.UserContext;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
-import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
@@ -45,8 +45,8 @@ public class UserFavoriteFacade {
     private final ArtistFavoriteService artistFavoriteService;
     private final ConcertFavoriteService concertFavoriteService;
     private final ConcertService concertService;
-    private final MusicAPIHandler musicAPIHandler;
     private final PerformanceService performanceService;
+    private final ArtistMusicAPIService artistMusicAPIService;
 
     @Transactional
     public void addFestivalFavorite(long festivalId) {
@@ -108,8 +108,9 @@ public class UserFavoriteFacade {
     }
 
     private void validateExistArtist(final String artistId) {
-        Optional<ConfetiArtist> artist = musicAPIHandler.findArtistByArtistId(artistId);
-        if (artist.isEmpty()) {
+        List<ConfetiArtist> artists = artistMusicAPIService.getList(
+            MusicAPICondition.from(artistId));
+        if (artists.isEmpty()) {
             throw new NotFoundException(ErrorMessage.NOT_FOUND);
         }
     }
