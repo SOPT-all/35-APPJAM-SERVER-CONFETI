@@ -176,7 +176,8 @@ public class PerformanceFacade {
         if (!context.isFull()) {
             List<Performance> general =
                 performanceService.getRecentPerformancesExcluding(
-                    context.getExcludedPerformanceIds(),
+                    context.getExcludedConcertIds(),
+                    context.getExcludedFestivalIds(),
                     context.remainingSlots()
                 );
             context.addGeneralPerformances(general);

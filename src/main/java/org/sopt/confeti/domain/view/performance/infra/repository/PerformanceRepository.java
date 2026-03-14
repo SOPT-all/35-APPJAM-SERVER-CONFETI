@@ -113,10 +113,15 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
 
     List<Performance> findRecentPerformancesByEndAtGreaterThanEqual(LocalDate now, PageRequest pageRequest);
 
-    @Query("SELECT p FROM Performance p WHERE p.endAt >= :date AND p.id NOT IN :excludedIds")
+    @Query("SELECT p FROM Performance p WHERE p.endAt >= :date " +
+            "AND NOT (p.type = :concertType AND p.typeId IN :excludedConcertIds) " +
+            "AND NOT (p.type = :festivalType AND p.typeId IN :excludedFestivalIds)")
     List<Performance> findRecentPerformancesExcluding(
-            @Param("excludedIds") List<Long> excludedIds,
+            @Param("excludedConcertIds") List<Long> excludedConcertIds,
+            @Param("excludedFestivalIds") List<Long> excludedFestivalIds,
             @Param("date") LocalDate date,
+            @Param("concertType") PerformanceType concertType,
+            @Param("festivalType") PerformanceType festivalType,
             PageRequest pageRequest
     );
 

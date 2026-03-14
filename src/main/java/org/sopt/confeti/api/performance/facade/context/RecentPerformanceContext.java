@@ -8,13 +8,14 @@ import java.util.Set;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public class RecentPerformanceContext {
 
     public static final int MAX_SIZE = 7;
 
     private final List<RecentPerformanceDTO> performances = new ArrayList<>();
-    private final Set<Long> addedPerformanceIds = new HashSet<>();
+    private final Set<PerformanceKey> addedPerformanceKeys = new HashSet<>();
 
     public boolean isFull() {
         return performances.size() >= MAX_SIZE;
@@ -29,7 +30,8 @@ public class RecentPerformanceContext {
             if (isFull()) {
                 break;
             }
-            if (addedPerformanceIds.add(performance.getId())) {
+            PerformanceKey key = new PerformanceKey(performance.getType(), performance.getTypeId());
+            if (addedPerformanceKeys.add(key)) {
                 performances.add(RecentPerformanceDTO.of(performance, true));
             }
         }
@@ -40,14 +42,27 @@ public class RecentPerformanceContext {
             if (isFull()) {
                 break;
             }
-            if (addedPerformanceIds.add(performance.getId())) {
+            PerformanceKey key = new PerformanceKey(performance.getType(), performance.getTypeId());
+            if (addedPerformanceKeys.add(key)) {
                 performances.add(RecentPerformanceDTO.of(performance, false));
             }
         }
     }
 
-    public List<Long> getExcludedPerformanceIds() {
-        return addedPerformanceIds.isEmpty() ? List.of(-1L) : List.copyOf(addedPerformanceIds);
+    public List<Long> getExcludedConcertIds() {
+        List<Long> ids = addedPerformanceKeys.stream()
+            .filter(key -> key.type() == PerformanceType.CONCERT)
+            .map(PerformanceKey::id)
+            .toList();
+        return ids.isEmpty() ? List.of(-1L) : ids;
+    }
+
+    public List<Long> getExcludedFestivalIds() {
+        List<Long> ids = addedPerformanceKeys.stream()
+            .filter(key -> key.type() == PerformanceType.FESTIVAL)
+            .map(PerformanceKey::id)
+            .toList();
+        return ids.isEmpty() ? List.of(-1L) : ids;
     }
 
     public RecentPerformancesDTO build() {

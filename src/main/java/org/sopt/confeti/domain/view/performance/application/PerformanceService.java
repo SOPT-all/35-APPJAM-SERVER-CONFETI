@@ -106,11 +106,16 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<Performance> getRecentPerformancesExcluding(final List<Long> excludedIds,
+    public List<Performance> getRecentPerformancesExcluding(
+        final List<Long> excludedConcertIds,
+        final List<Long> excludedFestivalIds,
         final int size) {
         return performanceRepository.findRecentPerformancesExcluding(
-            excludedIds,
+            excludedConcertIds,
+            excludedFestivalIds,
             LocalDate.now(),
+            PerformanceType.CONCERT,
+            PerformanceType.FESTIVAL,
             getPageRequest(size, getRecentPerformancesSort())
         );
     }

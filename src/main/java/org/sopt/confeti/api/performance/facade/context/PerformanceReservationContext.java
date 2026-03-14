@@ -15,7 +15,7 @@ public class PerformanceReservationContext {
     public static final int MAX_SIZE = 5;
 
     private final List<PerformanceReservationDetailDTO> performances = new ArrayList<>();
-    private final Set<String> addedKeys = new HashSet<>();
+    private final Set<PerformanceKey> addedKeys = new HashSet<>();
 
     public boolean isFull() {
         return performances.size() >= MAX_SIZE;
@@ -30,7 +30,7 @@ public class PerformanceReservationContext {
             if (isFull()) {
                 break;
             }
-            String key = ticket.type().name() + "_" + ticket.typeId();
+            PerformanceKey key = new PerformanceKey(ticket.type(), ticket.typeId());
             if (addedKeys.add(key)) {
                 performances.add(PerformanceReservationDetailDTO.of(ticket, true));
             }
@@ -42,7 +42,7 @@ public class PerformanceReservationContext {
             if (isFull()) {
                 break;
             }
-            String key = ticket.type().name() + "_" + ticket.typeId();
+            PerformanceKey key = new PerformanceKey(ticket.type(), ticket.typeId());
             if (addedKeys.add(key)) {
                 performances.add(PerformanceReservationDetailDTO.of(ticket, false));
             }
@@ -51,16 +51,16 @@ public class PerformanceReservationContext {
 
     public List<Long> getExcludedConcertIds() {
         List<Long> ids = addedKeys.stream()
-            .filter(key -> key.startsWith(PerformanceType.CONCERT.name() + "_"))
-            .map(key -> Long.parseLong(key.substring(key.indexOf("_") + 1)))
+            .filter(key -> key.type() == PerformanceType.CONCERT)
+            .map(PerformanceKey::id)
             .toList();
         return ids.isEmpty() ? List.of(-1L) : ids;
     }
 
     public List<Long> getExcludedFestivalIds() {
         List<Long> ids = addedKeys.stream()
-            .filter(key -> key.startsWith(PerformanceType.FESTIVAL.name() + "_"))
-            .map(key -> Long.parseLong(key.substring(key.indexOf("_") + 1)))
+            .filter(key -> key.type() == PerformanceType.FESTIVAL)
+            .map(PerformanceKey::id)
             .toList();
         return ids.isEmpty() ? List.of(-1L) : ids;
     }
