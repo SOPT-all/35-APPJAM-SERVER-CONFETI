@@ -2,20 +2,19 @@ package org.sopt.confeti.domain.music.relatedartist.application;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.music.application.MusicAPIService;
 import org.sopt.confeti.domain.music.application.dto.CacheResult;
 import org.sopt.confeti.domain.music.application.dto.FetchResult;
 import org.sopt.confeti.domain.music.application.dto.MusicAPICondition;
 import org.sopt.confeti.domain.music.application.dto.PersistResult;
-import org.sopt.confeti.domain.music.artist.application.ArtistService;
+import org.sopt.confeti.domain.music.relatedartist.CreateRelatedArtistsEvent;
 import org.sopt.confeti.domain.music.relatedartist.application.dto.RelatedArtistInfo;
 import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.sopt.confeti.global.common.redis.RedisKey;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
-import org.sopt.confeti.global.transaction.Tx;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,8 +25,8 @@ public class RelatedArtistMusicAPIService extends MusicAPIService<RelatedArtistI
 
     private final RedisHandler redisHandler;
     private final RelatedArtistService relatedArtistService;
-    private final ArtistService artistService;
     private final MusicAPIHandler musicAPIHandler;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     protected void cache(List<RelatedArtistInfo> targetList) {
@@ -40,20 +39,14 @@ public class RelatedArtistMusicAPIService extends MusicAPIService<RelatedArtistI
         if (targetList.isEmpty()) {
             return;
         }
-        String artistId = targetList.getFirst().artist().getId();
+
+        ConfetiArtist artist = targetList.getFirst().artist();
 
         List<ConfetiArtist> relatedArtists = targetList.stream()
             .map(RelatedArtistInfo::relatedArtist)
             .toList();
 
-        Set<String> relatedArtistIds = relatedArtists.stream()
-            .map(ConfetiArtist::getId)
-            .collect(Collectors.toSet());
-
-        Tx.masterTx(() -> {
-            artistService.create(relatedArtists);
-            relatedArtistService.createRelatedArtists(artistId, relatedArtistIds);
-        });
+        eventPublisher.publishEvent(new CreateRelatedArtistsEvent(artist, relatedArtists));
     }
 
     @Override

@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.music.artist.Artist;
-import org.sopt.confeti.domain.music.artist.application.dto.request.CreateArtistDTO;
+import org.sopt.confeti.domain.music.artist.application.dto.request.CreateArtistCommand;
 import org.sopt.confeti.domain.music.artist.infra.repository.ArtistRepository;
 import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
@@ -25,8 +25,8 @@ public class ArtistService {
     }
 
     @Transactional
-    public String create(CreateArtistDTO createArtistDTO) {
-        Artist artist = createArtistDTO.toArtist();
+    public String create(CreateArtistCommand createArtistCommand) {
+        Artist artist = createArtistCommand.toArtist();
         return artistRepository.save(artist).getId();
     }
 

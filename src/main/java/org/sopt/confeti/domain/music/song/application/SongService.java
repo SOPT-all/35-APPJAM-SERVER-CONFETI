@@ -2,6 +2,7 @@ package org.sopt.confeti.domain.music.song.application;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.domain.music.song.Song;
 import org.sopt.confeti.domain.music.song.application.dto.request.CreateSongDTO;
@@ -34,10 +35,19 @@ public class SongService {
 
     @Transactional
     public void create(List<ConfetiSong> confetiSongs) {
-        List<Song> songs = confetiSongs.stream()
+        Set<String> requestedIds = confetiSongs.stream()
+            .map(ConfetiSong::getId)
+            .collect(Collectors.toSet());
+
+        Set<String> existingIds = songRepository.findAllById(requestedIds).stream()
+            .map(Song::getId)
+            .collect(Collectors.toSet());
+
+        List<Song> newSongs = confetiSongs.stream()
+            .filter(song -> !existingIds.contains(song.getId()))
             .map(ConfetiSong::toSong)
             .toList();
 
-        songRepository.saveAll(songs);
+        songRepository.saveAll(newSongs);
     }
 }

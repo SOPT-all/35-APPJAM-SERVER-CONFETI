@@ -40,4 +40,17 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
+
+    @Bean(ExecutorName.MUSIC_API_EVENT_EXECUTOR)
+    public Executor musicApiEventExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(30);
+        executor.setThreadNamePrefix("music-api-event-");
+        executor.setTaskDecorator(compositeTaskDecorator);
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.initialize();
+        return executor;
+    }
 }
