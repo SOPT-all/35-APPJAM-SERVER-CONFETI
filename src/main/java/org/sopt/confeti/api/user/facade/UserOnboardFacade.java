@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.user.facade.dto.request.onboard.AddOnboardFavoriteArtistDTO;
 import org.sopt.confeti.api.user.facade.dto.request.onboard.PatchOnboardFavoriteArtistsDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.GetOnboardStatusDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardCacheDTO;
@@ -28,12 +27,9 @@ import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.sopt.confeti.global.common.redis.RedisKey;
 import org.sopt.confeti.global.exception.BadRequestException;
-import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.interceptor.auth.UserContext;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
-import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSong;
-import org.sopt.confeti.global.resolver.music_api.song.vo.ConfetiSongArtist;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserOnboardFacade {
 
-    private static final int FIXED_RELATED_ARTISTS_FETCH_SIZE = 20;
     private static final int FIXED_SEARCH_ARTISTS_FETCH_SIZE = 25;
 
     private final MusicAPIHandler musicAPIHandler;
@@ -62,23 +57,6 @@ public class UserOnboardFacade {
             cachedArtists.favoriteArtistIds(), limit);
 
         return UserOnboardRelatedArtistsDTO.from(filteredArtists);
-    }
-
-    @Deprecated
-    public UserOnboardTopArtistsDTO getTopArtists(int limit) {
-        List<ConfetiSong> topSongs = musicAPIHandler.getTopSongs(limit);
-        Set<String> topSongIds = topSongs.stream()
-            .map(ConfetiSong::getId)
-            .collect(Collectors.toSet());
-
-        List<ConfetiSong> topSongsWithArtists = musicAPIHandler.getSongsBySongIds(topSongIds);
-        Set<String> topArtistIds = topSongsWithArtists.stream()
-            .flatMap(song -> song.getArtists().stream())
-            .map(ConfetiSongArtist::getId)
-            .collect(Collectors.toSet());
-
-        List<ConfetiArtist> topArtists = musicAPIHandler.getArtistsByArtistIds(topArtistIds);
-        return UserOnboardTopArtistsDTO.from(topArtists);
     }
 
     public UserOnboardArtistsDTO getOnboardArtists(
@@ -118,32 +96,6 @@ public class UserOnboardFacade {
         return UserOnboardArtistsDTO.from(filteredRelatedArtists);
     }
 
-    @Deprecated
-    public UserOnboardRelatedArtistsDTO getRelatedArtists(
-        long userId,
-        String requestArtistId,
-        int limit
-    ) {
-        UserOnboardCacheDTO cachedOnboardArtists = userOnboardService.getCachedOnboardArtists(
-            userId);
-        List<ConfetiArtist> relatedArtists = musicAPIHandler.getRelatedArtists(requestArtistId,
-            FIXED_RELATED_ARTISTS_FETCH_SIZE);
-        List<ConfetiArtist> filteredRelatedArtists = getFilteredArtists(
-            relatedArtists, cachedOnboardArtists.favoriteArtistIds(), limit);
-
-        return UserOnboardRelatedArtistsDTO.from(filteredRelatedArtists);
-    }
-
-    @Deprecated
-    public void cacheTopArtistsToUser(UserOnboardTopArtistsDTO topArtists) {
-        long userId = UserContext.get().id();
-
-        if (!userService.existsById(userId)) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND);
-        }
-
-        userOnboardService.cacheOnboardArtists(userId, UserOnboardCacheDTO.from(topArtists));
-    }
 
     public void cacheExposedArtist(String artistId) {
         long userId = UserContext.get().id();

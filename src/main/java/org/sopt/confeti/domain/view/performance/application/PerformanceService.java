@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -145,12 +144,6 @@ public class PerformanceService {
             .toList();
     }
 
-    @Deprecated
-    @Transactional(readOnly = true)
-    public List<Performance> getRecommendPerformances() {
-        return performanceRepository.findTop5ByRand();
-    }
-
     @Transactional(readOnly = true)
     public List<Performance> getRecommendPerformances(int limit) {
         return performanceRepository.findUpcomingPerformancesByRand(limit);
@@ -180,16 +173,6 @@ public class PerformanceService {
         return performanceRepository.findPerformancesByTypeAndArtistId(type, artistId).stream()
             .map(PerformanceDTO::from)
             .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Performance> getPerformanceByRand() {
-        return performanceRepository.findPerformanceByRand();
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Performance> getPerformanceByUserFavorites(final Long userId) {
-        return performanceRepository.getPerformanceByUserFavorites(userId);
     }
 
     @Transactional(readOnly = true)

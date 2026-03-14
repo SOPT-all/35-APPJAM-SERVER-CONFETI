@@ -8,8 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistDTO;
-import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
 import org.sopt.confeti.global.annotation.RedisSerializable;
 import org.sopt.confeti.global.resolver.music_api.artist.vo.ConfetiArtist;
 
@@ -33,14 +31,6 @@ public record UserOnboardCacheDTO(
 
     public static UserOnboardCacheDTO createWithExposedArtistIds(Set<String> exposedArtistIds) {
         return new UserOnboardCacheDTO(Collections.emptySet(), exposedArtistIds);
-    }
-
-    public static UserOnboardCacheDTO from(UserOnboardTopArtistsDTO topArtists) {
-        return createWithExposedArtistIds(
-            topArtists.artists().stream()
-                .map(UserOnboardTopArtistDTO::id)
-                .collect(Collectors.toSet())
-        );
     }
 
     public static UserOnboardCacheDTO of(
