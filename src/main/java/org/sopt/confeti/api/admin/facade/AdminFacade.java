@@ -40,7 +40,9 @@ import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
 import org.sopt.confeti.domain.festival_stage.FestivalStage;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
+import org.sopt.confeti.domain.music.application.dto.MusicAPICondition;
 import org.sopt.confeti.domain.music.artist.Artist;
+import org.sopt.confeti.domain.music.artist.application.ArtistMusicAPIService;
 import org.sopt.confeti.domain.music.artist.application.ArtistService;
 import org.sopt.confeti.domain.performancedraft.PerformanceDraft;
 import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftParser;
@@ -87,6 +89,7 @@ public class AdminFacade {
     private final PerformanceService performanceService;
     private final ApplicationEventPublisher eventPublisher;
     private final PerformanceDraftParser performanceDraftParser;
+    private final ArtistMusicAPIService artistMusicAPIService;
 
     public TicketVendorResponse createTicketVendor(CreateTicketVendorRequest request) {
         String logoPath = s3FileHandler.uploadFile(request.logoImage(),
@@ -136,7 +139,8 @@ public class AdminFacade {
     }
 
     public AdminConcertListInfo getAdminConcerts(String keyword) {
-        List<ConcertPreviewInfo> concerts = Tx.readOnlyTx(() -> concertService.getAdminConcertPreviews(keyword));
+        List<ConcertPreviewInfo> concerts = Tx.readOnlyTx(
+            () -> concertService.getAdminConcertPreviews(keyword));
         LocalDate today = LocalDate.now();
 
         Map<Boolean, List<ConcertPreviewInfo>> partitioned = concerts.stream()
@@ -370,7 +374,8 @@ public class AdminFacade {
             .collect(Collectors.toSet());
 
         if (!missingIds.isEmpty()) {
-            List<ConfetiArtist> fetchedArtists = musicAPIHandler.getArtistsByArtistIds(missingIds);
+            List<ConfetiArtist> fetchedArtists = artistMusicAPIService.getList(
+                MusicAPICondition.from(missingIds));
 
             Set<String> fetchedIds = fetchedArtists.stream()
                 .map(ConfetiArtist::getId)

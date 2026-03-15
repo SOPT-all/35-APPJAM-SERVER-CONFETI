@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.search.facade.dto.response.PopularTermsDTO;
 import org.sopt.confeti.api.search.facade.dto.response.SearchResultDTO;
 import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService;
@@ -17,6 +18,8 @@ import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteServi
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.elastic_search.application.SearchTermService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
+import org.sopt.confeti.domain.music.application.dto.MusicAPICondition;
+import org.sopt.confeti.domain.music.artist.application.ArtistMusicAPIService;
 import org.sopt.confeti.domain.music.song.application.SongMusicAPIService;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceArtistDTO;
@@ -33,6 +36,7 @@ import org.sopt.confeti.global.util.analyzer.SearchTermAnalyzer;
 import org.sopt.confeti.global.util.analyzer.dto.PerformanceSearchTermAnalyzeResult;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 
+@Slf4j
 @Facade
 @RequiredArgsConstructor
 public class SearchFacade {
@@ -49,6 +53,7 @@ public class SearchFacade {
     private final ConcertFavoriteService concertFavoriteService;
     private final PerformanceSearchService performanceSearchService;
     private final SongMusicAPIService songMusicAPIService;
+    private final ArtistMusicAPIService artistMusicAPIService;
 
     @ReadOnlyTransactional
     public SearchResultDTO getHomeSearchResultWithAid(String aid) {
@@ -166,10 +171,14 @@ public class SearchFacade {
     }
 
     private ConfetiArtist getArtistById(String aid) {
-        return musicAPIHandler.findArtistByArtistId(aid)
-            .orElseThrow(
-                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
-            );
+        List<ConfetiArtist> artists = artistMusicAPIService.getList(MusicAPICondition.from(aid));
+
+        if (artists.isEmpty()) {
+            log.warn("SearchFacade.getArtistById : 아티스트 아이디에 해당하는 아티스트가 존재하지 않습니다. 아이디 : {}", aid);
+            throw new NotFoundException(ErrorMessage.NOT_FOUND);
+        }
+
+        return artists.getFirst();
     }
 
     private void getPerformanceFavorites(Map<Long, Boolean> performanceFavorites,

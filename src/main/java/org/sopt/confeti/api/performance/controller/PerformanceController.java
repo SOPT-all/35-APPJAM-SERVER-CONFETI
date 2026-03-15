@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.performance.controller.docs.PerformanceControllerDocs;
 import org.sopt.confeti.api.performance.dto.request.GetUpcomingPerformanceRequest;
@@ -17,8 +16,6 @@ import org.sopt.confeti.api.performance.dto.response.PerformanceIdsResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformanceReservationResponse;
 import org.sopt.confeti.api.performance.dto.response.PerformancesRecommendResponse;
 import org.sopt.confeti.api.performance.dto.response.RecentPerformancesResponse;
-import org.sopt.confeti.api.performance.dto.response.RecommendMusicsPerformanceResponse_deprecated;
-import org.sopt.confeti.api.performance.dto.response.RecommendMusicsResponse_deprecated;
 import org.sopt.confeti.api.performance.dto.response.RecommendPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.SearchACPerformancesResponse;
 import org.sopt.confeti.api.performance.dto.response.UpcomingPerformancesResponse;
@@ -33,8 +30,6 @@ import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservati
 import org.sopt.confeti.api.performance.facade.dto.response.PerformancesRecommendDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsDTO;
-import org.sopt.confeti.api.performance.facade.dto.response.RecommendSongsPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.UpcomingPerformancesDTO;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -111,15 +106,6 @@ public class PerformanceController implements PerformanceControllerDocs {
             RecentPerformancesResponse.of(recentPerformances, s3FileHandler));
     }
 
-    @GetMapping("/recommend")
-    @Deprecated
-    public ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances_deprecated(
-    ) {
-        RecommendPerformancesDTO recommendPerformances = performanceFacade.getRecommendPerformances();
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            RecommendPerformancesResponse.of(recommendPerformances, s3FileHandler));
-    }
-
     @ApiVersion("2")
     @GetMapping("/recommend")
     public ResponseEntity<BaseResponse<RecommendPerformancesResponse>> getRecommendPerformances(
@@ -155,28 +141,6 @@ public class PerformanceController implements PerformanceControllerDocs {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             PerformancesRecommendResponse.of(performancesRecommendDTO, s3FileHandler)
         );
-    }
-
-    @Deprecated
-    @GetMapping("/recommend/performance")
-    public ResponseEntity<BaseResponse<RecommendMusicsPerformanceResponse_deprecated>> getRecommendPerformanceId(
-    ) {
-        Optional<RecommendSongsPerformanceDTO> recommendMusicsDTO = performanceFacade.getRecommendPerformanceId();
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            recommendMusicsDTO.map(RecommendMusicsPerformanceResponse_deprecated::from).orElse(null)
-        );
-    }
-
-    @Deprecated
-    @GetMapping("/recommend/musics")
-    public ResponseEntity<BaseResponse<RecommendMusicsResponse_deprecated>> getRecommendMusics(
-        @RequestParam Long performanceId,
-        @RequestParam(required = false) List<String> musicIds
-    ) {
-        RecommendSongsDTO recommendSongsDTO = performanceFacade.getNewRecommendSongs(
-            performanceId, musicIds);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            RecommendMusicsResponse_deprecated.from(recommendSongsDTO));
     }
 
     @Permission(role = {Role.GENERAL})

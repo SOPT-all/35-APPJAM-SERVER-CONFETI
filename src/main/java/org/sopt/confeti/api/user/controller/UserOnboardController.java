@@ -7,13 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.docs.UserOnboardControllerDocs;
 import org.sopt.confeti.api.user.dto.request.AddOnboardFavoriteArtistRequest;
 import org.sopt.confeti.api.user.dto.request.PatchOnboardFavoriteArtistsRequest;
-import org.sopt.confeti.api.user.dto.response.UserOnboardTopArtistsResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.GetOnboardStatusResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardArtistsResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardFavoriteArtistsResponse;
 import org.sopt.confeti.api.user.dto.response.onboard.UserOnboardRelatedArtistsResponse;
 import org.sopt.confeti.api.user.facade.UserOnboardFacade;
-import org.sopt.confeti.api.user.facade.dto.response.UserOnboardTopArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.GetOnboardStatusDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardArtistsDTO;
 import org.sopt.confeti.api.user.facade.dto.response.onboard.UserOnboardFavoriteArtistsDTO;
@@ -43,20 +41,6 @@ public class UserOnboardController implements UserOnboardControllerDocs {
 
     private final UserOnboardFacade userOnboardFacade;
 
-    @Deprecated
-    @Onboarding
-    @GetMapping("/artists/{artistId}/related")
-    public ResponseEntity<BaseResponse<UserOnboardRelatedArtistsResponse>> getRelatedArtists(
-        @PathVariable String artistId,
-        @RequestParam(defaultValue = "1") @Min(1) @Max(30) Integer limit
-    ) {
-        UserOnboardRelatedArtistsDTO relatedArtists = userOnboardFacade.getRelatedArtists(
-            UserContext.get().id(),
-            artistId, limit);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserOnboardRelatedArtistsResponse.from(relatedArtists));
-    }
-
     @Onboarding
     @GetMapping("/artists/search")
     public ResponseEntity<BaseResponse<UserOnboardRelatedArtistsResponse>> getArtistsRelatedTerm(
@@ -80,18 +64,6 @@ public class UserOnboardController implements UserOnboardControllerDocs {
             Optional.ofNullable(targetArtistId));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             UserOnboardArtistsResponse.from(onboardArtists));
-    }
-
-    @Deprecated
-    @Onboarding
-    @GetMapping("/artists")
-    public ResponseEntity<BaseResponse<UserOnboardTopArtistsResponse>> getTopArtists(
-        @RequestParam(required = false, defaultValue = "100") @Min(1) @Max(200) int limit
-    ) {
-        UserOnboardTopArtistsDTO topArtists = userOnboardFacade.getTopArtists(limit);
-        userOnboardFacade.cacheTopArtistsToUser(topArtists);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserOnboardTopArtistsResponse.from(topArtists));
     }
 
     @Onboarding
