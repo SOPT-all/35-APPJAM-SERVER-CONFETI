@@ -57,9 +57,12 @@ import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendor
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorCreateResponseDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
+import org.sopt.confeti.domain.elastic_search.PerformanceDocument;
+import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.common.constant.PerformanceType;
@@ -87,6 +90,7 @@ public class AdminFacade {
     private final PerformanceDraftService performanceDraftService;
     private final ArtistService artistService;
     private final PerformanceService performanceService;
+    private final PerformanceSearchService performanceSearchService;
     private final ApplicationEventPublisher eventPublisher;
     private final PerformanceDraftParser performanceDraftParser;
     private final ArtistMusicAPIService artistMusicAPIService;
@@ -414,6 +418,7 @@ public class AdminFacade {
                 performanceArtists
             );
             performanceService.create(performance);
+            indexPerformanceDocument(performance);
 
             return concertId;
         });
@@ -448,6 +453,7 @@ public class AdminFacade {
                 command.startAt(), command.endAt(), posterPath,
                 performanceArtists
             );
+            indexPerformanceDocument(performance);
 
             return command.concertId();
         });
@@ -480,6 +486,12 @@ public class AdminFacade {
             .map(url -> ConcertReservationUrl.create(
                 url.reservationUrl(), vendorMap.get(url.ticketVendorId())))
             .toList();
+    }
+
+    private void indexPerformanceDocument(Performance performance) {
+        PerformanceDTO performanceDTO = PerformanceDTO.from(performance);
+        PerformanceDocument document = PerformanceDocument.create(performanceDTO);
+        performanceSearchService.save(List.of(document));
     }
 
     private List<PerformanceArtist> buildPerformanceArtists(AdminConcertCommand command) {
@@ -639,6 +651,7 @@ public class AdminFacade {
             Performance performance = Performance.create(
                 festivalId, command, posterPath, performanceArtists);
             performanceService.create(performance);
+            indexPerformanceDocument(performance);
 
             return festivalId;
         });
@@ -672,6 +685,7 @@ public class AdminFacade {
                 command.startAt(), command.endAt(), posterPath,
                 performanceArtists
             );
+            indexPerformanceDocument(performance);
 
             return command.festivalId();
         });
