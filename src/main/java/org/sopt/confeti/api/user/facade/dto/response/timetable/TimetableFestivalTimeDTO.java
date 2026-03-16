@@ -9,6 +9,7 @@ import org.sopt.confeti.domain.time_block.TimeBlock;
 
 public record TimetableFestivalTimeDTO(
     long timeBlockId,
+    String name,
     LocalTime startAt,
     LocalTime endAt,
     boolean isSelected,
@@ -19,6 +20,7 @@ public record TimetableFestivalTimeDTO(
         Map<Long, TimeBlock> timeBlocks) {
         return new TimetableFestivalTimeDTO(
             timeBlocks.get(festivalTime.getId()).getId(),
+            festivalTime.getName(),
             festivalTime.getStartAt(),
             festivalTime.getEndAt(),
             timeBlocks.get(festivalTime.getId()).isSelected(),
