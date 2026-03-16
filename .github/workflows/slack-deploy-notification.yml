@@ -1,0 +1,42 @@
+name: 905 Slack 배포 알림
+run-name: slack-deploy-notification-${{ github.event.workflow_run.head_branch }}-${{ github.run_number }} by @${{ github.actor }}
+
+on:
+  workflow_run:
+    workflows:
+      - "101 DEV confeti-api 배포"
+    types:
+      - completed
+
+jobs:
+  notification:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: slack notification
+        env:
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          ACTOR: ${{ github.event.workflow_run.actor.login }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{
+              "attachments": [
+                {
+                  "color": "#36a64f",
+                  "title": "[confeti-api] Production 배포 성공 🚀",
+                  "fields": [
+                    {
+                      "title": "릴리즈 브랜치",
+                      "value": "'"$BRANCH"'",
+                      "short": true
+                    },
+                    {
+                      "title": "작업자",
+                      "value": "'"$ACTOR"'",
+                      "short": true
+                    }
+                  ]
+                }
+              ]
+            }' ${{ secrets.RELEASE_SLACK_WEBHOOK_URL }}
