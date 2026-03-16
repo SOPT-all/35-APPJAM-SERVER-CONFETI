@@ -346,6 +346,24 @@ public interface AdminControllerDocs {
     );
 
     @Operation(
+        summary = "등록된 콘서트 삭제",
+        description = "어드민 권한으로 등록된 콘서트와 연관 데이터를 삭제합니다."
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<Void>> deleteConcert(
+        @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId
+    );
+
+    @Operation(
         summary = "수정할 페스티벌 단건 조회",
         description = "어드민 권한으로 수정할 페스티벌의 전체 상세 정보를 조회합니다. "
             + "예정된 공연 여부와 관계없이 모든 페스티벌을 조회할 수 있습니다."
@@ -361,6 +379,24 @@ public interface AdminControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<AdminFestivalDetailResponse>> getAdminFestivalDetail(
+        @PathVariable("festivalId") @Min(RequestConstraint.ID) long festivalId
+    );
+
+    @Operation(
+        summary = "등록된 페스티벌 삭제",
+        description = "어드민 권한으로 등록된 페스티벌과 연관 데이터를 삭제합니다."
+    )
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<Void>> deleteFestival(
         @PathVariable("festivalId") @Min(RequestConstraint.ID) long festivalId
     );
 

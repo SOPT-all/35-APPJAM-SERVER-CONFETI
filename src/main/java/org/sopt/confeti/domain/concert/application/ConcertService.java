@@ -85,10 +85,20 @@ public class ConcertService {
     }
 
     @Transactional
+    public void delete(long concertId) {
+        Concert concert = findById(concertId);
+        concertRepository.delete(concert);
+    }
+
+    @Transactional
     public Concert findWithRelationsById(long concertId) {
         Concert concert = concertRepository.findWithArtistsById(concertId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         concertRepository.findWithReservationUrlsById(concertId);
         return concert;
+    }
+
+    public void deleteDetailCache(long concertId) {
+        redisHandler.delete(RedisKey.PERFORMANCE_CONCERTS.createKeyInfo(concertId));
     }
 }

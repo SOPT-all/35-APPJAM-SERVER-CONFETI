@@ -125,6 +125,12 @@ public class FestivalService {
         return festivalRepository.save(festival).getId();
     }
 
+    @Transactional
+    public void delete(long festivalId) {
+        Festival festival = findById(festivalId);
+        festivalRepository.delete(festival);
+    }
+
     @Transactional(readOnly = true)
     public AdminFestivalDetailInfo getAdminFestivalDetailInfo(long festivalId) {
         Festival festival = festivalRepository.findWithDatesById(festivalId)
@@ -194,5 +200,9 @@ public class FestivalService {
         }
         return festivalRepository.findAllByTitleContainingOrAreaContainingOrSubtitleContaining(
             keyword, keyword, keyword);
+    }
+
+    public void deleteDetailCache(long festivalId) {
+        redisHandler.delete(RedisKey.PERFORMANCE_FESTIVALS.createKeyInfo(festivalId));
     }
 }

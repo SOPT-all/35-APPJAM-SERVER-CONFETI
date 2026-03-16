@@ -26,6 +26,8 @@ public interface ConcertFavoriteRepository extends JpaRepository<ConcertFavorite
 
     void deleteByUserIdAndConcertId(final long userId, final long concertId);
 
+    void deleteAllByConcertId(final long concertId);
+
     @Query("SELECT CASE WHEN COUNT(cf) > 0 THEN true ELSE false END " +
         "FROM ConcertFavorite cf " +
         "WHERE cf.user.id = :userId " +

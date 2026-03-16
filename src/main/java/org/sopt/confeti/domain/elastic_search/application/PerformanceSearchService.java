@@ -26,6 +26,10 @@ public class PerformanceSearchService {
         performanceSearchRepository.saveAll(performanceDocuments);
     }
 
+    public void deleteById(long performanceId) {
+        performanceSearchRepository.deleteById(performanceId);
+    }
+
     public List<SearchPerformanceResult> getPerformancesByTitleAndTypePartialMatched(String ptitle,
                                                                                      PerformanceType ptype) {
         List<PerformanceDocument> performances = performanceSearchOperator.searchByTitleAndTypePartialMatch(

@@ -227,4 +227,9 @@ public class SetlistService {
     public List<Long> findConcertIdsByUserId(final Long userId) {
         return setlistRepository.findConcertIdsByUserId(userId);
     }
+
+    @Transactional
+    public void deleteByTypeAndTypeId(SetlistType type, Long typeId) {
+        setlistRepository.deleteAllByTypeAndTypeId(type, typeId);
+    }
 }
