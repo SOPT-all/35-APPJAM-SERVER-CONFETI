@@ -39,6 +39,11 @@ public class ConcertFavoriteService {
         concertFavoriteRepository.deleteByUserIdAndConcertId(userId, concertId);
     }
 
+    @Transactional
+    public void deleteAllByConcertId(final long concertId) {
+        concertFavoriteRepository.deleteAllByConcertId(concertId);
+    }
+
     @Transactional(readOnly = true)
     public boolean existsUpcomingReservationByUserId(final Long userId) {
         return concertFavoriteRepository.existsUpcomingReservationByUserId(userId);

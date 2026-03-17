@@ -184,6 +184,15 @@ public class AdminController implements AdminControllerDocs {
     }
 
     @Override
+    @DeleteMapping("/performances/concerts/{concertId}")
+    public ResponseEntity<BaseResponse<Void>> deleteConcert(
+        @PathVariable("concertId") @Min(RequestConstraint.ID) long concertId
+    ) {
+        adminFacade.deleteConcert(concertId);
+        return ApiResponseUtil.success(SuccessMessage.DELETED);
+    }
+
+    @Override
     @GetMapping("/performances/festivals/{festivalId}")
     public ResponseEntity<BaseResponse<AdminFestivalDetailResponse>> getAdminFestivalDetail(
         @PathVariable("festivalId") @Min(RequestConstraint.ID) long festivalId
@@ -191,6 +200,15 @@ public class AdminController implements AdminControllerDocs {
         AdminFestivalDetailInfo festivalDetail = adminFacade.getAdminFestivalDetail(festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             AdminFestivalDetailResponse.of(festivalDetail, s3FileHandler));
+    }
+
+    @Override
+    @DeleteMapping("/performances/festivals/{festivalId}")
+    public ResponseEntity<BaseResponse<Void>> deleteFestival(
+        @PathVariable("festivalId") @Min(RequestConstraint.ID) long festivalId
+    ) {
+        adminFacade.deleteFestival(festivalId);
+        return ApiResponseUtil.success(SuccessMessage.DELETED);
     }
 
     @Override

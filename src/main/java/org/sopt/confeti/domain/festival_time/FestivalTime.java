@@ -44,7 +44,7 @@ public class FestivalTime {
     private LocalTime startAt;
     @Column(nullable = false)
     private LocalTime endAt;
-    @OneToMany(mappedBy = "festivalTime", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "festivalTime")
     private List<FestivalArtist> artists = new ArrayList<>();
 
     @Builder

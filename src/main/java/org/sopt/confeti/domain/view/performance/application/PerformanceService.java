@@ -62,6 +62,15 @@ public class PerformanceService {
         performanceRepository.save(performances);
     }
 
+    @Transactional
+    public long deleteByTypeAndTypeId(PerformanceType type, long typeId) {
+        Performance performance = performanceRepository.findPerformanceByTypeAndTypeId(type, typeId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+        long performanceId = performance.getId();
+        performanceRepository.delete(performance);
+        return performanceId;
+    }
+
     @Transactional(readOnly = true)
     public List<Performance> getPerformancesByArtistIds(final List<String> artistIds,
         final int size) {

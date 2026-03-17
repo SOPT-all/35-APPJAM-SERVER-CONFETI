@@ -24,4 +24,6 @@ public interface SetlistRepository extends JpaRepository<Setlist, Long> {
 
     @Query("SELECT s.typeId FROM Setlist s WHERE s.type =  org.sopt.confeti.domain.setlist.SetlistType.CONCERT AND s.user.id = :userId")
     List<Long> findConcertIdsByUserId(@Param("userId") Long userId);
+
+    void deleteAllByTypeAndTypeId(SetlistType type, Long typeId);
 }

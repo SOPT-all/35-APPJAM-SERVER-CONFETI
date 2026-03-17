@@ -32,7 +32,9 @@ import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
 import org.sopt.confeti.domain.concert_artist.ConcertArtist;
+import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
+import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_artist.FestivalArtist;
@@ -50,6 +52,8 @@ import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftServ
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
+import org.sopt.confeti.domain.setlist.SetlistType;
+import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
@@ -72,6 +76,8 @@ import org.sopt.confeti.global.transaction.Tx;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -82,11 +88,14 @@ public class AdminFacade {
     private final TicketVendorService ticketVendorService;
     private final ConcertService concertService;
     private final FestivalService festivalService;
+    private final ConcertFavoriteService concertFavoriteService;
+    private final SetlistService setlistService;
     private final MusicAPIHandler musicAPIHandler;
     private final S3FileHandler s3FileHandler;
     private final PerformanceDraftService performanceDraftService;
     private final ArtistService artistService;
     private final PerformanceService performanceService;
+    private final PerformanceSearchService performanceSearchService;
     private final ApplicationEventPublisher eventPublisher;
     private final PerformanceDraftParser performanceDraftParser;
     private final ArtistMusicAPIService artistMusicAPIService;
@@ -165,8 +174,49 @@ public class AdminFacade {
         return Tx.readOnlyTx(() -> concertService.getAdminConcertDetailInfo(concertId));
     }
 
+    public void deleteConcert(long concertId) {
+        Concert concert = Tx.readOnlyTx(() -> concertService.findById(concertId));
+
+        Tx.masterTx(() -> {
+            concertService.deleteDetailCache(concertId);
+            concertFavoriteService.deleteAllByConcertId(concertId);
+            setlistService.deleteByTypeAndTypeId(SetlistType.CONCERT, concertId);
+            long deletedPerformanceId = performanceService.deleteByTypeAndTypeId(
+                PerformanceType.CONCERT, concertId);
+            concertService.delete(concertId);
+            registerAfterCommitCleanup(() -> publishS3DeleteEventIfExists(
+                FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER),
+                concert.getPosterPath()
+            ));
+            registerAfterCommitCleanup(
+                () -> deletePerformanceSearchDocument(deletedPerformanceId));
+        });
+    }
+
     public AdminFestivalDetailInfo getAdminFestivalDetail(long festivalId) {
         return Tx.readOnlyTx(() -> festivalService.getAdminFestivalDetailInfo(festivalId));
+    }
+
+    public void deleteFestival(long festivalId) {
+        Festival festival = Tx.readOnlyTx(() -> festivalService.findById(festivalId));
+
+        Tx.masterTx(() -> {
+            festivalService.deleteDetailCache(festivalId);
+            setlistService.deleteByTypeAndTypeId(SetlistType.FESTIVAL, festivalId);
+            long deletedPerformanceId = performanceService.deleteByTypeAndTypeId(
+                PerformanceType.FESTIVAL, festivalId);
+            festivalService.delete(festivalId);
+            registerAfterCommitCleanup(() -> publishS3DeleteEventIfExists(
+                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER),
+                festival.getPosterPath()
+            ));
+            registerAfterCommitCleanup(() -> publishS3DeleteEventIfExists(
+                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO),
+                festival.getLogoPath()
+            ));
+            registerAfterCommitCleanup(
+                () -> deletePerformanceSearchDocument(deletedPerformanceId));
+        });
     }
 
     public AdminFestivalListInfo getAdminFestivals(String keyword) {
@@ -486,6 +536,38 @@ public class AdminFacade {
         return command.artistIds().stream()
             .map(PerformanceArtist::create)
             .toList();
+    }
+
+    private void publishS3DeleteEventIfExists(String folderPath, String filePath) {
+        Optional.ofNullable(filePath)
+            .ifPresent(path -> eventPublisher.publishEvent(new S3FileDeleteEvent(folderPath, path)));
+    }
+
+    private void registerAfterCommitCleanup(Runnable cleanup) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            cleanup.run();
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    cleanup.run();
+                }
+            }
+        );
+    }
+
+    private void deletePerformanceSearchDocument(long performanceId) {
+        try {
+            performanceSearchService.deleteById(performanceId);
+        } catch (Exception e) {
+            log.warn(
+                "AdminFacade.deletePerformanceSearchDocument : 검색 인덱스 문서 삭제에 실패했습니다. performanceId : {}, message : {}",
+                performanceId, e.getMessage(), e
+            );
+        }
     }
 
     public PutAdminFestivalResponse upsertFestival(MultipartFile poster, MultipartFile logo,
