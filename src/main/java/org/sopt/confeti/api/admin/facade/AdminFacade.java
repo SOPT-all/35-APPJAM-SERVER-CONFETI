@@ -76,6 +76,8 @@ import org.sopt.confeti.global.transaction.Tx;
 import org.sopt.confeti.global.util.S3FileHandler;
 import org.sopt.confeti.global.util.music.MusicAPIHandler;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -175,21 +177,20 @@ public class AdminFacade {
     public void deleteConcert(long concertId) {
         Concert concert = Tx.readOnlyTx(() -> concertService.findById(concertId));
 
-        long performanceId = Tx.masterTx(() -> {
+        Tx.masterTx(() -> {
+            concertService.deleteDetailCache(concertId);
             concertFavoriteService.deleteAllByConcertId(concertId);
             setlistService.deleteByTypeAndTypeId(SetlistType.CONCERT, concertId);
             long deletedPerformanceId = performanceService.deleteByTypeAndTypeId(
                 PerformanceType.CONCERT, concertId);
             concertService.delete(concertId);
-            return deletedPerformanceId;
+            registerAfterCommitCleanup(() -> publishS3DeleteEventIfExists(
+                FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER),
+                concert.getPosterPath()
+            ));
+            registerAfterCommitCleanup(
+                () -> deletePerformanceSearchDocument(deletedPerformanceId));
         });
-
-        concertService.deleteDetailCache(concertId);
-        publishS3DeleteEventIfExists(
-            FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER),
-            concert.getPosterPath()
-        );
-        deletePerformanceSearchDocument(performanceId);
     }
 
     public AdminFestivalDetailInfo getAdminFestivalDetail(long festivalId) {
@@ -199,24 +200,23 @@ public class AdminFacade {
     public void deleteFestival(long festivalId) {
         Festival festival = Tx.readOnlyTx(() -> festivalService.findById(festivalId));
 
-        long performanceId = Tx.masterTx(() -> {
+        Tx.masterTx(() -> {
+            festivalService.deleteDetailCache(festivalId);
             setlistService.deleteByTypeAndTypeId(SetlistType.FESTIVAL, festivalId);
             long deletedPerformanceId = performanceService.deleteByTypeAndTypeId(
                 PerformanceType.FESTIVAL, festivalId);
             festivalService.delete(festivalId);
-            return deletedPerformanceId;
+            registerAfterCommitCleanup(() -> publishS3DeleteEventIfExists(
+                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER),
+                festival.getPosterPath()
+            ));
+            registerAfterCommitCleanup(() -> publishS3DeleteEventIfExists(
+                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO),
+                festival.getLogoPath()
+            ));
+            registerAfterCommitCleanup(
+                () -> deletePerformanceSearchDocument(deletedPerformanceId));
         });
-
-        festivalService.deleteDetailCache(festivalId);
-        publishS3DeleteEventIfExists(
-            FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER),
-            festival.getPosterPath()
-        );
-        publishS3DeleteEventIfExists(
-            FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO),
-            festival.getLogoPath()
-        );
-        deletePerformanceSearchDocument(performanceId);
     }
 
     public AdminFestivalListInfo getAdminFestivals(String keyword) {
@@ -541,6 +541,22 @@ public class AdminFacade {
     private void publishS3DeleteEventIfExists(String folderPath, String filePath) {
         Optional.ofNullable(filePath)
             .ifPresent(path -> eventPublisher.publishEvent(new S3FileDeleteEvent(folderPath, path)));
+    }
+
+    private void registerAfterCommitCleanup(Runnable cleanup) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            cleanup.run();
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    cleanup.run();
+                }
+            }
+        );
     }
 
     private void deletePerformanceSearchDocument(long performanceId) {
