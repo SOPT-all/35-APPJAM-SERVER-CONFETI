@@ -25,34 +25,35 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public enum RedisKey {
     // music api handler
-    MUSIC_ARTISTS("apple-music-api:artists:%s", ConfetiArtist.class, Duration.ofHours(1)),
+    MUSIC_ARTISTS("apple-music-api:artists:%s", ConfetiArtist.class, Duration.ofMinutes(20)),
     MUSIC_ARTISTS_RELATED("apple-music-api:artists-related:%s:%d", ConfetiArtist.class,
-        Duration.ofHours(1)), // Deprecated
+        Duration.ofMinutes(20)), // Deprecated
     MUSIC_RELATED_ARTISTS("apple-music-api:artists:related:%s", RelatedArtistInfo.class,
-        Duration.ofDays(1)),
+        Duration.ofMinutes(20)),
     MUSIC_ARTISTS_TOP_SONGS("apple-music-api:artists:top-songs:%s", ConfetiSong.class,
-        Duration.ofHours(1)),
-    MUSIC_SONGS("apple-music-api:songs:%s", ConfetiSong.class, Duration.ofHours(1)),
-    MUSIC_TOP_SONGS("apple-music-api:top-songs", ConfetiSong.class, Duration.ofHours(1)),
+        Duration.ofMinutes(20)),
+    MUSIC_SONGS("apple-music-api:songs:%s", ConfetiSong.class, Duration.ofMinutes(20)),
+    MUSIC_TOP_SONGS("apple-music-api:top-songs", ConfetiSong.class, Duration.ofMinutes(20)),
     MUSIC_TOP_ARTISTS("apple-music-api:top-artists", ConfetiArtist.class, Duration.ofDays(1)),
     SONG_PAGE_ARTIST_OFFSET_LIMIT("apple-music-api:song-page:artists:%s:%d:%d", SongPage.class,
-        Duration.ofHours(1)),
+        Duration.ofMinutes(20)),
     SONG_PAGE_KEYWORD_OFFSET_LIMIT("apple-music-api:song-page:keyword:%s:%d:%d", SongPage.class,
-        Duration.ofHours(1)),
+        Duration.ofMinutes(20)),
 
     // user refresh token
     USER_REFRESH_TOKEN("user:refresh-token:%d", String.class, Duration.ofHours(1)),
 
     // user onboard
     USER_ONBOARD_TOP_ARTISTS("user:onboard:top-artists:%d", UserOnboardCacheDTO.class,
-        Duration.ofHours(1)),
+        Duration.ofMinutes(20)),
 
     // setlist
-    SETLIST_EDIT("edit:setlist:%d:%d", SetlistSongEditDTO.class, Duration.ofHours(1)),
+    SETLIST_EDIT("edit:setlist:%d:%d", SetlistSongEditDTO.class, Duration.ofMinutes(20)),
 
     // performances
-    PERFORMANCE_FESTIVALS("performance:festivals:%d", FestivalDetailDTO.class, Duration.ofHours(4)),
-    PERFORMANCE_CONCERTS("performance:concerts:%d", ConcertDetailDTO.class, Duration.ofHours(4));
+    PERFORMANCE_FESTIVALS("performance:festivals:%d", FestivalDetailDTO.class,
+        Duration.ofMinutes(20)),
+    PERFORMANCE_CONCERTS("performance:concerts:%d", ConcertDetailDTO.class, Duration.ofMinutes(20));
 
     private final String format;
     @Getter

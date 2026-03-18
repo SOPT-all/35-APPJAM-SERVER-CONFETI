@@ -67,6 +67,7 @@ import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.common.constant.PerformanceType;
+import org.sopt.confeti.global.event.PerformanceDocumentIndexEvent;
 import org.sopt.confeti.global.event.S3FileDeleteEvent;
 import org.sopt.confeti.global.exception.BadRequestException;
 import org.sopt.confeti.global.exception.ParameterInvalidException;
@@ -464,6 +465,7 @@ public class AdminFacade {
                 performanceArtists
             );
             performanceService.create(performance);
+            eventPublisher.publishEvent(PerformanceDocumentIndexEvent.from(performance));
 
             return concertId;
         });
@@ -498,6 +500,7 @@ public class AdminFacade {
                 command.startAt(), command.endAt(), posterPath,
                 performanceArtists
             );
+            eventPublisher.publishEvent(PerformanceDocumentIndexEvent.from(performance));
 
             return command.concertId();
         });
@@ -721,6 +724,7 @@ public class AdminFacade {
             Performance performance = Performance.create(
                 festivalId, command, posterPath, performanceArtists);
             performanceService.create(performance);
+            eventPublisher.publishEvent(PerformanceDocumentIndexEvent.from(performance));
 
             return festivalId;
         });
@@ -754,6 +758,7 @@ public class AdminFacade {
                 command.startAt(), command.endAt(), posterPath,
                 performanceArtists
             );
+            eventPublisher.publishEvent(PerformanceDocumentIndexEvent.from(performance));
 
             return command.festivalId();
         });
