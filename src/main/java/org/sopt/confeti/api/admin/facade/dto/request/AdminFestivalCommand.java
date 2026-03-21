@@ -20,7 +20,6 @@ public record AdminFestivalCommand(
     String address,
     TimetableSupportStatus timetableSupportStatus,
     List<ReservationUrlCommand> reservationUrls,
-    List<String> artistIds,
     List<DateCommand> dates
 ) {
 
@@ -29,13 +28,13 @@ public record AdminFestivalCommand(
         LocalDate startAt, LocalDate endAt, String area,
         LocalDateTime reserveAt, String ageRating, String time,
         String price, String address, TimetableSupportStatus timetableSupportStatus,
-        List<ReservationUrlCommand> reservationUrls, List<String> artistIds,
+        List<ReservationUrlCommand> reservationUrls,
         List<DateCommand> dates
     ) {
         return new AdminFestivalCommand(
             festivalId, title, subtitle, startAt, endAt, area,
             reserveAt, ageRating, time, price, address, timetableSupportStatus,
-            reservationUrls, artistIds, dates
+            reservationUrls, dates
         );
     }
 
@@ -53,12 +52,13 @@ public record AdminFestivalCommand(
         Long festivalDateId,
         LocalDate festivalAt,
         LocalTime openAt,
+        List<String> artistIds,
         List<StageCommand> stages
     ) {
 
         public static DateCommand of(Long festivalDateId, LocalDate festivalAt,
-            LocalTime openAt, List<StageCommand> stages) {
-            return new DateCommand(festivalDateId, festivalAt, openAt, stages);
+            LocalTime openAt, List<String> artistIds, List<StageCommand> stages) {
+            return new DateCommand(festivalDateId, festivalAt, openAt, artistIds, stages);
         }
     }
 

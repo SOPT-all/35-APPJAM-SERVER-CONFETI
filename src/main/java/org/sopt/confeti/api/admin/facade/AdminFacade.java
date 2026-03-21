@@ -578,8 +578,12 @@ public class AdminFacade {
         String posterFolderPath = FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER);
         String logoFolderPath = FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO);
 
-        if (command.artistIds() != null && !command.artistIds().isEmpty()) {
-            ensureArtistsExist(new HashSet<>(command.artistIds()));
+        Set<String> allArtistIds = command.dates().stream()
+            .filter(date -> date.artistIds() != null)
+            .flatMap(date -> date.artistIds().stream())
+            .collect(Collectors.toSet());
+        if (!allArtistIds.isEmpty()) {
+            ensureArtistsExist(allArtistIds);
         }
 
         if (command.festivalId() == null) {
@@ -791,12 +795,25 @@ public class AdminFacade {
                 existingDate.update(dateCmd.festivalAt(), dateCmd.openAt());
                 updateFestivalStages(existingDate, dateCmd, artistNameMap);
 
-                List<FestivalArtist> dateArtists = collectArtistsFromStages(
-                    existingDate.getStages());
+                List<FestivalArtist> dateArtists;
+                if (existingDate.getStages().isEmpty()) {
+                    dateArtists = dateCmd.artistIds().stream()
+                        .map(FestivalArtist::create)
+                        .toList();
+                } else {
+                    dateArtists = collectArtistsFromStages(existingDate.getStages());
+                }
                 existingDate.replaceArtists(dateArtists);
             } else { // 생성
                 List<FestivalStage> stages = buildFestivalStages(dateCmd, artistNameMap);
-                List<FestivalArtist> dateArtists = collectArtistsFromStages(stages);
+                List<FestivalArtist> dateArtists;
+                if (stages.isEmpty()) {
+                    dateArtists = dateCmd.artistIds().stream()
+                        .map(FestivalArtist::create)
+                        .toList();
+                } else {
+                    dateArtists = collectArtistsFromStages(stages);
+                }
                 FestivalDate newDate = FestivalDate.create(
                     dateCmd.festivalAt(), dateCmd.openAt(), stages, dateArtists);
                 festival.addDate(newDate);
@@ -892,9 +909,11 @@ public class AdminFacade {
     private Map<String, String> buildArtistNameMap(AdminFestivalCommand command) {
         Set<String> allArtistIds = new HashSet<>();
 
-        if (command.artistIds() != null) {
-            allArtistIds.addAll(command.artistIds());
-        }
+        command.dates().forEach(date -> {
+            if (date.artistIds() != null) {
+                allArtistIds.addAll(date.artistIds());
+            }
+        });
 
         command.dates().stream()
             .flatMap(date -> date.stages().stream())
@@ -934,7 +953,14 @@ public class AdminFacade {
         return command.dates().stream()
             .map(dateCmd -> {
                 List<FestivalStage> stages = buildFestivalStages(dateCmd, artistNameMap);
-                List<FestivalArtist> dateArtists = collectArtistsFromStages(stages);
+                List<FestivalArtist> dateArtists;
+                if (stages.isEmpty()) {
+                    dateArtists = dateCmd.artistIds().stream()
+                        .map(FestivalArtist::create)
+                        .toList();
+                } else {
+                    dateArtists = collectArtistsFromStages(stages);
+                }
                 return FestivalDate.create(
                     dateCmd.festivalAt(), dateCmd.openAt(), stages, dateArtists);
             })
@@ -986,11 +1012,16 @@ public class AdminFacade {
 
     private List<PerformanceArtist> buildFestivalPerformanceArtists(
         AdminFestivalCommand command) {
-        if (command.artistIds() == null || command.artistIds().isEmpty()) {
+        Set<String> allArtistIds = command.dates().stream()
+            .filter(date -> date.artistIds() != null)
+            .flatMap(date -> date.artistIds().stream())
+            .collect(Collectors.toSet());
+
+        if (allArtistIds.isEmpty()) {
             return List.of();
         }
 
-        return command.artistIds().stream()
+        return allArtistIds.stream()
             .map(PerformanceArtist::create)
             .toList();
     }
