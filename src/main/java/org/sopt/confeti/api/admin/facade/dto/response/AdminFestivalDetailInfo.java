@@ -14,7 +14,6 @@ import org.sopt.confeti.domain.festival_time.FestivalTime;
 public record AdminFestivalDetailInfo(
     long festivalId,
     String title,
-    String subtitle,
     LocalDate startAt,
     LocalDate endAt,
     String area,
@@ -111,7 +110,6 @@ public record AdminFestivalDetailInfo(
         return new AdminFestivalDetailInfo(
             festival.getId(),
             festival.getTitle(),
-            festival.getSubtitle(),
             festival.getStartAt(),
             festival.getEndAt(),
             festival.getArea(),

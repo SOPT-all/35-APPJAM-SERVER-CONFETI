@@ -8,7 +8,6 @@ import org.sopt.confeti.api.admin.dto.request.PutAdminConcertRequest;
 public record AdminConcertCommand(
     Long concertId,
     String title,
-    String subtitle,
     LocalDate startAt,
     LocalDate endAt,
     String area,
@@ -23,7 +22,7 @@ public record AdminConcertCommand(
 
     public static AdminConcertCommand from(PutAdminConcertRequest request) {
         return new AdminConcertCommand(
-            request.concertId(), request.title(), request.subtitle(),
+            request.concertId(), request.title(),
             request.startAt(), request.endAt(), request.area(),
             request.reserveAt(), request.ageRating(), request.time(),
             request.price(), request.address(), request.artistIds(),

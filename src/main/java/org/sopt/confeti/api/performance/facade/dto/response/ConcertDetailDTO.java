@@ -10,7 +10,6 @@ import org.sopt.confeti.global.annotation.RedisSerializable;
 public record ConcertDetailDTO(
     long concertId,
     String title,
-    String subtitle,
     LocalDate startAt,
     LocalDate endAt,
     String area,
@@ -28,7 +27,6 @@ public record ConcertDetailDTO(
         return new ConcertDetailDTO(
             concert.getId(),
             concert.getTitle(),
-            concert.getSubtitle(),
             concert.getStartAt(),
             concert.getEndAt(),
             concert.getArea(),

@@ -7,7 +7,6 @@ import org.sopt.confeti.domain.concert.Concert;
 public record ConcertPreviewInfo(
     long concertId,
     String title,
-    String subtitle,
     LocalDate startAt,
     LocalDate endAt,
     String area,
@@ -25,7 +24,6 @@ public record ConcertPreviewInfo(
         return new ConcertPreviewInfo(
             concert.getId(),
             concert.getTitle(),
-            concert.getSubtitle(),
             concert.getStartAt(),
             concert.getEndAt(),
             concert.getArea(),

@@ -47,6 +47,6 @@ public interface ConcertRepository extends JpaRepository<Concert, Long> {
 
     List<Concert> findAllByIdIn(final List<Long> concertIds);
 
-    List<Concert> findAllByTitleContainingOrAreaContainingOrSubtitleContaining(
-        String title, String area, String subtitle);
+    List<Concert> findAllByTitleContainingOrAreaContaining(
+        String title, String area);
 }

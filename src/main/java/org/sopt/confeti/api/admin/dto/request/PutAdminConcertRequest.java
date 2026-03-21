@@ -15,7 +15,6 @@ import org.sopt.confeti.global.message.ErrorMessage;
 public record PutAdminConcertRequest(
     Long concertId,
     @NotBlank String title,
-    @NotBlank String subtitle,
     @NotNull LocalDate startAt,
     @NotNull LocalDate endAt,
     @NotBlank String area,

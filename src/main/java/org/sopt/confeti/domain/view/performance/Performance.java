@@ -49,9 +49,6 @@ public class Performance {
     @Column(length = 100, nullable = false)
     private String title;
 
-    @Column(length = 100, nullable = false)
-    private String subtitle;
-
     @Column(nullable = false)
     private LocalDate startAt;
 
@@ -73,13 +70,12 @@ public class Performance {
 
     @Builder
     private Performance(long typeId, PerformanceType type, String area, String title,
-        String subtitle, LocalDate startAt, LocalDate endAt,
+        LocalDate startAt, LocalDate endAt,
         String posterPath, List<PerformanceArtist> artists) {
         this.typeId = typeId;
         this.type = type;
         this.area = area;
         this.title = title;
-        this.subtitle = subtitle;
         this.startAt = startAt;
         this.endAt = endAt;
         this.posterPath = posterPath;
@@ -88,13 +84,13 @@ public class Performance {
         this.artists.forEach(artist -> artist.setPerformance(this));
     }
 
-    public static Performance createConcert(long concertId, String title, String subtitle,
+    public static Performance createConcert(long concertId, String title,
         String area, LocalDate startAt, LocalDate endAt, String posterPath,
         List<PerformanceArtist> artists) {
         return Performance.builder()
             .typeId(concertId)
             .type(PerformanceType.CONCERT)
-            .title(title).subtitle(subtitle).area(area)
+            .title(title).area(area)
             .startAt(startAt).endAt(endAt)
             .posterPath(posterPath).artists(artists)
             .build();
@@ -107,7 +103,6 @@ public class Performance {
             .type(PerformanceType.FESTIVAL)
             .area(command.area())
             .title(command.title())
-            .subtitle(command.subtitle())
             .startAt(command.startAt())
             .endAt(command.endAt())
             .posterPath(posterPath)
@@ -115,11 +110,10 @@ public class Performance {
             .build();
     }
 
-    public void update(String title, String subtitle, String area,
+    public void update(String title, String area,
         LocalDate startAt, LocalDate endAt, String posterPath,
         List<PerformanceArtist> newArtists) {
         this.title = title;
-        this.subtitle = subtitle;
         this.area = area;
         this.startAt = startAt;
         this.endAt = endAt;

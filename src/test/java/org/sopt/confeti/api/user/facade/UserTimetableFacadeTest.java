@@ -105,7 +105,6 @@ class UserTimetableFacadeTest {
     private Festival createFestival(long id, String title) {
         Festival festival = Festival.create(
             title,
-            "subtitle",
             LocalDate.of(2026, 3, 20),
             LocalDate.of(2026, 3, 21),
             "Seoul",

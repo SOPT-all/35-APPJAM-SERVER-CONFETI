@@ -22,7 +22,6 @@ import org.sopt.confeti.global.message.ErrorMessage;
 public record PutAdminFestivalRequest(
     Long festivalId,
     @NotBlank String title,
-    @NotBlank String subtitle,
     @NotNull LocalDate startAt,
     @NotNull LocalDate endAt,
     @NotBlank String area,
@@ -42,7 +41,7 @@ public record PutAdminFestivalRequest(
             : TimetableSupportStatus.NOT_SUPPORTED;
 
         return AdminFestivalCommand.of(
-            festivalId, title, subtitle, startAt, endAt, area,
+            festivalId, title, startAt, endAt, area,
             reserveAt, ageRating, time, price, address, status,
             reservationUrls.stream()
                 .map(url -> AdminFestivalCommand.ReservationUrlCommand.of(

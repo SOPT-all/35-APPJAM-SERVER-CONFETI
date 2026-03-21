@@ -8,7 +8,6 @@ import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 public record AdminFestivalPreviewInfo(
     long festivalId,
     String title,
-    String subtitle,
     LocalDate startAt,
     LocalDate endAt,
     String area,
@@ -28,7 +27,6 @@ public record AdminFestivalPreviewInfo(
         return new AdminFestivalPreviewInfo(
             festival.getId(),
             festival.getTitle(),
-            festival.getSubtitle(),
             festival.getStartAt(),
             festival.getEndAt(),
             festival.getArea(),

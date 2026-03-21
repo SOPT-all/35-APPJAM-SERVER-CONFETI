@@ -13,7 +13,6 @@ public record AdminConcertListInfo(
         long concertId,
         String posterPath,
         String title,
-        String subtitle,
         LocalDate startAt,
         LocalDate endAt,
         String area
@@ -24,7 +23,6 @@ public record AdminConcertListInfo(
                 info.concertId(),
                 info.posterPath(),
                 info.title(),
-                info.subtitle(),
                 info.startAt(),
                 info.endAt(),
                 info.area()
