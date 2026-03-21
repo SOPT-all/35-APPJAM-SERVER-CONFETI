@@ -6,6 +6,7 @@ import org.sopt.confeti.api.user.controller.docs.UserTimetableControllerDocs;
 import org.sopt.confeti.api.user.dto.request.timetable.AddTimetablesRequest;
 import org.sopt.confeti.api.user.dto.request.timetable.PatchTimeBlocksRequest;
 import org.sopt.confeti.api.user.dto.request.timetable.PatchTimetablesRequest;
+import org.sopt.confeti.api.user.dto.response.timetable.TimetableCreateResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableCursorResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableDatesResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableEntireFestivalResponse;
@@ -17,6 +18,7 @@ import org.sopt.confeti.api.user.dto.response.timetable.TimetablesToAddResponse;
 import org.sopt.confeti.api.user.facade.UserTimetableFacade;
 import org.sopt.confeti.api.user.facade.dto.request.timetable.AddTimetablesDTO;
 import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimeBlocksDTO;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableCreateResponseDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableDatesDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableEntireFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableExistenceDTO;
@@ -91,12 +93,13 @@ public class UserTimetableController implements UserTimetableControllerDocs {
 
     @Permission(role = {Role.GENERAL})
     @PostMapping
-    public ResponseEntity<BaseResponse<Void>> addTimetableFestival(
+    public ResponseEntity<BaseResponse<TimetableCreateResponse>> addTimetableFestival(
         @RequestBody AddTimetablesRequest addTimetablesRequest
     ) {
-        userTimetableFacade.addTimetables(
+        TimetableCreateResponseDTO response = userTimetableFacade.addTimetables(
             AddTimetablesDTO.from(addTimetablesRequest));
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            TimetableCreateResponse.from(response));
     }
 
     @Permission(role = {Role.GENERAL})

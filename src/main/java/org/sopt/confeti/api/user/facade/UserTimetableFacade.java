@@ -1,6 +1,7 @@
 package org.sopt.confeti.api.user.facade;
 
 
+import java.util.Comparator;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.user.facade.dto.request.timetable.AddTimetableArtistDTO;
@@ -15,6 +17,7 @@ import org.sopt.confeti.api.user.facade.dto.request.timetable.AddTimetablesDTO;
 import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimeBlockDTO;
 import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimeBlocksDTO;
 import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimetablesCommand;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableCreateResponseDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableDatesDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableEntireFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableExistenceDTO;
@@ -64,15 +67,17 @@ public class UserTimetableFacade {
     private final TimeBlockService timeBlockService;
 
     @Transactional
-    public void addTimetables(AddTimetablesDTO from) {
+    public TimetableCreateResponseDTO addTimetables(AddTimetablesDTO from) {
         long userId = UserContext.get().id();
+        List<Long> requestedFestivalIds = from.festivals().stream()
+            .map(AddTimetableArtistDTO::festivalId)
+            .distinct()
+            .toList();
 
         User user = userService.findUserTimetablesById(userId);
-        List<Festival> addFestivals = festivalService.findFestivalsByIdIn(
-            from.festivals().stream()
-                .distinct()
-                .map(AddTimetableArtistDTO::festivalId)
-                .toList()
+        List<Festival> addFestivals = sortFestivalsByRequestOrder(
+            festivalService.findFestivalsByIdIn(requestedFestivalIds),
+            requestedFestivalIds
         );
 
         validateSupportedTimetable(addFestivals);
@@ -84,8 +89,23 @@ public class UserTimetableFacade {
         );
         validateCountTimetable(user.getTimetables().size(), addFestivals.size());
 
-        timetableService.addTimetables(user, addFestivals);
+        TimetableCreateResponseDTO response = TimetableCreateResponseDTO.of(
+            timetableService.addTimetables(user, addFestivals)
+        );
         userService.updateHasTimetableHistory(userId);
+        return response;
+    }
+
+    private List<Festival> sortFestivalsByRequestOrder(List<Festival> festivals,
+        List<Long> requestedFestivalIds) {
+        Map<Long, Integer> festivalOrder = IntStream.range(0, requestedFestivalIds.size())
+            .boxed()
+            .collect(Collectors.toMap(requestedFestivalIds::get, Function.identity()));
+
+        return festivals.stream()
+            .sorted(Comparator.comparingInt(festival ->
+                festivalOrder.getOrDefault(festival.getId(), Integer.MAX_VALUE)))
+            .toList();
     }
 
     protected void validateSupportedTimetable(final Collection<Festival> currentFestivals) {

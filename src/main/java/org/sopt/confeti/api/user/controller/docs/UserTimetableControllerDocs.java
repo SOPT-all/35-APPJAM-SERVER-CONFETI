@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Min;
 import org.sopt.confeti.api.user.dto.request.timetable.AddTimetablesRequest;
 import org.sopt.confeti.api.user.dto.request.timetable.PatchTimeBlocksRequest;
 import org.sopt.confeti.api.user.dto.request.timetable.PatchTimetablesRequest;
+import org.sopt.confeti.api.user.dto.response.timetable.TimetableCreateResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableCursorResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableDatesResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableEntireFestivalResponse;
@@ -86,7 +87,7 @@ public interface UserTimetableControllerDocs {
     )
     @AuthErrorResponses
     @CommonErrorResponses
-    ResponseEntity<BaseResponse<Void>> addTimetableFestival(
+    ResponseEntity<BaseResponse<TimetableCreateResponse>> addTimetableFestival(
         @Valid @RequestBody AddTimetablesRequest addTimetablesRequest
     );
 
