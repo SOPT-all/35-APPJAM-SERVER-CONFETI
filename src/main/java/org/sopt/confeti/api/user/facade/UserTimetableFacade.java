@@ -17,6 +17,7 @@ import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimeBlocksDTO
 import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimetablesCommand;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableDatesDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableEntireFestivalDTO;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableExistenceDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableFestivalBasicDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableHistoryDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableToAddDTO;
@@ -260,6 +261,15 @@ public class UserTimetableFacade {
     public TimetableHistoryDTO getHasTimetableHistory() {
         boolean hasTimetableHistory = userService.hasTimetableHistory(UserContext.get().id());
         return TimetableHistoryDTO.from(hasTimetableHistory);
+    }
+
+    @ReadOnlyTransactional
+    public TimetableExistenceDTO getTimetableExistence(final long festivalId) {
+        Long timetableId = timetableService.findTimetableIdByUserIdAndFestivalId(
+            UserContext.get().id(),
+            festivalId
+        ).orElse(null);
+        return TimetableExistenceDTO.of(timetableId != null, timetableId);
     }
 
     @ReadOnlyTransactional

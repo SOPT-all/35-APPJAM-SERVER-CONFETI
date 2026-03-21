@@ -14,6 +14,12 @@ public interface TimetableRepository extends JpaRepository<Timetable, Long> {
 
     boolean existsByUserIdAndFestivalId(final long userId, final long festivalId);
 
+    @Query("SELECT t.id FROM Timetable t WHERE t.user.id = :userId AND t.festival.id = :festivalId")
+    Optional<Long> findTimetableIdByUserIdAndFestivalId(
+        @Param("userId") long userId,
+        @Param("festivalId") long festivalId
+    );
+
     void deleteByUserIdAndFestivalId(final long userId, final long festivalId);
 
     void deleteAllByUserIdAndIdIn(final long userId, final Collection<Long> timetableIds);
