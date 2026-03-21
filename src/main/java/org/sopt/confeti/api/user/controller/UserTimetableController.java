@@ -1,5 +1,6 @@
 package org.sopt.confeti.api.user.controller;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.controller.docs.UserTimetableControllerDocs;
 import org.sopt.confeti.api.user.dto.request.timetable.AddTimetablesRequest;
@@ -9,6 +10,7 @@ import org.sopt.confeti.api.user.dto.response.timetable.TimetableCreateResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableCursorResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableDatesResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableEntireFestivalResponse;
+import org.sopt.confeti.api.user.dto.response.timetable.TimetableExistenceResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableFestivalResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableHistoryResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetablesPreviewResponse;
@@ -19,6 +21,7 @@ import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimeBlocksDTO
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableCreateResponseDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableDatesDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableEntireFestivalDTO;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableExistenceDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableFestivalBasicDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableHistoryDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableToAddDTO;
@@ -33,6 +36,7 @@ import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.CursorPage;
 import org.sopt.confeti.global.common.constant.Default;
 import org.sopt.confeti.global.common.constant.PerformanceStatus;
+import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.common.constant.TimetableSortType;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
@@ -63,6 +67,17 @@ public class UserTimetableController implements UserTimetableControllerDocs {
         TimetableHistoryDTO timetableHistoryDTO = userTimetableFacade.getHasTimetableHistory();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
             TimetableHistoryResponse.from(timetableHistoryDTO));
+    }
+
+    @Permission(role = {Role.GENERAL})
+    @GetMapping("/exists")
+    public ResponseEntity<BaseResponse<TimetableExistenceResponse>> getTimetableExistence(
+        @RequestParam(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId
+    ) {
+        TimetableExistenceDTO timetableExistenceDTO = userTimetableFacade.getTimetableExistence(
+            festivalId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+            TimetableExistenceResponse.from(timetableExistenceDTO));
     }
 
     @Permission(role = {Role.GENERAL})

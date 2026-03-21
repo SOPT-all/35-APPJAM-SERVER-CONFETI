@@ -13,6 +13,7 @@ import org.sopt.confeti.api.user.dto.response.timetable.TimetableCreateResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableCursorResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableDatesResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableEntireFestivalResponse;
+import org.sopt.confeti.api.user.dto.response.timetable.TimetableExistenceResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableFestivalResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetableHistoryResponse;
 import org.sopt.confeti.api.user.dto.response.timetable.TimetablesPreviewResponse;
@@ -44,6 +45,21 @@ public interface UserTimetableControllerDocs {
     @AuthErrorResponses
     @CommonErrorResponses
     ResponseEntity<BaseResponse<TimetableHistoryResponse>> getHasTimetableHistory();
+
+    @Operation(summary = "페스티벌별 생성된 타임테이블 존재 여부 조회")
+    @ApiResponses(
+        value = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "성공"
+            )
+        }
+    )
+    @AuthErrorResponses
+    @CommonErrorResponses
+    ResponseEntity<BaseResponse<TimetableExistenceResponse>> getTimetableExistence(
+        @RequestParam(name = "festivalId") @Min(RequestConstraint.ID) Long festivalId
+    );
 
     @Operation(summary = "추가할 페스티벌 목록 조회")
     @ApiResponses(
