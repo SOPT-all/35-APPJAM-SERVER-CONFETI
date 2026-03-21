@@ -56,8 +56,8 @@ public class TimetableService {
     }
 
     @Transactional
-    public void addTimetables(final User user, final List<Festival> festivals) {
-        timetableRepository.saveAll(
+    public List<Timetable> addTimetables(final User user, final List<Festival> festivals) {
+        return timetableRepository.saveAll(
             festivals.stream()
                 .map(festival -> Timetable.create(user, festival))
                 .toList()
