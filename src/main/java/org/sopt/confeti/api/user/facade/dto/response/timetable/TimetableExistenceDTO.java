@@ -5,10 +5,17 @@ public record TimetableExistenceDTO(
     Long timetableId
 ) {
 
-    public static TimetableExistenceDTO of(boolean hasTimetable, Long timetableId) {
+    public static TimetableExistenceDTO from(Long timetableId) {
         return new TimetableExistenceDTO(
-            hasTimetable,
+            true,
             timetableId
+        );
+    }
+
+    public static TimetableExistenceDTO notExists() {
+        return new TimetableExistenceDTO(
+            false,
+            null
         );
     }
 }
