@@ -3,7 +3,6 @@ package org.sopt.confeti.api.user.dto.response.timetable;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableExistenceDTO;
 
 public record TimetableExistenceResponse(
-    boolean hasTimetable,
     Long timetableId
 ) {
 
@@ -11,7 +10,6 @@ public record TimetableExistenceResponse(
         TimetableExistenceDTO timetableExistenceDTO
     ) {
         return new TimetableExistenceResponse(
-            timetableExistenceDTO.hasTimetable(),
             timetableExistenceDTO.timetableId()
         );
     }
