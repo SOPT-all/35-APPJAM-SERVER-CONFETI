@@ -111,7 +111,8 @@ public class AdminController implements AdminControllerDocs {
     ) {
         return ApiResponseUtil.success(
             SuccessMessage.SUCCESS,
-            PerformanceDraftListResponses.from(adminFacade.getPerformanceDrafts(search), s3FileHandler)
+            PerformanceDraftListResponses.from(adminFacade.getPerformanceDrafts(search),
+                s3FileHandler)
         );
     }
 
@@ -222,7 +223,8 @@ public class AdminController implements AdminControllerDocs {
     }
 
     @Override
-    @PutMapping(value = "/performances/concerts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/performances/concerts", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+        MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<BaseResponse<PutAdminConcertResponse>> upsertConcert(
         @RequestPart MultipartFile poster,
         @Valid @RequestPart(value = "concert") PutAdminConcertRequest request
@@ -237,7 +239,8 @@ public class AdminController implements AdminControllerDocs {
     }
 
     @Override
-    @PutMapping(value = "/performances/festivals", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/performances/festivals", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+        MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<BaseResponse<PutAdminFestivalResponse>> upsertFestival(
         @RequestPart(required = false) MultipartFile poster,
         @RequestPart(required = false) MultipartFile logo,
