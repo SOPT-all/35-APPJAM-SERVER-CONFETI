@@ -10,7 +10,6 @@ import org.sopt.confeti.global.annotation.RedisSerializable;
 public record FestivalDetailDTO(
     long festivalId,
     String title,
-    String subtitle,
     LocalDate startAt,
     LocalDate endAt,
     String area,
@@ -29,7 +28,6 @@ public record FestivalDetailDTO(
         return new FestivalDetailDTO(
             festival.getId(),
             festival.getTitle(),
-            festival.getSubtitle(),
             festival.getStartAt(),
             festival.getEndAt(),
             festival.getArea(),

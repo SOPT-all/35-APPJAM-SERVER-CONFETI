@@ -13,7 +13,6 @@ import org.sopt.confeti.global.util.S3FileHandler;
 public record AdminFestivalDetailResponse(
     long festivalId,
     String title,
-    String subtitle,
     LocalDate startAt,
     LocalDate endAt,
     String area,
@@ -110,7 +109,6 @@ public record AdminFestivalDetailResponse(
         return new AdminFestivalDetailResponse(
             info.festivalId(),
             info.title(),
-            info.subtitle(),
             info.startAt(),
             info.endAt(),
             info.area(),

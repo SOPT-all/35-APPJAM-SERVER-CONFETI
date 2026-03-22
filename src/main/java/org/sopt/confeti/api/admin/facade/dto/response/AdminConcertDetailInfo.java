@@ -10,7 +10,6 @@ import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
 public record AdminConcertDetailInfo(
     long concertId,
     String title,
-    String subtitle,
     LocalDate startAt,
     LocalDate endAt,
     String area,
@@ -60,7 +59,6 @@ public record AdminConcertDetailInfo(
         return new AdminConcertDetailInfo(
             concert.getId(),
             concert.getTitle(),
-            concert.getSubtitle(),
             concert.getStartAt(),
             concert.getEndAt(),
             concert.getArea(),

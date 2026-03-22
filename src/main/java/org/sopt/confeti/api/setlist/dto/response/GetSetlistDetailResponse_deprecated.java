@@ -14,7 +14,6 @@ public record GetSetlistDetailResponse_deprecated(
     Long typeId,
     String posterUrl,
     String title,
-    String subTitle,
     LocalDate startAt,
     LocalDate endAt,
     List<SetlistSongResponse_deprecated> musics
@@ -23,7 +22,6 @@ public record GetSetlistDetailResponse_deprecated(
     public static GetSetlistDetailResponse_deprecated of(
         Setlist setlist,
         String title,
-        String subtitle,
         String posterPath,
         LocalDate startAt,
         LocalDate endAt,
@@ -43,7 +41,6 @@ public record GetSetlistDetailResponse_deprecated(
             setlist.getTypeId(),
             posterUrl,
             title,
-            subtitle,
             startAt,
             endAt,
             musics

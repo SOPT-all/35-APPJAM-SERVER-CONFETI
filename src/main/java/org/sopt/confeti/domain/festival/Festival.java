@@ -45,8 +45,6 @@ public class Festival {
     private Long id;
     @Column(length = 100, nullable = false)
     private String title;
-    @Column(length = 100, nullable = false)
-    private String subtitle;
     @Column(nullable = false)
     private LocalDate startAt;
     @Column(nullable = false)
@@ -83,7 +81,7 @@ public class Festival {
     private List<FestivalReservationUrl> reservationUrls = new ArrayList<>();
 
     @Builder
-    private Festival(String title, String subtitle, LocalDate startAt, LocalDate endAt,
+    private Festival(String title, LocalDate startAt, LocalDate endAt,
         String area,
         String posterPath, String logoPath, LocalDateTime reserveAt,
         String ageRating,
@@ -92,7 +90,6 @@ public class Festival {
         List<FestivalDate> dates,
         List<FestivalReservationUrl> reservationUrls) {
         this.title = title;
-        this.subtitle = subtitle;
         this.startAt = startAt;
         this.endAt = endAt;
         this.area = area;
@@ -112,7 +109,7 @@ public class Festival {
     }
 
     public static Festival create(
-        String title, String subtitle, LocalDate startAt, LocalDate endAt,
+        String title, LocalDate startAt, LocalDate endAt,
         String area, String posterPath, String logoPath, LocalDateTime reserveAt,
         String ageRating, String time, String price, String address,
         TimetableSupportStatus timetableSupportStatus,
@@ -120,7 +117,6 @@ public class Festival {
     ) {
         return Festival.builder()
             .title(title)
-            .subtitle(subtitle)
             .startAt(startAt)
             .endAt(endAt)
             .area(area)
@@ -138,13 +134,12 @@ public class Festival {
     }
 
     public void updateBasicFields(
-        String title, String subtitle, LocalDate startAt, LocalDate endAt,
+        String title, LocalDate startAt, LocalDate endAt,
         String area, String posterPath, String logoPath, LocalDateTime reserveAt,
         String ageRating, String time, String price, String address,
         TimetableSupportStatus timetableSupportStatus
     ) {
         this.title = title;
-        this.subtitle = subtitle;
         this.startAt = startAt;
         this.endAt = endAt;
         this.area = area;

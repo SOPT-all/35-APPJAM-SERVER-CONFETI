@@ -38,9 +38,6 @@ public class Concert {
     @Column(length = 100, nullable = false)
     private String title;
 
-    @Column(length = 100, nullable = false)
-    private String subtitle;
-
     @Column(nullable = false)
     private LocalDate startAt;
 
@@ -83,12 +80,11 @@ public class Concert {
     private List<ConcertReservationUrl> reservationUrls = new ArrayList<>();
 
     @Builder
-    private Concert(String title, String subtitle, LocalDate startAt, LocalDate endAt, String area,
+    private Concert(String title, LocalDate startAt, LocalDate endAt, String area,
         String posterPath, LocalDateTime reserveAt, String ageRating,
         String time, String price, String address,
         List<ConcertArtist> artists, List<ConcertReservationUrl> reservationUrls) {
         this.title = title;
-        this.subtitle = subtitle;
         this.startAt = startAt;
         this.endAt = endAt;
         this.area = area;
@@ -105,13 +101,12 @@ public class Concert {
         this.reservationUrls.forEach(url -> url.setConcert(this));
     }
 
-    public static Concert create(String title, String subtitle, LocalDate startAt, LocalDate endAt,
+    public static Concert create(String title, LocalDate startAt, LocalDate endAt,
         String area, String posterPath, LocalDateTime reserveAt, String ageRating,
         String time, String price, String address,
         List<ConcertArtist> artists, List<ConcertReservationUrl> reservationUrls) {
         return Concert.builder()
             .title(title)
-            .subtitle(subtitle)
             .startAt(startAt)
             .endAt(endAt)
             .area(area)
@@ -126,12 +121,11 @@ public class Concert {
             .build();
     }
 
-    public void update(String title, String subtitle, LocalDate startAt, LocalDate endAt,
+    public void update(String title, LocalDate startAt, LocalDate endAt,
         String area, String posterPath, LocalDateTime reserveAt, String ageRating,
         String time, String price, String address,
         List<ConcertArtist> newArtists, List<ConcertReservationUrl> newReservationUrls) {
         this.title = title;
-        this.subtitle = subtitle;
         this.startAt = startAt;
         this.endAt = endAt;
         this.area = area;

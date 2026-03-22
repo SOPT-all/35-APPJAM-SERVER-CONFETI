@@ -198,8 +198,8 @@ public class FestivalService {
         if (!StringUtils.hasText(keyword)) {
             return festivalRepository.findAll();
         }
-        return festivalRepository.findAllByTitleContainingOrAreaContainingOrSubtitleContaining(
-            keyword, keyword, keyword);
+        return festivalRepository.findAllByTitleContainingOrAreaContaining(
+            keyword, keyword);
     }
 
     public void deleteDetailCache(long festivalId) {

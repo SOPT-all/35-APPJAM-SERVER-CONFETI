@@ -452,7 +452,7 @@ public class AdminFacade {
             List<PerformanceArtist> performanceArtists = buildPerformanceArtists(command);
 
             Concert concert = Concert.create(
-                command.title(), command.subtitle(), command.startAt(), command.endAt(),
+                command.title(), command.startAt(), command.endAt(),
                 command.area(), posterPath, command.reserveAt(), command.ageRating(),
                 command.time(), command.price(), command.address(),
                 concertArtists, reservationUrls
@@ -460,7 +460,7 @@ public class AdminFacade {
             long concertId = concertService.create(concert);
 
             Performance performance = Performance.createConcert(
-                concertId, command.title(), command.subtitle(), command.area(),
+                concertId, command.title(), command.area(),
                 command.startAt(), command.endAt(), posterPath,
                 performanceArtists
             );
@@ -487,7 +487,7 @@ public class AdminFacade {
             }
 
             concert.update(
-                command.title(), command.subtitle(), command.startAt(), command.endAt(),
+                command.title(), command.startAt(), command.endAt(),
                 command.area(), posterPath, command.reserveAt(), command.ageRating(),
                 command.time(), command.price(), command.address(),
                 concertArtists, reservationUrls
@@ -496,7 +496,7 @@ public class AdminFacade {
             Performance performance = performanceService.getPerformanceByTypeAndTypeId(
                 PerformanceType.CONCERT, command.concertId());
             performance.update(
-                command.title(), command.subtitle(), command.area(),
+                command.title(), command.area(),
                 command.startAt(), command.endAt(), posterPath,
                 performanceArtists
             );
@@ -714,7 +714,7 @@ public class AdminFacade {
                 command, vendorMap);
 
             Festival festival = Festival.create(
-                command.title(), command.subtitle(), command.startAt(), command.endAt(),
+                command.title(), command.startAt(), command.endAt(),
                 command.area(), posterPath, logoPath, command.reserveAt(),
                 command.ageRating(), command.time(), command.price(), command.address(),
                 command.timetableSupportStatus(), dates, reservationUrls
@@ -739,7 +739,7 @@ public class AdminFacade {
             Festival festival = festivalService.getWithRelationsById(command.festivalId());
 
             festival.updateBasicFields(
-                command.title(), command.subtitle(), command.startAt(), command.endAt(),
+                command.title(), command.startAt(), command.endAt(),
                 command.area(), posterPath, logoPath, command.reserveAt(),
                 command.ageRating(), command.time(), command.price(), command.address(),
                 command.timetableSupportStatus()
@@ -755,7 +755,7 @@ public class AdminFacade {
             Performance performance = performanceService.getWithArtistsByTypeAndTypeId(
                 PerformanceType.FESTIVAL, command.festivalId());
             performance.update(
-                command.title(), command.subtitle(), command.area(),
+                command.title(), command.area(),
                 command.startAt(), command.endAt(), posterPath,
                 performanceArtists
             );

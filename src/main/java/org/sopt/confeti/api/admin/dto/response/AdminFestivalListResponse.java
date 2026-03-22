@@ -32,7 +32,6 @@ public record AdminFestivalListResponse(
         long festivalId,
         String posterUrl,
         String title,
-        String subtitle,
         LocalDate startAt,
         LocalDate endAt,
         String area
@@ -49,7 +48,6 @@ public record AdminFestivalListResponse(
                     info.posterPath()
                 ).toString(),
                 info.title(),
-                info.subtitle(),
                 info.startAt(),
                 info.endAt(),
                 info.area()

@@ -153,7 +153,6 @@ public interface AdminControllerDocs {
         festival인 경우
 {
   "title": "2026 서울재즈페스티벌",
-  "subtitle": "Seoul Jazz Festival",
   "startAt": "2026-05-22T00:00:00",
   "endAt": "2026-05-24T23:59:59",
   "area": "SEOUL",
@@ -229,7 +228,6 @@ public interface AdminControllerDocs {
 
 {
   "title": "2026 카더가든 콘서트",
-  "subtitle": "The Golden Hour",
   "startAt": "2026-04-01T18:00:00",
   "endAt": "2026-04-01T20:30:00",
   "area": "서울",

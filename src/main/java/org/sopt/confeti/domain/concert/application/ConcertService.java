@@ -62,8 +62,8 @@ public class ConcertService {
         if (!StringUtils.hasText(keyword)) {
             return concertRepository.findAll();
         }
-        return concertRepository.findAllByTitleContainingOrAreaContainingOrSubtitleContaining(
-            keyword, keyword, keyword);
+        return concertRepository.findAllByTitleContainingOrAreaContaining(
+            keyword, keyword);
     }
 
     @ReadOnlyTransactional

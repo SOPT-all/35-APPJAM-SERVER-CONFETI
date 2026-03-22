@@ -171,7 +171,7 @@ public class SetlistService {
             Concert concert = concertRepository.findById(setlist.getTypeId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
             return GetSetlistDetailResponse_deprecated.of(
-                setlist, concert.getTitle(), concert.getSubtitle(),
+                setlist, concert.getTitle(),
                 concert.getPosterPath(),
                 concert.getStartAt(), concert.getEndAt(),
                 songs, setlist.getType(), s3FileHandler
@@ -180,7 +180,7 @@ public class SetlistService {
             Festival festival = festivalRepository.findById(setlist.getTypeId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
             return GetSetlistDetailResponse_deprecated.of(
-                setlist, festival.getTitle(), festival.getSubtitle(),
+                setlist, festival.getTitle(),
                 festival.getPosterPath(),
                 festival.getStartAt(), festival.getEndAt(),
                 songs, setlist.getType(), s3FileHandler
@@ -201,7 +201,7 @@ public class SetlistService {
             Concert concert = concertRepository.findById(setlist.getTypeId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
             return GetSetlistDetailResponse.of(
-                setlist, concert.getTitle(), concert.getSubtitle(),
+                setlist, concert.getTitle(),
                 concert.getPosterPath(),
                 concert.getStartAt(), concert.getEndAt(),
                 songs, setlist.getType(), s3FileHandler
@@ -210,7 +210,7 @@ public class SetlistService {
             Festival festival = festivalRepository.findById(setlist.getTypeId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
             return GetSetlistDetailResponse.of(
-                setlist, festival.getTitle(), festival.getSubtitle(),
+                setlist, festival.getTitle(),
                 festival.getPosterPath(),
                 festival.getStartAt(), festival.getEndAt(),
                 songs, setlist.getType(), s3FileHandler

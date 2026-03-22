@@ -13,7 +13,6 @@ public record GetSetlistDetailResponse(
     Long typeId,
     String posterUrl,
     String title,
-    String subTitle,
     LocalDate startAt,
     LocalDate endAt,
     List<SetlistSongResponse> songs
@@ -22,7 +21,6 @@ public record GetSetlistDetailResponse(
     public static GetSetlistDetailResponse of(
         Setlist setlist,
         String title,
-        String subtitle,
         String posterPath,
         LocalDate startAt,
         LocalDate endAt,
@@ -42,7 +40,6 @@ public record GetSetlistDetailResponse(
             setlist.getTypeId(),
             posterUrl,
             title,
-            subtitle,
             startAt,
             endAt,
             songs

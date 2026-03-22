@@ -11,7 +11,6 @@ import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 public record AdminFestivalCommand(
     Long festivalId,
     String title,
-    String subtitle,
     LocalDate startAt,
     LocalDate endAt,
     String area,
@@ -26,7 +25,7 @@ public record AdminFestivalCommand(
 ) {
 
     public static AdminFestivalCommand of(
-        Long festivalId, String title, String subtitle,
+        Long festivalId, String title,
         LocalDate startAt, LocalDate endAt, String area,
         LocalDateTime reserveAt, String ageRating, String time,
         String price, String address, TimetableSupportStatus timetableSupportStatus,
@@ -34,7 +33,7 @@ public record AdminFestivalCommand(
         List<DateCommand> dates
     ) {
         return new AdminFestivalCommand(
-            festivalId, title, subtitle, startAt, endAt, area,
+            festivalId, title, startAt, endAt, area,
             reserveAt, ageRating, time, price, address, timetableSupportStatus,
             reservationUrls, dates
         );
