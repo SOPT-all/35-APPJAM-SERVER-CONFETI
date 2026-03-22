@@ -9,49 +9,50 @@ import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record PerformanceDTO(
-        long id,
-        Long typeId,
-        PerformanceType type,
-        String area,
-        String title,
-        LocalDate startAt,
-        LocalDate endAt,
-        String posterPath,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        List<PerformanceArtistDTO> artists
+    Long id,
+    Long typeId,
+    PerformanceType type,
+    String area,
+    String title,
+    LocalDate startAt,
+    LocalDate endAt,
+    String posterPath,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
+    List<PerformanceArtistDTO> artists
 ) {
+
     public static PerformanceDTO from(final Performance performance) {
         return new PerformanceDTO(
-                performance.getId(),
-                performance.getTypeId(),
-                performance.getType(),
-                performance.getArea(),
-                performance.getTitle(),
-                performance.getStartAt(),
-                performance.getEndAt(),
-                performance.getPosterPath(),
-                performance.getCreatedAt(),
-                performance.getUpdatedAt(),
-                performance.getArtists().stream()
-                        .map(PerformanceArtistDTO::from)
-                        .toList()
+            performance.getId(),
+            performance.getTypeId(),
+            performance.getType(),
+            performance.getArea(),
+            performance.getTitle(),
+            performance.getStartAt(),
+            performance.getEndAt(),
+            performance.getPosterPath(),
+            performance.getCreatedAt(),
+            performance.getUpdatedAt(),
+            performance.getArtists().stream()
+                .map(PerformanceArtistDTO::from)
+                .toList()
         );
     }
 
     public static PerformanceDTO from(final SearchPerformanceResult searchedPerformance) {
         return new PerformanceDTO(
-                searchedPerformance.id(),
-                searchedPerformance.typeId(),
-                searchedPerformance.type(),
-                searchedPerformance.area(),
-                searchedPerformance.title(),
-                searchedPerformance.startAt(),
-                searchedPerformance.endAt(),
-                searchedPerformance.posterPath(),
-                null,
-                null,
-                List.of()
+            searchedPerformance.id(),
+            searchedPerformance.typeId(),
+            searchedPerformance.type(),
+            searchedPerformance.area(),
+            searchedPerformance.title(),
+            searchedPerformance.startAt(),
+            searchedPerformance.endAt(),
+            searchedPerformance.posterPath(),
+            null,
+            null,
+            List.of()
         );
     }
 
