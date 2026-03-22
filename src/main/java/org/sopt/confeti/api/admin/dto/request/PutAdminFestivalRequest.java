@@ -32,11 +32,12 @@ public record PutAdminFestivalRequest(
     @NotBlank String price,
     @NotBlank String address,
     @NotNull @Valid List<ReservationUrlRequest> reservationUrls,
-    List<String> artistIds,
     List<@Valid DateRequest> dates
 ) {
 
     public AdminFestivalCommand toCommand() {
+        validate();
+
         TimetableSupportStatus status = hasTimetableInfo()
             ? TimetableSupportStatus.SUPPORTED
             : TimetableSupportStatus.NOT_SUPPORTED;
@@ -48,7 +49,6 @@ public record PutAdminFestivalRequest(
                 .map(url -> AdminFestivalCommand.ReservationUrlCommand.of(
                     url.ticketVendorId(), url.reservationUrl()))
                 .toList(),
-            artistIds,
             dates != null
                 ? dates.stream().map(this::toDateCommand).toList()
                 : List.of()
@@ -58,6 +58,7 @@ public record PutAdminFestivalRequest(
     private AdminFestivalCommand.DateCommand toDateCommand(DateRequest date) {
         return AdminFestivalCommand.DateCommand.of(
             date.festivalDateId(), date.festivalAt(), date.openAt(),
+            date.artistIds() != null ? date.artistIds() : List.of(),
             date.stages() != null
                 ? date.stages().stream().map(this::toStageCommand).toList()
                 : List.of()
@@ -82,9 +83,13 @@ public record PutAdminFestivalRequest(
         validateDuration();
         validateReserveDate();
 
+        if (dates != null && !dates.isEmpty()) {
+            validateDatesRequireArtists();
+        }
+
         if (hasTimetableInfo()) {
             validateTimetableDuration();
-            validateTimetableRequiresArtists();
+            validateAllDatesHaveStages();
             validateArtistTimetableMapping();
         }
     }
@@ -127,33 +132,49 @@ public record PutAdminFestivalRequest(
         }
     }
 
-    private void validateTimetableRequiresArtists() {
-        if (artistIds == null || artistIds.isEmpty()) {
+    private void validateDatesRequireArtists() {
+        boolean hasDateWithoutArtists = dates.stream()
+            .anyMatch(date -> date.artistIds() == null || date.artistIds().isEmpty());
+
+        if (hasDateWithoutArtists) {
             log.warn(
-                "PutAdminFestivalRequest.validateTimetableRequiresArtists : 타임테이블이 존재하면 아티스트 목록이 필요합니다.");
+                "PutAdminFestivalRequest.validateDatesRequireArtists : 모든 날짜에 아티스트 목록이 필요합니다.");
+            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+        }
+    }
+
+    private void validateAllDatesHaveStages() {
+        boolean hasDateWithoutStages = dates.stream()
+            .anyMatch(date -> date.stages() == null || date.stages().isEmpty());
+
+        if (hasDateWithoutStages) {
+            log.warn(
+                "PutAdminFestivalRequest.validateAllDatesHaveStages : 타임테이블이 존재하면 모든 날짜에 스테이지 정보가 있어야 합니다.");
             throw new BadRequestException(ErrorMessage.BAD_REQUEST);
         }
     }
 
     private void validateArtistTimetableMapping() {
-        Set<String> targetArtistIds = new HashSet<>(artistIds);
-        Set<String> timetableArtistIds = dates.stream()
-            .filter(date -> date.stages() != null)
-            .flatMap(date -> date.stages().stream())
-            .flatMap(stage -> stage.times().stream())
-            .flatMap(time -> time.artistIds().stream())
-            .collect(Collectors.toSet());
+        for (DateRequest date : dates) {
+            Set<String> dateArtistIds = new HashSet<>(date.artistIds());
+            Set<String> timetableArtistIds = date.stages().stream()
+                .flatMap(stage -> stage.times().stream())
+                .flatMap(time -> time.artistIds().stream())
+                .collect(Collectors.toSet());
 
-        if (!timetableArtistIds.containsAll(targetArtistIds)) {
-            log.warn(
-                "PutAdminFestivalRequest.validateArtistTimetableMapping : 모든 아티스트가 타임테이블에 배정되어야 합니다.");
-            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
-        }
+            if (!timetableArtistIds.containsAll(dateArtistIds)) {
+                log.warn(
+                    "PutAdminFestivalRequest.validateArtistTimetableMapping : 날짜({})의 모든 아티스트가 타임테이블에 배정되어야 합니다.",
+                    date.festivalAt());
+                throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+            }
 
-        if (!targetArtistIds.containsAll(timetableArtistIds)) {
-            log.warn(
-                "PutAdminFestivalRequest.validateArtistTimetableMapping : 타임테이블의 모든 아티스트가 선택되어야 합니다.");
-            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+            if (!dateArtistIds.containsAll(timetableArtistIds)) {
+                log.warn(
+                    "PutAdminFestivalRequest.validateArtistTimetableMapping : 날짜({})의 타임테이블의 모든 아티스트가 선택되어야 합니다.",
+                    date.festivalAt());
+                throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+            }
         }
     }
 
@@ -162,15 +183,8 @@ public record PutAdminFestivalRequest(
             return false;
         }
 
-        boolean hasStageInfo = dates.stream()
-            .anyMatch(date -> date.stages() != null && !date.stages.isEmpty());
-
-        if (!hasStageInfo) {
-            log.warn("PutAdminFestivalRequest.hasTimetableInfo : 타임테이블 등록을 위해서 스테이지 정보까지 있어야 합니다.");
-            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
-        }
-
-        return true;
+        return dates.stream()
+            .anyMatch(date -> date.stages() != null && !date.stages().isEmpty());
     }
 
     public record ReservationUrlRequest(
@@ -184,6 +198,7 @@ public record PutAdminFestivalRequest(
         Long festivalDateId,
         @NotNull LocalDate festivalAt,
         @NotNull LocalTime openAt,
+        List<@NotBlank String> artistIds,
         List<@Valid StageRequest> stages
     ) {
 

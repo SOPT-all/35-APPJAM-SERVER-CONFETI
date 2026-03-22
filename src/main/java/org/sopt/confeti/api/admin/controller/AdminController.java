@@ -243,8 +243,6 @@ public class AdminController implements AdminControllerDocs {
         @RequestPart(required = false) MultipartFile logo,
         @Valid @RequestPart(value = "festival") PutAdminFestivalRequest request
     ) {
-        request.validate();
-
         AdminFestivalCommand command = request.toCommand();
         return ApiResponseUtil.success(
             command.festivalId() == null ? SuccessMessage.CREATED : SuccessMessage.SUCCESS,
