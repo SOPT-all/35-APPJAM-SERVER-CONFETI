@@ -153,6 +153,8 @@ public class FestivalService {
             festivalTimeService.findTimesWithArtistsByStageIds(stageIds);
         }
 
+        festivalRepository.findWithReservationUrlsById(festivalId);
+
         return AdminFestivalDetailInfo.from(festival);
     }
 

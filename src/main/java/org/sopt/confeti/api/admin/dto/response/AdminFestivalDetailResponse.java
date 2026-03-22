@@ -26,7 +26,8 @@ public record AdminFestivalDetailResponse(
     TimetableSupportStatus timetableSupportStatus,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
-    List<DateResponse> dates
+    List<DateResponse> dates,
+    List<ReservationUrlResponse> reservationUrls
 ) {
 
     public record DateResponse(
@@ -90,6 +91,21 @@ public record AdminFestivalDetailResponse(
         }
     }
 
+    public record ReservationUrlResponse(
+        long reservationUrlId,
+        String reservationUrl,
+        long ticketVendorId
+    ) {
+
+        public static ReservationUrlResponse from(AdminFestivalDetailInfo.ReservationUrlInfo info) {
+            return new ReservationUrlResponse(
+                info.reservationUrlId(),
+                info.reservationUrl(),
+                info.ticketVendorId()
+            );
+        }
+    }
+
     public record ArtistResponse(
         String artistId,
         String name,
@@ -124,6 +140,9 @@ public record AdminFestivalDetailResponse(
             info.updatedAt(),
             info.dates().stream()
                 .map(DateResponse::from)
+                .toList(),
+            info.reservationUrls().stream()
+                .map(ReservationUrlResponse::from)
                 .toList()
         );
     }

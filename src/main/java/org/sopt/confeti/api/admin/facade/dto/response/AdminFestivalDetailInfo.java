@@ -7,6 +7,7 @@ import java.util.List;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival_artist.FestivalArtist;
+import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_stage.FestivalStage;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
@@ -27,7 +28,8 @@ public record AdminFestivalDetailInfo(
     TimetableSupportStatus timetableSupportStatus,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
-    List<DateInfo> dates
+    List<DateInfo> dates,
+    List<ReservationUrlInfo> reservationUrls
 ) {
 
     public record DateInfo(
@@ -91,6 +93,21 @@ public record AdminFestivalDetailInfo(
         }
     }
 
+    public record ReservationUrlInfo(
+        long reservationUrlId,
+        String reservationUrl,
+        long ticketVendorId
+    ) {
+
+        public static ReservationUrlInfo from(FestivalReservationUrl url) {
+            return new ReservationUrlInfo(
+                url.getId(),
+                url.getReservationUrl(),
+                url.getTicketVendor().getId()
+            );
+        }
+    }
+
     public record ArtistInfo(
         String artistId,
         String name,
@@ -125,6 +142,9 @@ public record AdminFestivalDetailInfo(
             festival.getUpdatedAt(),
             festival.getDates().stream()
                 .map(DateInfo::from)
+                .toList(),
+            festival.getReservationUrls().stream()
+                .map(ReservationUrlInfo::from)
                 .toList()
         );
     }
