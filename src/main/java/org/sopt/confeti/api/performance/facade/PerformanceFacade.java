@@ -146,6 +146,25 @@ public class PerformanceFacade {
             context.addGeneralPerformances(general);
         }
 
+        if (!context.isFull()) {
+            UserContext.getOptional().ifPresent(userInfo -> {
+                List<PerformanceTicketDTO> favoritesStartAt =
+                    performanceService.getFavoritePerformancesReservationForStartAt(
+                        userInfo.id(), PerformanceReservationContext.MAX_SIZE);
+                context.addFavoritePerformances(favoritesStartAt);
+            });
+        }
+
+        if (!context.isFull()) {
+            List<PerformanceTicketDTO> generalStartAt =
+                performanceService.getPerformancesReservationExcludingForStartAt(
+                    context.getExcludedConcertIds(),
+                    context.getExcludedFestivalIds(),
+                    context.remainingSlots()
+                );
+            context.addGeneralPerformances(generalStartAt);
+        }
+
         return context.build();
     }
 

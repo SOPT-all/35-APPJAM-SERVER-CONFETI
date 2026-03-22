@@ -53,7 +53,7 @@ public class PerformanceService {
     @Transactional(readOnly = true)
     public List<PerformanceTicketDTO> getFavoritePerformancesReservation(final Long userId,
         final int reservationPerformanceCount) {
-        return performanceDTORepository.findFavoritePerformancesReservation(userId,
+        return performanceDTORepository.findFavoritePerformancesReservationForReserveAt(userId,
             reservationPerformanceCount);
     }
 
@@ -109,7 +109,23 @@ public class PerformanceService {
         final List<Long> excludedConcertIds,
         final List<Long> excludedFestivalIds,
         final int limit) {
-        return performanceDTORepository.findPerformancesReservationExcluding(
+        return performanceDTORepository.findPerformancesReservationExcludingForReserveAt(
+            excludedConcertIds, excludedFestivalIds, limit);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PerformanceTicketDTO> getFavoritePerformancesReservationForStartAt(
+        final Long userId, final int reservationPerformanceCount) {
+        return performanceDTORepository.findFavoritePerformancesReservationForStartAt(userId,
+            reservationPerformanceCount);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PerformanceTicketDTO> getPerformancesReservationExcludingForStartAt(
+        final List<Long> excludedConcertIds,
+        final List<Long> excludedFestivalIds,
+        final int limit) {
+        return performanceDTORepository.findPerformancesReservationExcludingForStartAt(
             excludedConcertIds, excludedFestivalIds, limit);
     }
 
