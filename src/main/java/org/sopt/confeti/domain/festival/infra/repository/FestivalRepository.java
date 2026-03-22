@@ -42,6 +42,7 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
                         SELECT DISTINCT f
                         FROM Festival f
                         LEFT JOIN FETCH f.reservationUrls fru
+                        LEFT JOIN FETCH fru.ticketVendor
                         WHERE f.id = :festivalId
                     """)
     Optional<Festival> findWithReservationUrlsById(@Param("festivalId") long festivalId);
