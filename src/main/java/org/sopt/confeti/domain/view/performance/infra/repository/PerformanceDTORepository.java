@@ -54,7 +54,8 @@ public class PerformanceDTORepository {
             .toList();
     }
 
-    public List<PerformanceTicketDTO> findFavoritePerformancesReservation(final Long userId,
+    public List<PerformanceTicketDTO> findFavoritePerformancesReservationForReserveAt(
+        final Long userId,
         final int reservationPerformanceSize) {
         String sql = """
             SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, title, reserve_at
@@ -83,7 +84,37 @@ public class PerformanceDTORepository {
         return convertToPerformanceTicketDTOs(results);
     }
 
-    public List<PerformanceTicketDTO> findPerformancesReservationExcluding(
+    public List<PerformanceTicketDTO> findFavoritePerformancesReservationForStartAt(
+        final Long userId,
+        final int reservationPerformanceSize) {
+        String sql = """
+            SELECT ROW_NUMBER() OVER (ORDER BY start_at ASC) AS ind, performance_id, type, title, reserve_at
+            FROM (
+                SELECT c.id performance_id, :concertType type, c.title title, c.reserve_at, c.start_at
+                FROM concert_favorites cf
+                JOIN concerts c ON cf.concert_id = c.id
+                WHERE cf.user_id = :userId AND c.start_at >= CURRENT_DATE 
+                UNION ALL
+                SELECT f.id performance_id, :festivalType type, f.title title, f.reserve_at, f.start_at
+                FROM festival_favorites ff
+                JOIN festivals f ON ff.festival_id = f.id
+                WHERE ff.user_id = :userId AND f.start_at >= CURRENT_DATE
+            ) AS favorite_performances
+            ORDER BY start_at ASC
+            LIMIT :performanceReservationCount
+            """;
+
+        Query query = em.createNativeQuery(sql)
+            .setParameter("userId", userId)
+            .setParameter("concertType", PerformanceType.CONCERT.getName())
+            .setParameter("festivalType", PerformanceType.FESTIVAL.getName())
+            .setParameter("performanceReservationCount", reservationPerformanceSize);
+
+        List<Object[]> results = query.getResultList();
+        return convertToPerformanceTicketDTOs(results);
+    }
+
+    public List<PerformanceTicketDTO> findPerformancesReservationExcludingForReserveAt(
         final List<Long> excludedConcertIds,
         final List<Long> excludedFestivalIds,
         final int limit) {
@@ -99,6 +130,36 @@ public class PerformanceDTORepository {
                 WHERE f.reserve_at >= CURRENT_DATE AND f.id NOT IN (:excludedFestivalIds)
             ) AS all_performances
             ORDER BY reserve_at ASC
+            LIMIT :limit
+            """;
+
+        Query query = em.createNativeQuery(sql)
+            .setParameter("concertType", PerformanceType.CONCERT.getName())
+            .setParameter("festivalType", PerformanceType.FESTIVAL.getName())
+            .setParameter("excludedConcertIds", excludedConcertIds)
+            .setParameter("excludedFestivalIds", excludedFestivalIds)
+            .setParameter("limit", limit);
+
+        List<Object[]> results = query.getResultList();
+        return convertToPerformanceTicketDTOs(results);
+    }
+
+    public List<PerformanceTicketDTO> findPerformancesReservationExcludingForStartAt(
+        final List<Long> excludedConcertIds,
+        final List<Long> excludedFestivalIds,
+        final int limit) {
+        String sql = """
+            SELECT ROW_NUMBER() OVER (ORDER BY start_at ASC) AS ind, performance_id, type, title, reserve_at
+            FROM (
+                SELECT c.id performance_id, :concertType type, c.title title, c.reserve_at, c.start_at
+                FROM concerts c
+                WHERE c.start_at >= CURRENT_DATE AND c.id NOT IN (:excludedConcertIds)
+                UNION ALL
+                SELECT f.id performance_id, :festivalType type, f.title title, f.reserve_at, f.start_at
+                FROM festivals f
+                WHERE f.start_at >= CURRENT_DATE AND f.id NOT IN (:excludedFestivalIds)
+            ) AS all_performances
+            ORDER BY start_at ASC
             LIMIT :limit
             """;
 

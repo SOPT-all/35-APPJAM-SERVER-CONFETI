@@ -84,7 +84,6 @@ public record PutAdminFestivalRequest(
         validateReserveDate();
 
         if (dates != null && !dates.isEmpty()) {
-            validateDatesRequireArtists();
             validateDateFestivalAtInRange();
         }
 
@@ -134,17 +133,6 @@ public record PutAdminFestivalRequest(
                 "PutAdminFestivalRequest.validateTimetableDuration : 타임테이블의 날짜는 페스티벌의 공연 기간 안으로 지정해야합니다. 공연 기간 : {} ~ {}, 타임테이블 지정 날짜 : {} ~ {}",
                 startAt, endAt, startDate, endDate);
             throw new ParameterInvalidException(ErrorMessage.BAD_REQUEST);
-        }
-    }
-
-    private void validateDatesRequireArtists() {
-        boolean hasDateWithoutArtists = dates.stream()
-            .anyMatch(date -> date.artistIds() == null || date.artistIds().isEmpty());
-
-        if (hasDateWithoutArtists) {
-            log.warn(
-                "PutAdminFestivalRequest.validateDatesRequireArtists : 모든 날짜에 아티스트 목록이 필요합니다.");
-            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
         }
     }
 
