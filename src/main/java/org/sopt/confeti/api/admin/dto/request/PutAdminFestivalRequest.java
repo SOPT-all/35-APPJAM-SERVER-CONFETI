@@ -197,10 +197,6 @@ public record PutAdminFestivalRequest(
 
     private void validateOpenAtBeforeFirstTime() {
         for (DateRequest date : dates) {
-            if (date.stages() == null || date.stages().isEmpty()) {
-                continue;
-            }
-
             LocalTime earliestStartAt = date.stages().stream()
                 .flatMap(stage -> stage.times().stream())
                 .map(TimeRequest::startAt)
@@ -218,10 +214,6 @@ public record PutAdminFestivalRequest(
 
     private void validateStageOrderUnique() {
         for (DateRequest date : dates) {
-            if (date.stages() == null || date.stages().isEmpty()) {
-                continue;
-            }
-
             List<Integer> orders = date.stages().stream()
                 .map(StageRequest::order)
                 .toList();
@@ -238,10 +230,6 @@ public record PutAdminFestivalRequest(
 
     private void validateTimeStartBeforeEnd() {
         for (DateRequest date : dates) {
-            if (date.stages() == null) {
-                continue;
-            }
-
             for (StageRequest stage : date.stages()) {
                 for (TimeRequest time : stage.times()) {
                     if (!time.startAt().isBefore(time.endAt())) {
@@ -257,10 +245,6 @@ public record PutAdminFestivalRequest(
 
     private void validateTimeNoOverlap() {
         for (DateRequest date : dates) {
-            if (date.stages() == null) {
-                continue;
-            }
-
             for (StageRequest stage : date.stages()) {
                 List<TimeRequest> sortedTimes = new ArrayList<>(stage.times());
                 sortedTimes.sort((a, b) -> a.startAt().compareTo(b.startAt()));
