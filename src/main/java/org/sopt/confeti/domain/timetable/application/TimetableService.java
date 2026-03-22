@@ -42,6 +42,14 @@ public class TimetableService {
         return timetableRepository.existsByUserIdAndFestivalId(userId, festivalId);
     }
 
+    @Transactional(readOnly = true)
+    public Optional<Long> findTimetableIdByUserIdAndFestivalId(
+        final long userId,
+        final long festivalId
+    ) {
+        return timetableRepository.findTimetableIdByUserIdAndFestivalId(userId, festivalId);
+    }
+
     @Transactional
     public void removeTimetable(final long userId, final long festivalId) {
         timetableRepository.deleteByUserIdAndFestivalId(userId, festivalId);

@@ -285,11 +285,11 @@ public class UserTimetableFacade {
 
     @ReadOnlyTransactional
     public TimetableExistenceDTO getTimetableExistence(final long festivalId) {
-        boolean hasTimetable = timetableService.existsByUserIdAndFestivalId(
+        return timetableService.findTimetableIdByUserIdAndFestivalId(
             UserContext.get().id(),
             festivalId
-        );
-        return TimetableExistenceDTO.from(hasTimetable);
+        ).map(TimetableExistenceDTO::from)
+            .orElse(TimetableExistenceDTO.notExists());
     }
 
     @ReadOnlyTransactional

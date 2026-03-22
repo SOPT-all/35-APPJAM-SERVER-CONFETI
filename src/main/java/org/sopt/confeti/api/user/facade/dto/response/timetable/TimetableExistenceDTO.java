@@ -1,12 +1,18 @@
 package org.sopt.confeti.api.user.facade.dto.response.timetable;
 
 public record TimetableExistenceDTO(
-    boolean hasTimetable
+    Long timetableId
 ) {
 
-    public static TimetableExistenceDTO from(boolean hasTimetable) {
+    public static TimetableExistenceDTO from(Long timetableId) {
         return new TimetableExistenceDTO(
-            hasTimetable
+            timetableId
+        );
+    }
+
+    public static TimetableExistenceDTO notExists() {
+        return new TimetableExistenceDTO(
+            null
         );
     }
 }
