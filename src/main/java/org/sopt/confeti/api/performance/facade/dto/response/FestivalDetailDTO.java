@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.global.annotation.RedisSerializable;
 
 @RedisSerializable
@@ -21,7 +22,8 @@ public record FestivalDetailDTO(
     String price,
     String address,
     List<FestivalReservationDTO> reservations,
-    List<FestivalDetailDateDTO> dates
+    List<FestivalDetailDateDTO> dates,
+    TimetableSupportStatus timetableSupportStatus
 ) {
 
     public static FestivalDetailDTO from(Festival festival) {
@@ -43,7 +45,8 @@ public record FestivalDetailDTO(
                 .toList(),
             festival.getDates().stream()
                 .map(FestivalDetailDateDTO::from)
-                .toList()
+                .toList(),
+            festival.getTimetableSupportStatus()
         );
     }
 }

@@ -2,6 +2,7 @@ package org.sopt.confeti.api.performance.dto.response;
 
 import java.util.List;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
+import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.DateConvertor;
 import org.sopt.confeti.global.util.S3FileHandler;
@@ -19,7 +20,8 @@ public record FestivalDetailInfoResponse(
     String price,
     boolean isFavorite,
     String address,
-    List<FestivalReservationResponse> reservations
+    List<FestivalReservationResponse> reservations,
+    TimetableSupportStatus timetableSupportStatus
 ) {
 
     public static FestivalDetailInfoResponse of(FestivalDetailDTO festival, boolean isFavorite,
@@ -40,7 +42,8 @@ public record FestivalDetailInfoResponse(
             festival.address(),
             festival.reservations().stream()
                 .map(reservation -> FestivalReservationResponse.of(reservation, s3FileHandler))
-                .toList()
+                .toList(),
+            festival.timetableSupportStatus()
         );
     }
 }
