@@ -36,6 +36,8 @@ public record PutAdminFestivalRequest(
 ) {
 
     public AdminFestivalCommand toCommand() {
+        validate();
+
         TimetableSupportStatus status = hasTimetableInfo()
             ? TimetableSupportStatus.SUPPORTED
             : TimetableSupportStatus.NOT_SUPPORTED;

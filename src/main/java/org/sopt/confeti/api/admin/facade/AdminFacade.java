@@ -578,10 +578,7 @@ public class AdminFacade {
         String posterFolderPath = FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER);
         String logoFolderPath = FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO);
 
-        Set<String> allArtistIds = command.dates().stream()
-            .filter(date -> date.artistIds() != null)
-            .flatMap(date -> date.artistIds().stream())
-            .collect(Collectors.toSet());
+        Set<String> allArtistIds = command.collectAllArtistIds();
         if (!allArtistIds.isEmpty()) {
             ensureArtistsExist(allArtistIds);
         }
@@ -794,28 +791,11 @@ public class AdminFacade {
 
                 existingDate.update(dateCmd.festivalAt(), dateCmd.openAt());
                 updateFestivalStages(existingDate, dateCmd, artistNameMap);
-
-                List<FestivalArtist> dateArtists;
-                if (existingDate.getStages().isEmpty()) {
-                    dateArtists = dateCmd.artistIds().stream()
-                        .map(FestivalArtist::create)
-                        .toList();
-                } else {
-                    dateArtists = collectArtistsFromStages(existingDate.getStages());
-                }
-                existingDate.replaceArtists(dateArtists);
+                existingDate.replaceArtists(buildDateArtists(dateCmd, existingDate.getStages()));
             } else { // 생성
                 List<FestivalStage> stages = buildFestivalStages(dateCmd, artistNameMap);
-                List<FestivalArtist> dateArtists;
-                if (stages.isEmpty()) {
-                    dateArtists = dateCmd.artistIds().stream()
-                        .map(FestivalArtist::create)
-                        .toList();
-                } else {
-                    dateArtists = collectArtistsFromStages(stages);
-                }
                 FestivalDate newDate = FestivalDate.create(
-                    dateCmd.festivalAt(), dateCmd.openAt(), stages, dateArtists);
+                    dateCmd.festivalAt(), dateCmd.openAt(), stages, buildDateArtists(dateCmd, stages));
                 festival.addDate(newDate);
             }
         }
@@ -907,13 +887,7 @@ public class AdminFacade {
     }
 
     private Map<String, String> buildArtistNameMap(AdminFestivalCommand command) {
-        Set<String> allArtistIds = new HashSet<>();
-
-        command.dates().forEach(date -> {
-            if (date.artistIds() != null) {
-                allArtistIds.addAll(date.artistIds());
-            }
-        });
+        Set<String> allArtistIds = new HashSet<>(command.collectAllArtistIds());
 
         command.dates().stream()
             .flatMap(date -> date.stages().stream())
@@ -953,16 +927,8 @@ public class AdminFacade {
         return command.dates().stream()
             .map(dateCmd -> {
                 List<FestivalStage> stages = buildFestivalStages(dateCmd, artistNameMap);
-                List<FestivalArtist> dateArtists;
-                if (stages.isEmpty()) {
-                    dateArtists = dateCmd.artistIds().stream()
-                        .map(FestivalArtist::create)
-                        .toList();
-                } else {
-                    dateArtists = collectArtistsFromStages(stages);
-                }
                 return FestivalDate.create(
-                    dateCmd.festivalAt(), dateCmd.openAt(), stages, dateArtists);
+                    dateCmd.festivalAt(), dateCmd.openAt(), stages, buildDateArtists(dateCmd, stages));
             })
             .toList();
     }
@@ -1002,6 +968,16 @@ public class AdminFacade {
             .toList();
     }
 
+    private List<FestivalArtist> buildDateArtists(
+        AdminFestivalCommand.DateCommand dateCmd, List<FestivalStage> stages) {
+        if (stages.isEmpty()) {
+            return dateCmd.artistIds().stream()
+                .map(FestivalArtist::create)
+                .toList();
+        }
+        return collectArtistsFromStages(stages);
+    }
+
     private List<FestivalReservationUrl> buildFestivalReservationUrls(
         AdminFestivalCommand command, Map<Long, TicketVendor> vendorMap) {
         return command.reservationUrls().stream()
@@ -1012,10 +988,7 @@ public class AdminFacade {
 
     private List<PerformanceArtist> buildFestivalPerformanceArtists(
         AdminFestivalCommand command) {
-        Set<String> allArtistIds = command.dates().stream()
-            .filter(date -> date.artistIds() != null)
-            .flatMap(date -> date.artistIds().stream())
-            .collect(Collectors.toSet());
+        Set<String> allArtistIds = command.collectAllArtistIds();
 
         if (allArtistIds.isEmpty()) {
             return List.of();

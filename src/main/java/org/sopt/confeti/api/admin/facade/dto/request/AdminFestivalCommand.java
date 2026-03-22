@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 
 public record AdminFestivalCommand(
@@ -36,6 +38,13 @@ public record AdminFestivalCommand(
             reserveAt, ageRating, time, price, address, timetableSupportStatus,
             reservationUrls, dates
         );
+    }
+
+    public Set<String> collectAllArtistIds() {
+        return dates.stream()
+            .filter(date -> date.artistIds() != null)
+            .flatMap(date -> date.artistIds().stream())
+            .collect(Collectors.toSet());
     }
 
     public record ReservationUrlCommand(
