@@ -7,6 +7,7 @@ import org.sopt.confeti.global.util.DateConvertor;
 
 public record TimetableFestivalTimeResponse(
     Long timeBlockId,
+    String name,
     String startAt,
     String endAt,
     Boolean isSelected,
@@ -17,6 +18,7 @@ public record TimetableFestivalTimeResponse(
         TimetableFestivalTimeDTO festivalTime) {
         return new TimetableFestivalTimeResponse(
             festivalTime.timeBlockId(),
+            festivalTime.name(),
             DateConvertor.convertToDefaultFormat(festivalDate, festivalTime.startAt()),
             DateConvertor.convertToDefaultFormat(festivalDate, festivalTime.endAt()),
             festivalTime.isSelected(),
