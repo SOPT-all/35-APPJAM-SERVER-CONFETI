@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -84,12 +85,17 @@ public record PutAdminFestivalRequest(
 
         if (dates != null && !dates.isEmpty()) {
             validateDatesRequireArtists();
+            validateDateFestivalAtInRange();
         }
 
         if (hasTimetableInfo()) {
             validateTimetableDuration();
             validateAllDatesHaveStages();
             validateArtistTimetableMapping();
+            validateOpenAtBeforeFirstTime();
+            validateStageOrderUnique();
+            validateTimeStartBeforeEnd();
+            validateTimeNoOverlap();
         }
     }
 
@@ -173,6 +179,89 @@ public record PutAdminFestivalRequest(
                     "PutAdminFestivalRequest.validateArtistTimetableMapping : 날짜({})의 타임테이블의 모든 아티스트가 선택되어야 합니다.",
                     date.festivalAt());
                 throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+            }
+        }
+    }
+
+    private void validateDateFestivalAtInRange() {
+        boolean hasDateOutOfRange = dates.stream()
+            .anyMatch(date -> date.festivalAt().isBefore(startAt) || date.festivalAt().isAfter(endAt));
+
+        if (hasDateOutOfRange) {
+            log.warn(
+                "PutAdminFestivalRequest.validateDateFestivalAtInRange : 모든 날짜의 festivalAt은 공연 기간({} ~ {}) 내에 있어야 합니다.",
+                startAt, endAt);
+            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+        }
+    }
+
+    private void validateOpenAtBeforeFirstTime() {
+        for (DateRequest date : dates) {
+            LocalTime earliestStartAt = date.stages().stream()
+                .flatMap(stage -> stage.times().stream())
+                .map(TimeRequest::startAt)
+                .min(LocalTime::compareTo)
+                .orElse(null);
+
+            if (earliestStartAt != null && date.openAt().isAfter(earliestStartAt)) {
+                log.warn(
+                    "PutAdminFestivalRequest.validateOpenAtBeforeFirstTime : 날짜({})의 openAt({})은 가장 이른 공연 시작 시간({}) 이하여야 합니다.",
+                    date.festivalAt(), date.openAt(), earliestStartAt);
+                throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+            }
+        }
+    }
+
+    private void validateStageOrderUnique() {
+        for (DateRequest date : dates) {
+            List<Integer> orders = date.stages().stream()
+                .map(StageRequest::order)
+                .toList();
+            Set<Integer> uniqueOrders = new HashSet<>(orders);
+
+            if (uniqueOrders.size() != orders.size()) {
+                log.warn(
+                    "PutAdminFestivalRequest.validateStageOrderUnique : 날짜({})의 스테이지 순서(order)가 중복됩니다.",
+                    date.festivalAt());
+                throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+            }
+        }
+    }
+
+    private void validateTimeStartBeforeEnd() {
+        for (DateRequest date : dates) {
+            for (StageRequest stage : date.stages()) {
+                for (TimeRequest time : stage.times()) {
+                    if (!time.startAt().isBefore(time.endAt())) {
+                        log.warn(
+                            "PutAdminFestivalRequest.validateTimeStartBeforeEnd : 날짜({}), 스테이지({})의 공연 시작 시간({})은 종료 시간({})보다 이전이어야 합니다.",
+                            date.festivalAt(), stage.name(), time.startAt(), time.endAt());
+                        throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+                    }
+                }
+            }
+        }
+    }
+
+    private void validateTimeNoOverlap() {
+        for (DateRequest date : dates) {
+            for (StageRequest stage : date.stages()) {
+                List<TimeRequest> sortedTimes = new ArrayList<>(stage.times());
+                sortedTimes.sort((a, b) -> a.startAt().compareTo(b.startAt()));
+
+                for (int i = 0; i < sortedTimes.size() - 1; i++) {
+                    TimeRequest current = sortedTimes.get(i);
+                    TimeRequest next = sortedTimes.get(i + 1);
+
+                    if (current.endAt().isAfter(next.startAt())) {
+                        log.warn(
+                            "PutAdminFestivalRequest.validateTimeNoOverlap : 날짜({}), 스테이지({})에서 공연 시간이 겹칩니다. ({} ~ {})와 ({} ~ {})",
+                            date.festivalAt(), stage.name(),
+                            current.startAt(), current.endAt(),
+                            next.startAt(), next.endAt());
+                        throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+                    }
+                }
             }
         }
     }

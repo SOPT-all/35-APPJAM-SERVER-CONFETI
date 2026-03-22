@@ -37,7 +37,7 @@ public class FestivalReservationUrl {
     @JoinColumn(name = "ticket_vendor_id")
     private TicketVendor ticketVendor;
 
-    @Column(length = 200, nullable = false)
+    @Column(length = 500, nullable = false)
     private String reservationUrl;
 
     @Builder
