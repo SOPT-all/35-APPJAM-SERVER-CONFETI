@@ -33,12 +33,16 @@ import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
 import org.sopt.confeti.domain.concert_artist.ConcertArtist;
 import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
+import org.sopt.confeti.domain.concert_reservation_schedule.ConcertReservationSchedule;
+import org.sopt.confeti.domain.concert_reservation_schedule.ConcertReservationScheduleInfo;
 import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_artist.FestivalArtist;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
+import org.sopt.confeti.domain.festival_reservation_schedule.FestivalReservationSchedule;
+import org.sopt.confeti.domain.festival_reservation_schedule.FestivalReservationScheduleInfo;
 import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
 import org.sopt.confeti.domain.festival_stage.FestivalStage;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
@@ -449,13 +453,14 @@ public class AdminFacade {
 
             List<ConcertArtist> concertArtists = buildConcertArtists(command);
             List<ConcertReservationUrl> reservationUrls = buildReservationUrls(command, vendorMap);
+            List<ConcertReservationSchedule> reservationSchedules = buildConcertReservationSchedules(command);
             List<PerformanceArtist> performanceArtists = buildPerformanceArtists(command);
 
             Concert concert = Concert.create(
                 command.title(), command.startAt(), command.endAt(),
-                command.area(), posterPath, command.reserveAt(), command.ageRating(),
+                command.area(), posterPath, command.ageRating(),
                 command.time(), command.price(), command.address(),
-                concertArtists, reservationUrls
+                concertArtists, reservationUrls, reservationSchedules
             );
             long concertId = concertService.create(concert);
 
@@ -477,6 +482,7 @@ public class AdminFacade {
 
             List<ConcertArtist> concertArtists = buildConcertArtists(command);
             List<ConcertReservationUrl> reservationUrls = buildReservationUrls(command, vendorMap);
+            List<ConcertReservationSchedule> reservationSchedules = buildConcertReservationSchedules(command);
             List<PerformanceArtist> performanceArtists = buildPerformanceArtists(command);
 
             Concert concert = concertService.findWithRelationsById(command.concertId());
@@ -488,9 +494,9 @@ public class AdminFacade {
 
             concert.update(
                 command.title(), command.startAt(), command.endAt(),
-                command.area(), posterPath, command.reserveAt(), command.ageRating(),
+                command.area(), posterPath, command.ageRating(),
                 command.time(), command.price(), command.address(),
-                concertArtists, reservationUrls
+                concertArtists, reservationUrls, reservationSchedules
             );
 
             Performance performance = performanceService.getPerformanceByTypeAndTypeId(
@@ -532,6 +538,13 @@ public class AdminFacade {
         return command.reservationUrls().stream()
             .map(url -> ConcertReservationUrl.create(
                 url.reservationUrl(), vendorMap.get(url.ticketVendorId())))
+            .toList();
+    }
+
+    private List<ConcertReservationSchedule> buildConcertReservationSchedules(AdminConcertCommand command) {
+        return command.reservationSchedules().stream()
+            .map(s -> ConcertReservationSchedule.fromDomain(
+                ConcertReservationScheduleInfo.of(s.roundName(), s.reserveAt())))
             .toList();
     }
 
@@ -712,12 +725,13 @@ public class AdminFacade {
             List<FestivalDate> dates = buildFestivalDates(command, artistNameMap);
             List<FestivalReservationUrl> reservationUrls = buildFestivalReservationUrls(
                 command, vendorMap);
+            List<FestivalReservationSchedule> reservationSchedules = buildFestivalReservationSchedules(command);
 
             Festival festival = Festival.create(
                 command.title(), command.startAt(), command.endAt(),
-                command.area(), posterPath, logoPath, command.reserveAt(),
+                command.area(), posterPath, logoPath,
                 command.ageRating(), command.time(), command.price(), command.address(),
-                command.timetableSupportStatus(), dates, reservationUrls
+                command.timetableSupportStatus(), dates, reservationUrls, reservationSchedules
             );
             long festivalId = festivalService.create(festival);
 
@@ -740,7 +754,7 @@ public class AdminFacade {
 
             festival.updateBasicFields(
                 command.title(), command.startAt(), command.endAt(),
-                command.area(), posterPath, logoPath, command.reserveAt(),
+                command.area(), posterPath, logoPath,
                 command.ageRating(), command.time(), command.price(), command.address(),
                 command.timetableSupportStatus()
             );
@@ -750,6 +764,9 @@ public class AdminFacade {
             List<FestivalReservationUrl> newReservationUrls = buildFestivalReservationUrls(
                 command, vendorMap);
             festival.replaceReservationUrls(newReservationUrls);
+
+            List<FestivalReservationSchedule> newReservationSchedules = buildFestivalReservationSchedules(command);
+            festival.replaceReservationSchedules(newReservationSchedules);
 
             List<PerformanceArtist> performanceArtists = buildFestivalPerformanceArtists(command);
             Performance performance = performanceService.getWithArtistsByTypeAndTypeId(
@@ -983,6 +1000,13 @@ public class AdminFacade {
         return command.reservationUrls().stream()
             .map(url -> FestivalReservationUrl.create(
                 url.reservationUrl(), vendorMap.get(url.ticketVendorId())))
+            .toList();
+    }
+
+    private List<FestivalReservationSchedule> buildFestivalReservationSchedules(AdminFestivalCommand command) {
+        return command.reservationSchedules().stream()
+            .map(s -> FestivalReservationSchedule.fromDomain(
+                FestivalReservationScheduleInfo.of(s.roundName(), s.reserveAt())))
             .toList();
     }
 

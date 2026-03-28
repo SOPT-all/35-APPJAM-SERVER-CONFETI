@@ -63,6 +63,7 @@ public class FestivalService {
 
         festivalDateService.findDatesWithArtistsByFestivalId(festivalId);
         festivalRepository.findUpcomingWithReservationUrlsById(festivalId);
+        festivalRepository.findUpcomingWithReservationSchedulesById(festivalId);
 
         FestivalDetailDTO festivalDetail = FestivalDetailDTO.from(festival);
         redisHandler.set(RedisKey.PERFORMANCE_FESTIVALS.createKeyInfo(festivalId), festivalDetail);
@@ -154,6 +155,7 @@ public class FestivalService {
         }
 
         festivalRepository.findWithReservationUrlsById(festivalId);
+        festivalRepository.findWithReservationSchedulesById(festivalId);
 
         return AdminFestivalDetailInfo.from(festival);
     }
@@ -180,6 +182,7 @@ public class FestivalService {
         }
 
         festivalRepository.findUpcomingWithReservationUrlsById(festivalId);
+        festivalRepository.findWithReservationSchedulesById(festivalId);
 
         return festival;
     }

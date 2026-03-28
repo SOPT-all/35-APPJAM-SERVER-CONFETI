@@ -30,7 +30,8 @@ public interface FestivalFavoriteRepository extends JpaRepository<FestivalFavori
     @Query("SELECT CASE WHEN COUNT(ff) > 0 THEN true ELSE false END " +
         "FROM FestivalFavorite ff " +
         "WHERE ff.user.id = :userId " +
-        "AND ff.festival.reserveAt >= CURRENT_DATE ")
+        "AND EXISTS (SELECT 1 FROM FestivalReservationSchedule frs " +
+        "WHERE frs.festival = ff.festival AND frs.reserveAt >= CURRENT_DATE)")
     boolean existsUpcomingReservationByUserId(@Param("userId") Long userId);
 
     @Query("SELECT ff.festival.id FROM FestivalFavorite ff WHERE ff.user.id = :userId AND ff.festival.id IN :festivalIds")

@@ -23,6 +23,7 @@ import lombok.Setter;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_favorite.FestivalFavorite;
+import org.sopt.confeti.domain.festival_reservation_schedule.FestivalReservationSchedule;
 import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
 import org.sopt.confeti.domain.timetable.Timetable;
 import org.springframework.data.annotation.CreatedDate;
@@ -57,8 +58,6 @@ public class Festival {
     @Setter
     @Column(length = 250)
     private String logoPath;
-    @Column(nullable = false)
-    private LocalDateTime reserveAt;
     @Column(length = 30, nullable = false)
     private String ageRating;
     @Column(name = "times", length = 30, nullable = false)
@@ -79,41 +78,46 @@ public class Festival {
     private List<FestivalDate> dates = new ArrayList<>();
     @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FestivalReservationUrl> reservationUrls = new ArrayList<>();
+    @OneToMany(mappedBy = "festival", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FestivalReservationSchedule> reservationSchedules = new ArrayList<>();
 
     @Builder
     private Festival(String title, LocalDate startAt, LocalDate endAt,
         String area,
-        String posterPath, String logoPath, LocalDateTime reserveAt,
+        String posterPath, String logoPath,
         String ageRating,
         String time, String price, String address,
         TimetableSupportStatus timetableSupportStatus,
         List<FestivalDate> dates,
-        List<FestivalReservationUrl> reservationUrls) {
+        List<FestivalReservationUrl> reservationUrls,
+        List<FestivalReservationSchedule> reservationSchedules) {
         this.title = title;
         this.startAt = startAt;
         this.endAt = endAt;
         this.area = area;
         this.posterPath = posterPath;
         this.logoPath = logoPath;
-        this.reserveAt = reserveAt;
         this.ageRating = ageRating;
         this.time = time;
         this.price = price;
         this.address = address;
         this.dates = dates;
         this.reservationUrls = reservationUrls;
+        this.reservationSchedules = reservationSchedules;
         this.timetableSupportStatus = timetableSupportStatus;
 
         this.dates.forEach(date -> date.setFestival(this));
         this.reservationUrls.forEach(url -> url.setFestival(this));
+        this.reservationSchedules.forEach(schedule -> schedule.setFestival(this));
     }
 
     public static Festival create(
         String title, LocalDate startAt, LocalDate endAt,
-        String area, String posterPath, String logoPath, LocalDateTime reserveAt,
+        String area, String posterPath, String logoPath,
         String ageRating, String time, String price, String address,
         TimetableSupportStatus timetableSupportStatus,
-        List<FestivalDate> dates, List<FestivalReservationUrl> reservationUrls
+        List<FestivalDate> dates, List<FestivalReservationUrl> reservationUrls,
+        List<FestivalReservationSchedule> reservationSchedules
     ) {
         return Festival.builder()
             .title(title)
@@ -122,7 +126,6 @@ public class Festival {
             .area(area)
             .posterPath(posterPath)
             .logoPath(logoPath)
-            .reserveAt(reserveAt)
             .ageRating(ageRating)
             .time(time)
             .price(price)
@@ -130,12 +133,13 @@ public class Festival {
             .timetableSupportStatus(timetableSupportStatus)
             .dates(dates)
             .reservationUrls(reservationUrls)
+            .reservationSchedules(reservationSchedules)
             .build();
     }
 
     public void updateBasicFields(
         String title, LocalDate startAt, LocalDate endAt,
-        String area, String posterPath, String logoPath, LocalDateTime reserveAt,
+        String area, String posterPath, String logoPath,
         String ageRating, String time, String price, String address,
         TimetableSupportStatus timetableSupportStatus
     ) {
@@ -145,7 +149,6 @@ public class Festival {
         this.area = area;
         this.posterPath = posterPath;
         this.logoPath = logoPath;
-        this.reserveAt = reserveAt;
         this.ageRating = ageRating;
         this.time = time;
         this.price = price;
@@ -162,6 +165,12 @@ public class Festival {
         this.reservationUrls.clear();
         this.reservationUrls.addAll(newReservationUrls);
         newReservationUrls.forEach(url -> url.setFestival(this));
+    }
+
+    public void replaceReservationSchedules(List<FestivalReservationSchedule> newReservationSchedules) {
+        this.reservationSchedules.clear();
+        this.reservationSchedules.addAll(newReservationSchedules);
+        newReservationSchedules.forEach(schedule -> schedule.setFestival(this));
     }
 
     public void addDate(FestivalDate date) {

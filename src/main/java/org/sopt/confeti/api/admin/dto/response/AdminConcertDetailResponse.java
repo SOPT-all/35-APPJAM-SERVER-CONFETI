@@ -14,7 +14,6 @@ public record AdminConcertDetailResponse(
     LocalDate endAt,
     String area,
     String posterUrl,
-    LocalDateTime reserveAt,
     String ageRating,
     String time,
     String price,
@@ -22,6 +21,7 @@ public record AdminConcertDetailResponse(
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     List<ReservationUrlResponse> reservationUrls,
+    List<ReservationScheduleResponse> reservationSchedules,
     List<ArtistResponse> artists
 ) {
 
@@ -36,6 +36,21 @@ public record AdminConcertDetailResponse(
                 info.reservationUrlId(),
                 info.reservationUrl(),
                 info.ticketVendorId()
+            );
+        }
+    }
+
+    public record ReservationScheduleResponse(
+        long reservationScheduleId,
+        String roundName,
+        LocalDateTime reserveAt
+    ) {
+
+        public static ReservationScheduleResponse from(AdminConcertDetailInfo.ReservationScheduleInfo info) {
+            return new ReservationScheduleResponse(
+                info.reservationScheduleId(),
+                info.roundName(),
+                info.reserveAt()
             );
         }
     }
@@ -63,7 +78,6 @@ public record AdminConcertDetailResponse(
             info.endAt(),
             info.area(),
             s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER), info.posterPath()).toString(),
-            info.reserveAt(),
             info.ageRating(),
             info.time(),
             info.price(),
@@ -72,6 +86,9 @@ public record AdminConcertDetailResponse(
             info.updatedAt(),
             info.reservationUrls().stream()
                 .map(ReservationUrlResponse::from)
+                .toList(),
+            info.reservationSchedules().stream()
+                .map(ReservationScheduleResponse::from)
                 .toList(),
             info.artists().stream()
                 .map(ArtistResponse::from)

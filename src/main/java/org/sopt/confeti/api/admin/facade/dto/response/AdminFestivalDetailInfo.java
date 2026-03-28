@@ -7,6 +7,7 @@ import java.util.List;
 import org.sopt.confeti.domain.festival.Festival;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival_artist.FestivalArtist;
+import org.sopt.confeti.domain.festival_reservation_schedule.FestivalReservationScheduleInfo;
 import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_stage.FestivalStage;
@@ -20,7 +21,6 @@ public record AdminFestivalDetailInfo(
     String area,
     String posterPath,
     String logoPath,
-    LocalDateTime reserveAt,
     String ageRating,
     String time,
     String price,
@@ -29,7 +29,8 @@ public record AdminFestivalDetailInfo(
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     List<DateInfo> dates,
-    List<ReservationUrlInfo> reservationUrls
+    List<ReservationUrlInfo> reservationUrls,
+    List<ReservationScheduleInfo> reservationSchedules
 ) {
 
     public record DateInfo(
@@ -108,6 +109,21 @@ public record AdminFestivalDetailInfo(
         }
     }
 
+    public record ReservationScheduleInfo(
+        long reservationScheduleId,
+        String roundName,
+        LocalDateTime reserveAt
+    ) {
+
+        public static ReservationScheduleInfo from(FestivalReservationScheduleInfo info) {
+            return new ReservationScheduleInfo(
+                info.id(),
+                info.roundName(),
+                info.reserveAt()
+            );
+        }
+    }
+
     public record ArtistInfo(
         String artistId,
         String name,
@@ -132,7 +148,6 @@ public record AdminFestivalDetailInfo(
             festival.getArea(),
             festival.getPosterPath(),
             festival.getLogoPath(),
-            festival.getReserveAt(),
             festival.getAgeRating(),
             festival.getTime(),
             festival.getPrice(),
@@ -145,6 +160,9 @@ public record AdminFestivalDetailInfo(
                 .toList(),
             festival.getReservationUrls().stream()
                 .map(ReservationUrlInfo::from)
+                .toList(),
+            festival.getReservationSchedules().stream()
+                .map(schedule -> ReservationScheduleInfo.from(schedule.toDomain()))
                 .toList()
         );
     }
