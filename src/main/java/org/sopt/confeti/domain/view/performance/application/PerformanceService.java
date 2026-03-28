@@ -114,22 +114,6 @@ public class PerformanceService {
     }
 
     @Transactional(readOnly = true)
-    public List<PerformanceTicketDTO> getFavoritePerformancesReservationForStartAt(
-        final Long userId, final int reservationPerformanceCount) {
-        return performanceDTORepository.findFavoritePerformancesReservationForStartAt(userId,
-            reservationPerformanceCount);
-    }
-
-    @Transactional(readOnly = true)
-    public List<PerformanceTicketDTO> getPerformancesReservationExcludingForStartAt(
-        final List<Long> excludedConcertIds,
-        final List<Long> excludedFestivalIds,
-        final int limit) {
-        return performanceDTORepository.findPerformancesReservationExcludingForStartAt(
-            excludedConcertIds, excludedFestivalIds, limit);
-    }
-
-    @Transactional(readOnly = true)
     public List<Performance> getRecentPerformancesExcluding(
         final List<Long> excludedConcertIds,
         final List<Long> excludedFestivalIds,

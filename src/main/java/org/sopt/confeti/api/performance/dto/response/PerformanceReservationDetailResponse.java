@@ -9,6 +9,7 @@ public record PerformanceReservationDetailResponse(
         long typeId,
         PerformanceType type,
         String title,
+        String roundName,
         String reserveAt,
         boolean isFavorite
 ) {
@@ -18,6 +19,7 @@ public record PerformanceReservationDetailResponse(
                 performanceReservation.typeId(),
                 performanceReservation.type(),
                 performanceReservation.title(),
+                performanceReservation.roundName(),
                 DateConvertor.convertToDefaultFormat(performanceReservation.reserveAt()),
                 performanceReservation.isFavorite()
         );

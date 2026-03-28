@@ -8,6 +8,7 @@ public record PerformanceTicketDTO(
         long typeId,
         PerformanceType type,
         String title,
+        String roundName,
         LocalDateTime reserveAt
 ) {
     public static PerformanceTicketDTO of(
@@ -15,6 +16,7 @@ public record PerformanceTicketDTO(
             final long performanceId,
             final String type,
             final String title,
+            final String roundName,
             final LocalDateTime reserveAt
     ) {
         return new PerformanceTicketDTO(
@@ -22,6 +24,7 @@ public record PerformanceTicketDTO(
                 performanceId,
                 PerformanceType.convert(type),
                 title,
+                roundName,
                 reserveAt
         );
     }

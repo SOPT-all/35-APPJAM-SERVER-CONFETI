@@ -58,49 +58,32 @@ public class PerformanceDTORepository {
         final Long userId,
         final int reservationPerformanceSize) {
         String sql = """
-            SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, title, reserve_at
+            SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind,
+                   performance_id, type, title, round_name, reserve_at
             FROM (
-                SELECT c.id performance_id, :concertType type, c.title title, c.reserve_at
+                SELECT c.id performance_id, :concertType type, c.title title,
+                       crs.round_name, crs.reserve_at
                 FROM concert_favorites cf
                 JOIN concerts c ON cf.concert_id = c.id
-                WHERE cf.user_id = :userId AND c.reserve_at >= CURRENT_DATE 
+                JOIN concert_reservation_schedules crs ON crs.concert_id = c.id
+                    AND crs.reserve_at = (
+                        SELECT MIN(crs2.reserve_at) FROM concert_reservation_schedules crs2
+                        WHERE crs2.concert_id = c.id AND crs2.reserve_at >= CURRENT_DATE
+                    )
+                WHERE cf.user_id = :userId
                 UNION ALL
-                SELECT f.id performance_id, :festivalType type, f.title title, f.reserve_at
+                SELECT f.id performance_id, :festivalType type, f.title title,
+                       frs.round_name, frs.reserve_at
                 FROM festival_favorites ff
                 JOIN festivals f ON ff.festival_id = f.id
-                WHERE ff.user_id = :userId AND f.reserve_at >= CURRENT_DATE
+                JOIN festival_reservation_schedules frs ON frs.festival_id = f.id
+                    AND frs.reserve_at = (
+                        SELECT MIN(frs2.reserve_at) FROM festival_reservation_schedules frs2
+                        WHERE frs2.festival_id = f.id AND frs2.reserve_at >= CURRENT_DATE
+                    )
+                WHERE ff.user_id = :userId
             ) AS favorite_performances
             ORDER BY reserve_at ASC
-            LIMIT :performanceReservationCount
-            """;
-
-        Query query = em.createNativeQuery(sql)
-            .setParameter("userId", userId)
-            .setParameter("concertType", PerformanceType.CONCERT.getName())
-            .setParameter("festivalType", PerformanceType.FESTIVAL.getName())
-            .setParameter("performanceReservationCount", reservationPerformanceSize);
-
-        List<Object[]> results = query.getResultList();
-        return convertToPerformanceTicketDTOs(results);
-    }
-
-    public List<PerformanceTicketDTO> findFavoritePerformancesReservationForStartAt(
-        final Long userId,
-        final int reservationPerformanceSize) {
-        String sql = """
-            SELECT ROW_NUMBER() OVER (ORDER BY start_at ASC) AS ind, performance_id, type, title, reserve_at
-            FROM (
-                SELECT c.id performance_id, :concertType type, c.title title, c.reserve_at, c.start_at
-                FROM concert_favorites cf
-                JOIN concerts c ON cf.concert_id = c.id
-                WHERE cf.user_id = :userId AND c.start_at >= CURRENT_DATE 
-                UNION ALL
-                SELECT f.id performance_id, :festivalType type, f.title title, f.reserve_at, f.start_at
-                FROM festival_favorites ff
-                JOIN festivals f ON ff.festival_id = f.id
-                WHERE ff.user_id = :userId AND f.start_at >= CURRENT_DATE
-            ) AS favorite_performances
-            ORDER BY start_at ASC
             LIMIT :performanceReservationCount
             """;
 
@@ -119,47 +102,30 @@ public class PerformanceDTORepository {
         final List<Long> excludedFestivalIds,
         final int limit) {
         String sql = """
-            SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind, performance_id, type, title, reserve_at
+            SELECT ROW_NUMBER() OVER (ORDER BY reserve_at ASC) AS ind,
+                   performance_id, type, title, round_name, reserve_at
             FROM (
-                SELECT c.id performance_id, :concertType type, c.title title, c.reserve_at
+                SELECT c.id performance_id, :concertType type, c.title title,
+                       crs.round_name, crs.reserve_at
                 FROM concerts c
-                WHERE c.reserve_at >= CURRENT_DATE AND c.id NOT IN (:excludedConcertIds)
+                JOIN concert_reservation_schedules crs ON crs.concert_id = c.id
+                    AND crs.reserve_at = (
+                        SELECT MIN(crs2.reserve_at) FROM concert_reservation_schedules crs2
+                        WHERE crs2.concert_id = c.id AND crs2.reserve_at >= CURRENT_DATE
+                    )
+                WHERE c.id NOT IN (:excludedConcertIds)
                 UNION ALL
-                SELECT f.id performance_id, :festivalType type, f.title title, f.reserve_at
+                SELECT f.id performance_id, :festivalType type, f.title title,
+                       frs.round_name, frs.reserve_at
                 FROM festivals f
-                WHERE f.reserve_at >= CURRENT_DATE AND f.id NOT IN (:excludedFestivalIds)
+                JOIN festival_reservation_schedules frs ON frs.festival_id = f.id
+                    AND frs.reserve_at = (
+                        SELECT MIN(frs2.reserve_at) FROM festival_reservation_schedules frs2
+                        WHERE frs2.festival_id = f.id AND frs2.reserve_at >= CURRENT_DATE
+                    )
+                WHERE f.id NOT IN (:excludedFestivalIds)
             ) AS all_performances
             ORDER BY reserve_at ASC
-            LIMIT :limit
-            """;
-
-        Query query = em.createNativeQuery(sql)
-            .setParameter("concertType", PerformanceType.CONCERT.getName())
-            .setParameter("festivalType", PerformanceType.FESTIVAL.getName())
-            .setParameter("excludedConcertIds", excludedConcertIds)
-            .setParameter("excludedFestivalIds", excludedFestivalIds)
-            .setParameter("limit", limit);
-
-        List<Object[]> results = query.getResultList();
-        return convertToPerformanceTicketDTOs(results);
-    }
-
-    public List<PerformanceTicketDTO> findPerformancesReservationExcludingForStartAt(
-        final List<Long> excludedConcertIds,
-        final List<Long> excludedFestivalIds,
-        final int limit) {
-        String sql = """
-            SELECT ROW_NUMBER() OVER (ORDER BY start_at ASC) AS ind, performance_id, type, title, reserve_at
-            FROM (
-                SELECT c.id performance_id, :concertType type, c.title title, c.reserve_at, c.start_at
-                FROM concerts c
-                WHERE c.start_at >= CURRENT_DATE AND c.id NOT IN (:excludedConcertIds)
-                UNION ALL
-                SELECT f.id performance_id, :festivalType type, f.title title, f.reserve_at, f.start_at
-                FROM festivals f
-                WHERE f.start_at >= CURRENT_DATE AND f.id NOT IN (:excludedFestivalIds)
-            ) AS all_performances
-            ORDER BY start_at ASC
             LIMIT :limit
             """;
 
@@ -181,8 +147,12 @@ public class PerformanceDTORepository {
                 ((Number) row[1]).longValue(),
                 (String) row[2],
                 (String) row[3],
-                LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) row[4]).getTime()),
-                    ZoneId.of("UTC"))
+                (String) row[4],
+                row[5] != null
+                    ? LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(((Timestamp) row[5]).getTime()),
+                        ZoneId.of("UTC"))
+                    : null
             ))
             .toList();
     }
