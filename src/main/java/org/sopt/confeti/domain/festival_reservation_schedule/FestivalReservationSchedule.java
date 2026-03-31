@@ -70,6 +70,10 @@ public class FestivalReservationSchedule {
             .build();
     }
 
+    public void updateReserveAt(LocalDateTime reserveAt) {
+        this.reserveAt = reserveAt;
+    }
+
     public FestivalReservationScheduleInfo toDomain() {
         return new FestivalReservationScheduleInfo(id, roundName, reserveAt, createdAt, updatedAt);
     }

@@ -15,6 +15,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -161,16 +165,45 @@ public class Festival {
         dates.forEach(date -> date.setFestival(this));
     }
 
-    public void replaceReservationUrls(List<FestivalReservationUrl> newReservationUrls) {
-        this.reservationUrls.clear();
-        this.reservationUrls.addAll(newReservationUrls);
-        newReservationUrls.forEach(url -> url.setFestival(this));
+    public void syncReservationUrls(List<FestivalReservationUrl> newUrls) {
+        Map<Long, FestivalReservationUrl> existingMap = this.reservationUrls.stream()
+            .collect(Collectors.toMap(u -> u.getTicketVendor().getId(), Function.identity()));
+        Set<Long> newVendorIds = newUrls.stream()
+            .map(u -> u.getTicketVendor().getId())
+            .collect(Collectors.toSet());
+
+        this.reservationUrls.removeIf(u -> !newVendorIds.contains(u.getTicketVendor().getId()));
+
+        for (FestivalReservationUrl newUrl : newUrls) {
+            FestivalReservationUrl existing = existingMap.get(newUrl.getTicketVendor().getId());
+            if (existing != null) {
+                existing.updateReservationUrl(newUrl.getReservationUrl());
+            } else {
+                newUrl.setFestival(this);
+                this.reservationUrls.add(newUrl);
+            }
+        }
     }
 
-    public void replaceReservationSchedules(List<FestivalReservationSchedule> newReservationSchedules) {
-        this.reservationSchedules.clear();
-        this.reservationSchedules.addAll(newReservationSchedules);
-        newReservationSchedules.forEach(schedule -> schedule.setFestival(this));
+    public void syncReservationSchedules(List<FestivalReservationSchedule> newSchedules) {
+        Map<String, FestivalReservationSchedule> existingMap = this.reservationSchedules.stream()
+            .collect(
+                Collectors.toMap(FestivalReservationSchedule::getRoundName, Function.identity()));
+        Set<String> newRoundNames = newSchedules.stream()
+            .map(FestivalReservationSchedule::getRoundName)
+            .collect(Collectors.toSet());
+
+        this.reservationSchedules.removeIf(s -> !newRoundNames.contains(s.getRoundName()));
+
+        for (FestivalReservationSchedule newSchedule : newSchedules) {
+            FestivalReservationSchedule existing = existingMap.get(newSchedule.getRoundName());
+            if (existing != null) {
+                existing.updateReserveAt(newSchedule.getReserveAt());
+            } else {
+                newSchedule.setFestival(this);
+                this.reservationSchedules.add(newSchedule);
+            }
+        }
     }
 
     public void addDate(FestivalDate date) {

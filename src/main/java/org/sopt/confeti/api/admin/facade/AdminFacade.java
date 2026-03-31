@@ -763,10 +763,10 @@ public class AdminFacade {
 
             List<FestivalReservationUrl> newReservationUrls = buildFestivalReservationUrls(
                 command, vendorMap);
-            festival.replaceReservationUrls(newReservationUrls);
+            festival.syncReservationUrls(newReservationUrls);
 
             List<FestivalReservationSchedule> newReservationSchedules = buildFestivalReservationSchedules(command);
-            festival.replaceReservationSchedules(newReservationSchedules);
+            festival.syncReservationSchedules(newReservationSchedules);
 
             List<PerformanceArtist> performanceArtists = buildFestivalPerformanceArtists(command);
             Performance performance = performanceService.getWithArtistsByTypeAndTypeId(

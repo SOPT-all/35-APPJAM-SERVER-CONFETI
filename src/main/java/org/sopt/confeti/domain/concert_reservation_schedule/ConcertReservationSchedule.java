@@ -70,6 +70,10 @@ public class ConcertReservationSchedule {
             .build();
     }
 
+    public void updateReserveAt(LocalDateTime reserveAt) {
+        this.reserveAt = reserveAt;
+    }
+
     public ConcertReservationScheduleInfo toDomain() {
         return new ConcertReservationScheduleInfo(id, roundName, reserveAt, createdAt, updatedAt);
     }

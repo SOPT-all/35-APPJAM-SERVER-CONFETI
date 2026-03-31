@@ -13,6 +13,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -140,16 +144,66 @@ public class Concert {
         this.price = price;
         this.address = address;
 
-        this.artists.clear();
-        this.artists.addAll(newArtists);
-        newArtists.forEach(a -> a.setConcert(this));
+        syncArtists(newArtists);
+        syncReservationUrls(newReservationUrls);
+        syncReservationSchedules(newReservationSchedules);
+    }
 
-        this.reservationUrls.clear();
-        this.reservationUrls.addAll(newReservationUrls);
-        newReservationUrls.forEach(url -> url.setConcert(this));
+    private void syncArtists(List<ConcertArtist> newArtists) {
+        Set<String> newArtistIds = newArtists.stream()
+            .map(a -> a.getArtist().getId())
+            .collect(Collectors.toSet());
+        Set<String> existingArtistIds = this.artists.stream()
+            .map(a -> a.getArtist().getId())
+            .collect(Collectors.toSet());
 
-        this.reservationSchedules.clear();
-        this.reservationSchedules.addAll(newReservationSchedules);
-        newReservationSchedules.forEach(schedule -> schedule.setConcert(this));
+        this.artists.removeIf(a -> !newArtistIds.contains(a.getArtist().getId()));
+
+        newArtists.stream()
+            .filter(a -> !existingArtistIds.contains(a.getArtist().getId()))
+            .forEach(a -> {
+                a.setConcert(this);
+                this.artists.add(a);
+            });
+    }
+
+    private void syncReservationUrls(List<ConcertReservationUrl> newUrls) {
+        Map<Long, ConcertReservationUrl> existingMap = this.reservationUrls.stream()
+            .collect(Collectors.toMap(u -> u.getTicketVendor().getId(), Function.identity()));
+        Set<Long> newVendorIds = newUrls.stream()
+            .map(u -> u.getTicketVendor().getId())
+            .collect(Collectors.toSet());
+
+        this.reservationUrls.removeIf(u -> !newVendorIds.contains(u.getTicketVendor().getId()));
+
+        for (ConcertReservationUrl newUrl : newUrls) {
+            ConcertReservationUrl existing = existingMap.get(newUrl.getTicketVendor().getId());
+            if (existing != null) {
+                existing.updateReservationUrl(newUrl.getReservationUrl());
+            } else {
+                newUrl.setConcert(this);
+                this.reservationUrls.add(newUrl);
+            }
+        }
+    }
+
+    private void syncReservationSchedules(List<ConcertReservationSchedule> newSchedules) {
+        Map<String, ConcertReservationSchedule> existingMap = this.reservationSchedules.stream()
+            .collect(Collectors.toMap(ConcertReservationSchedule::getRoundName, Function.identity()));
+        Set<String> newRoundNames = newSchedules.stream()
+            .map(ConcertReservationSchedule::getRoundName)
+            .collect(Collectors.toSet());
+
+        this.reservationSchedules.removeIf(s -> !newRoundNames.contains(s.getRoundName()));
+
+        for (ConcertReservationSchedule newSchedule : newSchedules) {
+            ConcertReservationSchedule existing = existingMap.get(newSchedule.getRoundName());
+            if (existing != null) {
+                existing.updateReserveAt(newSchedule.getReserveAt());
+            } else {
+                newSchedule.setConcert(this);
+                this.reservationSchedules.add(newSchedule);
+            }
+        }
     }
 }
