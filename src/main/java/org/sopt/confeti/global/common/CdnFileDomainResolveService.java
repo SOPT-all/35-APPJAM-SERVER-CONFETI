@@ -17,6 +17,10 @@ public class CdnFileDomainResolveService {
             return null;
         }
 
+        if (filePath.startsWith("/")) {
+            return fileDomain + filePath;
+        }
+
         return fileDomain + "/" + filePath;
     }
 }
