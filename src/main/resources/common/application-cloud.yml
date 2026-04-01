@@ -3,13 +3,36 @@ spring:
     aws:
       s3:
         host: https://confeti-s3-prod.s3.ap-northeast-2.amazonaws.com/
-        bucket-name: confeti-s3-prod
+        bucket-name: confeti-s3-prod # 환경 분리 필요
       credentials:
         access-key: ${cloud-secrets.aws.credentials.access-key}
         secret-key: ${cloud-secrets.aws.credentials.secret-key}
       region:
         static: ap-northeast-2
 
+aws:
+  cloudfront:
+    domain:
+      file-domain: ${cloud-secrets.aws.cloudfront.cdn.file-domain}
+
 event:
   queues:
     confeti-server: https://sqs.ap-northeast-2.amazonaws.com/078129922291/confeti-server-event-sqs
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+    import:
+      - aws-secretsmanager:/confeti-api/dev/cloud?prefix=cloud-secrets.
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+    import:
+      - aws-secretsmanager:/confeti-api/prod/cloud?prefix=cloud-secrets.
