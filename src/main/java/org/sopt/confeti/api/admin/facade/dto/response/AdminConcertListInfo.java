@@ -11,7 +11,7 @@ public record AdminConcertListInfo(
 
     public record ConcertInfo(
         long concertId,
-        String posterPath,
+        String posterUrl,
         String title,
         LocalDate startAt,
         LocalDate endAt,
@@ -21,7 +21,7 @@ public record AdminConcertListInfo(
         public static ConcertInfo from(ConcertPreviewInfo info) {
             return new ConcertInfo(
                 info.concertId(),
-                info.posterPath(),
+                info.posterUrl(),
                 info.title(),
                 info.startAt(),
                 info.endAt(),
