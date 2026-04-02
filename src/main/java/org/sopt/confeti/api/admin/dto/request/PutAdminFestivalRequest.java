@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -26,12 +27,12 @@ public record PutAdminFestivalRequest(
     @NotNull LocalDate startAt,
     @NotNull LocalDate endAt,
     @NotBlank String area,
-    @NotNull LocalDateTime reserveAt,
     @NotBlank String ageRating,
     @NotBlank String time,
     @NotBlank String price,
     @NotBlank String address,
     @NotNull @Valid List<ReservationUrlRequest> reservationUrls,
+    @NotEmpty List<@Valid ReservationScheduleRequest> reservationSchedules,
     List<@Valid DateRequest> dates
 ) {
 
@@ -44,10 +45,14 @@ public record PutAdminFestivalRequest(
 
         return AdminFestivalCommand.of(
             festivalId, title, startAt, endAt, area,
-            reserveAt, ageRating, time, price, address, status,
+            ageRating, time, price, address, status,
             reservationUrls.stream()
                 .map(url -> AdminFestivalCommand.ReservationUrlCommand.of(
                     url.ticketVendorId(), url.reservationUrl()))
+                .toList(),
+            reservationSchedules.stream()
+                .map(s -> AdminFestivalCommand.ReservationScheduleCommand.of(
+                    s.roundName(), s.reserveAt()))
                 .toList(),
             dates != null
                 ? dates.stream().map(this::toDateCommand).toList()
@@ -106,9 +111,13 @@ public record PutAdminFestivalRequest(
     }
 
     private void validateReserveDate() {
-        if (!reserveAt.isBefore(startAt.atStartOfDay())) {
-            log.warn("PutAdminFestivalRequest.validateReserveDate : 예약 일자는 시작 날짜보다 작아야 합니다.");
-            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+        for (ReservationScheduleRequest schedule : reservationSchedules) {
+            if (!schedule.reserveAt().isBefore(startAt.atStartOfDay())) {
+                log.warn(
+                    "PutAdminFestivalRequest.validateReserveDate : 예약 일자({})는 시작 날짜({})보다 작아야 합니다.",
+                    schedule.reserveAt(), startAt);
+                throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+            }
         }
     }
 
@@ -266,6 +275,13 @@ public record PutAdminFestivalRequest(
     public record ReservationUrlRequest(
         @NotNull Long ticketVendorId,
         @NotBlank String reservationUrl
+    ) {
+
+    }
+
+    public record ReservationScheduleRequest(
+        @NotBlank @Size(max = 30) String roundName,
+        @NotNull LocalDateTime reserveAt
     ) {
 
     }

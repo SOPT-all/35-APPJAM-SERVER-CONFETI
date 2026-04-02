@@ -52,4 +52,8 @@ public class FestivalReservationUrl {
             .ticketVendor(ticketVendor)
             .build();
     }
+
+    public void updateReservationUrl(String reservationUrl) {
+        this.reservationUrl = reservationUrl;
+    }
 }

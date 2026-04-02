@@ -13,14 +13,29 @@ public record ConcertDetailInfoResponse(
     String startAt,
     String endAt,
     String area,
-    String reserveAt,
     String time,
     String ageRating,
     String price,
     String address,
     boolean isFavorite,
-    List<ConcertReservationResponse> reservations
+    List<ConcertReservationResponse> reservations,
+    List<ReservationScheduleResponse> reservationSchedules
 ) {
+
+    public record ReservationScheduleResponse(
+        long reservationScheduleId,
+        String roundName,
+        String reserveAt
+    ) {
+
+        public static ReservationScheduleResponse from(ConcertDetailDTO.ReservationScheduleDTO dto) {
+            return new ReservationScheduleResponse(
+                dto.reservationScheduleId(),
+                dto.roundName(),
+                DateConvertor.convertToDefaultFormat(dto.reserveAt())
+            );
+        }
+    }
 
     public static ConcertDetailInfoResponse of(ConcertDetailDTO concertDetailDTO,
         boolean isFavorite,
@@ -33,7 +48,6 @@ public record ConcertDetailInfoResponse(
             DateConvertor.convertToDefaultFormat(concertDetailDTO.startAt()),
             DateConvertor.convertToDefaultFormat(concertDetailDTO.endAt()),
             concertDetailDTO.area(),
-            DateConvertor.convertToDefaultFormat(concertDetailDTO.reserveAt()),
             concertDetailDTO.time(),
             concertDetailDTO.ageRating(),
             concertDetailDTO.price(),
@@ -41,6 +55,9 @@ public record ConcertDetailInfoResponse(
             isFavorite,
             concertDetailDTO.reservations().stream()
                 .map(reservation -> ConcertReservationResponse.of(reservation, s3FileHandler))
+                .toList(),
+            concertDetailDTO.reservationSchedules().stream()
+                .map(ReservationScheduleResponse::from)
                 .toList()
         );
     }

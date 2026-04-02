@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -119,9 +121,25 @@ public class Performance {
         this.endAt = endAt;
         this.posterPath = posterPath;
 
-        this.artists.clear();
-        this.artists.addAll(newArtists);
-        newArtists.forEach(artist -> artist.setPerformance(this));
+        syncArtists(newArtists);
+    }
+
+    private void syncArtists(List<PerformanceArtist> newArtists) {
+        Set<String> newArtistIds = newArtists.stream()
+            .map(PerformanceArtist::getArtistId)
+            .collect(Collectors.toSet());
+        Set<String> existingArtistIds = this.artists.stream()
+            .map(PerformanceArtist::getArtistId)
+            .collect(Collectors.toSet());
+
+        this.artists.removeIf(a -> !newArtistIds.contains(a.getArtistId()));
+
+        newArtists.stream()
+            .filter(a -> !existingArtistIds.contains(a.getArtistId()))
+            .forEach(a -> {
+                a.setPerformance(this);
+                this.artists.add(a);
+            });
     }
 
     public void addArtists(List<PerformanceArtist> artists) {

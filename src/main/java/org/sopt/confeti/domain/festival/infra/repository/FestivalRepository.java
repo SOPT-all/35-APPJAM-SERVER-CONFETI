@@ -47,6 +47,22 @@ public interface FestivalRepository extends JpaRepository<Festival, Long> {
                     """)
     Optional<Festival> findWithReservationUrlsById(@Param("festivalId") long festivalId);
 
+    @Query("""
+                        SELECT DISTINCT f
+                        FROM Festival f
+                        LEFT JOIN FETCH f.reservationSchedules
+                        WHERE f.id = :festivalId AND f.endAt >= CURRENT_DATE
+                    """)
+    Optional<Festival> findUpcomingWithReservationSchedulesById(@Param("festivalId") long festivalId);
+
+    @Query("""
+                        SELECT DISTINCT f
+                        FROM Festival f
+                        LEFT JOIN FETCH f.reservationSchedules
+                        WHERE f.id = :festivalId
+                    """)
+    Optional<Festival> findWithReservationSchedulesById(@Param("festivalId") long festivalId);
+
     List<Festival> findFestivalsByIdIn(final @Param("festivalIds") List<Long> festivalIds);
 
     @Query(value = "SELECT f" +

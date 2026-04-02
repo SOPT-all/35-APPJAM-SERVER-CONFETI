@@ -229,9 +229,7 @@ public class AdminController implements AdminControllerDocs {
         @RequestPart MultipartFile poster,
         @Valid @RequestPart(value = "concert") PutAdminConcertRequest request
     ) {
-        request.validate();
-
-        AdminConcertCommand command = AdminConcertCommand.from(request);
+        AdminConcertCommand command = request.toCommand();
         return ApiResponseUtil.success(
             command.concertId() == null ? SuccessMessage.CREATED : SuccessMessage.SUCCESS,
             adminFacade.upsertConcert(poster, command)

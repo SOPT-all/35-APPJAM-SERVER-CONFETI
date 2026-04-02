@@ -45,6 +45,22 @@ public interface ConcertRepository extends JpaRepository<Concert, Long> {
         """)
     Optional<Concert> findWithReservationUrlsById(@Param("concertId") long concertId);
 
+    @Query(value = """
+            SELECT DISTINCT c
+            FROM Concert c
+            LEFT JOIN FETCH c.reservationSchedules
+            WHERE c.id = :concertId AND c.endAt >= CURRENT_DATE
+        """)
+    Optional<Concert> findUpcomingWithReservationSchedulesById(@Param("concertId") long concertId);
+
+    @Query(value = """
+            SELECT DISTINCT c
+            FROM Concert c
+            LEFT JOIN FETCH c.reservationSchedules
+            WHERE c.id = :concertId
+        """)
+    Optional<Concert> findWithReservationSchedulesById(@Param("concertId") long concertId);
+
     List<Concert> findAllByIdIn(final List<Long> concertIds);
 
     List<Concert> findAllByTitleContainingOrAreaContaining(

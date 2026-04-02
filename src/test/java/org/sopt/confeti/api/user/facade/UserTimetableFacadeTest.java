@@ -110,12 +110,12 @@ class UserTimetableFacadeTest {
             "Seoul",
             "poster.png",
             null,
-            LocalDateTime.of(2026, 1, 1, 12, 0),
             "ALL",
             "120m",
             "100000",
             "address",
             TimetableSupportStatus.SUPPORTED,
+            List.of(),
             List.of(),
             List.of()
         );

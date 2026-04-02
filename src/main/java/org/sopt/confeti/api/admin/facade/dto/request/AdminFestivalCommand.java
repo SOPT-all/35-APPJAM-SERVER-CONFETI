@@ -14,28 +14,29 @@ public record AdminFestivalCommand(
     LocalDate startAt,
     LocalDate endAt,
     String area,
-    LocalDateTime reserveAt,
     String ageRating,
     String time,
     String price,
     String address,
     TimetableSupportStatus timetableSupportStatus,
     List<ReservationUrlCommand> reservationUrls,
+    List<ReservationScheduleCommand> reservationSchedules,
     List<DateCommand> dates
 ) {
 
     public static AdminFestivalCommand of(
         Long festivalId, String title,
         LocalDate startAt, LocalDate endAt, String area,
-        LocalDateTime reserveAt, String ageRating, String time,
+        String ageRating, String time,
         String price, String address, TimetableSupportStatus timetableSupportStatus,
         List<ReservationUrlCommand> reservationUrls,
+        List<ReservationScheduleCommand> reservationSchedules,
         List<DateCommand> dates
     ) {
         return new AdminFestivalCommand(
             festivalId, title, startAt, endAt, area,
-            reserveAt, ageRating, time, price, address, timetableSupportStatus,
-            reservationUrls, dates
+            ageRating, time, price, address, timetableSupportStatus,
+            reservationUrls, reservationSchedules, dates
         );
     }
 
@@ -53,6 +54,16 @@ public record AdminFestivalCommand(
 
         public static ReservationUrlCommand of(Long ticketVendorId, String reservationUrl) {
             return new ReservationUrlCommand(ticketVendorId, reservationUrl);
+        }
+    }
+
+    public record ReservationScheduleCommand(
+        String roundName,
+        LocalDateTime reserveAt
+    ) {
+
+        public static ReservationScheduleCommand of(String roundName, LocalDateTime reserveAt) {
+            return new ReservationScheduleCommand(roundName, reserveAt);
         }
     }
 

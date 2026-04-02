@@ -14,15 +14,30 @@ public record FestivalDetailInfoResponse(
     String startAt,
     String endAt,
     String area,
-    String reserveAt,
     String time,
     String ageRating,
     String price,
     boolean isFavorite,
     String address,
     List<FestivalReservationResponse> reservations,
+    List<ReservationScheduleResponse> reservationSchedules,
     TimetableSupportStatus timetableSupportStatus
 ) {
+
+    public record ReservationScheduleResponse(
+        long reservationScheduleId,
+        String roundName,
+        String reserveAt
+    ) {
+
+        public static ReservationScheduleResponse from(FestivalDetailDTO.ReservationScheduleDTO dto) {
+            return new ReservationScheduleResponse(
+                dto.reservationScheduleId(),
+                dto.roundName(),
+                DateConvertor.convertToDefaultFormat(dto.reserveAt())
+            );
+        }
+    }
 
     public static FestivalDetailInfoResponse of(FestivalDetailDTO festival, boolean isFavorite,
         S3FileHandler s3FileHandler) {
@@ -34,7 +49,6 @@ public record FestivalDetailInfoResponse(
             DateConvertor.convertToDefaultFormat(festival.startAt()),
             DateConvertor.convertToDefaultFormat(festival.endAt()),
             festival.area(),
-            DateConvertor.convertToDefaultFormat(festival.reserveAt()),
             festival.time(),
             festival.ageRating(),
             festival.price(),
@@ -42,6 +56,9 @@ public record FestivalDetailInfoResponse(
             festival.address(),
             festival.reservations().stream()
                 .map(reservation -> FestivalReservationResponse.of(reservation, s3FileHandler))
+                .toList(),
+            festival.reservationSchedules().stream()
+                .map(ReservationScheduleResponse::from)
                 .toList(),
             festival.timetableSupportStatus()
         );

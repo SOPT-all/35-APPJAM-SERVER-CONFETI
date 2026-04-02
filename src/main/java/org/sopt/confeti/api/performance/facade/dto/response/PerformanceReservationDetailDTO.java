@@ -9,6 +9,7 @@ public record PerformanceReservationDetailDTO(
         long typeId,
         PerformanceType type,
         String title,
+        String roundName,
         LocalDateTime reserveAt,
         boolean isFavorite
 ) {
@@ -18,6 +19,7 @@ public record PerformanceReservationDetailDTO(
                 performanceTicketDTO.typeId(),
                 performanceTicketDTO.type(),
                 performanceTicketDTO.title(),
+                performanceTicketDTO.roundName(),
                 performanceTicketDTO.reserveAt(),
                 isFavorite
         );
@@ -29,6 +31,7 @@ public record PerformanceReservationDetailDTO(
                 typeId,
                 type,
                 title,
+                roundName,
                 reserveAt,
                 isFavorite
         );

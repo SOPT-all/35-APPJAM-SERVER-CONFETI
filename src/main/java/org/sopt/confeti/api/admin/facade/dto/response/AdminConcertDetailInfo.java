@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert_artist.ConcertArtist;
+import org.sopt.confeti.domain.concert_reservation_schedule.ConcertReservationScheduleInfo;
 import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
 
 public record AdminConcertDetailInfo(
@@ -14,7 +15,6 @@ public record AdminConcertDetailInfo(
     LocalDate endAt,
     String area,
     String posterPath,
-    LocalDateTime reserveAt,
     String ageRating,
     String time,
     String price,
@@ -22,6 +22,7 @@ public record AdminConcertDetailInfo(
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     List<ReservationUrlInfo> reservationUrls,
+    List<ReservationScheduleInfo> reservationSchedules,
     List<ArtistInfo> artists
 ) {
 
@@ -36,6 +37,21 @@ public record AdminConcertDetailInfo(
                 url.getId(),
                 url.getReservationUrl(),
                 url.getTicketVendor().getId()
+            );
+        }
+    }
+
+    public record ReservationScheduleInfo(
+        long reservationScheduleId,
+        String roundName,
+        LocalDateTime reserveAt
+    ) {
+
+        public static ReservationScheduleInfo from(ConcertReservationScheduleInfo info) {
+            return new ReservationScheduleInfo(
+                info.id(),
+                info.roundName(),
+                info.reserveAt()
             );
         }
     }
@@ -63,7 +79,6 @@ public record AdminConcertDetailInfo(
             concert.getEndAt(),
             concert.getArea(),
             concert.getPosterPath(),
-            concert.getReserveAt(),
             concert.getAgeRating(),
             concert.getTime(),
             concert.getPrice(),
@@ -72,6 +87,9 @@ public record AdminConcertDetailInfo(
             concert.getUpdatedAt(),
             concert.getReservationUrls().stream()
                 .map(ReservationUrlInfo::from)
+                .toList(),
+            concert.getReservationSchedules().stream()
+                .map(schedule -> ReservationScheduleInfo.from(schedule.toDomain()))
                 .toList(),
             concert.getArtists().stream()
                 .map(ArtistInfo::from)

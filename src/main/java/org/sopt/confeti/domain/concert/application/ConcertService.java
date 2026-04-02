@@ -37,6 +37,7 @@ public class ConcertService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
         concertRepository.findUpcomingWithReservationUrlsById(concertId);
+        concertRepository.findUpcomingWithReservationSchedulesById(concertId);
 
         ConcertDetailDTO concertDetail = ConcertDetailDTO.from(concert);
         redisHandler.set(RedisKey.PERFORMANCE_CONCERTS.createKeyInfo(concertId), concertDetail);
@@ -48,6 +49,7 @@ public class ConcertService {
         Concert concert = concertRepository.findWithArtistsById(concertId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         concertRepository.findWithReservationUrlsById(concertId);
+        concertRepository.findWithReservationSchedulesById(concertId);
         return AdminConcertDetailInfo.from(concert);
     }
 
@@ -95,6 +97,7 @@ public class ConcertService {
         Concert concert = concertRepository.findWithArtistsById(concertId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         concertRepository.findWithReservationUrlsById(concertId);
+        concertRepository.findWithReservationSchedulesById(concertId);
         return concert;
     }
 

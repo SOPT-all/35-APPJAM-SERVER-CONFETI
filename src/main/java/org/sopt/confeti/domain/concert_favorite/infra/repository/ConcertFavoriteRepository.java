@@ -31,7 +31,8 @@ public interface ConcertFavoriteRepository extends JpaRepository<ConcertFavorite
     @Query("SELECT CASE WHEN COUNT(cf) > 0 THEN true ELSE false END " +
         "FROM ConcertFavorite cf " +
         "WHERE cf.user.id = :userId " +
-        "AND cf.concert.reserveAt >= CURRENT_DATE ")
+        "AND EXISTS (SELECT 1 FROM ConcertReservationSchedule crs " +
+        "WHERE crs.concert = cf.concert AND crs.reserveAt >= CURRENT_DATE)")
     boolean existsUpcomingReservationByUserId(@Param("userId") Long userId);
 
     @Query("SELECT cf.concert.id FROM ConcertFavorite cf WHERE cf.user.id = :userId AND cf.concert.id IN :concertIds")
