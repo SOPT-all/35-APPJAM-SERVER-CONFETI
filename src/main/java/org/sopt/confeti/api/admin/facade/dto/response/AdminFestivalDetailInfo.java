@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import lombok.Builder;
 import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.festival.FestivalFileInfo;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival_artist.FestivalArtist;
 import org.sopt.confeti.domain.festival_reservation_schedule.FestivalReservationScheduleInfo;
@@ -13,6 +15,7 @@ import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.festival_stage.FestivalStage;
 import org.sopt.confeti.domain.festival_time.FestivalTime;
 
+@Builder(toBuilder = true)
 public record AdminFestivalDetailInfo(
     long festivalId,
     String title,
@@ -20,7 +23,9 @@ public record AdminFestivalDetailInfo(
     LocalDate endAt,
     String area,
     String posterPath,
+    String posterUrl,
     String logoPath,
+    String logoUrl,
     String ageRating,
     String time,
     String price,
@@ -140,30 +145,37 @@ public record AdminFestivalDetailInfo(
     }
 
     public static AdminFestivalDetailInfo from(Festival festival) {
-        return new AdminFestivalDetailInfo(
-            festival.getId(),
-            festival.getTitle(),
-            festival.getStartAt(),
-            festival.getEndAt(),
-            festival.getArea(),
-            festival.getPosterPath(),
-            festival.getLogoPath(),
-            festival.getAgeRating(),
-            festival.getTime(),
-            festival.getPrice(),
-            festival.getAddress(),
-            festival.getTimetableSupportStatus(),
-            festival.getCreatedAt(),
-            festival.getUpdatedAt(),
-            festival.getDates().stream()
+        return AdminFestivalDetailInfo.builder()
+            .festivalId(festival.getId())
+            .title(festival.getTitle())
+            .startAt(festival.getStartAt())
+            .endAt(festival.getEndAt())
+            .area(festival.getArea())
+            .posterPath(festival.getPosterPath())
+            .logoPath(festival.getLogoPath())
+            .ageRating(festival.getAgeRating())
+            .time(festival.getTime())
+            .price(festival.getPrice())
+            .address(festival.getAddress())
+            .timetableSupportStatus(festival.getTimetableSupportStatus())
+            .createdAt(festival.getCreatedAt())
+            .updatedAt(festival.getUpdatedAt())
+            .dates(festival.getDates().stream()
                 .map(DateInfo::from)
-                .toList(),
-            festival.getReservationUrls().stream()
+                .toList())
+            .reservationUrls(festival.getReservationUrls().stream()
                 .map(ReservationUrlInfo::from)
-                .toList(),
-            festival.getReservationSchedules().stream()
+                .toList())
+            .reservationSchedules(festival.getReservationSchedules().stream()
                 .map(schedule -> ReservationScheduleInfo.from(schedule.toDomain()))
-                .toList()
-        );
+                .toList())
+            .build();
+    }
+
+    public AdminFestivalDetailInfo withFileUrls(FestivalFileInfo festivalFileInfo) {
+        return this.toBuilder()
+            .posterUrl(festivalFileInfo.posterUrl())
+            .logoUrl(festivalFileInfo.logoUrl())
+            .build();
     }
 }

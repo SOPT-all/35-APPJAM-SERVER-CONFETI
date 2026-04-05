@@ -14,7 +14,7 @@ public record TicketVendorResponse(
         return TicketVendorResponse.builder()
             .ticketVendorId(ticketVendorDto.id())
             .name(ticketVendorDto.name())
-            .logoUrl(ticketVendorDto.logoPath())
+            .logoUrl(ticketVendorDto.logoUrl())
             .build();
     }
 }

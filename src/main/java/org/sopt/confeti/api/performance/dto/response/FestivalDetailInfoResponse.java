@@ -3,9 +3,7 @@ package org.sopt.confeti.api.performance.dto.response;
 import java.util.List;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
-import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.DateConvertor;
-import org.sopt.confeti.global.util.S3FileHandler;
 
 public record FestivalDetailInfoResponse(
     long festivalId,
@@ -24,12 +22,10 @@ public record FestivalDetailInfoResponse(
     TimetableSupportStatus timetableSupportStatus
 ) {
 
-    public static FestivalDetailInfoResponse of(FestivalDetailDTO festival, boolean isFavorite,
-        S3FileHandler s3FileHandler) {
+    public static FestivalDetailInfoResponse of(FestivalDetailDTO festival, boolean isFavorite) {
         return new FestivalDetailInfoResponse(
             festival.festivalId(),
-            s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER),
-                festival.posterPath()).toString(),
+            festival.posterUrl(),
             festival.title(),
             DateConvertor.convertToDefaultFormat(festival.startAt()),
             DateConvertor.convertToDefaultFormat(festival.endAt()),
