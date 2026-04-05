@@ -7,7 +7,8 @@ public record TicketVendorDto(
     String name,
     String logoPath
 ) {
-    public static TicketVendorDto of(TicketVendor ticketVendor) {
+
+    public static TicketVendorDto from(TicketVendor ticketVendor) {
         return new TicketVendorDto(
             ticketVendor.getId(),
             ticketVendor.getName(),

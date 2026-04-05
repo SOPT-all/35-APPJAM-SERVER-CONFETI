@@ -24,21 +24,6 @@ public record FestivalDetailInfoResponse(
     TimetableSupportStatus timetableSupportStatus
 ) {
 
-    public record ReservationScheduleResponse(
-        long reservationScheduleId,
-        String roundName,
-        String reserveAt
-    ) {
-
-        public static ReservationScheduleResponse from(FestivalDetailDTO.ReservationScheduleDTO dto) {
-            return new ReservationScheduleResponse(
-                dto.reservationScheduleId(),
-                dto.roundName(),
-                DateConvertor.convertToDefaultFormat(dto.reserveAt())
-            );
-        }
-    }
-
     public static FestivalDetailInfoResponse of(FestivalDetailDTO festival, boolean isFavorite,
         S3FileHandler s3FileHandler) {
         return new FestivalDetailInfoResponse(
@@ -55,12 +40,28 @@ public record FestivalDetailInfoResponse(
             isFavorite,
             festival.address(),
             festival.reservations().stream()
-                .map(reservation -> FestivalReservationResponse.of(reservation, s3FileHandler))
+                .map(FestivalReservationResponse::from)
                 .toList(),
             festival.reservationSchedules().stream()
                 .map(ReservationScheduleResponse::from)
                 .toList(),
             festival.timetableSupportStatus()
         );
+    }
+
+    public record ReservationScheduleResponse(
+        long reservationScheduleId,
+        String roundName,
+        String reserveAt
+    ) {
+
+        public static ReservationScheduleResponse from(
+            FestivalDetailDTO.ReservationScheduleDTO dto) {
+            return new ReservationScheduleResponse(
+                dto.reservationScheduleId(),
+                dto.roundName(),
+                DateConvertor.convertToDefaultFormat(dto.reserveAt())
+            );
+        }
     }
 }
