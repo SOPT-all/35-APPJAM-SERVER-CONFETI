@@ -64,6 +64,7 @@ public record FestivalDetailDTO(
         Map<Long, FestivalReservationFileInfo> reservationFileInfoMap =
             festivalFileInfo.festivalReservationFileInfoMap();
         List<FestivalReservationDTO> resolvedReservations = this.reservations.stream()
+            .filter(r -> reservationFileInfoMap.containsKey(r.reservationId()))
             .map(r -> r.withFileUrls(reservationFileInfoMap.get(r.reservationId())))
             .toList();
 
