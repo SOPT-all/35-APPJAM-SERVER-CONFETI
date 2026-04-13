@@ -406,7 +406,6 @@ public class AdminFacade {
                 concertId = createConcert(command, posterPath);
             } else {
                 concertId = updateConcert(command, posterPath, folderPath);
-                concertService.deleteDetailCache(concertId);
             }
         } catch (Exception e) {
             log.warn(
@@ -414,6 +413,10 @@ public class AdminFacade {
                 folderPath, posterPath);
             eventPublisher.publishEvent(new S3FileDeleteEvent(folderPath, posterPath));
             throw e;
+        }
+
+        if (command.concertId() != null) {
+            invalidateConcertDetailCacheQuietly(concertId);
         }
 
         return PutAdminConcertResponse.from(concertId);
@@ -560,6 +563,28 @@ public class AdminFacade {
             .ifPresent(path -> eventPublisher.publishEvent(new S3FileDeleteEvent(folderPath, path)));
     }
 
+    private void invalidateConcertDetailCacheQuietly(long concertId) {
+        try {
+            concertService.deleteDetailCache(concertId);
+        } catch (Exception e) {
+            log.warn(
+                "AdminFacade.invalidateConcertDetailCacheQuietly : 콘서트 상세 캐시 삭제에 실패했습니다. concertId : {}, message : {}",
+                concertId, e.getMessage(), e
+            );
+        }
+    }
+
+    private void invalidateFestivalDetailCacheQuietly(long festivalId) {
+        try {
+            festivalService.deleteDetailCache(festivalId);
+        } catch (Exception e) {
+            log.warn(
+                "AdminFacade.invalidateFestivalDetailCacheQuietly : 페스티벌 상세 캐시 삭제에 실패했습니다. festivalId : {}, message : {}",
+                festivalId, e.getMessage(), e
+            );
+        }
+    }
+
     private void registerAfterCommitCleanup(Runnable cleanup) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             cleanup.run();
@@ -678,7 +703,6 @@ public class AdminFacade {
 
         try {
             festivalId = updateFestival(command, finalPosterPath, finalLogoPath);
-            festivalService.deleteDetailCache(festivalId);
         } catch (Exception e) {
             log.warn(
                 "AdminFacade.upsertFestivalForUpdate : 페스티벌 수정에 실패해 업로드했던 이미지 파일을 롤백합니다. Poster Folder Path : {}, Poster File Name : {}, Logo Folder Path : {}, Logo File Name : {}",
@@ -696,6 +720,8 @@ public class AdminFacade {
             }
             throw e;
         }
+
+        invalidateFestivalDetailCacheQuietly(festivalId);
 
         try {
             // 트랜잭션 커밋 성공 후 기존 S3 파일 삭제

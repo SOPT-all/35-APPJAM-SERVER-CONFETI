@@ -2,14 +2,17 @@ package org.sopt.confeti.api.admin.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,6 +47,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
+@ResourceLock("Tx.txRunner")
 class AdminFacadeUpdateTest {
 
     @Mock
@@ -98,6 +102,11 @@ class AdminFacadeUpdateTest {
             performanceDraftParser,
             artistMusicAPIService
         );
+    }
+
+    @AfterEach
+    void tearDown() {
+        ReflectionTestUtils.setField(Tx.class, "txRunner", null);
     }
 
     @Test
@@ -195,6 +204,57 @@ class AdminFacadeUpdateTest {
             .extracting(ConcertReservationSchedule::getRoundName)
             .containsExactly("1차", "2차");
         verify(concertService).deleteDetailCache(concertId);
+    }
+
+    @Test
+    void upsertConcert_캐시무효화에_실패해도_S3_롤백없이_응답한다() {
+        long concertId = 78L;
+        Concert concert = Concert.create(
+            "SUMMER SONIC 2026",
+            LocalDate.of(2026, 8, 15),
+            LocalDate.of(2026, 8, 15),
+            "KSPO DOME",
+            "old-poster.png",
+            "전체 관람가",
+            "180분",
+            "132,000원",
+            "서울특별시 송파구 올림픽로 424",
+            new ArrayList<>(),
+            new ArrayList<>(),
+            new ArrayList<>(List.of(
+                ConcertReservationSchedule.create(
+                    "1차",
+                    LocalDateTime.of(2026, 6, 1, 20, 0)
+                )
+            ))
+        );
+        Performance performance = Performance.createConcert(
+            concertId,
+            "SUMMER SONIC 2026",
+            "KSPO DOME",
+            LocalDate.of(2026, 8, 15),
+            LocalDate.of(2026, 8, 15),
+            "old-poster.png",
+            new ArrayList<>()
+        );
+
+        given(s3FileHandler.uploadFile(poster, "concert/poster/")).willReturn("new-poster.png");
+        given(concertService.findWithRelationsById(concertId)).willReturn(concert);
+        given(performanceService.getPerformanceByTypeAndTypeId(PerformanceType.CONCERT, concertId))
+            .willReturn(performance);
+        org.mockito.Mockito.doThrow(new RuntimeException("redis down"))
+            .when(concertService).deleteDetailCache(concertId);
+
+        PutAdminConcertResponse response = adminFacade.upsertConcert(
+            poster,
+            concertUpdateCommand(concertId)
+        );
+
+        assertThat(response.concertId()).isEqualTo(concertId);
+        verify(eventPublisher, never()).publishEvent(org.mockito.ArgumentMatchers.<Object>argThat(
+            event -> event instanceof org.sopt.confeti.global.event.S3FileDeleteEvent s3Event
+                && "new-poster.png".equals(s3Event.filePath())
+        ));
     }
 
     private AdminFestivalCommand festivalUpdateCommand(long festivalId) {
