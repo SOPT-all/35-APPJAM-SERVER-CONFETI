@@ -406,6 +406,7 @@ public class AdminFacade {
                 concertId = createConcert(command, posterPath);
             } else {
                 concertId = updateConcert(command, posterPath, folderPath);
+                concertService.deleteDetailCache(concertId);
             }
         } catch (Exception e) {
             log.warn(
@@ -677,6 +678,7 @@ public class AdminFacade {
 
         try {
             festivalId = updateFestival(command, finalPosterPath, finalLogoPath);
+            festivalService.deleteDetailCache(festivalId);
         } catch (Exception e) {
             log.warn(
                 "AdminFacade.upsertFestivalForUpdate : 페스티벌 수정에 실패해 업로드했던 이미지 파일을 롤백합니다. Poster Folder Path : {}, Poster File Name : {}, Logo Folder Path : {}, Logo File Name : {}",
