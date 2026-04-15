@@ -477,7 +477,7 @@ public class AdminFacade {
     }
 
     private long updateConcert(AdminConcertCommand command, String posterPath, String folderPath) {
-        return Tx.masterTx(() -> {
+        long concertId = Tx.masterTx(() -> {
             Map<Long, TicketVendor> vendorMap = getTicketVendorMap(command);
 
             List<ConcertArtist> concertArtists = buildConcertArtists(command);
@@ -510,6 +510,9 @@ public class AdminFacade {
 
             return command.concertId();
         });
+
+        invalidateConcertDetailCacheQuietly(concertId);
+        return concertId;
     }
 
     private Map<Long, TicketVendor> getTicketVendorMap(AdminConcertCommand command) {
@@ -557,6 +560,28 @@ public class AdminFacade {
     private void publishS3DeleteEventIfExists(String folderPath, String filePath) {
         Optional.ofNullable(filePath)
             .ifPresent(path -> eventPublisher.publishEvent(new S3FileDeleteEvent(folderPath, path)));
+    }
+
+    private void invalidateConcertDetailCacheQuietly(long concertId) {
+        try {
+            concertService.deleteDetailCache(concertId);
+        } catch (Exception e) {
+            log.warn(
+                "AdminFacade.invalidateConcertDetailCacheQuietly : 콘서트 상세 캐시 삭제에 실패했습니다. concertId : {}, message : {}",
+                concertId, e.getMessage(), e
+            );
+        }
+    }
+
+    private void invalidateFestivalDetailCacheQuietly(long festivalId) {
+        try {
+            festivalService.deleteDetailCache(festivalId);
+        } catch (Exception e) {
+            log.warn(
+                "AdminFacade.invalidateFestivalDetailCacheQuietly : 페스티벌 상세 캐시 삭제에 실패했습니다. festivalId : {}, message : {}",
+                festivalId, e.getMessage(), e
+            );
+        }
     }
 
     private void registerAfterCommitCleanup(Runnable cleanup) {
@@ -694,6 +719,8 @@ public class AdminFacade {
             }
             throw e;
         }
+
+        invalidateFestivalDetailCacheQuietly(festivalId);
 
         try {
             // 트랜잭션 커밋 성공 후 기존 S3 파일 삭제
