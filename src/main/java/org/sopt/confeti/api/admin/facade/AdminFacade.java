@@ -415,10 +415,6 @@ public class AdminFacade {
             throw e;
         }
 
-        if (command.concertId() != null) {
-            invalidateConcertDetailCacheQuietly(concertId);
-        }
-
         return PutAdminConcertResponse.from(concertId);
     }
 
@@ -481,7 +477,7 @@ public class AdminFacade {
     }
 
     private long updateConcert(AdminConcertCommand command, String posterPath, String folderPath) {
-        return Tx.masterTx(() -> {
+        long concertId = Tx.masterTx(() -> {
             Map<Long, TicketVendor> vendorMap = getTicketVendorMap(command);
 
             List<ConcertArtist> concertArtists = buildConcertArtists(command);
@@ -514,6 +510,9 @@ public class AdminFacade {
 
             return command.concertId();
         });
+
+        invalidateConcertDetailCacheQuietly(concertId);
+        return concertId;
     }
 
     private Map<Long, TicketVendor> getTicketVendorMap(AdminConcertCommand command) {
