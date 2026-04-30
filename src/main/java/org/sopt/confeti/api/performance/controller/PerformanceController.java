@@ -79,7 +79,7 @@ public class PerformanceController implements PerformanceControllerDocs {
         FestivalDetailWithFavoriteDTO festivalDetail = performanceFacade.getUpcomingFestivalDetail(
             festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            FestivalDetailResponse.of(festivalDetail, s3FileHandler));
+            FestivalDetailResponse.from(festivalDetail));
     }
 
     @GetMapping("/reservation")

@@ -200,7 +200,7 @@ public class AdminController implements AdminControllerDocs {
     ) {
         AdminFestivalDetailInfo festivalDetail = adminFacade.getAdminFestivalDetail(festivalId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            AdminFestivalDetailResponse.of(festivalDetail, s3FileHandler));
+            AdminFestivalDetailResponse.from(festivalDetail));
     }
 
     @Override
@@ -219,7 +219,7 @@ public class AdminController implements AdminControllerDocs {
     ) {
         AdminFestivalListInfo festivalListInfo = adminFacade.getAdminFestivals(search);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            AdminFestivalListResponse.of(festivalListInfo, s3FileHandler));
+            AdminFestivalListResponse.from(festivalListInfo));
     }
 
     @Override

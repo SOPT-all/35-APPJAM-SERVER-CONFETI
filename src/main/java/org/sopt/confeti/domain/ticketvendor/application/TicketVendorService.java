@@ -91,7 +91,7 @@ public class TicketVendorService {
     public TicketVendorDtos findAll() {
         return TicketVendorDtos.from(
             ticketVendorRepository.findAll().stream()
-                .map(TicketVendorDto::of)
+                .map(TicketVendorDto::from)
                 .toList()
         );
     }

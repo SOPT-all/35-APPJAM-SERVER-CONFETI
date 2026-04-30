@@ -3,11 +3,14 @@ package org.sopt.confeti.api.performance.facade.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
 import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.festival.FestivalFileInfo;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival_reservation_schedule.FestivalReservationScheduleInfo;
 import org.sopt.confeti.global.annotation.RedisSerializable;
 
+@Builder
 @RedisSerializable
 public record FestivalDetailDTO(
     long festivalId,
@@ -15,8 +18,8 @@ public record FestivalDetailDTO(
     LocalDate startAt,
     LocalDate endAt,
     String area,
-    String posterPath,
-    String logoPath,
+    String posterUrl,
+    String logoUrl,
     String ageRating,
     String time,
     String price,
@@ -27,6 +30,32 @@ public record FestivalDetailDTO(
     TimetableSupportStatus timetableSupportStatus
 ) {
 
+    public static FestivalDetailDTO toDto(Festival festival, FestivalFileInfo fileInfo) {
+        return FestivalDetailDTO.builder()
+            .festivalId(festival.getId())
+            .title(festival.getTitle())
+            .startAt(festival.getStartAt())
+            .endAt(festival.getEndAt())
+            .area(festival.getArea())
+            .posterUrl(fileInfo.posterUrl())
+            .logoUrl(fileInfo.logoUrl())
+            .ageRating(festival.getAgeRating())
+            .time(festival.getTime())
+            .price(festival.getPrice())
+            .address(festival.getAddress())
+            .reservations(festival.getReservationUrls().stream()
+                .map(FestivalReservationDTO::from)
+                .toList())
+            .reservationSchedules(festival.getReservationSchedules().stream()
+                .map(schedule -> ReservationScheduleDTO.from(schedule.toDomain()))
+                .toList())
+            .dates(festival.getDates().stream()
+                .map(FestivalDetailDateDTO::from)
+                .toList())
+            .timetableSupportStatus(festival.getTimetableSupportStatus())
+            .build();
+    }
+
     public record ReservationScheduleDTO(
         long reservationScheduleId,
         String roundName,
@@ -36,31 +65,5 @@ public record FestivalDetailDTO(
         public static ReservationScheduleDTO from(FestivalReservationScheduleInfo info) {
             return new ReservationScheduleDTO(info.id(), info.roundName(), info.reserveAt());
         }
-    }
-
-    public static FestivalDetailDTO from(Festival festival) {
-        return new FestivalDetailDTO(
-            festival.getId(),
-            festival.getTitle(),
-            festival.getStartAt(),
-            festival.getEndAt(),
-            festival.getArea(),
-            festival.getPosterPath(),
-            festival.getLogoPath(),
-            festival.getAgeRating(),
-            festival.getTime(),
-            festival.getPrice(),
-            festival.getAddress(),
-            festival.getReservationUrls().stream()
-                .map(FestivalReservationDTO::from)
-                .toList(),
-            festival.getReservationSchedules().stream()
-                .map(schedule -> ReservationScheduleDTO.from(schedule.toDomain()))
-                .toList(),
-            festival.getDates().stream()
-                .map(FestivalDetailDateDTO::from)
-                .toList(),
-            festival.getTimetableSupportStatus()
-        );
     }
 }

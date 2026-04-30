@@ -7,8 +7,6 @@ import java.util.List;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo.DateInfo;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
-import org.sopt.confeti.global.common.constant.FolderPath;
-import org.sopt.confeti.global.util.S3FileHandler;
 
 public record AdminFestivalDetailResponse(
     long festivalId,
@@ -136,15 +134,15 @@ public record AdminFestivalDetailResponse(
         }
     }
 
-    public static AdminFestivalDetailResponse of(AdminFestivalDetailInfo info, S3FileHandler s3FileHandler) {
+    public static AdminFestivalDetailResponse from(AdminFestivalDetailInfo info) {
         return new AdminFestivalDetailResponse(
             info.festivalId(),
             info.title(),
             info.startAt(),
             info.endAt(),
             info.area(),
-            s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER), info.posterPath()).toString(),
-            s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO), info.logoPath()).toString(),
+            info.posterUrl(),
+            info.logoUrl(),
             info.ageRating(),
             info.time(),
             info.price(),

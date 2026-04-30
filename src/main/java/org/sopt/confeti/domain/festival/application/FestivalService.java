@@ -33,11 +33,11 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class FestivalService {
 
-    private static final String START_AT_COLUMN = "startAt";
     private static final int INIT_PAGE = 0;
     private static final String TITLE_COLUMN = "title";
 
     private final FestivalRepository festivalRepository;
+    private final FestivalFileService festivalFileService;
     private final FestivalDateService festivalDateService;
     private final FestivalStageService festivalStageService;
     private final FestivalTimeService festivalTimeService;
@@ -65,7 +65,8 @@ public class FestivalService {
         festivalRepository.findUpcomingWithReservationUrlsById(festivalId);
         festivalRepository.findUpcomingWithReservationSchedulesById(festivalId);
 
-        FestivalDetailDTO festivalDetail = FestivalDetailDTO.from(festival);
+        FestivalDetailDTO festivalDetail = FestivalDetailDTO.toDto(festival,
+            festivalFileService.getFileInfo(festival));
         redisHandler.set(RedisKey.PERFORMANCE_FESTIVALS.createKeyInfo(festivalId), festivalDetail);
         return festivalDetail;
     }
@@ -157,7 +158,8 @@ public class FestivalService {
         festivalRepository.findWithReservationUrlsById(festivalId);
         festivalRepository.findWithReservationSchedulesById(festivalId);
 
-        return AdminFestivalDetailInfo.from(festival);
+        return AdminFestivalDetailInfo.from(festival)
+            .withFileUrls(festivalFileService.getFileInfo(festival));
     }
 
     @Transactional(readOnly = true)
@@ -195,7 +197,8 @@ public class FestivalService {
     @ReadOnlyTransactional
     public List<AdminFestivalPreviewInfo> getAdminFestivalPreviews(String keyword) {
         return findFestivalsByKeyword(keyword).stream()
-            .map(AdminFestivalPreviewInfo::from)
+            .map(festival -> AdminFestivalPreviewInfo.from(festival)
+                .withFileUrls(festivalFileService.getFileInfo(festival)))
             .toList();
     }
 
