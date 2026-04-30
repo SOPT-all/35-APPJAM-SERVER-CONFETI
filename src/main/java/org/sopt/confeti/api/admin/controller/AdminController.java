@@ -171,7 +171,7 @@ public class AdminController implements AdminControllerDocs {
     ) {
         AdminConcertListInfo concertList = adminFacade.getAdminConcerts(search);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            AdminConcertListResponse.of(concertList, s3FileHandler));
+            AdminConcertListResponse.from(concertList));
     }
 
     @Override
@@ -181,7 +181,7 @@ public class AdminController implements AdminControllerDocs {
     ) {
         AdminConcertDetailInfo concertDetail = adminFacade.getAdminConcertDetail(concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            AdminConcertDetailResponse.of(concertDetail, s3FileHandler));
+            AdminConcertDetailResponse.from(concertDetail));
     }
 
     @Override

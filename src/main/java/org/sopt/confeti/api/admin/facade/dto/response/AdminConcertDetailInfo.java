@@ -3,11 +3,14 @@ package org.sopt.confeti.api.admin.facade.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
 import org.sopt.confeti.domain.concert.Concert;
+import org.sopt.confeti.domain.concert.application.dto.ConcertFileInfo;
 import org.sopt.confeti.domain.concert_artist.ConcertArtist;
 import org.sopt.confeti.domain.concert_reservation_schedule.ConcertReservationScheduleInfo;
 import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationUrl;
 
+@Builder(toBuilder = true)
 public record AdminConcertDetailInfo(
     long concertId,
     String title,
@@ -15,6 +18,7 @@ public record AdminConcertDetailInfo(
     LocalDate endAt,
     String area,
     String posterPath,
+    String posterUrl,
     String ageRating,
     String time,
     String price,
@@ -72,28 +76,34 @@ public record AdminConcertDetailInfo(
     }
 
     public static AdminConcertDetailInfo from(Concert concert) {
-        return new AdminConcertDetailInfo(
-            concert.getId(),
-            concert.getTitle(),
-            concert.getStartAt(),
-            concert.getEndAt(),
-            concert.getArea(),
-            concert.getPosterPath(),
-            concert.getAgeRating(),
-            concert.getTime(),
-            concert.getPrice(),
-            concert.getAddress(),
-            concert.getCreatedAt(),
-            concert.getUpdatedAt(),
-            concert.getReservationUrls().stream()
+        return AdminConcertDetailInfo.builder()
+            .concertId(concert.getId())
+            .title(concert.getTitle())
+            .startAt(concert.getStartAt())
+            .endAt(concert.getEndAt())
+            .area(concert.getArea())
+            .posterPath(concert.getPosterPath())
+            .ageRating(concert.getAgeRating())
+            .time(concert.getTime())
+            .price(concert.getPrice())
+            .address(concert.getAddress())
+            .createdAt(concert.getCreatedAt())
+            .updatedAt(concert.getUpdatedAt())
+            .reservationUrls(concert.getReservationUrls().stream()
                 .map(ReservationUrlInfo::from)
-                .toList(),
-            concert.getReservationSchedules().stream()
+                .toList())
+            .reservationSchedules(concert.getReservationSchedules().stream()
                 .map(schedule -> ReservationScheduleInfo.from(schedule.toDomain()))
-                .toList(),
-            concert.getArtists().stream()
+                .toList())
+            .artists(concert.getArtists().stream()
                 .map(ArtistInfo::from)
-                .toList()
-        );
+                .toList())
+            .build();
+    }
+
+    public AdminConcertDetailInfo withFileUrls(ConcertFileInfo fileUrls) {
+        return this.toBuilder()
+            .posterUrl(fileUrls.posterUrl())
+            .build();
     }
 }

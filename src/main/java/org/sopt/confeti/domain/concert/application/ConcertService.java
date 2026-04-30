@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
-import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.domain.concert.Concert;
+import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
 import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.redis.RedisHandler;
@@ -23,6 +23,7 @@ public class ConcertService {
 
     private final RedisHandler redisHandler;
     private final ConcertRepository concertRepository;
+    private final ConcertFileService concertFileService;
 
     // TODO: AOP 방식으로 캐싱 전략 수정
     @Transactional(readOnly = true)
@@ -39,7 +40,8 @@ public class ConcertService {
         concertRepository.findUpcomingWithReservationUrlsById(concertId);
         concertRepository.findUpcomingWithReservationSchedulesById(concertId);
 
-        ConcertDetailDTO concertDetail = ConcertDetailDTO.from(concert);
+        ConcertDetailDTO concertDetail = ConcertDetailDTO.toDTO(concert,
+            concertFileService.getFileInfo(concert));
         redisHandler.set(RedisKey.PERFORMANCE_CONCERTS.createKeyInfo(concertId), concertDetail);
         return concertDetail;
     }
@@ -50,13 +52,15 @@ public class ConcertService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
         concertRepository.findWithReservationUrlsById(concertId);
         concertRepository.findWithReservationSchedulesById(concertId);
-        return AdminConcertDetailInfo.from(concert);
+        return AdminConcertDetailInfo.from(concert)
+            .withFileUrls(concertFileService.getFileInfo(concert));
     }
 
     @ReadOnlyTransactional
     public List<ConcertPreviewInfo> getAdminConcertPreviews(String keyword) {
         return findConcertsByKeyword(keyword).stream()
-            .map(ConcertPreviewInfo::from)
+            .map(concert -> ConcertPreviewInfo.from(concert)
+                .withFileUrls(concertFileService.getFileInfo(concert)))
             .toList();
     }
 

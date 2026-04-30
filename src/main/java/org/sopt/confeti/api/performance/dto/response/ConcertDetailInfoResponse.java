@@ -2,7 +2,6 @@ package org.sopt.confeti.api.performance.dto.response;
 
 import java.util.List;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
-import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.DateConvertor;
 import org.sopt.confeti.global.util.S3FileHandler;
 
@@ -42,8 +41,7 @@ public record ConcertDetailInfoResponse(
         S3FileHandler s3FileHandler) {
         return new ConcertDetailInfoResponse(
             concertDetailDTO.concertId(),
-            s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER),
-                concertDetailDTO.posterPath()).toString(),
+            concertDetailDTO.posterUrl(),
             concertDetailDTO.title(),
             DateConvertor.convertToDefaultFormat(concertDetailDTO.startAt()),
             DateConvertor.convertToDefaultFormat(concertDetailDTO.endAt()),
