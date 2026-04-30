@@ -8,7 +8,6 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
 import org.sopt.confeti.api.performance.facade.dto.response.FestivalDetailDTO;
 import org.sopt.confeti.domain.festival.Festival;
-import org.sopt.confeti.domain.festival.FestivalFileInfo;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
@@ -34,7 +33,6 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class FestivalService {
 
-    private static final String START_AT_COLUMN = "startAt";
     private static final int INIT_PAGE = 0;
     private static final String TITLE_COLUMN = "title";
 
@@ -67,8 +65,8 @@ public class FestivalService {
         festivalRepository.findUpcomingWithReservationUrlsById(festivalId);
         festivalRepository.findUpcomingWithReservationSchedulesById(festivalId);
 
-        FestivalDetailDTO festivalDetail = FestivalDetailDTO.from(festival)
-            .withFileUrls(festivalFileService.getFileUrls(festival));
+        FestivalDetailDTO festivalDetail = FestivalDetailDTO.toDto(festival,
+            festivalFileService.getFileInfo(festival));
         redisHandler.set(RedisKey.PERFORMANCE_FESTIVALS.createKeyInfo(festivalId), festivalDetail);
         return festivalDetail;
     }
@@ -161,7 +159,7 @@ public class FestivalService {
         festivalRepository.findWithReservationSchedulesById(festivalId);
 
         return AdminFestivalDetailInfo.from(festival)
-            .withFileUrls(festivalFileService.getFileUrls(festival));
+            .withFileUrls(festivalFileService.getFileInfo(festival));
     }
 
     @Transactional(readOnly = true)
@@ -200,7 +198,7 @@ public class FestivalService {
     public List<AdminFestivalPreviewInfo> getAdminFestivalPreviews(String keyword) {
         return findFestivalsByKeyword(keyword).stream()
             .map(festival -> AdminFestivalPreviewInfo.from(festival)
-                .withFileUrls(festivalFileService.getFileUrls(festival)))
+                .withFileUrls(festivalFileService.getFileInfo(festival)))
             .toList();
     }
 

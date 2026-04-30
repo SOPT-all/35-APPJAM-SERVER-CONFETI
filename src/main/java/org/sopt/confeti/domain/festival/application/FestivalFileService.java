@@ -17,7 +17,7 @@ public class FestivalFileService {
     private final CdnFileDomainResolveService cdnFileDomainResolveService;
     private final FestivalReservationFileService festivalReservationFileService;
 
-    public FestivalFileInfo getFileUrls(Festival festival) {
+    public FestivalFileInfo getFileInfo(Festival festival) {
         Map<Long, FestivalReservationFileInfo> reservationFileInfoMap =
             new LinkedHashMap<>(festival.getReservationUrls().size());
         festival.getReservationUrls().forEach(reservationUrl ->
