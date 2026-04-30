@@ -12,7 +12,7 @@ public class ConcertFileService {
 
     private final CdnFileDomainResolveService cdnFileDomainResolveService;
 
-    public ConcertFileInfo getFileUrls(Concert concert) {
+    public ConcertFileInfo getFileInfo(Concert concert) {
         return ConcertFileInfo.builder()
             .posterUrl(cdnFileDomainResolveService.resolve(concert.getPosterPath()))
             .build();

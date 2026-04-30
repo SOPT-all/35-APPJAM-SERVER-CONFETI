@@ -10,14 +10,13 @@ import org.sopt.confeti.domain.concert_reservation_schedule.ConcertReservationSc
 import org.sopt.confeti.global.annotation.RedisSerializable;
 
 @RedisSerializable
-@Builder(toBuilder = true)
+@Builder
 public record ConcertDetailDTO(
     long concertId,
     String title,
     LocalDate startAt,
     LocalDate endAt,
     String area,
-    String posterPath,
     String posterUrl,
     String ageRating,
     String time,
@@ -28,26 +27,15 @@ public record ConcertDetailDTO(
     List<ConcertArtistDTO> artists
 ) {
 
-    public record ReservationScheduleDTO(
-        long reservationScheduleId,
-        String roundName,
-        LocalDateTime reserveAt
-    ) {
-
-        public static ReservationScheduleDTO from(ConcertReservationScheduleInfo info) {
-            return new ReservationScheduleDTO(info.id(), info.roundName(), info.reserveAt());
-        }
-    }
-
-    public static ConcertDetailDTO from(Concert concert) {
+    public static ConcertDetailDTO toDTO(Concert concert, ConcertFileInfo fileInfo) {
         return ConcertDetailDTO.builder()
             .concertId(concert.getId())
             .title(concert.getTitle())
             .startAt(concert.getStartAt())
             .endAt(concert.getEndAt())
             .area(concert.getArea())
-            .posterPath(concert.getPosterPath())
             .ageRating(concert.getAgeRating())
+            .posterUrl(fileInfo.posterUrl())
             .time(concert.getTime())
             .price(concert.getPrice())
             .address(concert.getAddress())
@@ -63,9 +51,14 @@ public record ConcertDetailDTO(
             .build();
     }
 
-    public ConcertDetailDTO withFileUrls(ConcertFileInfo fileUrls) {
-        return this.toBuilder()
-            .posterUrl(fileUrls.posterUrl())
-            .build();
+    public record ReservationScheduleDTO(
+        long reservationScheduleId,
+        String roundName,
+        LocalDateTime reserveAt
+    ) {
+
+        public static ReservationScheduleDTO from(ConcertReservationScheduleInfo info) {
+            return new ReservationScheduleDTO(info.id(), info.roundName(), info.reserveAt());
+        }
     }
 }
