@@ -22,6 +22,7 @@ public class ErrorResponseConstant {
     public static final String FESTIVAL_TIMETABLE_STAGE_ORDER_DUPLICATE_MESSAGE = "스테이지 순서(order)가 중복됩니다.";
     public static final String FESTIVAL_TIMETABLE_TIME_START_AFTER_END_MESSAGE = "공연 시작 시간은 종료 시간보다 이전이어야 합니다.";
     public static final String FESTIVAL_TIMETABLE_TIME_OVERLAP_MESSAGE = "같은 스테이지 내 공연 시간이 겹칩니다.";
+    public static final String FESTIVAL_TIMETABLE_NOT_SUPPORTED_MESSAGE = "타임테이블을 지원하지 않는 페스티벌입니다.";
 
     /* 401 Unauthorized */
     public static final String UNAUTHORIZED_STATUS = "401";
