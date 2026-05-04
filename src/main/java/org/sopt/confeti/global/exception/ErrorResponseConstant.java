@@ -16,7 +16,6 @@ public class ErrorResponseConstant {
     public static final String FESTIVAL_INVALID_DURATION_MESSAGE = "시작 날짜는 종료 날짜보다 클 수 없습니다.";
     public static final String FESTIVAL_INVALID_RESERVE_DATE_MESSAGE = "예매 일자는 공연 시작일보다 이전이어야 합니다.";
     public static final String FESTIVAL_DATE_OUT_OF_RANGE_MESSAGE = "날짜가 공연 기간 범위를 벗어났습니다.";
-    public static final String FESTIVAL_TIMETABLE_DURATION_INVALID_MESSAGE = "타임테이블 날짜는 공연 기간 내에 있어야 합니다.";
     public static final String FESTIVAL_TIMETABLE_DATE_NO_STAGE_MESSAGE = "타임테이블이 존재하면 모든 날짜에 스테이지 정보가 있어야 합니다.";
     public static final String FESTIVAL_TIMETABLE_ARTIST_NOT_MAPPED_MESSAGE = "모든 아티스트가 타임테이블에 배정되어야 합니다.";
     public static final String FESTIVAL_TIMETABLE_OPEN_AT_AFTER_FIRST_TIME_MESSAGE = "티켓 오픈 시간은 첫 번째 공연 시작 시간 이전이어야 합니다.";

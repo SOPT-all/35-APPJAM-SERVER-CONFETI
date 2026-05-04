@@ -7,7 +7,6 @@ import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_I
 import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_INVALID_RESERVE_DATE_MESSAGE;
 import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_ARTIST_NOT_MAPPED_MESSAGE;
 import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_DATE_NO_STAGE_MESSAGE;
-import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_DURATION_INVALID_MESSAGE;
 import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_OPEN_AT_AFTER_FIRST_TIME_MESSAGE;
 import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_STAGE_ORDER_DUPLICATE_MESSAGE;
 import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_TIME_OVERLAP_MESSAGE;
@@ -36,7 +35,6 @@ public enum ErrorMessage {
     FESTIVAL_INVALID_DURATION(HttpStatus.BAD_REQUEST, FESTIVAL_INVALID_DURATION_MESSAGE),
     FESTIVAL_INVALID_RESERVE_DATE(HttpStatus.BAD_REQUEST, FESTIVAL_INVALID_RESERVE_DATE_MESSAGE),
     FESTIVAL_DATE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, FESTIVAL_DATE_OUT_OF_RANGE_MESSAGE),
-    FESTIVAL_TIMETABLE_DURATION_INVALID(HttpStatus.BAD_REQUEST, FESTIVAL_TIMETABLE_DURATION_INVALID_MESSAGE),
     FESTIVAL_TIMETABLE_DATE_NO_STAGE(HttpStatus.BAD_REQUEST, FESTIVAL_TIMETABLE_DATE_NO_STAGE_MESSAGE),
     FESTIVAL_TIMETABLE_ARTIST_NOT_MAPPED(HttpStatus.BAD_REQUEST, FESTIVAL_TIMETABLE_ARTIST_NOT_MAPPED_MESSAGE),
     FESTIVAL_TIMETABLE_OPEN_AT_AFTER_FIRST_TIME(HttpStatus.BAD_REQUEST, FESTIVAL_TIMETABLE_OPEN_AT_AFTER_FIRST_TIME_MESSAGE),
