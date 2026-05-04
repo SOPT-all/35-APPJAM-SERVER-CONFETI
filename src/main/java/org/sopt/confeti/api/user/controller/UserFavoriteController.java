@@ -20,7 +20,6 @@ import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
-import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,7 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserFavoriteController {
 
     private final UserFavoriteFacade userFavoriteFacade;
-    private final S3FileHandler s3FileHandler;
 
     @Permission(role = {Role.GENERAL})
     @PostMapping("/festivals/{festivalId}")
@@ -106,7 +104,7 @@ public class UserFavoriteController {
     ) {
         UserFavoritePerformancesDTO userFavoritePerformancesDTO = userFavoriteFacade.getFavoritePerformances();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserFavoritePerformancesResponse.of(userFavoritePerformancesDTO, s3FileHandler));
+            UserFavoritePerformancesResponse.from(userFavoritePerformancesDTO));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -117,7 +115,7 @@ public class UserFavoriteController {
         UserFavoritePerformancesAllDTO userFavoritePerformancesAllDTO = userFavoriteFacade.getFavoritePerformancesAll(
             type);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UserFavoritePerformancesAllResponse.of(userFavoritePerformancesAllDTO, s3FileHandler));
+            UserFavoritePerformancesAllResponse.from(userFavoritePerformancesAllDTO));
     }
 
     /**
@@ -133,7 +131,7 @@ public class UserFavoriteController {
             return ApiResponseUtil.success(SuccessMessage.SUCCESS, Collections.emptyMap());
         }
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UpcomingPerformanceResponse.of(upcomingPerformanceDTO, s3FileHandler));
+            UpcomingPerformanceResponse.from(upcomingPerformanceDTO));
     }
 
     @Permission(role = {Role.GENERAL})

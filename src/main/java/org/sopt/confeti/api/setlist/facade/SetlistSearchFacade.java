@@ -12,8 +12,9 @@ import org.sopt.confeti.api.setlist.facade.dto.response.search.SearchPerformance
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchArtistSongsDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.search.SetlistSearchSongsDTO;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
+import org.sopt.confeti.domain.view.performance.application.PerformanceFileService;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
-import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceInfo;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.ConfetiException;
@@ -32,6 +33,7 @@ public class SetlistSearchFacade {
     private static final int SEARCH_ARTIST_BY_KEYWORD_LIMIT = 1;
 
     private final PerformanceService performanceService;
+    private final PerformanceFileService performanceFileService;
     private final MusicAPIHandler musicAPIHandler;
     private final PerformanceSearchService performanceSearchService;
 
@@ -73,7 +75,7 @@ public class SetlistSearchFacade {
 
     @Transactional(readOnly = true)
     public SearchPerformancesDTO searchPerformances(String aid, Long pid, String term) {
-        List<PerformanceDTO> performances = new ArrayList<>();
+        List<PerformanceInfo> performances = new ArrayList<>();
         PerformanceSearchTermAnalyzeResult analyzeResult = PerformanceSearchTermAnalyzeResult.empty();
 
         if (isPresent(aid)) {
@@ -81,7 +83,7 @@ public class SetlistSearchFacade {
         }
 
         if (isPresent(pid)) {
-            performances.add(PerformanceDTO.from(performanceService.getPerformanceById(pid)));
+            performances.add(performanceService.getPerformanceById(pid));
         }
 
         if (isPresent(term)) {
@@ -95,13 +97,14 @@ public class SetlistSearchFacade {
                 performanceSearchService.getPerformancesByTitleAndTypePartialMatched(
                         analyzeResult.processedTerm(),
                         analyzeResult.performanceType()).stream()
-                    .map(PerformanceDTO::from)
+                    .map(result -> PerformanceInfo.of(result,
+                        performanceFileService.getFileInfo(result.posterPath())))
                     .toList()
             );
         }
 
         PerformanceSearchTermAnalyzeResult finalAnalyzeResult = analyzeResult;
-        Set<PerformanceDTO> searchedPerformances = performances.stream()
+        Set<PerformanceInfo> searchedPerformances = performances.stream()
             .filter(
                 performance -> finalAnalyzeResult.performanceType() == PerformanceType.PERFORMANCE
                     ||
@@ -111,7 +114,7 @@ public class SetlistSearchFacade {
 
         return SearchPerformancesDTO.from(
             searchedPerformances.stream()
-                .sorted(Comparator.comparing(PerformanceDTO::startAt).reversed())
+                .sorted(Comparator.comparing(PerformanceInfo::startAt).reversed())
                 .toList()
         );
     }

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
-import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceInfo;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public class RecentPerformanceContext {
@@ -25,24 +25,24 @@ public class RecentPerformanceContext {
         return MAX_SIZE - performances.size();
     }
 
-    public void addFavoritePerformances(List<Performance> favoritePerformances) {
-        for (Performance performance : favoritePerformances) {
+    public void addFavoritePerformances(List<PerformanceInfo> favoritePerformances) {
+        for (PerformanceInfo performance : favoritePerformances) {
             if (isFull()) {
                 break;
             }
-            PerformanceKey key = new PerformanceKey(performance.getType(), performance.getTypeId());
+            PerformanceKey key = new PerformanceKey(performance.type(), performance.typeId());
             if (addedPerformanceKeys.add(key)) {
                 performances.add(RecentPerformanceDTO.of(performance, true));
             }
         }
     }
 
-    public void addGeneralPerformances(List<Performance> generalPerformances) {
-        for (Performance performance : generalPerformances) {
+    public void addGeneralPerformances(List<PerformanceInfo> generalPerformances) {
+        for (PerformanceInfo performance : generalPerformances) {
             if (isFull()) {
                 break;
             }
-            PerformanceKey key = new PerformanceKey(performance.getType(), performance.getTypeId());
+            PerformanceKey key = new PerformanceKey(performance.type(), performance.typeId());
             if (addedPerformanceKeys.add(key)) {
                 performances.add(RecentPerformanceDTO.of(performance, false));
             }

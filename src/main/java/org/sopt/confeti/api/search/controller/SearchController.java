@@ -12,7 +12,6 @@ import org.sopt.confeti.api.search.facade.dto.response.SearchResultDTO;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
-import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class SearchController {
 
     private final SearchFacade searchFacade;
-    private final S3FileHandler s3FileHandler;
 
     @GetMapping
     public ResponseEntity<BaseResponse<SearchResultResponse>> homeSearch(
@@ -38,7 +36,7 @@ public class SearchController {
         SearchResultDTO searchResult = searchType.search(searchFacade, aid, pid, term);
 
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            SearchResultResponse.of(searchResult, s3FileHandler));
+            SearchResultResponse.from(searchResult));
     }
 
     @GetMapping("/terms/popular")

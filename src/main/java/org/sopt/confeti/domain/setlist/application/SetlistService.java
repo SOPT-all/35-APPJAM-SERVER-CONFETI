@@ -25,6 +25,7 @@ import org.sopt.confeti.domain.setlist.infra.repository.SetlistRepository;
 import org.sopt.confeti.domain.setlist.infra.repository.SetlistSongRepository;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.application.PerformanceFileService;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
@@ -44,6 +45,7 @@ public class SetlistService {
     private final FestivalRepository festivalRepository;
     private final SetlistSongRepository setlistSongRepository;
     private final S3FileHandler s3FileHandler;
+    private final PerformanceFileService performanceFileService;
     private final PerformanceService performanceService;
 
     @Deprecated
@@ -56,7 +58,8 @@ public class SetlistService {
             .map(setlist -> {
                 Performance performance = performanceService.getPerformanceByTypeAndTypeId(
                     PerformanceType.valueOf(setlist.getType().name()), setlist.getTypeId());
-                return SetlistSummaryResponse.of(setlist, performance, s3FileHandler);
+                String posterUrl = performanceFileService.getFileInfo(performance).posterUrl();
+                return SetlistSummaryResponse.of(setlist, performance, posterUrl);
             })
             .sorted((a, b) -> sortType == SetlistSortTypeDeprecated.OLDEST
                 ? a.endAt().compareTo(b.endAt()) : b.endAt().compareTo(a.endAt()))
@@ -74,7 +77,8 @@ public class SetlistService {
             .map(setlist -> {
                 Performance performance = performanceService.getPerformanceByTypeAndTypeId(
                     PerformanceType.valueOf(setlist.getType().name()), setlist.getTypeId());
-                return SetlistSummaryResponse.of(setlist, performance, s3FileHandler);
+                String posterUrl = performanceFileService.getFileInfo(performance).posterUrl();
+                return SetlistSummaryResponse.of(setlist, performance, posterUrl);
             })
             .sorted((a, b) -> sortType == SetlistSortType.EARLIEST
                 ? a.startAt().compareTo(b.startAt()) : b.startAt().compareTo(a.startAt()))
@@ -92,7 +96,8 @@ public class SetlistService {
             .map(setlist -> {
                 Performance performance = performanceService.getPerformanceByTypeAndTypeId(
                     PerformanceType.valueOf(setlist.getType().name()), setlist.getTypeId());
-                return SetlistSummaryResponse.of(setlist, performance, s3FileHandler);
+                String posterUrl = performanceFileService.getFileInfo(performance).posterUrl();
+                return SetlistSummaryResponse.of(setlist, performance, posterUrl);
             })
             .sorted(Comparator.comparing(SetlistSummaryResponse::endAt))
             .limit(MAX_SETLIST_PREVIEW_COUNT)
@@ -107,7 +112,8 @@ public class SetlistService {
             .map(setlist -> {
                 Performance performance = performanceService.getPerformanceByTypeAndTypeId(
                     PerformanceType.valueOf(setlist.getType().name()), setlist.getTypeId());
-                return SetlistSummaryResponse.of(setlist, performance, s3FileHandler);
+                String posterUrl = performanceFileService.getFileInfo(performance).posterUrl();
+                return SetlistSummaryResponse.of(setlist, performance, posterUrl);
             })
             .sorted(Comparator.comparing(SetlistSummaryResponse::startAt))
             .limit(MAX_SETLIST_PREVIEW_COUNT)

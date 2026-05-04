@@ -4,17 +4,19 @@ import org.sopt.confeti.domain.elastic_search.application.dto.response.SearchPer
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record SearchACPerformanceDTO(
-        long id,
-        String title,
-        String posterPath,
-        PerformanceType type
+    long id,
+    String title,
+    String posterUrl,
+    PerformanceType type
 ) {
-    public static SearchACPerformanceDTO from(SearchPerformanceResult performanceResult) {
+
+    public static SearchACPerformanceDTO of(SearchPerformanceResult performanceResult,
+        String posterUrl) {
         return new SearchACPerformanceDTO(
-                performanceResult.id(),
-                performanceResult.title(),
-                performanceResult.posterPath(),
-                performanceResult.type()
+            performanceResult.id(),
+            performanceResult.title(),
+            posterUrl,
+            performanceResult.type()
         );
     }
 }

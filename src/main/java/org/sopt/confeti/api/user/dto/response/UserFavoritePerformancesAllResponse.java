@@ -2,17 +2,16 @@ package org.sopt.confeti.api.user.dto.response;
 
 import java.util.List;
 import org.sopt.confeti.api.user.facade.dto.response.UserFavoritePerformancesAllDTO;
-import org.sopt.confeti.global.util.S3FileHandler;
 
 public record UserFavoritePerformancesAllResponse(
-        List<UserFavoritePerformanceAllResponse> performances) {
-    public static UserFavoritePerformancesAllResponse of(
-            final UserFavoritePerformancesAllDTO performancesDTO, final S3FileHandler s3FileHandler) {
+    List<UserFavoritePerformanceAllResponse> performances) {
+
+    public static UserFavoritePerformancesAllResponse from(
+        final UserFavoritePerformancesAllDTO performancesDTO) {
         return new UserFavoritePerformancesAllResponse(
-                performancesDTO.performances().stream()
-                        .map(userFavoritePerformanceAllDTO ->
-                                UserFavoritePerformanceAllResponse.of(userFavoritePerformanceAllDTO, s3FileHandler))
-                        .toList()
+            performancesDTO.performances().stream()
+                .map(UserFavoritePerformanceAllResponse::from)
+                .toList()
         );
     }
 }

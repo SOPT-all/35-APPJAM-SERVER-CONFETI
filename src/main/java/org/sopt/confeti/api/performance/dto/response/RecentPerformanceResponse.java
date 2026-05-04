@@ -1,35 +1,30 @@
 package org.sopt.confeti.api.performance.dto.response;
 
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformanceDTO;
-import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.util.DateConvertor;
-import org.sopt.confeti.global.util.S3FileHandler;
 
 public record RecentPerformanceResponse(
-        long performanceId,
-        long typeId,
-        PerformanceType type,
-        String title,
-        String area,
-        String startAt,
-        String posterUrl,
-        boolean isFavorite
+    long performanceId,
+    long typeId,
+    PerformanceType type,
+    String title,
+    String area,
+    String startAt,
+    String posterUrl,
+    boolean isFavorite
 ) {
-    public static RecentPerformanceResponse of(final RecentPerformanceDTO recentPerformanceDTO,
-                                               final S3FileHandler s3FileHandler) {
-        FolderPath topFolder = FolderPath.getFolderPathByPerformanceType(recentPerformanceDTO.type());
 
+    public static RecentPerformanceResponse from(RecentPerformanceDTO recentPerformanceDTO) {
         return new RecentPerformanceResponse(
-                recentPerformanceDTO.performanceId(),
-                recentPerformanceDTO.typeId(),
-                recentPerformanceDTO.type(),
-                recentPerformanceDTO.title(),
-                recentPerformanceDTO.area(),
-                DateConvertor.convertToDefaultFormat(recentPerformanceDTO.startAt()),
-                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER),
-                        recentPerformanceDTO.posterPath()).toString(),
-                recentPerformanceDTO.isFavorite()
+            recentPerformanceDTO.performanceId(),
+            recentPerformanceDTO.typeId(),
+            recentPerformanceDTO.type(),
+            recentPerformanceDTO.title(),
+            recentPerformanceDTO.area(),
+            DateConvertor.convertToDefaultFormat(recentPerformanceDTO.startAt()),
+            recentPerformanceDTO.posterUrl(),
+            recentPerformanceDTO.isFavorite()
         );
     }
 }

@@ -22,12 +22,12 @@ public class PerformanceDocumentIndexEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePerformanceDocumentIndex(PerformanceDocumentIndexEvent event) {
         try {
-            PerformanceDocument document = PerformanceDocument.create(event.performanceDTO());
+            PerformanceDocument document = PerformanceDocument.create(event.performance());
             performanceSearchService.save(List.of(document));
         } catch (Exception e) {
             log.error(
                 "PerformanceDocumentIndexEventListener.handlePerformanceDocumentIndex : ES 인덱싱 실패. performanceId : {}",
-                event.performanceDTO().id(), e
+                event.performance().getId(), e
             );
         }
     }

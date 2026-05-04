@@ -1,10 +1,8 @@
 package org.sopt.confeti.api.performance.dto.response;
 
 import org.sopt.confeti.api.performance.facade.dto.response.ArtistPerformancesDetailDTO;
-import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.util.DateConvertor;
-import org.sopt.confeti.global.util.S3FileHandler;
 
 public record ArtistPerformancesDetailResponse(
         long performanceId,
@@ -17,10 +15,7 @@ public record ArtistPerformancesDetailResponse(
         String area,
         boolean isFavorite
 ) {
-    public static ArtistPerformancesDetailResponse of(ArtistPerformancesDetailDTO performance,
-                                                      S3FileHandler s3FileHandler) {
-        FolderPath topFolder = FolderPath.getFolderPathByPerformanceType(performance.type());
-
+    public static ArtistPerformancesDetailResponse from(ArtistPerformancesDetailDTO performance) {
         return new ArtistPerformancesDetailResponse(
                 performance.performanceId(),
                 performance.typeId(),
@@ -28,8 +23,7 @@ public record ArtistPerformancesDetailResponse(
                 performance.title(),
                 DateConvertor.convertToDefaultFormat(performance.startAt()),
                 DateConvertor.convertToDefaultFormat(performance.endAt()),
-                s3FileHandler.getFileUrl(FolderPath.combine(topFolder, FolderPath.POSTER), performance.posterPath())
-                        .toString(),
+                performance.posterUrl(),
                 performance.area(),
                 performance.isFavorite()
         );

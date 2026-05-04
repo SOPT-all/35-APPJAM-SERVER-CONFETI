@@ -20,7 +20,6 @@ import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
-import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class SetlistSearchController {
 
     private final SetlistSearchFacade setlistSearchFacade;
-    private final S3FileHandler s3FileHandler;
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/performances")
@@ -44,7 +42,7 @@ public class SetlistSearchController {
     ) {
         SearchPerformancesDTO searchResult = setlistSearchFacade.searchPerformances(aid, pid, term);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            SetlistSearchPerformancesResponse.of(searchResult, s3FileHandler));
+            SetlistSearchPerformancesResponse.from(searchResult));
     }
 
     @Deprecated

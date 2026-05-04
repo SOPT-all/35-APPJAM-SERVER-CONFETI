@@ -2,7 +2,7 @@ package org.sopt.confeti.domain.elastic_search;
 
 import java.time.LocalDate;
 import lombok.Builder;
-import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
+import org.sopt.confeti.domain.view.performance.Performance;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -49,16 +49,16 @@ public record PerformanceDocument(
     String area
 ) {
 
-    public static PerformanceDocument create(PerformanceDTO performance) {
+    public static PerformanceDocument create(Performance performance) {
         return PerformanceDocument.builder()
-            .id(performance.id())
-            .type(performance.type().getName())
-            .typeId(performance.typeId())
-            .title(performance.title())
-            .startAt(performance.startAt())
-            .endAt(performance.endAt())
-            .posterPath(performance.posterPath())
-            .area(performance.area())
+            .id(performance.getId())
+            .type(performance.getType().getName())
+            .typeId(performance.getTypeId())
+            .title(performance.getTitle())
+            .startAt(performance.getStartAt())
+            .endAt(performance.getEndAt())
+            .posterPath(performance.getPosterPath())
+            .area(performance.getArea())
             .build();
     }
 }

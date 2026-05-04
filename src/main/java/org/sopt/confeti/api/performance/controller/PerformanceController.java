@@ -95,7 +95,7 @@ public class PerformanceController implements PerformanceControllerDocs {
     ) {
         ArtistPerformancesDTO performances = performanceFacade.getPerformancesByArtistId(artistId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            ArtistPerformancesResponse.of(performances, s3FileHandler));
+            ArtistPerformancesResponse.from(performances));
     }
 
     @GetMapping("/info")
@@ -103,7 +103,7 @@ public class PerformanceController implements PerformanceControllerDocs {
     ) {
         RecentPerformancesDTO recentPerformances = performanceFacade.getRecentPerformances();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            RecentPerformancesResponse.of(recentPerformances, s3FileHandler));
+            RecentPerformancesResponse.from(recentPerformances));
     }
 
     @ApiVersion("2")
@@ -114,7 +114,7 @@ public class PerformanceController implements PerformanceControllerDocs {
         RecommendPerformancesDTO recommendPerformances = performanceFacade.getRecommendPerformances(
             limit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            RecommendPerformancesResponse.of(recommendPerformances, s3FileHandler));
+            RecommendPerformancesResponse.from(recommendPerformances));
     }
 
     @GetMapping("/search/ac")
@@ -127,7 +127,7 @@ public class PerformanceController implements PerformanceControllerDocs {
             limit,
             status);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            SearchACPerformancesResponse.of(performancesDTO, s3FileHandler));
+            SearchACPerformancesResponse.from(performancesDTO));
     }
 
     @ApiVersion("2")
@@ -139,7 +139,7 @@ public class PerformanceController implements PerformanceControllerDocs {
         PerformancesRecommendDTO performancesRecommendDTO = performanceFacade.getPerformancesRecommend(
             performanceLimit, songLimit);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            PerformancesRecommendResponse.of(performancesRecommendDTO, s3FileHandler)
+            PerformancesRecommendResponse.from(performancesRecommendDTO)
         );
     }
 
@@ -161,7 +161,7 @@ public class PerformanceController implements PerformanceControllerDocs {
         UpcomingPerformancesDTO upcomingPerformances = performanceFacade.getUpcomingPerformances(
             GetUpcomingPerformancesDTO.from(performanceRequests));
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            UpcomingPerformancesResponse.of(upcomingPerformances, s3FileHandler));
+            UpcomingPerformancesResponse.from(upcomingPerformances));
     }
 
     private List<GetUpcomingPerformanceRequest> decodeToUpcomingPerformancesRequest(

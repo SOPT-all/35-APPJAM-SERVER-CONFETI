@@ -28,6 +28,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.PerformanceReservati
 import org.sopt.confeti.api.performance.facade.dto.response.PerformancesRecommendDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecentPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.RecommendPerformancesDTO;
+import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformanceDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SearchACPerformancesDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.SongRecommendDTO;
 import org.sopt.confeti.api.performance.facade.dto.response.UpcomingPerformancesDTO;
@@ -35,16 +36,17 @@ import org.sopt.confeti.domain.artist_favorite.application.ArtistFavoriteService
 import org.sopt.confeti.domain.concert.application.ConcertService;
 import org.sopt.confeti.domain.concert_favorite.application.ConcertFavoriteService;
 import org.sopt.confeti.domain.elastic_search.application.PerformanceSearchService;
+import org.sopt.confeti.domain.elastic_search.application.dto.response.SearchPerformanceResult;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival_favorite.application.FestivalFavoriteService;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.timetable.application.TimetableService;
 import org.sopt.confeti.domain.user.application.UserService;
-import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceTicketDTO;
+import org.sopt.confeti.domain.view.performance.application.PerformanceFileService;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceArtistDTO;
-import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceInfo;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.ExecutorName;
@@ -70,6 +72,7 @@ public class PerformanceFacade {
     private final ConcertFavoriteService concertFavoriteService;
     private final ArtistFavoriteService artistFavoriteService;
     private final PerformanceSearchService performanceSearchService;
+    private final PerformanceFileService performanceFileService;
     private final MusicAPIHandler musicAPIHandler;
     private final TimetableService timetableService;
     private final SetlistService setlistService;
@@ -83,6 +86,7 @@ public class PerformanceFacade {
         ConcertFavoriteService concertFavoriteService,
         ArtistFavoriteService artistFavoriteService,
         PerformanceSearchService performanceSearchService,
+        PerformanceFileService performanceFileService,
         MusicAPIHandler musicAPIHandler,
         TimetableService timetableService,
         SetlistService setlistService,
@@ -95,6 +99,7 @@ public class PerformanceFacade {
         this.concertFavoriteService = concertFavoriteService;
         this.artistFavoriteService = artistFavoriteService;
         this.performanceSearchService = performanceSearchService;
+        this.performanceFileService = performanceFileService;
         this.musicAPIHandler = musicAPIHandler;
         this.timetableService = timetableService;
         this.setlistService = setlistService;
@@ -157,7 +162,7 @@ public class PerformanceFacade {
             List<String> favoriteArtistIds =
                 artistFavoriteService.getArtistIdsByUserId(userInfo.id());
             if (!favoriteArtistIds.isEmpty()) {
-                List<Performance> favoritePerformances =
+                List<PerformanceInfo> favoritePerformances =
                     performanceService.getPerformancesByArtistIds(
                         favoriteArtistIds,
                         RecentPerformanceContext.MAX_SIZE
@@ -167,7 +172,7 @@ public class PerformanceFacade {
         });
 
         if (!context.isFull()) {
-            List<Performance> general =
+            List<PerformanceInfo> general =
                 performanceService.getRecentPerformancesExcluding(
                     context.getExcludedConcertIds(),
                     context.getExcludedFestivalIds(),
@@ -181,7 +186,7 @@ public class PerformanceFacade {
 
     @ReadOnlyTransactional
     public ArtistPerformancesDTO getPerformancesByArtistId(String artistId) {
-        List<PerformanceDTO> performances = performanceService.getPerformancesByArtistId(artistId);
+        List<PerformanceInfo> performances = performanceService.getPerformancesByArtistId(artistId);
 
         Map<String, Boolean> favoriteMap = getFavoriteMap(performances);
         List<ArtistPerformancesDetailDTO> performanceList = performances.stream()
@@ -196,7 +201,7 @@ public class PerformanceFacade {
     }
 
     @ReadOnlyTransactional
-    public Map<String, Boolean> getFavoriteMap(List<PerformanceDTO> performances) {
+    public Map<String, Boolean> getFavoriteMap(List<PerformanceInfo> performances) {
         if (performances.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -207,10 +212,10 @@ public class PerformanceFacade {
     }
 
     private Map<PerformanceType, Set<Long>> groupPerformancesByType(
-        List<PerformanceDTO> performances) {
+        List<PerformanceInfo> performances) {
         Map<PerformanceType, Set<Long>> typeToIdsMap = new HashMap<>();
 
-        for (PerformanceDTO performance : performances) {
+        for (PerformanceInfo performance : performances) {
             if (!typeToIdsMap.containsKey(performance.type())) {
                 typeToIdsMap.put(performance.type(), new HashSet<>());
             }
@@ -252,9 +257,13 @@ public class PerformanceFacade {
     @ReadOnlyTransactional
     public SearchACPerformancesDTO searchACPerformances(String term, int limit,
         PerformanceStatus status) {
-        return SearchACPerformancesDTO.from(
-            performanceSearchService.getPerformancesByTitle(term, limit, status)
-        );
+        List<SearchPerformanceResult> results = performanceSearchService.getPerformancesByTitle(
+            term, limit, status);
+        List<SearchACPerformanceDTO> performances = results.stream()
+            .map(result -> SearchACPerformanceDTO.of(result,
+                performanceFileService.getFileInfo(result.posterPath()).posterUrl()))
+            .toList();
+        return SearchACPerformancesDTO.from(performances);
     }
 
     @ReadOnlyTransactional
@@ -294,7 +303,7 @@ public class PerformanceFacade {
     }
 
     public PerformancesRecommendDTO getPerformancesRecommend(int performanceLimit, int songLimit) {
-        List<PerformanceDTO> performances = getFavoritePerformanceRecommend(performanceLimit);
+        List<PerformanceInfo> performances = getFavoritePerformanceRecommend(performanceLimit);
 
         if (performances.isEmpty()) {
             performances = performanceService.getRandomUpcomingPerformances(performanceLimit);
@@ -319,8 +328,8 @@ public class PerformanceFacade {
         return PerformancesRecommendDTO.from(performancesRecommend);
     }
 
-    private List<PerformanceDTO> getFavoritePerformanceRecommend(int performanceLimit) {
-        List<PerformanceDTO> recommendPerformances = UserContext.getOptional()
+    private List<PerformanceInfo> getFavoritePerformanceRecommend(int performanceLimit) {
+        List<PerformanceInfo> recommendPerformances = UserContext.getOptional()
             .map(userInfo -> getRandomFavoritePerformances(userInfo.id(), performanceLimit))
             .orElse(List.of());
 
@@ -335,21 +344,21 @@ public class PerformanceFacade {
             .toList();
     }
 
-    private List<PerformanceDTO> getRandomFavoritePerformances(long userId, int performanceLimit) {
+    private List<PerformanceInfo> getRandomFavoritePerformances(long userId, int performanceLimit) {
         List<Long> festivalFavoriteIds = festivalFavoriteService.getRandomFavoriteUpcomingFestivalIds(
             userId, performanceLimit);
         List<Long> concertFavoriteIds = concertFavoriteService.getRandomFavoriteUpcomingConcertIds(
             userId, performanceLimit);
 
-        List<PerformanceDTO> festivalPerformances = performanceService.getPerformancesByTypeAndTypeIds(
+        List<PerformanceInfo> festivalPerformances = performanceService.getPerformancesByTypeAndTypeIds(
             PerformanceType.FESTIVAL, festivalFavoriteIds);
-        List<PerformanceDTO> concertPerformances = performanceService.getPerformancesByTypeAndTypeIds(
+        List<PerformanceInfo> concertPerformances = performanceService.getPerformancesByTypeAndTypeIds(
             PerformanceType.CONCERT, concertFavoriteIds);
         return new ArrayList<>(
             Stream.concat(festivalPerformances.stream(), concertPerformances.stream()).toList());
     }
 
-    private PerformanceRecommendDTO getPerformanceRecommend(PerformanceDTO performance,
+    private PerformanceRecommendDTO getPerformanceRecommend(PerformanceInfo performance,
         int songLimit) {
         List<SongRecommendDTO> songsRecommend = getSongsRecommend(
             performanceService.getRandomPerformanceArtists(performance.id(), songLimit), songLimit

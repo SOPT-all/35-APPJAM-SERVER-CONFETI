@@ -19,10 +19,9 @@ import org.sopt.confeti.domain.music.application.dto.MusicAPICondition;
 import org.sopt.confeti.domain.music.artist.application.ArtistMusicAPIService;
 import org.sopt.confeti.domain.user.User;
 import org.sopt.confeti.domain.user.application.UserService;
-import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
-import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceDTO;
-import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewDTO;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceInfo;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformancePreviewInfo;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.constant.PerformanceType;
@@ -152,7 +151,7 @@ public class UserFavoriteFacade {
 
     @ReadOnlyTransactional
     public UserFavoritePerformancesDTO getFavoritePerformances() {
-        List<PerformancePreviewDTO> performances = performanceService.getFavoritePerformancesPreview(
+        List<PerformancePreviewInfo> performances = performanceService.getFavoritePerformancesPreview(
             UserContext.get().id());
         return UserFavoritePerformancesDTO.from(performances);
     }
@@ -161,7 +160,7 @@ public class UserFavoriteFacade {
     public UserFavoritePerformancesAllDTO getFavoritePerformancesAll(String type) {
         validateType(type);
 
-        List<PerformanceDTO> performances = performanceService.getFavoritePerformancesAll(
+        List<PerformanceInfo> performances = performanceService.getFavoritePerformancesAll(
             UserContext.get().id(), type);
         return UserFavoritePerformancesAllDTO.from(performances);
     }
@@ -197,7 +196,7 @@ public class UserFavoriteFacade {
 
     @ReadOnlyTransactional
     public UpcomingPerformanceDTO getUpcomingPerformance() {
-        Performance performance = performanceService.getUpcomingPerformanceByUserId(
+        PerformanceInfo performance = performanceService.getUpcomingPerformanceByUserId(
             UserContext.get().id());
         if (performance == null) {
             return null;
