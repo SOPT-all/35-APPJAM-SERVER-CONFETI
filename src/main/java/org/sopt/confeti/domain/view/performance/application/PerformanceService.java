@@ -43,7 +43,7 @@ public class PerformanceService {
     public List<PerformancePreviewInfo> getFavoritePerformancesPreview(final long userId) {
         return performanceDTORepository.findFavoritePerformancesPreview(userId).stream()
             .map(performancePreview -> PerformancePreviewInfo.of(performancePreview,
-                performanceFileService.getFileInfo(performancePreview.posterPath())))
+                performanceFileService.getFileInfo(performancePreview)))
             .toList();
     }
 

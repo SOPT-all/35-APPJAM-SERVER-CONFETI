@@ -261,7 +261,7 @@ public class PerformanceFacade {
             term, limit, status);
         List<SearchACPerformanceDTO> performances = results.stream()
             .map(result -> SearchACPerformanceDTO.of(result,
-                performanceFileService.getFileInfo(result.posterPath()).posterUrl()))
+                performanceFileService.getFileInfo(result)))
             .toList();
         return SearchACPerformancesDTO.from(performances);
     }

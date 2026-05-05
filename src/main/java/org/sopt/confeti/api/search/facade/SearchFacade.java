@@ -67,7 +67,8 @@ public class SearchFacade {
             artistFavorite = artistFavoriteService.isFavorite(UserContext.get().id(), aid);
         }
 
-        List<PerformanceInfo> performances = performanceService.getPerformancesByArtistIdAndType(aid,
+        List<PerformanceInfo> performances = performanceService.getPerformancesByArtistIdAndType(
+            aid,
             PerformanceType.PERFORMANCE);
         List<ConfetiSong> songs = songMusicAPIService.getPopularSongsByArtist(artist.getId(),
             RELATED_POPULAR_SONG_LIMIT);
@@ -139,7 +140,7 @@ public class SearchFacade {
         // 검색어 기반
         List<PerformanceInfo> searchedPerformances = performanceSearchService.getUpcomingPerformancesByTitleAndTypePartialMatched(
                 analyzeResult.processedTerm(), analyzeResult.performanceType()).stream()
-            .map(result -> PerformanceInfo.of(result, performanceFileService.getFileInfo(result.posterPath())))
+            .map(result -> PerformanceInfo.of(result, performanceFileService.getFileInfo(result)))
             .toList();
 
         performances.addAll(searchedPerformances);

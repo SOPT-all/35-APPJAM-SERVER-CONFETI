@@ -98,7 +98,7 @@ public class SetlistSearchFacade {
                         analyzeResult.processedTerm(),
                         analyzeResult.performanceType()).stream()
                     .map(result -> PerformanceInfo.of(result,
-                        performanceFileService.getFileInfo(result.posterPath())))
+                        performanceFileService.getFileInfo(result)))
                     .toList()
             );
         }
