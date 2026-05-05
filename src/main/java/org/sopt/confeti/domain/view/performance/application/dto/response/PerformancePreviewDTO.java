@@ -1,7 +1,9 @@
 package org.sopt.confeti.domain.view.performance.application.dto.response;
 
+import lombok.Builder;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
+@Builder
 public record PerformancePreviewDTO(
         long typeId,
         PerformanceType type,
@@ -14,11 +16,11 @@ public record PerformancePreviewDTO(
             final String title,
             final String posterPath
     ) {
-        return new PerformancePreviewDTO(
-                typeId,
-                PerformanceType.convert(type),
-                title,
-                posterPath
-        );
+        return PerformancePreviewDTO.builder()
+                .typeId(typeId)
+                .type(PerformanceType.convert(type))
+                .title(title)
+                .posterPath(posterPath)
+                .build();
     }
 }

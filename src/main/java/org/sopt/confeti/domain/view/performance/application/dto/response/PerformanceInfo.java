@@ -7,25 +7,26 @@ import java.util.Objects;
 import lombok.Builder;
 import org.sopt.confeti.domain.elastic_search.application.dto.response.SearchPerformanceResult;
 import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.PerformanceFileInfo;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 @Builder
-public record PerformanceDTO(
-    Long id,
+public record PerformanceInfo(
+    long id,
     Long typeId,
     PerformanceType type,
     String area,
     String title,
     LocalDate startAt,
     LocalDate endAt,
-    String posterPath,
+    String posterUrl,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     List<PerformanceArtistDTO> artists
 ) {
 
-    public static PerformanceDTO from(final Performance performance) {
-        return PerformanceDTO.builder()
+    public static PerformanceInfo of(Performance performance, PerformanceFileInfo fileInfo) {
+        return PerformanceInfo.builder()
             .id(performance.getId())
             .typeId(performance.getTypeId())
             .type(performance.getType())
@@ -33,7 +34,7 @@ public record PerformanceDTO(
             .title(performance.getTitle())
             .startAt(performance.getStartAt())
             .endAt(performance.getEndAt())
-            .posterPath(performance.getPosterPath())
+            .posterUrl(fileInfo.posterUrl())
             .createdAt(performance.getCreatedAt())
             .updatedAt(performance.getUpdatedAt())
             .artists(performance.getArtists().stream()
@@ -42,16 +43,16 @@ public record PerformanceDTO(
             .build();
     }
 
-    public static PerformanceDTO from(final SearchPerformanceResult searchedPerformance) {
-        return PerformanceDTO.builder()
-            .id(searchedPerformance.id())
-            .typeId(searchedPerformance.typeId())
-            .type(searchedPerformance.type())
-            .area(searchedPerformance.area())
-            .title(searchedPerformance.title())
-            .startAt(searchedPerformance.startAt())
-            .endAt(searchedPerformance.endAt())
-            .posterPath(searchedPerformance.posterPath())
+    public static PerformanceInfo of(SearchPerformanceResult result, PerformanceFileInfo fileInfo) {
+        return PerformanceInfo.builder()
+            .id(result.id())
+            .typeId(result.typeId())
+            .type(result.type())
+            .area(result.area())
+            .title(result.title())
+            .startAt(result.startAt())
+            .endAt(result.endAt())
+            .posterUrl(fileInfo.posterUrl())
             .artists(List.of())
             .build();
     }
@@ -64,8 +65,8 @@ public record PerformanceDTO(
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        PerformanceDTO that = (PerformanceDTO) o;
-        return Objects.equals(id, that.id);
+        PerformanceInfo that = (PerformanceInfo) o;
+        return id == that.id;
     }
 
     @Override

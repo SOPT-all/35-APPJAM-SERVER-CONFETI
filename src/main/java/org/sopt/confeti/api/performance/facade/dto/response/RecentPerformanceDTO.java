@@ -1,7 +1,7 @@
 package org.sopt.confeti.api.performance.facade.dto.response;
 
 import java.time.LocalDate;
-import org.sopt.confeti.domain.view.performance.Performance;
+import org.sopt.confeti.domain.view.performance.application.dto.response.PerformanceInfo;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 
 public record RecentPerformanceDTO(
@@ -11,23 +11,23 @@ public record RecentPerformanceDTO(
         String title,
         String area,
         LocalDate startAt,
-        String posterPath,
+        String posterUrl,
         boolean isFavorite
 ) {
-    public static RecentPerformanceDTO of(final Performance performance, final boolean isFavorite) {
+    public static RecentPerformanceDTO of(final PerformanceInfo performance, final boolean isFavorite) {
         return new RecentPerformanceDTO(
-                performance.getId(),
-                performance.getTypeId(),
-                performance.getType(),
-                performance.getTitle(),
-                performance.getArea(),
-                performance.getStartAt(),
-                performance.getPosterPath(),
+                performance.id(),
+                performance.typeId(),
+                performance.type(),
+                performance.title(),
+                performance.area(),
+                performance.startAt(),
+                performance.posterUrl(),
                 isFavorite
         );
     }
 
-    public static RecentPerformanceDTO from(final Performance performance) {
+    public static RecentPerformanceDTO from(final PerformanceInfo performance) {
         return of(performance, false);
     }
 }
