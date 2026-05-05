@@ -23,7 +23,7 @@ public class FestivalFileService {
         festival.getReservationUrls().forEach(reservationUrl ->
             reservationFileInfoMap.put(
                 reservationUrl.getId(),
-                festivalReservationFileService.getFileUrls(reservationUrl)
+                festivalReservationFileService.getFileInfo(reservationUrl)
             )
         );
 

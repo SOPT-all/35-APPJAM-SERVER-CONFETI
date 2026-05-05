@@ -55,16 +55,15 @@ import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftPars
 import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftService;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
-import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
+import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftInfo;
 import org.sopt.confeti.domain.setlist.SetlistType;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorCreateResponseDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
-import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorInfo;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorInfos;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
@@ -110,10 +109,9 @@ public class AdminFacade {
             FolderPath.combine(FolderPath.TICKET_VENDOR, FolderPath.LOGO));
         TicketVendorCreateDto dto = TicketVendorCreateDto.from(request, logoPath);
 
-        TicketVendorCreateResponseDto responseDto = Tx.masterTx(
-            () -> ticketVendorService.create(dto));
+        TicketVendorInfo info = Tx.masterTx(() -> ticketVendorService.create(dto));
 
-        return TicketVendorResponse.from(responseDto, s3FileHandler);
+        return TicketVendorResponse.from(info);
     }
 
     public TicketVendorResponse updateTicketVendor(Long ticketVendorId,
@@ -130,14 +128,14 @@ public class AdminFacade {
                 FolderPath.combine(FolderPath.TICKET_VENDOR, FolderPath.LOGO));
         }
 
-        final String finalLogoPath = logoPath;
-        TicketVendorUpdateResponseDto responseDto = Tx.masterTx(() -> {
+        String finalLogoPath = logoPath;
+        TicketVendorInfo info = Tx.masterTx(() -> {
             TicketVendorUpdateDto dto = TicketVendorUpdateDto.of(ticketVendorId, request,
                 finalLogoPath);
             return ticketVendorService.update(dto);
         });
 
-        return TicketVendorResponse.from(responseDto, s3FileHandler);
+        return TicketVendorResponse.from(info);
     }
 
     public void deleteTicketVendor(Long ticketVendorId) {
@@ -148,7 +146,7 @@ public class AdminFacade {
         Tx.masterTx(() -> ticketVendorService.delete(ticketVendorId));
     }
 
-    public TicketVendorDtos getTicketVendors() {
+    public TicketVendorInfos getTicketVendors() {
         return Tx.readOnlyTx(ticketVendorService::findAll);
     }
 
@@ -249,7 +247,7 @@ public class AdminFacade {
         return AdminArtistSearchResponses.from(artists);
     }
 
-    public PerformanceDraftDto createPerformanceDraft(PerformanceDraftCreateDto dto) {
+    public PerformanceDraftInfo createPerformanceDraft(PerformanceDraftCreateDto dto) {
         String posterPath = null;
         String logoPath = null;
 
@@ -309,20 +307,19 @@ public class AdminFacade {
     }
 
     public PerformanceDraftDetailInfo getPerformanceDraftDetail(Long draftId) {
-        PerformanceDraft draft = Tx.readOnlyTx(() -> performanceDraftService.getById(draftId));
-        PerformanceDraftDto dto = PerformanceDraftDto.from(draft);
+        PerformanceDraftInfo info = Tx.readOnlyTx(() -> performanceDraftService.getDraftById(draftId));
 
-        Set<String> artistIds = performanceDraftParser.parseArtistIds(dto.performanceDraftType(),
-            dto.performanceData());
+        Set<String> artistIds = performanceDraftParser.parseArtistIds(info.performanceDraftType(),
+            info.performanceData());
         List<ConfetiArtist> artists = Tx.readOnlyTx(() -> artistService.getArtists(artistIds))
             .stream()
             .map(Artist::toDomain)
             .toList();
 
-        return new PerformanceDraftDetailInfo(dto, artists);
+        return new PerformanceDraftDetailInfo(info, artists);
     }
 
-    public PerformanceDraftDto updatePerformanceDraft(PerformanceDraftUpdateDto dto) {
+    public PerformanceDraftInfo updatePerformanceDraft(PerformanceDraftUpdateDto dto) {
         PerformanceDraft existing = Tx.readOnlyTx(() -> performanceDraftService.getById(dto.id()));
 
         String newPosterPath = dto.getOptionalPosterImage()
@@ -349,11 +346,11 @@ public class AdminFacade {
             throw e;
         }
 
-        final String finalPosterPath =
+        String finalPosterPath =
             newPosterPath != null ? newPosterPath : existing.getPosterPath();
-        final String finalLogoPath = newLogoPath != null ? newLogoPath : existing.getLogoPath();
+        String finalLogoPath = newLogoPath != null ? newLogoPath : existing.getLogoPath();
 
-        PerformanceDraftDto result;
+        PerformanceDraftInfo result;
         try {
             result = Tx.masterTx(
                 () -> performanceDraftService.updateDraft(dto, finalPosterPath, finalLogoPath));
@@ -695,8 +692,8 @@ public class AdminFacade {
             }
         }
 
-        final String finalPosterPath = posterPath;
-        final String finalLogoPath = logoPath;
+        String finalPosterPath = posterPath;
+        String finalLogoPath = logoPath;
 
         long festivalId;
 
