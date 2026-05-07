@@ -5,11 +5,11 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
-import org.sopt.confeti.api.setlist.dto.response.SetlistSongResponse;
 import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddSongDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistDetailDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistSongDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertFileService;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
@@ -165,9 +165,9 @@ public class SetlistService {
         Setlist setlist = setlistRepository.findByIdAndUserId(setlistId, userId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        List<SetlistSongResponse> songs = setlistSongRepository.findBySetlist(setlist).stream()
+        List<SetlistSongDTO> songs = setlistSongRepository.findBySetlist(setlist).stream()
             .sorted(Comparator.comparing(SetlistSong::getOrders))
-            .map(SetlistSongResponse::from)
+            .map(SetlistSongDTO::from)
             .toList();
 
         if (setlist.getType() == SetlistType.CONCERT) {

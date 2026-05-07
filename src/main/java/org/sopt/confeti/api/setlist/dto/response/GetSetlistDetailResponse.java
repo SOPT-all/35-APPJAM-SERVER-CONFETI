@@ -5,9 +5,9 @@ import java.util.List;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistDetailDTO;
 
 public record GetSetlistDetailResponse(
-    Long setlistId,
+    long setlistId,
     String type,
-    Long typeId,
+    long typeId,
     String posterUrl,
     String title,
     LocalDate startAt,
@@ -24,7 +24,9 @@ public record GetSetlistDetailResponse(
             dto.title(),
             dto.startAt(),
             dto.endAt(),
-            dto.songs()
+            dto.songs().stream()
+                .map(SetlistSongResponse::from)
+                .toList()
         );
     }
 }

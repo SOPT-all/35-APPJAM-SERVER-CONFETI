@@ -4,7 +4,7 @@ import org.sopt.confeti.api.user.facade.dto.response.UserInfoDTO;
 import org.sopt.confeti.domain.user.OAuthProvider;
 
 public record UserInfoResponse(
-    Long userId,
+    long userId,
     String profileUrl,
     String name,
     OAuthProvider provider

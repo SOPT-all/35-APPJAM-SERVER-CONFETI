@@ -1,9 +1,9 @@
 package org.sopt.confeti.api.setlist.dto.response;
 
-import org.sopt.confeti.domain.setlist.SetlistSong;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistSongDTO;
 
 public record SetlistSongResponse(
-    Long setlistSongId,
+    long setlistSongId,
     String songId,
     String artistName,
     String trackName,
@@ -12,15 +12,15 @@ public record SetlistSongResponse(
     int orders
 ) {
 
-    public static SetlistSongResponse from(SetlistSong song) {
+    public static SetlistSongResponse from(SetlistSongDTO song) {
         return new SetlistSongResponse(
-            song.getId(),
-            song.getSongId(),
-            song.getArtistName(),
-            song.getTrackName(),
-            song.getArtworkUrl(),
-            song.getPreviewUrl(),
-            song.getOrders()
+            song.setlistSongId(),
+            song.songId(),
+            song.artistName(),
+            song.trackName(),
+            song.artworkUrl(),
+            song.previewUrl(),
+            song.orders()
         );
     }
 }
