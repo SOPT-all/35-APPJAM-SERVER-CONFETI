@@ -118,7 +118,7 @@ public class UserTimetableFacade {
                 .filter(f -> f.getTimetableSupportStatus() == TimetableSupportStatus.NOT_SUPPORTED)
                 .map(Festival::getId)
                 .toList());
-            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+            throw new BadRequestException(ErrorMessage.FESTIVAL_TIMETABLE_NOT_SUPPORTED);
         }
     }
 

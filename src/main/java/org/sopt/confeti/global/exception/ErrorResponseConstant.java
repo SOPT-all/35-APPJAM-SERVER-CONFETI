@@ -12,6 +12,18 @@ public class ErrorResponseConstant {
     public static final String BAD_REQUEST_DESCRIPTION = "Bad Request";
     public static final String BAD_REQUEST_MESSAGE = "요청 형식이 올바르지 않습니다.";
 
+    /* 400 Bad Request - Festival Validation */
+    public static final String FESTIVAL_INVALID_DURATION_MESSAGE = "시작 날짜는 종료 날짜보다 클 수 없습니다.";
+    public static final String FESTIVAL_INVALID_RESERVE_DATE_MESSAGE = "예매 일자는 공연 시작일보다 이전이어야 합니다.";
+    public static final String FESTIVAL_DATE_OUT_OF_RANGE_MESSAGE = "날짜가 공연 기간 범위를 벗어났습니다.";
+    public static final String FESTIVAL_TIMETABLE_DATE_NO_STAGE_MESSAGE = "타임테이블이 존재하면 모든 날짜에 스테이지 정보가 있어야 합니다.";
+    public static final String FESTIVAL_TIMETABLE_ARTIST_NOT_MAPPED_MESSAGE = "모든 아티스트가 타임테이블에 배정되어야 합니다.";
+    public static final String FESTIVAL_TIMETABLE_OPEN_AT_AFTER_FIRST_TIME_MESSAGE = "티켓 오픈 시간은 첫 번째 공연 시작 시간 이전이어야 합니다.";
+    public static final String FESTIVAL_TIMETABLE_STAGE_ORDER_DUPLICATE_MESSAGE = "스테이지 순서(order)가 중복됩니다.";
+    public static final String FESTIVAL_TIMETABLE_TIME_START_AFTER_END_MESSAGE = "공연 시작 시간은 종료 시간보다 이전이어야 합니다.";
+    public static final String FESTIVAL_TIMETABLE_TIME_OVERLAP_MESSAGE = "같은 스테이지 내 공연 시간이 겹칩니다.";
+    public static final String FESTIVAL_TIMETABLE_NOT_SUPPORTED_MESSAGE = "타임테이블을 지원하지 않는 페스티벌입니다.";
+
     /* 401 Unauthorized */
     public static final String UNAUTHORIZED_STATUS = "401";
     public static final String UNAUTHORIZED_DESCRIPTION = "Unauthorized";

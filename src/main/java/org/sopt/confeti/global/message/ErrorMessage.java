@@ -2,6 +2,16 @@ package org.sopt.confeti.global.message;
 
 import static org.sopt.confeti.global.exception.ErrorResponseConstant.BAD_REQUEST_MESSAGE;
 import static org.sopt.confeti.global.exception.ErrorResponseConstant.CONFLICT_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_DATE_OUT_OF_RANGE_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_INVALID_DURATION_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_INVALID_RESERVE_DATE_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_ARTIST_NOT_MAPPED_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_DATE_NO_STAGE_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_OPEN_AT_AFTER_FIRST_TIME_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_STAGE_ORDER_DUPLICATE_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_TIME_OVERLAP_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_NOT_SUPPORTED_MESSAGE;
+import static org.sopt.confeti.global.exception.ErrorResponseConstant.FESTIVAL_TIMETABLE_TIME_START_AFTER_END_MESSAGE;
 import static org.sopt.confeti.global.exception.ErrorResponseConstant.EMPTY_TOKEN_MESSAGE;
 import static org.sopt.confeti.global.exception.ErrorResponseConstant.EXPIRED_TOKEN_MESSAGE;
 import static org.sopt.confeti.global.exception.ErrorResponseConstant.FORBIDDEN_MESSAGE;
@@ -23,6 +33,16 @@ import org.springframework.http.HttpStatus;
 public enum ErrorMessage {
     /* 400 Bad Request */
     BAD_REQUEST(HttpStatus.BAD_REQUEST, BAD_REQUEST_MESSAGE),
+    FESTIVAL_INVALID_DURATION(HttpStatus.BAD_REQUEST, FESTIVAL_INVALID_DURATION_MESSAGE),
+    FESTIVAL_INVALID_RESERVE_DATE(HttpStatus.BAD_REQUEST, FESTIVAL_INVALID_RESERVE_DATE_MESSAGE),
+    FESTIVAL_DATE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, FESTIVAL_DATE_OUT_OF_RANGE_MESSAGE),
+    FESTIVAL_TIMETABLE_DATE_NO_STAGE(HttpStatus.BAD_REQUEST, FESTIVAL_TIMETABLE_DATE_NO_STAGE_MESSAGE),
+    FESTIVAL_TIMETABLE_ARTIST_NOT_MAPPED(HttpStatus.BAD_REQUEST, FESTIVAL_TIMETABLE_ARTIST_NOT_MAPPED_MESSAGE),
+    FESTIVAL_TIMETABLE_OPEN_AT_AFTER_FIRST_TIME(HttpStatus.BAD_REQUEST, FESTIVAL_TIMETABLE_OPEN_AT_AFTER_FIRST_TIME_MESSAGE),
+    FESTIVAL_TIMETABLE_STAGE_ORDER_DUPLICATE(HttpStatus.BAD_REQUEST, FESTIVAL_TIMETABLE_STAGE_ORDER_DUPLICATE_MESSAGE),
+    FESTIVAL_TIMETABLE_TIME_START_AFTER_END(HttpStatus.BAD_REQUEST, FESTIVAL_TIMETABLE_TIME_START_AFTER_END_MESSAGE),
+    FESTIVAL_TIMETABLE_TIME_OVERLAP(HttpStatus.BAD_REQUEST, FESTIVAL_TIMETABLE_TIME_OVERLAP_MESSAGE),
+    FESTIVAL_TIMETABLE_NOT_SUPPORTED(HttpStatus.BAD_REQUEST, FESTIVAL_TIMETABLE_NOT_SUPPORTED_MESSAGE),
 
     /* 401 Unauthorized */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, UNAUTHORIZED_MESSAGE),

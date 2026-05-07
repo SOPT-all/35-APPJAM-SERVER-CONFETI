@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.admin.facade.dto.request.AdminFestivalCommand;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
 import org.sopt.confeti.global.exception.BadRequestException;
-import org.sopt.confeti.global.exception.ParameterInvalidException;
 import org.sopt.confeti.global.message.ErrorMessage;
 
 @Slf4j
@@ -37,9 +36,10 @@ public record PutAdminFestivalRequest(
 ) {
 
     public AdminFestivalCommand toCommand() {
-        validate();
+        boolean hasTimetable = hasTimetableInfo();
+        validate(hasTimetable);
 
-        TimetableSupportStatus status = hasTimetableInfo()
+        TimetableSupportStatus status = hasTimetable
             ? TimetableSupportStatus.SUPPORTED
             : TimetableSupportStatus.NOT_SUPPORTED;
 
@@ -84,7 +84,7 @@ public record PutAdminFestivalRequest(
         );
     }
 
-    public void validate() {
+    private void validate(boolean hasTimetable) {
         validateDuration();
         validateReserveDate();
 
@@ -92,8 +92,7 @@ public record PutAdminFestivalRequest(
             validateDateFestivalAtInRange();
         }
 
-        if (hasTimetableInfo()) {
-            validateTimetableDuration();
+        if (hasTimetable) {
             validateAllDatesHaveStages();
             validateArtistTimetableMapping();
             validateOpenAtBeforeFirstTime();
@@ -106,7 +105,7 @@ public record PutAdminFestivalRequest(
     private void validateDuration() {
         if (startAt.isAfter(endAt)) {
             log.warn("PutAdminFestivalRequest.validateDuration : 시작 날짜는 끝 날짜보다 작거나 같아야 합니다.");
-            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+            throw new BadRequestException(ErrorMessage.FESTIVAL_INVALID_DURATION);
         }
     }
 
@@ -116,32 +115,8 @@ public record PutAdminFestivalRequest(
                 log.warn(
                     "PutAdminFestivalRequest.validateReserveDate : 예약 일자({})는 시작 날짜({})보다 작아야 합니다.",
                     schedule.reserveAt(), startAt);
-                throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+                throw new BadRequestException(ErrorMessage.FESTIVAL_INVALID_RESERVE_DATE);
             }
-        }
-    }
-
-    private void validateTimetableDuration() {
-        if (dates.isEmpty()) {
-            log.warn(
-                "PutAdminFestivalRequest.validateTimetableDuration : 타임테이블을 등록하려면 날짜 정보가 있어야 합니다.");
-            throw new ParameterInvalidException(ErrorMessage.BAD_REQUEST);
-        }
-
-        LocalDate startDate = dates.stream().findFirst().get().festivalAt();
-        LocalDate endDate = dates.stream().findFirst().get().festivalAt();
-
-        for (DateRequest date : dates) {
-            startDate = date.festivalAt.isBefore(startDate) ? date.festivalAt : startDate;
-            endDate = date.festivalAt.isAfter(endDate) ? date.festivalAt : endDate;
-        }
-
-        if (startAt.isAfter(startDate)
-            || endAt.isBefore(endDate)) {
-            log.warn(
-                "PutAdminFestivalRequest.validateTimetableDuration : 타임테이블의 날짜는 페스티벌의 공연 기간 안으로 지정해야합니다. 공연 기간 : {} ~ {}, 타임테이블 지정 날짜 : {} ~ {}",
-                startAt, endAt, startDate, endDate);
-            throw new ParameterInvalidException(ErrorMessage.BAD_REQUEST);
         }
     }
 
@@ -152,30 +127,24 @@ public record PutAdminFestivalRequest(
         if (hasDateWithoutStages) {
             log.warn(
                 "PutAdminFestivalRequest.validateAllDatesHaveStages : 타임테이블이 존재하면 모든 날짜에 스테이지 정보가 있어야 합니다.");
-            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+            throw new BadRequestException(ErrorMessage.FESTIVAL_TIMETABLE_DATE_NO_STAGE);
         }
     }
 
     private void validateArtistTimetableMapping() {
         for (DateRequest date : dates) {
-            Set<String> dateArtistIds = new HashSet<>(date.artistIds());
+            Set<String> dateArtistIds = new HashSet<>(
+                date.artistIds() != null ? date.artistIds() : List.of());
             Set<String> timetableArtistIds = date.stages().stream()
                 .flatMap(stage -> stage.times().stream())
                 .flatMap(time -> time.artistIds().stream())
                 .collect(Collectors.toSet());
 
-            if (!timetableArtistIds.containsAll(dateArtistIds)) {
+            if (!timetableArtistIds.equals(dateArtistIds)) {
                 log.warn(
-                    "PutAdminFestivalRequest.validateArtistTimetableMapping : 날짜({})의 모든 아티스트가 타임테이블에 배정되어야 합니다.",
+                    "PutAdminFestivalRequest.validateArtistTimetableMapping : 날짜({})의 아티스트와 타임테이블 아티스트가 일치하지 않습니다.",
                     date.festivalAt());
-                throw new BadRequestException(ErrorMessage.BAD_REQUEST);
-            }
-
-            if (!dateArtistIds.containsAll(timetableArtistIds)) {
-                log.warn(
-                    "PutAdminFestivalRequest.validateArtistTimetableMapping : 날짜({})의 타임테이블의 모든 아티스트가 선택되어야 합니다.",
-                    date.festivalAt());
-                throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+                throw new BadRequestException(ErrorMessage.FESTIVAL_TIMETABLE_ARTIST_NOT_MAPPED);
             }
         }
     }
@@ -188,7 +157,7 @@ public record PutAdminFestivalRequest(
             log.warn(
                 "PutAdminFestivalRequest.validateDateFestivalAtInRange : 모든 날짜의 festivalAt은 공연 기간({} ~ {}) 내에 있어야 합니다.",
                 startAt, endAt);
-            throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+            throw new BadRequestException(ErrorMessage.FESTIVAL_DATE_OUT_OF_RANGE);
         }
     }
 
@@ -204,23 +173,23 @@ public record PutAdminFestivalRequest(
                 log.warn(
                     "PutAdminFestivalRequest.validateOpenAtBeforeFirstTime : 날짜({})의 openAt({})은 가장 이른 공연 시작 시간({}) 이하여야 합니다.",
                     date.festivalAt(), date.openAt(), earliestStartAt);
-                throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+                throw new BadRequestException(ErrorMessage.FESTIVAL_TIMETABLE_OPEN_AT_AFTER_FIRST_TIME);
             }
         }
     }
 
     private void validateStageOrderUnique() {
         for (DateRequest date : dates) {
-            List<Integer> orders = date.stages().stream()
+            long distinctCount = date.stages().stream()
                 .map(StageRequest::order)
-                .toList();
-            Set<Integer> uniqueOrders = new HashSet<>(orders);
+                .distinct()
+                .count();
 
-            if (uniqueOrders.size() != orders.size()) {
+            if (distinctCount != date.stages().size()) {
                 log.warn(
                     "PutAdminFestivalRequest.validateStageOrderUnique : 날짜({})의 스테이지 순서(order)가 중복됩니다.",
                     date.festivalAt());
-                throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+                throw new BadRequestException(ErrorMessage.FESTIVAL_TIMETABLE_STAGE_ORDER_DUPLICATE);
             }
         }
     }
@@ -233,7 +202,7 @@ public record PutAdminFestivalRequest(
                         log.warn(
                             "PutAdminFestivalRequest.validateTimeStartBeforeEnd : 날짜({}), 스테이지({})의 공연 시작 시간({})은 종료 시간({})보다 이전이어야 합니다.",
                             date.festivalAt(), stage.name(), time.startAt(), time.endAt());
-                        throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+                        throw new BadRequestException(ErrorMessage.FESTIVAL_TIMETABLE_TIME_START_AFTER_END);
                     }
                 }
             }
@@ -256,7 +225,7 @@ public record PutAdminFestivalRequest(
                             date.festivalAt(), stage.name(),
                             current.startAt(), current.endAt(),
                             next.startAt(), next.endAt());
-                        throw new BadRequestException(ErrorMessage.BAD_REQUEST);
+                        throw new BadRequestException(ErrorMessage.FESTIVAL_TIMETABLE_TIME_OVERLAP);
                     }
                 }
             }
