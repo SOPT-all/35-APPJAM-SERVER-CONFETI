@@ -3,14 +3,13 @@ package org.sopt.confeti.api.setlist.facade;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
-import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
-import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse_deprecated;
 import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddSongDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistUpdateSongOrderDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistAddSongResponseDTO;
 import org.sopt.confeti.api.setlist.facade.dto.response.SetlistCreateResponseDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistDetailDTO;
 import org.sopt.confeti.domain.setlist.SetlistSortType;
 import org.sopt.confeti.domain.setlist.SetlistSortTypeDeprecated;
 import org.sopt.confeti.domain.setlist.application.SetlistEditService;
@@ -57,13 +56,7 @@ public class SetlistFacade {
             setlistService.addSongs(UserContext.get().id(), setlistId, requests));
     }
 
-    @Deprecated
-    public GetSetlistDetailResponse_deprecated getSetlistDetail_deprecated(Long userId,
-        Long setlistId) {
-        return setlistService.getSetlistDetail_deprecated(userId, setlistId);
-    }
-
-    public GetSetlistDetailResponse getSetlistDetail(Long setlistId) {
+    public SetlistDetailDTO getSetlistDetail(Long setlistId) {
         return setlistService.getSetlistDetail(UserContext.get().id(), setlistId);
     }
 

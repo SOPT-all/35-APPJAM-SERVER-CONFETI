@@ -2,15 +2,12 @@ package org.sopt.confeti.api.setlist.dto.response;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.sopt.confeti.domain.setlist.Setlist;
-import org.sopt.confeti.domain.setlist.SetlistType;
-import org.sopt.confeti.global.common.constant.FolderPath;
-import org.sopt.confeti.global.util.S3FileHandler;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistDetailDTO;
 
 public record GetSetlistDetailResponse(
-    Long setlistId,
+    long setlistId,
     String type,
-    Long typeId,
+    long typeId,
     String posterUrl,
     String title,
     LocalDate startAt,
@@ -18,31 +15,18 @@ public record GetSetlistDetailResponse(
     List<SetlistSongResponse> songs
 ) {
 
-    public static GetSetlistDetailResponse of(
-        Setlist setlist,
-        String title,
-        String posterPath,
-        LocalDate startAt,
-        LocalDate endAt,
-        List<SetlistSongResponse> songs,
-        SetlistType type,
-        S3FileHandler s3FileHandler
-    ) {
-        String posterUrl = s3FileHandler.getFileUrl(
-            FolderPath.combine(
-                type == SetlistType.CONCERT ? FolderPath.CONCERT : FolderPath.FESTIVAL,
-                FolderPath.POSTER
-            ), posterPath).toString();
-
+    public static GetSetlistDetailResponse from(SetlistDetailDTO dto) {
         return new GetSetlistDetailResponse(
-            setlist.getId(),
-            type.name(),
-            setlist.getTypeId(),
-            posterUrl,
-            title,
-            startAt,
-            endAt,
-            songs
+            dto.setlistId(),
+            dto.type(),
+            dto.typeId(),
+            dto.posterUrl(),
+            dto.title(),
+            dto.startAt(),
+            dto.endAt(),
+            dto.songs().stream()
+                .map(SetlistSongResponse::from)
+                .toList()
         );
     }
 }

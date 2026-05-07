@@ -5,16 +5,16 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.sopt.confeti.api.setlist.dto.response.GetAllSetlistsResponse;
-import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse;
-import org.sopt.confeti.api.setlist.dto.response.GetSetlistDetailResponse_deprecated;
-import org.sopt.confeti.api.setlist.dto.response.SetlistSongResponse;
-import org.sopt.confeti.api.setlist.dto.response.SetlistSongResponse_deprecated;
 import org.sopt.confeti.api.setlist.dto.response.SetlistSummaryResponse;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistAddSongDTO;
 import org.sopt.confeti.api.setlist.facade.dto.request.SetlistCreateRequestDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistDetailDTO;
+import org.sopt.confeti.api.setlist.facade.dto.response.SetlistSongDTO;
 import org.sopt.confeti.domain.concert.Concert;
+import org.sopt.confeti.domain.concert.application.ConcertFileService;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
 import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.festival.application.FestivalFileService;
 import org.sopt.confeti.domain.festival.infra.repository.FestivalRepository;
 import org.sopt.confeti.domain.setlist.Setlist;
 import org.sopt.confeti.domain.setlist.SetlistSong;
@@ -30,7 +30,6 @@ import org.sopt.confeti.domain.view.performance.application.PerformanceService;
 import org.sopt.confeti.global.common.constant.PerformanceType;
 import org.sopt.confeti.global.exception.NotFoundException;
 import org.sopt.confeti.global.message.ErrorMessage;
-import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +43,8 @@ public class SetlistService {
     private final ConcertRepository concertRepository;
     private final FestivalRepository festivalRepository;
     private final SetlistSongRepository setlistSongRepository;
-    private final S3FileHandler s3FileHandler;
+    private final ConcertFileService concertFileService;
+    private final FestivalFileService festivalFileService;
     private final PerformanceFileService performanceFileService;
     private final PerformanceService performanceService;
 
@@ -161,65 +161,32 @@ public class SetlistService {
         return addedCount;
     }
 
-    @Deprecated
-    public GetSetlistDetailResponse_deprecated getSetlistDetail_deprecated(Long userId,
-        Long setlistId) {
+    public SetlistDetailDTO getSetlistDetail(Long userId, Long setlistId) {
         Setlist setlist = setlistRepository.findByIdAndUserId(setlistId, userId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
 
-        List<SetlistSongResponse_deprecated> songs = setlistSongRepository.findBySetlist(setlist)
-            .stream()
+        List<SetlistSongDTO> songs = setlistSongRepository.findBySetlist(setlist).stream()
             .sorted(Comparator.comparing(SetlistSong::getOrders))
-            .map(SetlistSongResponse_deprecated::from)
+            .map(SetlistSongDTO::from)
             .toList();
 
         if (setlist.getType() == SetlistType.CONCERT) {
             Concert concert = concertRepository.findById(setlist.getTypeId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-            return GetSetlistDetailResponse_deprecated.of(
-                setlist, concert.getTitle(),
-                concert.getPosterPath(),
+            String posterUrl = concertFileService.getFileInfo(concert).posterUrl();
+            return SetlistDetailDTO.of(
+                setlist, concert.getTitle(), posterUrl,
                 concert.getStartAt(), concert.getEndAt(),
-                songs, setlist.getType(), s3FileHandler
+                songs, setlist.getType()
             );
         } else {
             Festival festival = festivalRepository.findById(setlist.getTypeId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-            return GetSetlistDetailResponse_deprecated.of(
-                setlist, festival.getTitle(),
-                festival.getPosterPath(),
+            String posterUrl = festivalFileService.getBasicFileInfo(festival).posterUrl();
+            return SetlistDetailDTO.of(
+                setlist, festival.getTitle(), posterUrl,
                 festival.getStartAt(), festival.getEndAt(),
-                songs, setlist.getType(), s3FileHandler
-            );
-        }
-    }
-
-    public GetSetlistDetailResponse getSetlistDetail(Long userId, Long setlistId) {
-        Setlist setlist = setlistRepository.findByIdAndUserId(setlistId, userId)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-
-        List<SetlistSongResponse> songs = setlistSongRepository.findBySetlist(setlist).stream()
-            .sorted(Comparator.comparing(SetlistSong::getOrders))
-            .map(SetlistSongResponse::from)
-            .toList();
-
-        if (setlist.getType() == SetlistType.CONCERT) {
-            Concert concert = concertRepository.findById(setlist.getTypeId())
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-            return GetSetlistDetailResponse.of(
-                setlist, concert.getTitle(),
-                concert.getPosterPath(),
-                concert.getStartAt(), concert.getEndAt(),
-                songs, setlist.getType(), s3FileHandler
-            );
-        } else {
-            Festival festival = festivalRepository.findById(setlist.getTypeId())
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-            return GetSetlistDetailResponse.of(
-                setlist, festival.getTitle(),
-                festival.getPosterPath(),
-                festival.getStartAt(), festival.getEndAt(),
-                songs, setlist.getType(), s3FileHandler
+                songs, setlist.getType()
             );
         }
     }
