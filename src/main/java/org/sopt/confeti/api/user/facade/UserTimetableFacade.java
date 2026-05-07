@@ -223,7 +223,7 @@ public class UserTimetableFacade {
             .map(timetable -> TimetableDTO.of(timetable,
                 festivalFileService.getBasicFileInfo(timetable.getFestival())))
             .toList();
-        return new TimetablesDTO(timetableDTOs);
+        return TimetablesDTO.from(timetableDTOs);
     }
 
     protected void validateExistFestivalTimeIds(final List<Long> festivalTimeIds) {
