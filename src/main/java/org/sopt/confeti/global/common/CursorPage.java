@@ -1,6 +1,7 @@
 package org.sopt.confeti.global.common;
 
 import java.util.List;
+import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -58,5 +59,12 @@ public class CursorPage<T> {
         if (isLast()) return null;
 
         return itemsWithNextCursor.getLast();
+    }
+
+    public <R> CursorPage<R> map(final Function<T, R> mapper) {
+        List<R> mapped = itemsWithNextCursor.stream()
+            .map(mapper)
+            .toList();
+        return new CursorPage<>(mapped, size);
     }
 }

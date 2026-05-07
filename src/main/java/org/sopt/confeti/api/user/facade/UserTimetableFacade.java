@@ -18,6 +18,8 @@ import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimeBlockDTO;
 import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimeBlocksDTO;
 import org.sopt.confeti.api.user.facade.dto.request.timetable.PatchTimetablesCommand;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableCreateResponseDTO;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableCursorItemDTO;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableDatesDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableEntireFestivalDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableExistenceDTO;
@@ -26,6 +28,7 @@ import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableHistoryD
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetablesDTO;
 import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.festival.application.FestivalFileService;
 import org.sopt.confeti.domain.festival.application.FestivalService;
 import org.sopt.confeti.domain.festival.application.dto.FestivalCursorDTO;
 import org.sopt.confeti.domain.festival.infra.TimetableSupportStatus;
@@ -63,6 +66,7 @@ public class UserTimetableFacade {
     private final UserService userService;
     private final TimetableService timetableService;
     private final FestivalService festivalService;
+    private final FestivalFileService festivalFileService;
     private final FestivalDateService festivalDateService;
     private final TimeBlockService timeBlockService;
 
@@ -154,7 +158,8 @@ public class UserTimetableFacade {
 
         return CursorPage.of(
             festivals.stream()
-                .map(TimetableToAddDTO::from)
+                .map(festival -> TimetableToAddDTO.of(festival,
+                    festivalFileService.getBasicFileInfo(festival)))
                 .toList(),
             TIMETABLES_TO_ADD_SIZE
         );
@@ -202,18 +207,23 @@ public class UserTimetableFacade {
     }
 
     @ReadOnlyTransactional
-    public CursorPage<Timetable> getTimetableCursorPage(TimetableSortType sortBy,
+    public CursorPage<TimetableCursorItemDTO> getTimetableCursorPage(TimetableSortType sortBy,
         CursorData cursor, PerformanceStatus performanceStatus) {
-        return sortBy.getTimetableCursorPage(timetableService, UserContext.get().id(),
-            cursor,
-            performanceStatus);
+        CursorPage<Timetable> cursorPage = sortBy.getTimetableCursorPage(timetableService,
+            UserContext.get().id(), cursor, performanceStatus);
+        return cursorPage.map(timetable -> TimetableCursorItemDTO.of(timetable,
+            festivalFileService.getBasicFileInfo(timetable.getFestival())));
     }
 
     @Transactional(readOnly = true)
     public TimetablesDTO getTimetablesPreview() {
         List<Timetable> timetables = timetableService.getTimetablesPreview(
             UserContext.get().id());
-        return TimetablesDTO.from(timetables);
+        List<TimetableDTO> timetableDTOs = timetables.stream()
+            .map(timetable -> TimetableDTO.of(timetable,
+                festivalFileService.getBasicFileInfo(timetable.getFestival())))
+            .toList();
+        return new TimetablesDTO(timetableDTOs);
     }
 
     protected void validateExistFestivalTimeIds(final List<Long> festivalTimeIds) {
@@ -296,7 +306,8 @@ public class UserTimetableFacade {
     public TimetableEntireFestivalDTO getEntireFestivalInfo(long timetableId) {
         Timetable timetable = timetableService.getWithFestivalAndDates(timetableId);
         timetable.validateOwner(UserContext.get().id());
-        return TimetableEntireFestivalDTO.from(timetable);
+        return TimetableEntireFestivalDTO.of(timetable,
+            festivalFileService.getBasicFileInfo(timetable.getFestival()));
     }
 
     @ReadOnlyTransactional
@@ -325,6 +336,7 @@ public class UserTimetableFacade {
         Festival festival = timetable.getFestival();
         List<FestivalDate> festivalDates = festivalDateService.findAllByFestivalId(
             festival.getId());
-        return TimetableDatesDTO.of(timetable, festival, festivalDates);
+        return TimetableDatesDTO.of(timetable, festival, festivalDates,
+            festivalFileService.getBasicFileInfo(festival));
     }
 }

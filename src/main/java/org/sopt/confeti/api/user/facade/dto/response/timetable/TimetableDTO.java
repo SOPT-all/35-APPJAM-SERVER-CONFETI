@@ -1,17 +1,18 @@
 package org.sopt.confeti.api.user.facade.dto.response.timetable;
 
+import org.sopt.confeti.domain.festival.FestivalFileInfo;
 import org.sopt.confeti.domain.timetable.Timetable;
 
 public record TimetableDTO(
     Long typeId,
-    String posterPath,
+    String posterUrl,
     String title
 ) {
 
-    public static TimetableDTO from(final Timetable timetable) {
+    public static TimetableDTO of(final Timetable timetable, final FestivalFileInfo fileInfo) {
         return new TimetableDTO(
             timetable.getFestival().getId(),
-            timetable.getFestival().getPosterPath(),
+            fileInfo.posterUrl(),
             timetable.getFestival().getTitle()
         );
     }

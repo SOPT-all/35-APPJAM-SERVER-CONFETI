@@ -2,10 +2,11 @@ package org.sopt.confeti.api.user.facade.dto.response.timetable;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.sopt.confeti.domain.festival.FestivalFileInfo;
 import org.sopt.confeti.domain.timetable.Timetable;
 
 public record TimetableEntireFestivalDTO(
-    String logoPath,
+    String logoUrl,
     String title,
     LocalDate startAt,
     LocalDate endAt,
@@ -13,9 +14,9 @@ public record TimetableEntireFestivalDTO(
     List<TimetableFestivalDateDTO> festivalDates
 ) {
 
-    public static TimetableEntireFestivalDTO from(Timetable timetable) {
+    public static TimetableEntireFestivalDTO of(Timetable timetable, FestivalFileInfo fileInfo) {
         return new TimetableEntireFestivalDTO(
-            timetable.getFestival().getLogoPath(),
+            fileInfo.logoUrl(),
             timetable.getFestival().getTitle(),
             timetable.getFestival().getStartAt(),
             timetable.getFestival().getEndAt(),

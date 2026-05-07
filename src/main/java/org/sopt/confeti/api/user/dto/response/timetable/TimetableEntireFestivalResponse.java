@@ -2,9 +2,7 @@ package org.sopt.confeti.api.user.dto.response.timetable;
 
 import java.util.List;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableEntireFestivalDTO;
-import org.sopt.confeti.global.common.constant.FolderPath;
 import org.sopt.confeti.global.util.DateConvertor;
-import org.sopt.confeti.global.util.S3FileHandler;
 
 public record TimetableEntireFestivalResponse(
     String logoUrl,
@@ -15,12 +13,10 @@ public record TimetableEntireFestivalResponse(
     List<TimetableDetailDateResponse> festivalDates
 ) {
 
-    public static TimetableEntireFestivalResponse of(
-        TimetableEntireFestivalDTO timetableEntireFestivalDTO, S3FileHandler s3FileHandler) {
+    public static TimetableEntireFestivalResponse from(
+        TimetableEntireFestivalDTO timetableEntireFestivalDTO) {
         return new TimetableEntireFestivalResponse(
-            s3FileHandler.getFileUrl(
-                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO),
-                timetableEntireFestivalDTO.logoPath()).toString(),
+            timetableEntireFestivalDTO.logoUrl(),
             timetableEntireFestivalDTO.title(),
             DateConvertor.convertToDefaultFormat(timetableEntireFestivalDTO.startAt()),
             DateConvertor.convertToDefaultFormat(timetableEntireFestivalDTO.endAt()),
