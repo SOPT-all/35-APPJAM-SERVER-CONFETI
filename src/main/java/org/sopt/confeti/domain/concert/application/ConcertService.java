@@ -8,6 +8,8 @@ import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.dto.ConcertPreviewInfo;
 import org.sopt.confeti.domain.concert.infra.repository.ConcertRepository;
+import org.sopt.confeti.domain.concert_reservation_url.ConcertReservationFileInfo;
+import org.sopt.confeti.domain.concert_reservation_url.application.ConcertReservationFileService;
 import org.sopt.confeti.global.annotation.ReadOnlyTransactional;
 import org.sopt.confeti.global.common.redis.RedisHandler;
 import org.sopt.confeti.global.common.redis.RedisKey;
@@ -24,6 +26,7 @@ public class ConcertService {
     private final RedisHandler redisHandler;
     private final ConcertRepository concertRepository;
     private final ConcertFileService concertFileService;
+    private final ConcertReservationFileService concertReservationFileService;
 
     // TODO: AOP 방식으로 캐싱 전략 수정
     @Transactional(readOnly = true)
@@ -40,8 +43,12 @@ public class ConcertService {
         concertRepository.findUpcomingWithReservationUrlsById(concertId);
         concertRepository.findUpcomingWithReservationSchedulesById(concertId);
 
+        List<ConcertReservationFileInfo> reservationFileInfos = concert.getReservationUrls().stream()
+            .map(concertReservationFileService::getFileInfo)
+            .toList();
+
         ConcertDetailDTO concertDetail = ConcertDetailDTO.toDTO(concert,
-            concertFileService.getFileInfo(concert));
+            concertFileService.getFileInfo(concert), reservationFileInfos);
         redisHandler.set(RedisKey.PERFORMANCE_CONCERTS.createKeyInfo(concertId), concertDetail);
         return concertDetail;
     }

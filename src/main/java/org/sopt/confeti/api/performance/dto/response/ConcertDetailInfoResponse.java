@@ -3,7 +3,6 @@ package org.sopt.confeti.api.performance.dto.response;
 import java.util.List;
 import org.sopt.confeti.api.performance.facade.dto.response.ConcertDetailDTO;
 import org.sopt.confeti.global.util.DateConvertor;
-import org.sopt.confeti.global.util.S3FileHandler;
 
 public record ConcertDetailInfoResponse(
     long concertId,
@@ -37,8 +36,7 @@ public record ConcertDetailInfoResponse(
     }
 
     public static ConcertDetailInfoResponse of(ConcertDetailDTO concertDetailDTO,
-        boolean isFavorite,
-        S3FileHandler s3FileHandler) {
+        boolean isFavorite) {
         return new ConcertDetailInfoResponse(
             concertDetailDTO.concertId(),
             concertDetailDTO.posterUrl(),
@@ -52,7 +50,7 @@ public record ConcertDetailInfoResponse(
             concertDetailDTO.address(),
             isFavorite,
             concertDetailDTO.reservations().stream()
-                .map(reservation -> ConcertReservationResponse.of(reservation, s3FileHandler))
+                .map(ConcertReservationResponse::from)
                 .toList(),
             concertDetailDTO.reservationSchedules().stream()
                 .map(ReservationScheduleResponse::from)

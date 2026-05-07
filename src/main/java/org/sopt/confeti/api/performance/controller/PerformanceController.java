@@ -44,7 +44,6 @@ import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.message.ErrorMessage;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
-import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,7 +59,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class PerformanceController implements PerformanceControllerDocs {
 
     private final PerformanceFacade performanceFacade;
-    private final S3FileHandler s3FileHandler;
 
     @GetMapping("/concerts/{concertId}")
     public ResponseEntity<BaseResponse<ConcertDetailResponse>> getConcertInfo(
@@ -69,7 +67,7 @@ public class PerformanceController implements PerformanceControllerDocs {
         ConcertDetailWithFavoriteDTO concertDetail = performanceFacade.getUpcomingConcertDetail(
             concertId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            ConcertDetailResponse.of(concertDetail, s3FileHandler));
+            ConcertDetailResponse.from(concertDetail));
     }
 
     @GetMapping("/festivals/{festivalId}")
