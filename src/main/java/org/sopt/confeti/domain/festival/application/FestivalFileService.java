@@ -33,4 +33,12 @@ public class FestivalFileService {
             .festivalReservationFileInfoMap(reservationFileInfoMap)
             .build();
     }
+
+    public FestivalFileInfo getBasicFileInfo(Festival festival) {
+        return FestivalFileInfo.builder()
+            .posterUrl(cdnFileDomainResolveService.resolve(festival.getPosterPath()))
+            .logoUrl(cdnFileDomainResolveService.resolve(festival.getLogoPath()))
+            .festivalReservationFileInfoMap(Map.of())
+            .build();
+    }
 }

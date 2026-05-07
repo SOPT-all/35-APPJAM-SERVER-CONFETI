@@ -3,6 +3,7 @@ package org.sopt.confeti.api.user.facade.dto.response.timetable;
 
 import java.util.List;
 import org.sopt.confeti.domain.festival.Festival;
+import org.sopt.confeti.domain.festival.FestivalFileInfo;
 import org.sopt.confeti.domain.festival_date.FestivalDate;
 import org.sopt.confeti.domain.timetable.Timetable;
 
@@ -16,14 +17,15 @@ public record TimetableDatesDTO(
     public static TimetableDatesDTO of(
         Timetable timetable,
         Festival festival,
-        List<FestivalDate> festivalDates
+        List<FestivalDate> festivalDates,
+        FestivalFileInfo fileInfo
     ) {
         List<TimetableDateDTO> dates = festivalDates.stream()
             .map(TimetableDateDTO::from)
             .toList();
 
         return new TimetableDatesDTO(
-            timetable.getId(), festival.getTitle(), festival.getPosterPath(), dates);
+            timetable.getId(), festival.getTitle(), fileInfo.posterUrl(), dates);
     }
 
 }

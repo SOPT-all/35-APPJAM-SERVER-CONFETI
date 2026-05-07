@@ -3,7 +3,6 @@ package org.sopt.confeti.api.user.dto.response.timetable;
 import java.util.List;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableToAddDTO;
 import org.sopt.confeti.global.common.CursorPage;
-import org.sopt.confeti.global.util.S3FileHandler;
 
 public record TimetablesToAddResponse(
     long nextCursor,
@@ -12,8 +11,7 @@ public record TimetablesToAddResponse(
 
     private static final long DEFAULT_NEXT_CURSOR = -1L;
 
-    public static TimetablesToAddResponse of(final CursorPage<TimetableToAddDTO> cursorPage,
-        final S3FileHandler s3FileHandler) {
+    public static TimetablesToAddResponse from(final CursorPage<TimetableToAddDTO> cursorPage) {
         Long nextCursor = DEFAULT_NEXT_CURSOR;
 
         if (!cursorPage.isLast()) {
@@ -23,8 +21,7 @@ public record TimetablesToAddResponse(
         return new TimetablesToAddResponse(
             nextCursor,
             cursorPage.getItems().stream()
-                .map(timetableToAddDTO -> TimetablesToAddFestivalResponse.of(timetableToAddDTO,
-                    s3FileHandler))
+                .map(TimetablesToAddFestivalResponse::from)
                 .toList()
         );
     }

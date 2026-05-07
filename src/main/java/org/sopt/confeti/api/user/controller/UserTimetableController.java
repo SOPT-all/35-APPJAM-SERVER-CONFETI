@@ -26,7 +26,7 @@ import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableFestival
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableHistoryDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableToAddDTO;
 import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetablesDTO;
-import org.sopt.confeti.domain.timetable.Timetable;
+import org.sopt.confeti.api.user.facade.dto.response.timetable.TimetableCursorItemDTO;
 import org.sopt.confeti.domain.timetable.TimetableCursor;
 import org.sopt.confeti.domain.timetable.TimetableCursor.CursorData;
 import org.sopt.confeti.domain.user.constant.Role;
@@ -40,7 +40,6 @@ import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.common.constant.TimetableSortType;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
-import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,7 +58,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserTimetableController implements UserTimetableControllerDocs {
 
     private final UserTimetableFacade userTimetableFacade;
-    private final S3FileHandler s3FileHandler;
 
     @Permission(role = {Role.GENERAL})
     @GetMapping("/history")
@@ -88,7 +86,7 @@ public class UserTimetableController implements UserTimetableControllerDocs {
         CursorPage<TimetableToAddDTO> timetablesToAdd = userTimetableFacade.getTimetablesToAdd(
             cursor);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            TimetablesToAddResponse.of(timetablesToAdd, s3FileHandler));
+            TimetablesToAddResponse.from(timetablesToAdd));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -134,10 +132,10 @@ public class UserTimetableController implements UserTimetableControllerDocs {
         @RequestParam(defaultValue = Default.PERFORMANCE_STATUS) PerformanceStatus status
     ) {
         CursorData cursorData = TimetableCursor.decode(cursor);
-        CursorPage<Timetable> timetableCursorPage = userTimetableFacade.getTimetableCursorPage(
+        CursorPage<TimetableCursorItemDTO> timetableCursorPage = userTimetableFacade.getTimetableCursorPage(
             sortBy, cursorData, status);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            TimetableCursorResponse.of(timetableCursorPage, s3FileHandler));
+            TimetableCursorResponse.from(timetableCursorPage));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -145,7 +143,7 @@ public class UserTimetableController implements UserTimetableControllerDocs {
     public ResponseEntity<BaseResponse<TimetablesPreviewResponse>> getTimetablesPreview() {
         TimetablesDTO timetables = userTimetableFacade.getTimetablesPreview();
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            TimetablesPreviewResponse.of(timetables, s3FileHandler));
+            TimetablesPreviewResponse.from(timetables));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -156,7 +154,7 @@ public class UserTimetableController implements UserTimetableControllerDocs {
         TimetableEntireFestivalDTO entireFestivalDTO = userTimetableFacade.getEntireFestivalInfo(
             timetableId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            TimetableEntireFestivalResponse.of(entireFestivalDTO, s3FileHandler));
+            TimetableEntireFestivalResponse.from(entireFestivalDTO));
     }
 
     @Permission(role = {Role.GENERAL})
@@ -189,6 +187,6 @@ public class UserTimetableController implements UserTimetableControllerDocs {
         TimetableDatesDTO timetableDates = userTimetableFacade.getTimetableDates(
             timetableId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-            TimetableDatesResponse.of(timetableDates, s3FileHandler));
+            TimetableDatesResponse.from(timetableDates));
     }
 }
