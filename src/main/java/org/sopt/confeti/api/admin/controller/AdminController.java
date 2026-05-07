@@ -32,13 +32,12 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminConcertListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
-import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
+import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftInfo;
 import org.sopt.confeti.global.annotation.Admin;
 import org.sopt.confeti.global.common.BaseResponse;
 import org.sopt.confeti.global.common.constant.RequestConstraint;
 import org.sopt.confeti.global.message.SuccessMessage;
 import org.sopt.confeti.global.util.ApiResponseUtil;
-import org.sopt.confeti.global.util.S3FileHandler;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -61,7 +60,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class AdminController implements AdminControllerDocs {
 
     private final AdminFacade adminFacade;
-    private final S3FileHandler s3FileHandler;
 
     @Override
     @PostMapping("/ticket-vendors")
@@ -100,7 +98,7 @@ public class AdminController implements AdminControllerDocs {
     public ResponseEntity<BaseResponse<TicketVendorResponses>> getTicketVendors() {
         return ApiResponseUtil.success(
             SuccessMessage.SUCCESS,
-            TicketVendorResponses.from(adminFacade.getTicketVendors(), s3FileHandler)
+            TicketVendorResponses.from(adminFacade.getTicketVendors())
         );
     }
 
@@ -111,8 +109,7 @@ public class AdminController implements AdminControllerDocs {
     ) {
         return ApiResponseUtil.success(
             SuccessMessage.SUCCESS,
-            PerformanceDraftListResponses.from(adminFacade.getPerformanceDrafts(search),
-                s3FileHandler)
+            PerformanceDraftListResponses.from(adminFacade.getPerformanceDrafts(search))
         );
     }
 
@@ -121,11 +118,11 @@ public class AdminController implements AdminControllerDocs {
     public ResponseEntity<BaseResponse<PerformanceDraftResponse>> createPerformanceDraft(
         @ModelAttribute CreatePerformanceDraftRequest request
     ) {
-        PerformanceDraftDto performanceDraftDto = adminFacade.createPerformanceDraft(
+        PerformanceDraftInfo performanceDraftInfo = adminFacade.createPerformanceDraft(
             request.toCreateManualDto());
         return ApiResponseUtil.success(
             SuccessMessage.CREATED,
-            PerformanceDraftResponse.from(performanceDraftDto, s3FileHandler)
+            PerformanceDraftResponse.from(performanceDraftInfo)
         );
     }
 
@@ -136,8 +133,7 @@ public class AdminController implements AdminControllerDocs {
     ) {
         return ApiResponseUtil.success(
             SuccessMessage.SUCCESS,
-            PerformanceDraftDetailResponse.from(adminFacade.getPerformanceDraftDetail(draftId),
-                s3FileHandler)
+            PerformanceDraftDetailResponse.from(adminFacade.getPerformanceDraftDetail(draftId))
         );
     }
 
@@ -147,11 +143,11 @@ public class AdminController implements AdminControllerDocs {
         @PathVariable Long draftId,
         @ModelAttribute UpdatePerformanceDraftRequest request
     ) {
-        PerformanceDraftDto performanceDraftDto = adminFacade.updatePerformanceDraft(
+        PerformanceDraftInfo performanceDraftInfo = adminFacade.updatePerformanceDraft(
             request.toUpdateDto(draftId));
         return ApiResponseUtil.success(
             SuccessMessage.UPDATED,
-            PerformanceDraftResponse.from(performanceDraftDto, s3FileHandler)
+            PerformanceDraftResponse.from(performanceDraftInfo)
         );
     }
 

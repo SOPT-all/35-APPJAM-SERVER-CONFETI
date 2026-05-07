@@ -4,25 +4,21 @@ import lombok.Builder;
 import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationFileInfo;
 import org.sopt.confeti.domain.festival_reservation_url.FestivalReservationUrl;
 import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorInfo;
 
-@Builder(toBuilder = true)
+@Builder
 public record FestivalReservationDTO(
     long reservationId,
     String url,
-    TicketVendorDto ticketVendor
+    TicketVendorInfo ticketVendor
 ) {
 
-    public static FestivalReservationDTO from(FestivalReservationUrl reservation) {
+    public static FestivalReservationDTO of(FestivalReservationUrl reservation, FestivalReservationFileInfo fileInfo) {
+        TicketVendorDto vendorDto = TicketVendorDto.from(reservation.getTicketVendor());
         return FestivalReservationDTO.builder()
             .reservationId(reservation.getId())
             .url(reservation.getReservationUrl())
-            .ticketVendor(TicketVendorDto.from(reservation.getTicketVendor()))
-            .build();
-    }
-
-    public FestivalReservationDTO withFileUrls(FestivalReservationFileInfo fileInfo) {
-        return this.toBuilder()
-            .ticketVendor(this.ticketVendor.withFileUrls(fileInfo.ticketVendorFileInfo()))
+            .ticketVendor(TicketVendorInfo.of(vendorDto, fileInfo.ticketVendorFileInfo()))
             .build();
     }
 }

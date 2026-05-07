@@ -44,7 +44,9 @@ public record FestivalDetailDTO(
             .price(festival.getPrice())
             .address(festival.getAddress())
             .reservations(festival.getReservationUrls().stream()
-                .map(FestivalReservationDTO::from)
+                .map(reservation -> FestivalReservationDTO.of(
+                    reservation,
+                    fileInfo.festivalReservationFileInfoMap().get(reservation.getId())))
                 .toList())
             .reservationSchedules(festival.getReservationSchedules().stream()
                 .map(schedule -> ReservationScheduleDTO.from(schedule.toDomain()))

@@ -1,14 +1,10 @@
 package org.sopt.confeti.api.admin.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
+import java.time.LocalDateTime;
 import org.sopt.confeti.domain.performancedraft.DraftStatus;
 import org.sopt.confeti.domain.performancedraft.PerformanceDraftType;
-import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
-import org.sopt.confeti.global.common.constant.FolderPath;
-import org.sopt.confeti.global.util.S3FileHandler;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
+import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftInfo;
 
 public record PerformanceDraftResponse(
         Long id,
@@ -21,20 +17,16 @@ public record PerformanceDraftResponse(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
-    public static PerformanceDraftResponse from(PerformanceDraftDto dto, S3FileHandler s3FileHandler) {
+    public static PerformanceDraftResponse from(PerformanceDraftInfo info) {
         return new PerformanceDraftResponse(
-                dto.id(),
-                dto.performanceDraftType(),
-                dto.status(),
-                dto.performanceData(),
-                Optional.ofNullable(dto.posterUrl())
-                    .map(path -> s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER), path).toString())
-                    .orElse(null),
-                Optional.ofNullable(dto.logoUrl())
-                    .map(path -> s3FileHandler.getFileUrl(FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO), path).toString())
-                    .orElse(null),
-                dto.createdAt(),
-                dto.updatedAt()
+                info.id(),
+                info.performanceDraftType(),
+                info.status(),
+                info.performanceData(),
+                info.posterUrl(),
+                info.logoUrl(),
+                info.createdAt(),
+                info.updatedAt()
         );
     }
 }

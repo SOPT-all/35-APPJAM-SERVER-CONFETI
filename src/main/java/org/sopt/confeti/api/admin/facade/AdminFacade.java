@@ -27,6 +27,7 @@ import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalDetailInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalListInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminFestivalPreviewInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.AdminPerformanceDraftListInfo;
+import org.sopt.confeti.api.admin.facade.dto.response.AdminPerformanceDraftPreviewInfo;
 import org.sopt.confeti.api.admin.facade.dto.response.PerformanceDraftDetailInfo;
 import org.sopt.confeti.domain.concert.Concert;
 import org.sopt.confeti.domain.concert.application.ConcertService;
@@ -55,16 +56,15 @@ import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftPars
 import org.sopt.confeti.domain.performancedraft.application.PerformanceDraftService;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
-import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
+import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftInfo;
 import org.sopt.confeti.domain.setlist.SetlistType;
 import org.sopt.confeti.domain.setlist.application.SetlistService;
 import org.sopt.confeti.domain.ticketvendor.TicketVendor;
 import org.sopt.confeti.domain.ticketvendor.application.TicketVendorService;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorCreateDto;
 import org.sopt.confeti.domain.ticketvendor.application.dto.request.TicketVendorUpdateDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorCreateResponseDto;
-import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorDtos;
-import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorUpdateResponseDto;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorInfo;
+import org.sopt.confeti.domain.ticketvendor.application.dto.response.TicketVendorInfos;
 import org.sopt.confeti.domain.view.performance.Performance;
 import org.sopt.confeti.domain.view.performance.PerformanceArtist;
 import org.sopt.confeti.domain.view.performance.application.PerformanceService;
@@ -110,10 +110,9 @@ public class AdminFacade {
             FolderPath.combine(FolderPath.TICKET_VENDOR, FolderPath.LOGO));
         TicketVendorCreateDto dto = TicketVendorCreateDto.from(request, logoPath);
 
-        TicketVendorCreateResponseDto responseDto = Tx.masterTx(
-            () -> ticketVendorService.create(dto));
+        TicketVendorInfo info = Tx.masterTx(() -> ticketVendorService.create(dto));
 
-        return TicketVendorResponse.from(responseDto, s3FileHandler);
+        return TicketVendorResponse.from(info);
     }
 
     public TicketVendorResponse updateTicketVendor(Long ticketVendorId,
@@ -131,13 +130,13 @@ public class AdminFacade {
         }
 
         final String finalLogoPath = logoPath;
-        TicketVendorUpdateResponseDto responseDto = Tx.masterTx(() -> {
+        TicketVendorInfo info = Tx.masterTx(() -> {
             TicketVendorUpdateDto dto = TicketVendorUpdateDto.of(ticketVendorId, request,
                 finalLogoPath);
             return ticketVendorService.update(dto);
         });
 
-        return TicketVendorResponse.from(responseDto, s3FileHandler);
+        return TicketVendorResponse.from(info);
     }
 
     public void deleteTicketVendor(Long ticketVendorId) {
@@ -148,7 +147,7 @@ public class AdminFacade {
         Tx.masterTx(() -> ticketVendorService.delete(ticketVendorId));
     }
 
-    public TicketVendorDtos getTicketVendors() {
+    public TicketVendorInfos getTicketVendors() {
         return Tx.readOnlyTx(ticketVendorService::findAll);
     }
 
@@ -249,7 +248,7 @@ public class AdminFacade {
         return AdminArtistSearchResponses.from(artists);
     }
 
-    public PerformanceDraftDto createPerformanceDraft(PerformanceDraftCreateDto dto) {
+    public PerformanceDraftInfo createPerformanceDraft(PerformanceDraftCreateDto dto) {
         String posterPath = null;
         String logoPath = null;
 
@@ -284,9 +283,12 @@ public class AdminFacade {
     }
 
     public AdminPerformanceDraftListInfo getPerformanceDrafts(String keyword) {
-        return AdminPerformanceDraftListInfo.from(
-            Tx.readOnlyTx(() -> performanceDraftService.getAdminPerformanceDraftPreviews(keyword))
-        );
+        List<PerformanceDraftInfo> draftInfos = Tx.readOnlyTx(
+            () -> performanceDraftService.getDraftPreviews(keyword));
+        List<AdminPerformanceDraftPreviewInfo> previews = draftInfos.stream()
+            .map(info -> AdminPerformanceDraftPreviewInfo.of(info, performanceDraftParser))
+            .toList();
+        return AdminPerformanceDraftListInfo.from(previews);
     }
 
     public void deletePerformanceDraft(Long draftId) {
@@ -309,20 +311,20 @@ public class AdminFacade {
     }
 
     public PerformanceDraftDetailInfo getPerformanceDraftDetail(Long draftId) {
-        PerformanceDraft draft = Tx.readOnlyTx(() -> performanceDraftService.getById(draftId));
-        PerformanceDraftDto dto = PerformanceDraftDto.from(draft);
+        PerformanceDraftInfo info = Tx.readOnlyTx(
+            () -> performanceDraftService.getDraftById(draftId));
 
-        Set<String> artistIds = performanceDraftParser.parseArtistIds(dto.performanceDraftType(),
-            dto.performanceData());
+        Set<String> artistIds = performanceDraftParser.parseArtistIds(info.performanceDraftType(),
+            info.performanceData());
         List<ConfetiArtist> artists = Tx.readOnlyTx(() -> artistService.getArtists(artistIds))
             .stream()
             .map(Artist::toDomain)
             .toList();
 
-        return new PerformanceDraftDetailInfo(dto, artists);
+        return new PerformanceDraftDetailInfo(info, artists);
     }
 
-    public PerformanceDraftDto updatePerformanceDraft(PerformanceDraftUpdateDto dto) {
+    public PerformanceDraftInfo updatePerformanceDraft(PerformanceDraftUpdateDto dto) {
         PerformanceDraft existing = Tx.readOnlyTx(() -> performanceDraftService.getById(dto.id()));
 
         String newPosterPath = dto.getOptionalPosterImage()
@@ -353,7 +355,7 @@ public class AdminFacade {
             newPosterPath != null ? newPosterPath : existing.getPosterPath();
         final String finalLogoPath = newLogoPath != null ? newLogoPath : existing.getLogoPath();
 
-        PerformanceDraftDto result;
+        PerformanceDraftInfo result;
         try {
             result = Tx.masterTx(
                 () -> performanceDraftService.updateDraft(dto, finalPosterPath, finalLogoPath));
@@ -453,7 +455,8 @@ public class AdminFacade {
 
             List<ConcertArtist> concertArtists = buildConcertArtists(command);
             List<ConcertReservationUrl> reservationUrls = buildReservationUrls(command, vendorMap);
-            List<ConcertReservationSchedule> reservationSchedules = buildConcertReservationSchedules(command);
+            List<ConcertReservationSchedule> reservationSchedules = buildConcertReservationSchedules(
+                command);
             List<PerformanceArtist> performanceArtists = buildPerformanceArtists(command);
 
             Concert concert = Concert.create(
@@ -482,7 +485,8 @@ public class AdminFacade {
 
             List<ConcertArtist> concertArtists = buildConcertArtists(command);
             List<ConcertReservationUrl> reservationUrls = buildReservationUrls(command, vendorMap);
-            List<ConcertReservationSchedule> reservationSchedules = buildConcertReservationSchedules(command);
+            List<ConcertReservationSchedule> reservationSchedules = buildConcertReservationSchedules(
+                command);
             List<PerformanceArtist> performanceArtists = buildPerformanceArtists(command);
 
             Concert concert = concertService.findWithRelationsById(command.concertId());
@@ -544,7 +548,8 @@ public class AdminFacade {
             .toList();
     }
 
-    private List<ConcertReservationSchedule> buildConcertReservationSchedules(AdminConcertCommand command) {
+    private List<ConcertReservationSchedule> buildConcertReservationSchedules(
+        AdminConcertCommand command) {
         return command.reservationSchedules().stream()
             .map(s -> ConcertReservationSchedule.fromDomain(
                 ConcertReservationScheduleInfo.of(s.roundName(), s.reserveAt())))
@@ -559,7 +564,8 @@ public class AdminFacade {
 
     private void publishS3DeleteEventIfExists(String folderPath, String filePath) {
         Optional.ofNullable(filePath)
-            .ifPresent(path -> eventPublisher.publishEvent(new S3FileDeleteEvent(folderPath, path)));
+            .ifPresent(
+                path -> eventPublisher.publishEvent(new S3FileDeleteEvent(folderPath, path)));
     }
 
     private void invalidateConcertDetailCacheQuietly(long concertId) {
@@ -752,7 +758,8 @@ public class AdminFacade {
             List<FestivalDate> dates = buildFestivalDates(command, artistNameMap);
             List<FestivalReservationUrl> reservationUrls = buildFestivalReservationUrls(
                 command, vendorMap);
-            List<FestivalReservationSchedule> reservationSchedules = buildFestivalReservationSchedules(command);
+            List<FestivalReservationSchedule> reservationSchedules = buildFestivalReservationSchedules(
+                command);
 
             Festival festival = Festival.create(
                 command.title(), command.startAt(), command.endAt(),
@@ -792,7 +799,8 @@ public class AdminFacade {
                 command, vendorMap);
             festival.syncReservationUrls(newReservationUrls);
 
-            List<FestivalReservationSchedule> newReservationSchedules = buildFestivalReservationSchedules(command);
+            List<FestivalReservationSchedule> newReservationSchedules = buildFestivalReservationSchedules(
+                command);
             festival.syncReservationSchedules(newReservationSchedules);
 
             List<PerformanceArtist> performanceArtists = buildFestivalPerformanceArtists(command);
@@ -839,7 +847,8 @@ public class AdminFacade {
             } else { // 생성
                 List<FestivalStage> stages = buildFestivalStages(dateCmd, artistNameMap);
                 FestivalDate newDate = FestivalDate.create(
-                    dateCmd.festivalAt(), dateCmd.openAt(), stages, buildDateArtists(dateCmd, stages));
+                    dateCmd.festivalAt(), dateCmd.openAt(), stages,
+                    buildDateArtists(dateCmd, stages));
                 festival.addDate(newDate);
             }
         }
@@ -972,7 +981,8 @@ public class AdminFacade {
             .map(dateCmd -> {
                 List<FestivalStage> stages = buildFestivalStages(dateCmd, artistNameMap);
                 return FestivalDate.create(
-                    dateCmd.festivalAt(), dateCmd.openAt(), stages, buildDateArtists(dateCmd, stages));
+                    dateCmd.festivalAt(), dateCmd.openAt(), stages,
+                    buildDateArtists(dateCmd, stages));
             })
             .toList();
     }
@@ -1030,7 +1040,8 @@ public class AdminFacade {
             .toList();
     }
 
-    private List<FestivalReservationSchedule> buildFestivalReservationSchedules(AdminFestivalCommand command) {
+    private List<FestivalReservationSchedule> buildFestivalReservationSchedules(
+        AdminFestivalCommand command) {
         return command.reservationSchedules().stream()
             .map(s -> FestivalReservationSchedule.fromDomain(
                 FestivalReservationScheduleInfo.of(s.roundName(), s.reserveAt())))
