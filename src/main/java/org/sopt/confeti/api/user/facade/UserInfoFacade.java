@@ -3,10 +3,14 @@ package org.sopt.confeti.api.user.facade;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.sopt.confeti.api.user.dto.request.PatchUserInfoRequest;
+import org.sopt.confeti.api.user.facade.dto.response.UserInfoDTO;
+import org.sopt.confeti.domain.user.UserFileInfo;
+import org.sopt.confeti.domain.user.application.UserFileService;
 import org.sopt.confeti.domain.user.application.UserService;
 import org.sopt.confeti.global.annotation.Facade;
 import org.sopt.confeti.global.exception.ConfetiException;
 import org.sopt.confeti.global.interceptor.auth.UserContext;
+import org.sopt.confeti.global.interceptor.auth.UserInfo;
 import org.sopt.confeti.global.message.ErrorMessage;
 
 @Facade
@@ -17,6 +21,13 @@ public class UserInfoFacade {
     private static final int MAXIMUM_NAME_LENGTH = 10;
 
     private final UserService userService;
+    private final UserFileService userFileService;
+
+    public UserInfoDTO getUserInfo() {
+        UserInfo userInfo = UserContext.get();
+        UserFileInfo userFileInfo = userFileService.getFileInfo(userInfo);
+        return UserInfoDTO.of(userInfo, userFileInfo);
+    }
 
     public void patchUserInfo(PatchUserInfoRequest patchUserInfoRequest) {
         validateUserInfoRequest(patchUserInfoRequest);
