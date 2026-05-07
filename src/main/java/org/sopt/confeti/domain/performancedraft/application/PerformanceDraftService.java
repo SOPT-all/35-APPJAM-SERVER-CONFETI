@@ -2,9 +2,7 @@ package org.sopt.confeti.domain.performancedraft.application;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.sopt.confeti.api.admin.facade.dto.response.AdminPerformanceDraftPreviewInfo;
 import org.sopt.confeti.domain.performancedraft.PerformanceDraft;
-import org.sopt.confeti.domain.performancedraft.PerformanceDraftFileInfo;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftCreateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.request.PerformanceDraftUpdateDto;
 import org.sopt.confeti.domain.performancedraft.application.dto.response.PerformanceDraftDto;
@@ -23,7 +21,6 @@ import org.springframework.util.StringUtils;
 public class PerformanceDraftService {
 
     private final PerformanceDraftRepository draftRepository;
-    private final PerformanceDraftParser draftParser;
     private final PerformanceDraftFileService performanceDraftFileService;
 
     @Transactional
@@ -43,12 +40,11 @@ public class PerformanceDraftService {
     }
 
     @ReadOnlyTransactional
-    public List<AdminPerformanceDraftPreviewInfo> getAdminPerformanceDraftPreviews(String keyword) {
+    public List<PerformanceDraftInfo> getDraftPreviews(String keyword) {
         return findDraftsByKeyword(keyword).stream()
             .map(draft -> {
                 PerformanceDraftDto dto = PerformanceDraftDto.from(draft);
-                PerformanceDraftFileInfo fileInfo = performanceDraftFileService.getFileInfo(dto);
-                return AdminPerformanceDraftPreviewInfo.of(dto, draftParser, fileInfo);
+                return PerformanceDraftInfo.of(dto, performanceDraftFileService.getFileInfo(dto));
             })
             .toList();
     }
