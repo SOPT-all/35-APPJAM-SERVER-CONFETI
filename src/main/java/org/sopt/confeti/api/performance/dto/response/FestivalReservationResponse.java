@@ -5,7 +5,7 @@ import org.sopt.confeti.api.performance.facade.dto.response.FestivalReservationD
 public record FestivalReservationResponse(
     long reservationId,
     String url,
-    TicketVendorResponse ticketVendorResponse
+    TicketVendorResponse ticketVendor
 ) {
 
     public static FestivalReservationResponse from(FestivalReservationDTO reservationDTO) {
