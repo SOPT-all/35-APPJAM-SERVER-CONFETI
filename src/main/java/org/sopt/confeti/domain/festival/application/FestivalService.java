@@ -198,7 +198,7 @@ public class FestivalService {
     public List<AdminFestivalPreviewInfo> getAdminFestivalPreviews(String keyword) {
         return findFestivalsByKeyword(keyword).stream()
             .map(festival -> AdminFestivalPreviewInfo.from(festival)
-                .withFileUrls(festivalFileService.getFileInfo(festival)))
+                .withFileUrls(festivalFileService.getBasicFileInfo(festival)))
             .toList();
     }
 
