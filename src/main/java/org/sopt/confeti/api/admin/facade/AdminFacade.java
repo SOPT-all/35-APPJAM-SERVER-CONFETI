@@ -123,8 +123,7 @@ public class AdminFacade {
         MultipartFile logoImage = request != null ? request.logoImage() : null;
 
         if (logoImage != null && !logoImage.isEmpty()) {
-            s3FileHandler.deleteFile(FolderPath.combine(FolderPath.TICKET_VENDOR, FolderPath.LOGO),
-                logoPath);
+            s3FileHandler.deleteFile(logoPath);
             logoPath = s3FileHandler.uploadFile(logoImage,
                 FolderPath.combine(FolderPath.TICKET_VENDOR, FolderPath.LOGO));
         }
@@ -142,8 +141,7 @@ public class AdminFacade {
     public void deleteTicketVendor(Long ticketVendorId) {
         org.sopt.confeti.domain.ticketvendor.TicketVendor existing = Tx.readOnlyTx(
             () -> ticketVendorService.getById(ticketVendorId));
-        s3FileHandler.deleteFile(FolderPath.combine(FolderPath.TICKET_VENDOR, FolderPath.LOGO),
-            existing.getLogoPath());
+        s3FileHandler.deleteFile(existing.getLogoPath());
         Tx.masterTx(() -> ticketVendorService.delete(ticketVendorId));
     }
 
@@ -189,7 +187,6 @@ public class AdminFacade {
                 PerformanceType.CONCERT, concertId);
             concertService.delete(concertId);
             registerAfterCommitCleanup(() -> publishS3DeleteEventIfExists(
-                FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER),
                 concert.getPosterPath()
             ));
             registerAfterCommitCleanup(
@@ -211,11 +208,9 @@ public class AdminFacade {
                 PerformanceType.FESTIVAL, festivalId);
             festivalService.delete(festivalId);
             registerAfterCommitCleanup(() -> publishS3DeleteEventIfExists(
-                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER),
                 festival.getPosterPath()
             ));
             registerAfterCommitCleanup(() -> publishS3DeleteEventIfExists(
-                FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO),
                 festival.getLogoPath()
             ));
             registerAfterCommitCleanup(
@@ -267,16 +262,10 @@ public class AdminFacade {
                 posterPath, logoPath);
 
             if (posterPath != null) {
-                eventPublisher.publishEvent(new S3FileDeleteEvent(
-                    FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER),
-                    posterPath
-                ));
+                eventPublisher.publishEvent(new S3FileDeleteEvent(posterPath));
             }
             if (logoPath != null) {
-                eventPublisher.publishEvent(new S3FileDeleteEvent(
-                    FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO),
-                    logoPath
-                ));
+                eventPublisher.publishEvent(new S3FileDeleteEvent(logoPath));
             }
             throw e;
         }
@@ -296,17 +285,11 @@ public class AdminFacade {
         Tx.masterTx(() -> performanceDraftService.deleteDraft(draftId));
 
         if (draft.getPosterPath() != null) {
-            eventPublisher.publishEvent(new S3FileDeleteEvent(
-                FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER),
-                draft.getPosterPath()
-            ));
+            eventPublisher.publishEvent(new S3FileDeleteEvent(draft.getPosterPath()));
         }
 
         if (draft.getLogoPath() != null) {
-            eventPublisher.publishEvent(new S3FileDeleteEvent(
-                FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO),
-                draft.getLogoPath()
-            ));
+            eventPublisher.publishEvent(new S3FileDeleteEvent(draft.getLogoPath()));
         }
     }
 
@@ -343,10 +326,7 @@ public class AdminFacade {
                 "AdminFacade.updatePerformanceDraft : logo 업로드에 실패해 업로드했던 poster 파일을 롤백합니다. newPosterPath : {}",
                 newPosterPath);
             if (newPosterPath != null) {
-                eventPublisher.publishEvent(new S3FileDeleteEvent(
-                    FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER),
-                    newPosterPath
-                ));
+                eventPublisher.publishEvent(new S3FileDeleteEvent(newPosterPath));
             }
             throw e;
         }
@@ -363,16 +343,10 @@ public class AdminFacade {
             log.warn(
                 "AdminFacade.updatePerformanceDraft : 공연 초안 수정(DB)에 실패해 업로드했던 새 이미지 파일을 롤백합니다.");
             if (newPosterPath != null) {
-                eventPublisher.publishEvent(new S3FileDeleteEvent(
-                    FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER),
-                    newPosterPath
-                ));
+                eventPublisher.publishEvent(new S3FileDeleteEvent(newPosterPath));
             }
             if (newLogoPath != null) {
-                eventPublisher.publishEvent(new S3FileDeleteEvent(
-                    FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO),
-                    newLogoPath
-                ));
+                eventPublisher.publishEvent(new S3FileDeleteEvent(newLogoPath));
             }
             throw e;
         }
@@ -380,16 +354,12 @@ public class AdminFacade {
         Optional.ofNullable(newPosterPath)
             .filter(path -> existing.getPosterPath() != null)
             .ifPresent(path -> eventPublisher.publishEvent(
-                new S3FileDeleteEvent(
-                    FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.POSTER),
-                    existing.getPosterPath())
+                new S3FileDeleteEvent(existing.getPosterPath())
             ));
         Optional.ofNullable(newLogoPath)
             .filter(path -> existing.getLogoPath() != null)
             .ifPresent(path -> eventPublisher.publishEvent(
-                new S3FileDeleteEvent(
-                    FolderPath.combine(FolderPath.PERFORMANCE_DRAFT, FolderPath.LOGO),
-                    existing.getLogoPath())
+                new S3FileDeleteEvent(existing.getLogoPath())
             ));
 
         return result;
@@ -411,9 +381,9 @@ public class AdminFacade {
             }
         } catch (Exception e) {
             log.warn(
-                "AdminFacade.upsertConcert : 콘서트 생성에 실패해 업로드했던 이미지 파일을 롤백합니다. Folder Path : {}, File Name : {}",
-                folderPath, posterPath);
-            eventPublisher.publishEvent(new S3FileDeleteEvent(folderPath, posterPath));
+                "AdminFacade.upsertConcert : 콘서트 생성에 실패해 업로드했던 이미지 파일을 롤백합니다. Full Path : {}",
+                posterPath);
+            eventPublisher.publishEvent(new S3FileDeleteEvent(posterPath));
             throw e;
         }
 
@@ -493,7 +463,7 @@ public class AdminFacade {
             String oldPosterPath = concert.getPosterPath();
 
             if (oldPosterPath != null) {
-                eventPublisher.publishEvent(new S3FileDeleteEvent(folderPath, oldPosterPath));
+                eventPublisher.publishEvent(new S3FileDeleteEvent(oldPosterPath));
             }
 
             concert.update(
@@ -562,10 +532,9 @@ public class AdminFacade {
             .toList();
     }
 
-    private void publishS3DeleteEventIfExists(String folderPath, String filePath) {
-        Optional.ofNullable(filePath)
-            .ifPresent(
-                path -> eventPublisher.publishEvent(new S3FileDeleteEvent(folderPath, path)));
+    private void publishS3DeleteEventIfExists(String fullPath) {
+        Optional.ofNullable(fullPath)
+            .ifPresent(path -> eventPublisher.publishEvent(new S3FileDeleteEvent(path)));
     }
 
     private void invalidateConcertDetailCacheQuietly(long concertId) {
@@ -653,7 +622,7 @@ public class AdminFacade {
             log.warn(
                 "AdminFacade.createFestivalWithFileUpload : 로고 파일 업로드 도중 에러가 발생해 롤백합니다. Festival Create Command : {}",
                 command);
-            s3FileHandler.deleteFile(posterFolderPath, posterPath);
+            s3FileHandler.deleteFile(posterPath);
             throw e;
         }
 
@@ -661,8 +630,8 @@ public class AdminFacade {
             long festivalId = createFestival(command, posterPath, logoPath);
             return PutAdminFestivalResponse.from(festivalId);
         } catch (Exception e) {
-            eventPublisher.publishEvent(new S3FileDeleteEvent(posterFolderPath, posterPath));
-            eventPublisher.publishEvent(new S3FileDeleteEvent(logoFolderPath, logoPath));
+            eventPublisher.publishEvent(new S3FileDeleteEvent(posterPath));
+            eventPublisher.publishEvent(new S3FileDeleteEvent(logoPath));
             throw e;
         }
     }
@@ -693,9 +662,9 @@ public class AdminFacade {
             } catch (Exception e) {
                 if (hasPoster) {
                     log.warn(
-                        "AdminFacade.upsertFestivalForUpdate : 로고 업로드에 실패해 업로드했던 포스터 파일을 롤백합니다. Folder Path : {}, File Name : {}",
-                        posterFolderPath, posterPath);
-                    s3FileHandler.deleteFile(posterFolderPath, posterPath);
+                        "AdminFacade.upsertFestivalForUpdate : 로고 업로드에 실패해 업로드했던 포스터 파일을 롤백합니다. Full Path : {}",
+                        posterPath);
+                    s3FileHandler.deleteFile(posterPath);
                 }
                 throw e;
             }
@@ -710,18 +679,14 @@ public class AdminFacade {
             festivalId = updateFestival(command, finalPosterPath, finalLogoPath);
         } catch (Exception e) {
             log.warn(
-                "AdminFacade.upsertFestivalForUpdate : 페스티벌 수정에 실패해 업로드했던 이미지 파일을 롤백합니다. Poster Folder Path : {}, Poster File Name : {}, Logo Folder Path : {}, Logo File Name : {}",
-                posterFolderPath, finalPosterPath, logoFolderPath, finalLogoPath);
+                "AdminFacade.upsertFestivalForUpdate : 페스티벌 수정에 실패해 업로드했던 이미지 파일을 롤백합니다. Poster Full Path : {}, Logo Full Path : {}",
+                finalPosterPath, finalLogoPath);
 
             if (hasPoster) {
-                eventPublisher.publishEvent(
-                    new S3FileDeleteEvent(posterFolderPath, finalPosterPath)
-                );
+                eventPublisher.publishEvent(new S3FileDeleteEvent(finalPosterPath));
             }
             if (hasLogo) {
-                eventPublisher.publishEvent(
-                    new S3FileDeleteEvent(logoFolderPath, finalLogoPath)
-                );
+                eventPublisher.publishEvent(new S3FileDeleteEvent(finalLogoPath));
             }
             throw e;
         }
@@ -731,21 +696,17 @@ public class AdminFacade {
         try {
             // 트랜잭션 커밋 성공 후 기존 S3 파일 삭제
             if (hasPoster && oldPosterPath != null) {
-                eventPublisher.publishEvent(
-                    new S3FileDeleteEvent(posterFolderPath, oldPosterPath)
-                );
+                eventPublisher.publishEvent(new S3FileDeleteEvent(oldPosterPath));
             }
             if (hasLogo && oldLogoPath != null) {
-                eventPublisher.publishEvent(
-                    new S3FileDeleteEvent(logoFolderPath, oldLogoPath)
-                );
+                eventPublisher.publishEvent(new S3FileDeleteEvent(oldLogoPath));
             }
 
             return PutAdminFestivalResponse.from(festivalId);
         } catch (Exception e) {
             log.warn(
-                "AdminFacade.upsertFestivalForUpdate : 페스티벌 수정 후 기존 파일 삭제에 실패했습니다. Poster Folder Path : {}, Poster File Name : {}, Logo Folder Path : {}, Logo File Name : {}, Error Message : {}",
-                posterFolderPath, finalPosterPath, logoFolderPath, finalLogoPath, e.getMessage());
+                "AdminFacade.upsertFestivalForUpdate : 페스티벌 수정 후 기존 파일 삭제에 실패했습니다. Poster Full Path : {}, Logo Full Path : {}, Error Message : {}",
+                finalPosterPath, finalLogoPath, e.getMessage());
             throw e;
         }
     }

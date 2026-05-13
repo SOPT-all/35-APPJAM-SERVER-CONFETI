@@ -61,8 +61,7 @@ public class LoginService {
 
     private String getDefaultProfileImgName(String socialName) {
         return s3FileHandler.copyFile(
-                FolderPath.combine(FolderPath.USER, FolderPath.DEFAULT),
-                Default.PROFILE_IMG_NAME,
+                FolderPath.combine(FolderPath.USER, FolderPath.DEFAULT) + Default.PROFILE_IMG_NAME,
                 FolderPath.combine(FolderPath.USER, FolderPath.PROFILE),
                 socialName + Default.PROFILE_IMG_NAME
         );

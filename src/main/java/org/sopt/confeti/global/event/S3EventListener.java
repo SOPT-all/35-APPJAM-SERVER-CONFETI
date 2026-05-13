@@ -18,10 +18,10 @@ public class S3EventListener {
     @EventListener
     public void handleDeleteEvent(S3FileDeleteEvent event) {
         try {
-            s3FileHandler.deleteFile(event.folderPath(), event.filePath());
-            log.info("S3EventListener.handleDeleteEvent : 기존 S3 파일 삭제 완료. path : {}", event.filePath());
+            s3FileHandler.deleteFile(event.fullPath());
+            log.info("S3EventListener.handleDeleteEvent : 기존 S3 파일 삭제 완료. path : {}", event.fullPath());
         } catch (Exception e) {
-            log.error("S3EventListener.handleDeleteEvent : 기존 파일 삭제 실패 (S3 고아 객체 발생). path : {}", event.filePath(), e);
+            log.error("S3EventListener.handleDeleteEvent : 기존 파일 삭제 실패 (S3 고아 객체 발생). path : {}", event.fullPath(), e);
         }
     }
 }
