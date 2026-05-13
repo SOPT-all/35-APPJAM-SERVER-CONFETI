@@ -119,9 +119,7 @@ class AdminFacadeDeleteTest {
 
         ArgumentCaptor<S3FileDeleteEvent> captor = ArgumentCaptor.forClass(S3FileDeleteEvent.class);
         verify(eventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().folderPath()).isEqualTo(
-            FolderPath.combine(FolderPath.CONCERT, FolderPath.POSTER));
-        assertThat(captor.getValue().filePath()).isEqualTo("poster.png");
+        assertThat(captor.getValue().fullPath()).isEqualTo("poster.png");
     }
 
     @Test
@@ -147,16 +145,10 @@ class AdminFacadeDeleteTest {
         ArgumentCaptor<S3FileDeleteEvent> captor = ArgumentCaptor.forClass(S3FileDeleteEvent.class);
         verify(eventPublisher, org.mockito.Mockito.times(2)).publishEvent(captor.capture());
         assertThat(captor.getAllValues())
-            .extracting(S3FileDeleteEvent::folderPath, S3FileDeleteEvent::filePath)
+            .extracting(S3FileDeleteEvent::fullPath)
             .containsExactlyInAnyOrder(
-                org.assertj.core.groups.Tuple.tuple(
-                    FolderPath.combine(FolderPath.FESTIVAL, FolderPath.POSTER),
-                    "poster.png"
-                ),
-                org.assertj.core.groups.Tuple.tuple(
-                    FolderPath.combine(FolderPath.FESTIVAL, FolderPath.LOGO),
-                    "logo.png"
-                )
+                "poster.png",
+                "logo.png"
             );
     }
 }

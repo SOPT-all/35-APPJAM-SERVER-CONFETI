@@ -253,7 +253,7 @@ class AdminFacadeUpdateTest {
         assertThat(response.concertId()).isEqualTo(concertId);
         verify(eventPublisher, never()).publishEvent(org.mockito.ArgumentMatchers.<Object>argThat(
             event -> event instanceof org.sopt.confeti.global.event.S3FileDeleteEvent s3Event
-                && "new-poster.png".equals(s3Event.filePath())
+                && "new-poster.png".equals(s3Event.fullPath())
         ));
     }
 
